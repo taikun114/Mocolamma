@@ -1,0 +1,137 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.93512,0.93512,0.93512,1.00000",
+      "srgb:0.85523,0.85523,0.85523,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "Eyes@2x.png",
+          "name" : "Eyes@2x"
+        }
+      ],
+      "position" : {
+        "scale" : 1.25,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : 1,
+      "layers" : [
+        {
+          "image-name" : "Face@2x.png",
+          "name" : "Face@2x"
+        }
+      ],
+      "lighting" : "individual",
+      "opacity-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : 0.9
+        }
+      ],
+      "position" : {
+        "scale" : 1.25,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "image-name" : "Ears@2x.png",
+          "name" : "Ears@2x",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 1
+            }
+          ]
+        }
+      ],
+      "opacity-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : 0.75
+        }
+      ],
+      "position" : {
+        "scale" : 1.25,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "Tool@2x.png",
+          "name" : "Tool@2x"
+        }
+      ],
+      "position" : {
+        "scale" : 1.25,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

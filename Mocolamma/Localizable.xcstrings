@@ -533,6 +533,12 @@
         }
       }
     },
+    "Settings" : {
+
+    },
+    "Settings content will go here." : {
+
+    },
     "Size" : {
       "localizations" : {
         "en" : {
