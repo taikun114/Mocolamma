@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%.1f%% completed (%@ / %@)" : {
+      "comment" : "Download progress format string. Example: '50.0% completed (100MB / 200MB)'",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$.1f%% completed (%2$@ / %3$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% 完了 (%2$@ / %3$@)"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -48,6 +65,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新規追加"
+          }
+        }
+      }
+    },
+    "Are you sure you want to delete model '%@'?\nThis action cannot be undone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete model '%@'?\nThis action cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%@」を削除してもよろしいですか？この操作は元に戻せません。"
           }
         }
       }
@@ -180,8 +213,21 @@
         }
       }
     },
-    "e.g., llama3, mistral" : {
-
+    "e.g., gemma3:4b, phi4:latest" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g., gemma3:4b, phi4:latest"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: gemma3:4b、phi4:latestなど"
+          }
+        }
+      }
     },
     "Enter the name of the model you want to add." : {
       "localizations" : {
@@ -243,22 +289,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "形式: %@"
-          }
-        }
-      }
-    },
-    "Model Details" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model Details"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルの詳細"
           }
         }
       }
@@ -339,22 +369,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名前"
-          }
-        }
-      }
-    },
-    "Name:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名前:"
           }
         }
       }

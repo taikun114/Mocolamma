@@ -1,4 +1,3 @@
-// OllamaModel.swift
 import Foundation
 
 /// Ollama APIの /api/tags エンドポイントから返されるモデル詳細の内部構造体
@@ -15,7 +14,7 @@ struct OllamaModelDetails: Codable, Hashable {
 struct OllamaModel: Identifiable, Hashable, Codable {
     let id = UUID() // テーブルビューで各行を一意に識別するためのID (Codableの対象外)
     var originalIndex: Int = 0 // 新しく追加: 元のリスト順のインデックス (Codableの対象外)
-    
+
     let name: String
     let model: String // name と同じ値だが、APIレスポンスに含まれるため保持
     let modified_at: String // ISO 8601形式の文字列
@@ -32,7 +31,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         case digest
         case details
     }
-    
+
     // Decodable のカスタムイニシャライザ
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -42,7 +41,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.size = try container.decode(Int64.self, forKey: .size)
         self.digest = try container.decode(String.self, forKey: .digest)
         self.details = try container.decodeIfPresent(OllamaModelDetails.self, forKey: .details)
-        
+
         // originalIndex は API レスポンスに含まれないため、ここでは初期化しない
         // CommandExecutor で API 応答後に設定する
         self.originalIndex = 0 // デフォルト値
@@ -63,7 +62,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
         return formatter.date(from: modified_at) ?? Date.distantPast
     }
-    
+
     /// サイズを判読可能な文字列に変換するヘルパー
     var formattedSize: String {
         let byteCountFormatter = ByteCountFormatter()

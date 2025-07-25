@@ -261,7 +261,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     }
                     
                     if self.pullTotal > 0 {
-                        self.pullProgress = Double(self.pullCompleted) / Double(self.pullTotal)
+                        var calculatedProgress = Double(self.pullCompleted) / Double(self.pullTotal)
+                        // 進捗値を0.0から1.0の間にクランプします
+                        calculatedProgress = min(max(0.0, calculatedProgress), 1.0)
+                        self.pullProgress = calculatedProgress
                     } else {
                         self.pullProgress = 0.0
                     }

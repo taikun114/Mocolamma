@@ -1,18 +1,17 @@
-// ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var executor = CommandExecutor() // CommandExecutorのインスタンス
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     @State private var sidebarSelection: String? = "models" // サイドバーの選択状態を保持します
-    
+
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトでは全てのカラムを表示
 
     @State private var showingAddSheet = false // モデル追加シートの表示/非表示を制御します
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
-    
+
     // ソート順を保持するState変数 (ModelListViewにバインディングとして渡します)
     @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
         .init(\.originalIndex, order: .forward)
@@ -63,7 +62,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddSheet) { // シートの表示は ContentView が管理
             AddModelsSheet(showingAddSheet: $showingAddSheet, executor: executor)
         }
-        .alert("Delete Model", isPresented: $showingDeleteConfirmation, presenting: modelToDelete) { model in // 削除確認アラートは ContentView が管理
+        .alert("Delete Model", isPresented: $showingDeleteConfirmation, presenting: modelToDelete) { model in // 削除確認アラートのタイトル。
             Button("Delete", role: .destructive) { // アラートの削除ボタン。
                 if let modelName = model?.name {
                     Task {
@@ -75,7 +74,8 @@ struct ContentView: View {
                 modelToDelete = nil
             }
         } message: { model in
-            Text(String(format: "Are you sure you want to delete model '%@'?\nThis action cannot be undone.", model?.name ?? "Unknown Model")) // モデル削除の確認メッセージ。 // 不明なモデル。
+            // String Catalogで認識されるように修正
+            Text("Are you sure you want to delete model '\(model?.name ?? "Unknown Model")'?\nThis action cannot be undone.")
         }
         .onAppear {
             // アプリ起動時に「Models」をデフォルトで選択状態にします
@@ -89,7 +89,7 @@ extension Color {
     static let textEditorBackground = Color(NSColor.textBackgroundColor)
 }
 
-// MARK: - モデル追加シート (変更なし)
+// MARK: - モデル追加シート
 
 struct AddModelsSheet: View {
     @Binding var showingAddSheet: Bool
@@ -107,16 +107,16 @@ struct AddModelsSheet: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            TextField("e.g., llama3, mistral", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
+            TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal)
-            
+
             HStack {
                 Button("Cancel") { // キャンセルボタンのテキスト。
                     showingAddSheet = false
                 }
                 .keyboardShortcut(.cancelAction) // Escキーでキャンセル
-                
+
                 Button("Add") { // 追加ボタンのテキスト。
                     if !modelNameInput.isEmpty {
                         executor.pullModel(modelName: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -132,14 +132,15 @@ struct AddModelsSheet: View {
     }
 }
 
-// MARK: - モデル詳細ビュー (変更なし)
+// MARK: - モデル詳細ビュー
 
 struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
     let model: OllamaModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Model Details") // モデル詳細のタイトル。
+            // タイトルをモデルの名前に変更
+            Text(model.name) // モデル詳細のタイトルをモデル名に変更。
                 .font(.title2)
                 .bold()
                 .padding(.bottom, 5)
@@ -147,11 +148,12 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
             Divider()
 
             Group {
-                HStack {
-                    Text("Name:") // 名前。
-                        .bold()
-                    Text(model.name)
-                }
+                // 名前欄を削除（タイトルで表示されるため）
+                // HStack {
+                //     Text("Name:") // 名前。
+                //         .bold()
+                //     Text(model.name)
+                // }
                 HStack {
                     Text("Model Name:") // モデル名。
                         .bold()
@@ -211,7 +213,7 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
             }
-            
+
             Spacer()
         }
         .padding()

@@ -8,7 +8,7 @@ struct MocolammaApp: App {
             ContentView()
         }
         .windowStyle(.titleBar) // 標準的なタイトルバーを使用します
-        .windowToolbarStyle(.unifiedCompact) // ツールバーのスタイルをコンパクトにします
+        // .windowToolbarStyle(.unifiedCompact) // ツールバーのスタイルをコンパクトにします (ユーザーの要望により削除)
         .windowResizability(.contentMinSize) // ウィンドウの最小サイズをコンテンツに基づいて設定します
         .commands {
             // アプリケーションメニューのコマンドをカスタマイズしたい場合にここに記述します

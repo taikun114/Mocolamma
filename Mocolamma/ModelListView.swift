@@ -1,4 +1,3 @@
-// ModelListView.swift
 import SwiftUI
 import AppKit // NSPasteboard のため
 
@@ -6,7 +5,7 @@ struct ModelListView: View {
     @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
-    
+
     @Binding var showingAddSheet: Bool // モデル追加シートの表示/非表示を制御するバインディング
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
@@ -88,33 +87,14 @@ struct ModelListView: View {
                 }
             }
             // プログレスバーとステータステキスト
+            // PullProgressViewを抽出して型チェックの負担を軽減
             if executor.isPulling {
-                VStack {
-                    ProgressView(value: executor.pullProgress) {
-                        Text(executor.pullStatus)
-                    } currentValueLabel: {
-                        Text(String(format: "%.1f%% completed (%@ / %@)",
-                            executor.pullProgress * 100,
-                            ByteCountFormatter().string(fromByteCount: executor.pullCompleted),
-                            ByteCountFormatter().string(fromByteCount: executor.pullTotal))) // ダウンロード進捗: 完了/合計。
-                    }
-                    .progressViewStyle(.linear)
-                }
-                .padding()
+                PullProgressView(executor: executor)
             }
 
             // コマンド実行の出力表示（以前のTextEditor）
-            TextEditor(text: .constant(executor.output))
-                .font(.footnote)
-                .frame(height: 80) // 高さを制限します
-                .padding(.horizontal)
-                .scrollContentBackground(.hidden) // macOS 13以降で背景を隠します
-                .background(Color.textEditorBackground) // カスタム背景色
-                .cornerRadius(5) // 角を丸くします
-                .padding([.horizontal, .bottom])
-                .onChange(of: executor.output) { oldValue, newValue in // デバッグ用: 出力の変更を監視します
-                    print("Executor Output Changed (first 100 chars): \(newValue.prefix(100))...")
-                }
+            // OutputTextViewを抽出して型チェックの負担を軽減
+            OutputTextView(executor: executor)
         }
         .navigationTitle("Models") // ナビゲーションタイトル: モデル。
         .toolbar { // ここで全てのToolbarItemをまとめます
@@ -149,6 +129,50 @@ struct ModelListView: View {
         }
     }
 }
+
+// MARK: - PullProgressView (抽出されたサブビュー)
+struct PullProgressView: View {
+    @ObservedObject var executor: CommandExecutor
+
+    var body: some View {
+        VStack {
+            ProgressView(value: executor.pullProgress) {
+                Text(executor.pullStatus)
+            } currentValueLabel: {
+                // String Catalogで認識されるようにNSLocalizedStringを使用してフォーマット文字列を取得し、String(format:)で適用します。
+                // CVarArgへの明示的なキャストにより、コンパイラの型推論を助けます。
+                let formatString = NSLocalizedString("%.1f%% completed (%@ / %@)", comment: "Download progress format string. Example: '50.0% completed (100MB / 200MB)'")
+                
+                Text(String(format: formatString,
+                            executor.pullProgress * 100 as CVarArg,
+                            ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                            ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+            }
+            .progressViewStyle(.linear)
+        }
+        .padding()
+    }
+}
+
+// MARK: - OutputTextView (抽出されたサブビュー)
+struct OutputTextView: View {
+    @ObservedObject var executor: CommandExecutor
+
+    var body: some View {
+        TextEditor(text: .constant(executor.output))
+            .font(.footnote)
+            .frame(height: 80) // 高さを制限します
+            .padding(.horizontal)
+            .scrollContentBackground(.hidden) // macOS 13以降で背景を隠します
+            .background(Color.textEditorBackground) // カスタム背景色
+            .cornerRadius(5) // 角を丸くします
+            .padding([.horizontal, .bottom])
+            .onChange(of: executor.output) { oldValue, newValue in // デバッグ用: 出力の変更を監視します
+                print("Executor Output Changed (first 100 chars): \(newValue.prefix(100))...")
+            }
+    }
+}
+
 
 // SwiftUIのプレビュー用
 struct ModelListView_Previews: PreviewProvider {
