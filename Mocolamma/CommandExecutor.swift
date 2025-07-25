@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI // @Published を使うため
+import Combine // CombineフレームワークをインポートしてPublisherを購読可能にする
 
 @preconcurrency @MainActor // @preconcurrency を追加して、URLSessionDelegateのデリゲートメソッドに関する警告を抑制します
 class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessionDataDelegate {
@@ -18,19 +19,52 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
 
-    override init() {
+    // Ollama APIのベースURL
+    // ServerManagerから現在のサーバーホストを受け取るように変更
+    @Published var apiBaseURL: String
+
+    private var cancellables = Set<AnyCancellable>() // ServerManagerの変更を監視するためのSet
+
+    /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
+    /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
+    init(serverManager: ServerManager) {
+        // 初期化時にServerManagerから現在のホストURLを設定
+        self.apiBaseURL = serverManager.currentServerHost
         super.init()
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
         // デリゲートメソッド内で @MainActor への切り替えをTask { @MainActor in ... } で明示的に行います
         let configuration = URLSessionConfiguration.default
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+
+        // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
+        serverManager.$servers
+            .map { servers in
+                // serversリストが変更された場合、selectedServerIDに基づき新しいcurrentServerHostを計算
+                // selectedServerIDがない場合や、対応するサーバーがserversにない場合を考慮
+                if let selectedID = serverManager.selectedServerID,
+                   let selectedServer = servers.first(where: { $0.id == selectedID }) {
+                    return selectedServer.host
+                }
+                // デフォルトのフォールバック
+                return servers.first?.host ?? "localhost:11434"
+            }
+            .assign(to: \.apiBaseURL, on: self)
+            .store(in: &cancellables)
+
+        serverManager.$selectedServerID
+            .compactMap { selectedID in
+                // selectedServerIDが変更された場合、対応するサーバーのホストを返す
+                serverManager.servers.first(where: { $0.id == selectedID })?.host
+            }
+            .assign(to: \.apiBaseURL, on: self)
+            .store(in: &cancellables)
     }
 
     /// Ollama APIからモデルリストを取得します (async/await版)
     func fetchOllamaModelsFromAPI() async {
-        print("Fetching Ollama API models...")
+        print("Fetching Ollama API models from \(apiBaseURL)...")
         // UI更新はメインアクターで行います
-        self.output = "Fetching models from API..." // APIからモデルを取得中のステータスメッセージ。
+        self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "APIからモデルを取得中のステータスメッセージ。"), apiBaseURL)
         self.isRunning = true
 
         // defer を使って関数終了時に必ず isRunning を false に設定します
@@ -38,8 +72,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.isRunning = false
         }
 
-        guard let url = URL(string: "http://localhost:11434/api/tags") else {
-            self.output = "Error: Invalid API URL." // 無効なAPI URLのエラーメッセージ。
+        guard let url = URL(string: "http://\(apiBaseURL)/api/tags") else {
+            self.output = NSLocalizedString("Error: Invalid API URL.", comment: "無効なAPI URLのエラーメッセージ。")
             return
         }
 
@@ -47,13 +81,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             let (data, response) = try await URLSession.shared.data(from: url)
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                self.output = "API Error: Unknown response type." // 不明なAPIレスポンスタイプのエラーメッセージ。
+                self.output = NSLocalizedString("API Error: Unknown response type.", comment: "不明なAPIレスポンスタイプのエラーメッセージ。")
                 print("API Error: Invalid response type.")
                 return
             }
 
             guard httpResponse.statusCode == 200 else {
-                let statusMessage = String(format: "API Error: HTTP Status Code %d", httpResponse.statusCode) // HTTPステータスコードのエラーメッセージ。
+                let statusMessage = String(format: NSLocalizedString("API Error: HTTP Status Code %d", comment: "HTTPステータスコードのエラーメッセージ。"), httpResponse.statusCode)
                 self.output = statusMessage
                 print("API Error: HTTP Status Code \(httpResponse.statusCode)")
                 if let errorString = String(data: data, encoding: .utf8) {
@@ -70,12 +104,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 mutableModel.originalIndex = index
                 return mutableModel
             }
-            let successMessage = String(format: "Successfully fetched models. Total: %d", self.models.count) // モデル取得成功のメッセージ。
+            let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "モデル取得成功のメッセージ。"), self.models.count)
             self.output = successMessage
             print("Models fetched successfully. Total: \(self.models.count)")
 
         } catch let decodingError as DecodingError {
-            self.output = "API Decode Error: " + decodingError.localizedDescription // APIデコードエラーのプレフィックス。
+            self.output = NSLocalizedString("API Decode Error: ", comment: "APIデコードエラーのプレフィックス。") + decodingError.localizedDescription
             print("API Decode Error: \(decodingError.localizedDescription)")
 
             switch decodingError {
@@ -96,24 +130,24 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
 
         } catch {
-            self.output = "API Request Error: " + error.localizedDescription // APIリクエストエラーのプレフィックス。
+            self.output = NSLocalizedString("API Request Error: ", comment: "APIリクエストエラーのプレフィックス。") + error.localizedDescription
             print("API Request Error (other): \(error.localizedDescription)")
         }
     }
 
     /// モデルをダウンロードします (デリゲートを使用するため async化はしませんが、UI更新は @MainActor にディスパッチします)
     func pullModel(modelName: String) {
-        print("Attempting to pull model: \(modelName)")
+        print("Attempting to pull model: \(modelName) from \(apiBaseURL)")
         // UI更新はメインアクターで行います
-        self.output = String(format: "Downloading model '%@'...", modelName) // モデルダウンロード中のステータスメッセージ。
+        self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "モデルダウンロード中のステータスメッセージ。"), modelName, apiBaseURL)
         self.isPulling = true
-        self.pullStatus = "Preparing..." // プルステータス: 準備中。
+        self.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
         self.pullProgress = 0.0
         self.pullTotal = 0
         self.pullCompleted = 0
 
-        guard let url = URL(string: "http://localhost:11434/api/pull") else {
-            self.output = "Error: Invalid API URL for pull." // プル用API URLが無効な場合のエラーメッセージ。
+        guard let url = URL(string: "http://\(apiBaseURL)/api/pull") else {
+            self.output = NSLocalizedString("Error: Invalid API URL for pull.", comment: "プル用API URLが無効な場合のエラーメッセージ。")
             self.isPulling = false
             return
         }
@@ -126,7 +160,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         } catch {
-            self.output = "Error: Failed to serialize pull request body: " + error.localizedDescription // プルリクエストボディのシリアライズ失敗のエラーメッセージ。
+            self.output = NSLocalizedString("Error: Failed to serialize pull request body: ", comment: "プルリクエストボディのシリアライズ失敗のエラーメッセージ。") + error.localizedDescription
             self.isPulling = false
             return
         }
@@ -138,15 +172,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
 
     /// モデルを削除します
     func deleteModel(modelName: String) async {
-        print("Attempting to delete model: \(modelName)")
+        print("Attempting to delete model: \(modelName) from \(apiBaseURL)")
         // UI更新はメインアクターで行います
-        self.output = String(format: "Deleting model '%@'...", modelName) // モデル削除中のステータスメッセージ。
+        self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "モデル削除中のステータスメッセージ。"), modelName, apiBaseURL)
         self.isRunning = true
 
         defer { self.isRunning = false }
 
-        guard let url = URL(string: "http://localhost:11434/api/delete") else {
-            self.output = "Error: Invalid API URL for delete." // 削除用API URLが無効な場合のエラーメッセージ。
+        guard let url = URL(string: "http://\(apiBaseURL)/api/delete") else {
+            self.output = NSLocalizedString("Error: Invalid API URL for delete.", comment: "削除用API URLが無効な場合のエラーメッセージ。")
             return
         }
 
@@ -158,7 +192,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         } catch {
-            self.output = "Error: Failed to serialize request body: " + error.localizedDescription // リクエストボディのシリアライズ失敗のエラーメッセージ。
+            self.output = NSLocalizedString("Error: Failed to serialize request body: ", comment: "リクエストボディのシリアライズ失敗のエラーメッセージ。") + error.localizedDescription
             return
         }
         
@@ -166,28 +200,55 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             let (data, response) = try await URLSession.shared.data(for: request)
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                self.output = "Delete Error: Unknown response type." // 削除エラー: 不明なレスポンスタイプのエラーメッセージ。
+                self.output = NSLocalizedString("Delete Error: Unknown response type.", comment: "削除エラー: 不明なレスポンスタイプのエラーメッセージ。")
                 print("Delete Error: Unknown response type.")
                 return
             }
 
             if httpResponse.statusCode == 200 {
-                self.output = String(format: "Successfully deleted model '%@'.", modelName) // モデル削除成功のメッセージ。
-                print("Model '\(modelName)' deleted successfully.")
+                self.output = String(format: NSLocalizedString("Successfully deleted model '%@' from %@.", comment: "モデル削除成功のメッセージ。"), modelName, apiBaseURL)
+                print("Model '\(modelName)' deleted successfully from \(apiBaseURL).")
                 await self.fetchOllamaModelsFromAPI() // メインアクターで実行されるasync関数なので直接呼び出し可能です
 
             } else if httpResponse.statusCode == 404 {
-                self.output = String(format: "Delete Error: Model '%@' not found (404 Not Found).", modelName) // 削除エラー: モデルが見つからない場合のエラーメッセージ。
-                print("Delete Error: Model '\(modelName)' not found (404).")
+                self.output = String(format: NSLocalizedString("Delete Error: Model '%@' not found (404 Not Found) on %@.", comment: "削除エラー: モデルが見つからない場合のエラーメッセージ。"), modelName, apiBaseURL)
+                print("Delete Error: Model '\(modelName)' not found (404) on \(apiBaseURL).")
             } else {
-                let errorString = String(data: data, encoding: .utf8) ?? "No data available" // データなし。
-                let errorMessage = String(format: "Delete Error: HTTP Status Code %d - %@", httpResponse.statusCode, errorString) // 削除エラー: HTTPステータスコードのエラーメッセージ。
+                let errorString = String(data: data, encoding: .utf8) ?? NSLocalizedString("No data available", comment: "データなし。")
+                let errorMessage = String(format: NSLocalizedString("Delete Error: HTTP Status Code %d - %@ on %@", comment: "削除エラー: HTTPステータスコードのエラーメッセージ。"), httpResponse.statusCode, errorString, apiBaseURL)
                 self.output = errorMessage
-                print("Delete Error: HTTP Status Code \(httpResponse.statusCode) - \(errorString)")
+                print("Delete Error: HTTP Status Code \(httpResponse.statusCode) - \(errorString) on \(apiBaseURL)")
             }
         } catch {
-            self.output = "Model deletion failed: " + error.localizedDescription // モデル削除失敗のプレフィックス。
+            self.output = NSLocalizedString("Model deletion failed: ", comment: "モデル削除失敗のプレフィックス。") + error.localizedDescription
             print("Model delete failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// 指定されたホストにOllama APIが接続可能かを確認します。
+    /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
+    /// - Returns: 接続に成功した場合はtrue、それ以外はfalse。
+    func checkAPIConnectivity(host: String) async -> Bool {
+        guard let url = URL(string: "http://\(host)/api/tags") else {
+            print("Connectivity Check Error: Invalid URL for host \(host)") // 接続確認エラー: ホストのURLが無効です。
+            return false
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD" // HEADリクエストでヘッダーのみを取得し、高速化と帯域幅の節約を図る
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("Connectivity Check: Successfully connected to \(host)") // 接続確認: 接続成功。
+                return true
+            } else {
+                print("Connectivity Check: Failed to connect to \(host) - HTTP Status Code: \((response as? HTTPURLResponse)?.statusCode ?? -1)") // 接続確認: 接続失敗 - HTTPステータスコード。
+                return false
+            }
+        } catch {
+            print("Connectivity Check Error for \(host): \(error.localizedDescription)") // 接続確認エラー。
+            return false
         }
     }
 
@@ -208,9 +269,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 return
             }
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                self.output = String(format: "Model pull error: HTTP Status Code %d", (response as? HTTPURLResponse)?.statusCode ?? -1) // モデルプルエラー: HTTPステータスコード。
+                self.output = String(format: NSLocalizedString("Model pull error: HTTP Status Code %d", comment: "モデルプルエラー: HTTPステータスコード。"), (response as? HTTPURLResponse)?.statusCode ?? -1)
                 self.isPulling = false
-                self.pullStatus = "Error" // プルステータス: エラー。
+                self.pullStatus = NSLocalizedString("Error", comment: "プルステータス: エラー。")
                 completionHandler(.cancel)
                 return
             }
@@ -227,7 +288,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             if let newString = String(data: data, encoding: .utf8) {
                 self.pullLineBuffer.append(newString)
             } else {
-                print("Error: Could not decode incoming data as UTF-8 string.") // エラー: 受信データをUTF-8文字列としてデコードできませんでした。
+                print(NSLocalizedString("Error: Could not decode incoming data as UTF-8 string.", comment: "エラー: 受信データをUTF-8文字列としてデコードできませんでした。"))
                 return
             }
             
@@ -245,7 +306,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             for line in lines {
                 guard !line.isEmpty else { continue } // 空行はスキップします
                 guard let jsonData = line.data(using: .utf8) else {
-                    print("Error: Could not convert line to Data: \(line)") // エラー: 行をDataに変換できませんでした。
+                    print(String(format: NSLocalizedString("Error: Could not convert line to Data: %@", comment: "エラー: 行をDataに変換できませんでした。"), line))
                     continue
                 }
 
@@ -269,12 +330,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         self.pullProgress = 0.0
                     }
                     
-                    print("Pull Status: \(self.pullStatus), Completed: \(self.pullCompleted), Total: \(self.pullTotal), Progress: \(self.pullProgress)") // プルステータス、完了、合計、進捗
+                    print(String(format: NSLocalizedString("Pull Status: %@, Completed: %lld, Total: %lld, Progress: %.2f", comment: "プルステータス、完了、合計、進捗"), self.pullStatus, self.pullCompleted, self.pullTotal, self.pullProgress))
                 } catch {
                     if let debugString = String(data: jsonData, encoding: .utf8) {
-                        print("Error decoding pull stream JSON: \(error.localizedDescription) - Line: \(debugString)") // プルストリームJSONのデコードエラー。
+                        print(String(format: NSLocalizedString("Error decoding pull stream JSON: %@ - Line: %@", comment: "プルストリームJSONのデコードエラー。"), error.localizedDescription, debugString))
                     } else {
-                        print("Error decoding pull stream JSON: \(error.localizedDescription) - Line data unreadable.") // プルストリームJSONのデコードエラー。行データが読み取り不能です。
+                        print(NSLocalizedString("Error decoding pull stream JSON: %@ - Line data unreadable.", comment: "プルストリームJSONのデコードエラー。行データが読み取り不能です。"))
                     }
                 }
             }
@@ -289,16 +350,16 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.pullLineBuffer = ""
 
             if let error = error {
-                self.output = "Model pull failed: " + error.localizedDescription // モデルプルの失敗プレフィックス。
+                self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
                 self.isPulling = false
-                self.pullStatus = "Failed" // プルステータス: 失敗。
-                print("Model pull failed with error: \(error.localizedDescription)") // モデルプルがエラーで失敗しました。
+                self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
+                print(String(format: NSLocalizedString("Model pull failed with error: %@", comment: "モデルプルがエラーで失敗しました。"), error.localizedDescription))
             } else {
-                self.output = "Model pull completed: " + self.pullStatus // モデルプルの完了プレフィックス。
+                self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
                 self.isPulling = false
                 self.pullProgress = 1.0
-                self.pullStatus = "Completed" // プルステータス: 完了。
-                print("Model pull completed.") // モデルプルが完了しました。
+                self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
+                print(NSLocalizedString("Model pull completed.", comment: "モデルプルが完了しました。"))
                 // モデルリストを更新するために API から再取得します
                 await self.fetchOllamaModelsFromAPI()
             }

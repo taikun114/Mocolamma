@@ -159,8 +159,12 @@ struct ModelListView: View {
 
 // 新しいプレビューマクロを使用し、ダミーのBindingを直接渡す
 #Preview {
-    ModelListView(
-        executor: CommandExecutor(), // ダミーのCommandExecutorインスタンス
+    // プレビュー用にダミーのServerManagerインスタンスを作成
+    let previewServerManager = ServerManager()
+    let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
+
+    return ModelListView(
+        executor: previewCommandExecutor, // ダミーのCommandExecutorインスタンス
         selectedModel: .constant(nil), // ダミーのBinding<OllamaModel.ID?>
         sortOrder: .constant([.init(\.originalIndex, order: .forward)]), // ダミーのBinding<[KeyPathComparator<OllamaModel>]>
         showingAddSheet: .constant(false), // ダミーのBinding<Bool>

@@ -1,22 +1,26 @@
 import SwiftUI
 
+// MARK: - メインアプリケーション構造
+
+/// アプリケーションの起動ポイントとなる基本ファイルです。
+/// ウィンドウのタイトルやスタイルなどの初期設定を行い、
+/// アプリケーションのメインコンテンツビューであるContentViewをホストします。
 @main
 struct MocolammaApp: App {
+    // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
+    // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
+    @StateObject private var serverManager = ServerManager()
+
     var body: some Scene {
         // WindowGroup の初期化時に文字列を渡すことで、ウィンドウタイトルを設定します
         WindowGroup("Models") { // モデル
-            ContentView()
+            // ContentViewにServerManagerのインスタンスを渡します
+            ContentView(serverManager: serverManager)
         }
         .windowStyle(.titleBar) // 標準的なタイトルバーを使用します
         .windowResizability(.contentMinSize) // ウィンドウの最小サイズをコンテンツに基づいて設定します
-        .commands {
-            // アプリケーションメニューのコマンドをカスタマイズしたい場合にここに記述します
-            // Settings シーンが自動的に「Settings...」メニュー項目を提供するので、
-            // ここでCommandGroup(replacing: .appSettings)は不要になります。
-        }
-
-        // macOSアプリの設定ウィンドウには、専用のSettingsシーンを使用します。
-        // これにより、自動的にアプリケーションメニューに「設定...」項目が追加されます。
+        
+        // 設定ウィンドウを定義します。macOSの標準的な「設定...」メニュー項目を自動で提供します。
         Settings {
             SettingsView()
         }

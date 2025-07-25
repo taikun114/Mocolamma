@@ -1,0 +1,27 @@
+import Foundation
+
+// MARK: - サーバー情報モデル
+
+/// Ollamaサーバーの接続情報を表すデータモデルです。
+/// Identifiable, Codable, Equatable に準拠し、リスト表示や永続化を可能にします。
+struct ServerInfo: Identifiable, Codable, Equatable {
+    let id: UUID // 各サーバーを一意に識別するためのID
+    var name: String // サーバーの表示名
+    var host: String // サーバーのホストURL (例: "localhost:11434" または "192.168.1.50:11434")
+
+    /// 新しいServerInfoインスタンスを初期化します。
+    /// - Parameters:
+    ///   - id: サーバーの一意なID。デフォルトで新しいUUIDが生成されます。
+    ///   - name: サーバーの表示名。
+    ///   - host: サーバーのホストURL。
+    init(id: UUID = UUID(), name: String, host: String) {
+        self.id = id
+        self.name = name
+        self.host = host
+    }
+
+    // Equatableプロトコルの実装（IDとホストで比較）
+    static func == (lhs: ServerInfo, rhs: ServerInfo) -> Bool {
+        lhs.id == rhs.id && lhs.host == rhs.host
+    }
+}
