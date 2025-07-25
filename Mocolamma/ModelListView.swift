@@ -1,6 +1,12 @@
 import SwiftUI
 import AppKit // NSPasteboard のため
 
+// MARK: - モデルリストビュー
+
+/// モデルのテーブル表示、ダウンロード進捗ゲージ、APIログ表示、
+/// および再読み込み・モデル追加用のツールバーボタンなど、
+/// モデルリストに関連するUIとロジックをカプセル化したビューです。
+/// ContentViewから必要なデータとバインディングを受け取って表示を更新します。
 struct ModelListView: View {
     @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
@@ -149,25 +155,17 @@ struct ModelListView: View {
     }
 }
 
-// SwiftUIのプレビュー用
-struct ModelListView_Previews: PreviewProvider {
-    @State static var selectedModel: OllamaModel.ID? = nil
-    @State static var sortOrder: [KeyPathComparator<OllamaModel>] = [.init(\.originalIndex, order: .forward)]
-    @State static var showingAddSheet = false
-    @State static var showingDeleteConfirmation = false
-    @State static var modelToDelete: OllamaModel? = nil // @State static var を使用
+// MARK: - プレビュー用
 
-    static var previews: some View {
-        ModelListView(
-            executor: CommandExecutor(),
-            selectedModel: $selectedModel,
-            sortOrder: $sortOrder,
-            showingAddSheet: $showingAddSheet,
-            showingDeleteConfirmation: $showingDeleteConfirmation,
-            modelToDelete: $modelToDelete, // ここを修正: Bindingとして渡す
-            onTogglePreview: { // PreviewProviderでもダミーのクロージャを渡す
-                print("ModelListView_Previews: Dummy onTogglePreview called.")
-            }
-        )
-    }
+// 新しいプレビューマクロを使用し、ダミーのBindingを直接渡す
+#Preview {
+    ModelListView(
+        executor: CommandExecutor(), // ダミーのCommandExecutorインスタンス
+        selectedModel: .constant(nil), // ダミーのBinding<OllamaModel.ID?>
+        sortOrder: .constant([.init(\.originalIndex, order: .forward)]), // ダミーのBinding<[KeyPathComparator<OllamaModel>]>
+        showingAddSheet: .constant(false), // ダミーのBinding<Bool>
+        showingDeleteConfirmation: .constant(false), // ダミーのBinding<Bool>
+        modelToDelete: .constant(nil), // ダミーのBinding<OllamaModel?>
+        onTogglePreview: { print("ModelListView_Previews: Dummy onTogglePreview called.") } // ダミーのクロージャ
+    )
 }

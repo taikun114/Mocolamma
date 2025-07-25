@@ -309,6 +309,9 @@
         }
       }
     },
+    "General settings will go here." : {
+
+    },
     "Model Name:" : {
       "localizations" : {
         "en" : {
@@ -517,6 +520,9 @@
         }
       }
     },
+    "Select a category from the sidebar." : {
+
+    },
     "Select a model to view details." : {
       "localizations" : {
         "en" : {
@@ -533,10 +539,23 @@
         }
       }
     },
-    "Settings" : {
-
+    "Server" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー"
+          }
+        }
+      }
     },
-    "Settings content will go here." : {
+    "Server content will go here." : {
 
     },
     "Size" : {

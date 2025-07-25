@@ -2,7 +2,8 @@ import SwiftUI
 
 // MARK: - モデル詳細ビュー
 
-struct ModelDetailsView: View {
+/// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
+struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
     let model: OllamaModel
 
     var body: some View {

@@ -1,13 +1,14 @@
 import SwiftUI
 
-// 自動でインポートされるため、個別のビューファイルのインポートは不要です。
-// import AddModelsSheet
-// import ModelDetailsView
-
+// ContentViewは、アプリのメインウィンドウを構成するSwiftUIビューです。
+// NavigationSplitViewを使用して、サイドバー、モデルリスト、およびモデル詳細の3カラムレイアウトを構築します。
+// アプリ全体の状態（選択されたモデル、シート、アラートなど）を管理し、下位ビューにバインディングとして渡します。
+// このファイルは、サイドバーのビュー切り替えと、トップレベルの状態管理に特化しています。
 struct ContentView: View {
     @ObservedObject var executor = CommandExecutor() // CommandExecutorのインスタンス
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
-    @State private var sidebarSelection: String? = "models" // サイドバーの選択状態を保持します
+    // サイドバーの選択状態を保持します。デフォルトを"server"に変更します。
+    @State private var sidebarSelection: String? = "server"
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .detailOnly // デフォルトで詳細パネルを閉じる
@@ -29,36 +30,50 @@ struct ContentView: View {
     var body: some View {
         // NavigationSplitView を使って3カラムレイアウトを構築します
         // sidebar: 左側のナビゲーション (Categories)
-        // content: 中央のコンテンツエリア (Model List)
+        // content: 中央のコンテンツエリア (Model List / Server View)
         // detail: 右側の詳細エリア (Model Details)
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
             // MARK: - サイドバー (左端のカラム)
             List(selection: $sidebarSelection) {
+                // "Server" という項目を"Models"の上に配置し、選択可能にします
+                Label("Server", systemImage: "cloud.fill") // アイコンをcloud.fillに変更
+                    .tag("server")
+
                 // "Models" という項目だけを配置し、選択可能にします
                 Label("Models", systemImage: "tray.full") // アイコンをtray.fullに変更
                     .tag("models")
             }
             .navigationTitle("Categories") // サイドバーのタイトル
         } content: {
-            // MARK: - コンテンツ (中央のカラム: モデルリストとログ)
-            // ModelListView をここに配置し、必要なバインディングを渡します
-            ModelListView(
-                executor: executor,
-                selectedModel: $selectedModel,
-                sortOrder: $sortOrder,
-                showingAddSheet: $showingAddSheet,
-                showingDeleteConfirmation: $showingDeleteConfirmation,
-                modelToDelete: $modelToDelete,
-                onTogglePreview: { // クロージャを渡す
-                    print("ContentView: onTogglePreview received. Current visibility: \(columnVisibility)")
-                    if columnVisibility == .all {
-                        columnVisibility = .detailOnly
-                    } else {
-                        columnVisibility = .all
+            // MARK: - コンテンツ (中央のカラム)
+            // sidebarSelectionに基づいて表示するビューを切り替えます
+            switch sidebarSelection {
+            case "server":
+                ServerView() // 新しいServerViewを表示
+            case "models":
+                ModelListView(
+                    executor: executor,
+                    selectedModel: $selectedModel,
+                    sortOrder: $sortOrder,
+                    showingAddSheet: $showingAddSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    onTogglePreview: { // クロージャを渡す
+                        print("ContentView: onTogglePreview received. Current visibility: \(columnVisibility)")
+                        if columnVisibility == .all {
+                            columnVisibility = .detailOnly
+                        } else {
+                            columnVisibility = .all
+                        }
+                        print("ContentView: New visibility: \(columnVisibility)")
                     }
-                    print("ContentView: New visibility: \(columnVisibility)")
-                }
-            )
+                )
+            default:
+                // デフォルトのビュー、またはエラーメッセージ
+                Text("Select a category from the sidebar.") // サイドバーからカテゴリを選択してください。
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
         } detail: {
             // MARK: - ディテール (右端のカラム: モデル詳細)
             // 選択されたモデルがある場合にのみ詳細を表示します
@@ -73,7 +88,6 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingAddSheet) { // シートの表示は ContentView が管理
-            // AddModelsSheetを直接呼び出す
             AddModelsSheet(showingAddSheet: $showingAddSheet, executor: executor)
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
@@ -99,8 +113,8 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            // アプリ起動時に「Models」をデフォルトで選択状態にします
-            sidebarSelection = "models"
+            // アプリ起動時にデフォルトで「Server」を選択状態にします
+            sidebarSelection = "server"
         }
         .onChange(of: columnVisibility) { oldVal, newVal in
             print("ContentView: columnVisibility changed from \(oldVal) to \(newVal)")
@@ -113,9 +127,9 @@ extension Color {
     static let textEditorBackground = Color(NSColor.textBackgroundColor)
 }
 
-// SwiftUIのプレビュー用
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+// MARK: - プレビュー用
+
+// 新しいプレビューマクロを使用
+#Preview {
+    ContentView()
 }

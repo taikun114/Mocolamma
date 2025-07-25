@@ -1,28 +1,28 @@
 import SwiftUI
 
+// MARK: - 設定ビュー
+
+/// アプリケーションの「設定」ウィンドウのメインUIを定義するSwiftUIビューです。
+/// 現時点ではプレースホルダーのコンテンツのみが含まれており、今後の機能追加のために用意されています。
 struct SettingsView: View {
     var body: some View {
+        // 設定ウィンドウのコンテンツはここに実装されます
         VStack {
-            Image(systemName: "gearshape.fill") // 歯車アイコン
-                .font(.largeTitle)
-                .padding(.bottom, 10)
-
-            Text("Settings") // 設定
-                .font(.title)
-                .bold()
-                .padding(.bottom, 5)
-
-            Text("Settings content will go here.") // 設定のコンテンツはここに表示されます。
-                .font(.headline)
+            Text("General settings will go here.") // 一般設定はここに表示されます。
+                .font(.title2)
                 .foregroundColor(.secondary)
+                .padding()
+            Spacer() // コンテンツが上部に寄るようにSpacerを追加
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // 全体に広がるように設定
-        .navigationTitle("Settings") // ナビゲーションタイトル: 設定。
+        .padding()
+        .frame(minWidth: 500, minHeight: 300) // 設定ウィンドウ全体の最小サイズ
+        // 設定ウィンドウのタイトルはSettingsシーンで設定されるため、navigationTitleはここでは不要です
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-    }
+// MARK: - プレビュー用
+
+// 新しいプレビューマクロを使用
+#Preview {
+    SettingsView()
 }

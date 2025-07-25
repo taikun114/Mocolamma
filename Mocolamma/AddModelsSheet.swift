@@ -2,6 +2,8 @@ import SwiftUI
 
 // MARK: - モデル追加シート
 
+/// 新しいモデルの追加（プル）を行うためのシートビューです。
+/// ユーザーがモデル名を入力し、ダウンロードを開始するためのUIを提供します。
 struct AddModelsSheet: View {
     @Binding var showingAddSheet: Bool
     @ObservedObject var executor: CommandExecutor
@@ -43,9 +45,10 @@ struct AddModelsSheet: View {
     }
 }
 
-struct AddModelsSheet_Previews: PreviewProvider {
-    @State static var showingAddSheet = true
-    static var previews: some View {
-        AddModelsSheet(showingAddSheet: $showingAddSheet, executor: CommandExecutor())
-    }
+// MARK: - プレビュー用
+
+// 新しいプレビューマクロを使用
+#Preview {
+    // プレビュー用にダミーのBindingとObservedObjectを渡す
+    AddModelsSheet(showingAddSheet: .constant(true), executor: CommandExecutor())
 }
