@@ -4,14 +4,14 @@ struct ContentView: View {
     @ObservedObject var executor = CommandExecutor() // CommandExecutorのインスタンス
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     @State private var sidebarSelection: String? = "models" // サイドバーの選択状態を保持します
-
+    
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトでは全てのカラムを表示
 
     @State private var showingAddSheet = false // モデル追加シートの表示/非表示を制御します
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
-
+    
     // ソート順を保持するState変数 (ModelListViewにバインディングとして渡します)
     @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
         .init(\.originalIndex, order: .forward)
@@ -74,8 +74,7 @@ struct ContentView: View {
                 modelToDelete = nil
             }
         } message: { model in
-            // String Catalogで認識されるように修正
-            Text("Are you sure you want to delete model '\(model?.name ?? "Unknown Model")'?\nThis action cannot be undone.")
+            Text("Are you sure you want to delete model '\(model?.name ?? "Unknown Model")'?\nThis action cannot be undone.") // モデル削除の確認メッセージ。 // 不明なモデル。
         }
         .onAppear {
             // アプリ起動時に「Models」をデフォルトで選択状態にします
@@ -110,13 +109,13 @@ struct AddModelsSheet: View {
             TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal)
-
+            
             HStack {
                 Button("Cancel") { // キャンセルボタンのテキスト。
                     showingAddSheet = false
                 }
                 .keyboardShortcut(.cancelAction) // Escキーでキャンセル
-
+                
                 Button("Add") { // 追加ボタンのテキスト。
                     if !modelNameInput.isEmpty {
                         executor.pullModel(modelName: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -143,84 +142,121 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
             Text(model.name) // モデル詳細のタイトルをモデル名に変更。
                 .font(.title2)
                 .bold()
-                .padding(.bottom, 5)
+                .padding(.bottom, 5) // Keep bottom padding for title
+                .lineLimit(1) // 1行に制限
+                .truncationMode(.tail) // はみ出た場合は省略記号
 
             Divider()
 
             Group {
-                // 名前欄を削除（タイトルで表示されるため）
-                // HStack {
-                //     Text("Name:") // 名前。
-                //         .bold()
-                //     Text(model.name)
-                // }
                 HStack {
                     Text("Model Name:") // モデル名。
                         .bold()
                     Text(model.model)
+                        .lineLimit(1) // 1行に制限
+                        .truncationMode(.tail) // はみ出た場合は省略記号
                 }
                 HStack {
                     Text("Size:") // サイズ。
                         .bold()
                     Text(model.formattedSize)
+                        .lineLimit(1) // 1行に制限
+                        .truncationMode(.tail) // はみ出た場合は省略記号
                 }
                 HStack {
                     Text("Modified At:") // 変更日。
                         .bold()
                     Text(model.formattedModifiedAt)
+                        .lineLimit(1) // 1行に制限
+                        .truncationMode(.tail) // はみ出た場合は省略記号
                 }
                 HStack {
                     Text("Digest:") // ダイジェスト。
                         .bold()
                     Text(model.digest)
+                        .lineLimit(1) // 1行に制限
+                        .truncationMode(.tail) // はみ出た場合は省略記号
                 }
             }
             .font(.body)
-            .padding(.horizontal)
+            .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
 
             Divider()
 
             Text("Details Information:") // 詳細情報（Details）。
                 .font(.headline)
-                .padding(.horizontal)
+                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
+
 
             if let details = model.details { // ここでOptionalをアンラップします
                 VStack(alignment: .leading, spacing: 5) {
                     if let parentModel = details.parent_model, !parentModel.isEmpty {
-                        Text("Parent Model: \(parentModel)") // 親モデル。
+                        HStack {
+                            Text("Parent Model:") // 親モデル。
+                                .bold()
+                            Text(parentModel)
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                     if let format = details.format {
-                        Text("Format: \(format)") // フォーマット。
+                        HStack {
+                            Text("Format:") // フォーマット。
+                                .bold()
+                            Text(format)
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                     if let family = details.family {
-                        Text("Family: \(family)") // ファミリー。
+                        HStack {
+                            Text("Family:") // ファミリー。
+                                .bold()
+                            Text(family)
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                     if let families = details.families, !families.isEmpty {
-                        Text("Families: \(families.joined(separator: ", "))") // ファミリーズ。
+                        HStack {
+                            Text("Families:") // ファミリーズ。
+                                .bold()
+                            Text(families.joined(separator: ", "))
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                     if let parameterSize = details.parameter_size {
-                        Text("Parameter Size: \(parameterSize)") // パラメータサイズ。
+                        HStack {
+                            Text("Parameter Size:") // パラメータサイズ。
+                                .bold()
+                            Text(parameterSize)
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                     if let quantizationLevel = details.quantization_level {
-                        Text("Quantization Level: \(quantizationLevel)") // 量子化レベル。
+                        HStack {
+                            Text("Quantization Level:") // 量子化レベル。
+                                .bold()
+                            Text(quantizationLevel)
+                                .lineLimit(1) // 1行に制限
+                                .truncationMode(.tail) // はみ出た場合は省略記号
+                        }
                     }
                 }
                 .font(.subheadline)
-                .padding(.horizontal)
+                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
             } else {
                 Text("No details available.") // 詳細情報はありません。
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
             }
-
+            
             Spacer()
         }
-        .padding()
-        .background(Color.init(nsColor: .controlBackgroundColor)) // macOSの標準背景色
-        .cornerRadius(10)
-        .shadow(radius: 5)
-        .padding()
+        .padding() // 詳細パネル全体の上下左右のパディングは保持 (これ自体が親ビューからのパディング)
     }
 }
 

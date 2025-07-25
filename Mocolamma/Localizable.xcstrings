@@ -245,50 +245,50 @@
         }
       }
     },
-    "Families: %@" : {
+    "Families:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Families: %@"
+            "value" : "Families:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ファミリーズ: %@"
+            "value" : "ファミリーズ:"
           }
         }
       }
     },
-    "Family: %@" : {
+    "Family:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Family: %@"
+            "value" : "Family:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ファミリー: %@"
+            "value" : "ファミリー:"
           }
         }
       }
     },
-    "Format: %@" : {
+    "Format:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Format: %@"
+            "value" : "Format:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "形式: %@"
+            "value" : "形式:"
           }
         }
       }
@@ -437,50 +437,50 @@
         }
       }
     },
-    "Parameter Size: %@" : {
+    "Parameter Size:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Parameter Size: %@"
+            "value" : "Parameter Size:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "パラメーターサイズ: %@"
+            "value" : "パラメーターサイズ:"
           }
         }
       }
     },
-    "Parent Model: %@" : {
+    "Parent Model:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Parent Model: %@"
+            "value" : "Parent Model:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "親モデル: %@"
+            "value" : "親モデル:"
           }
         }
       }
     },
-    "Quantization Level: %@" : {
+    "Quantization Level:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quantization Level: %@"
+            "value" : "Quantization Level:"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "量子化レベル: %@"
+            "value" : "量子化レベル:"
           }
         }
       }
