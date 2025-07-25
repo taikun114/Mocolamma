@@ -1,204 +1,145 @@
+// ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var executor = CommandExecutor() // CommandExecutorのインスタンス
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
-    @State private var showingAddSheet = false // モデル追加シートの表示/非表示を制御
-    @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御
-    @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持
+    @State private var sidebarSelection: String? = "models" // サイドバーの選択状態を保持します
     
-    // ソート順を保持するState変数
-    // デフォルトでは「番号」の昇順でソートされるように変更
+    // NavigationSplitViewのサイドバーの表示状態を制御するState変数
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトでは全てのカラムを表示
+
+    @State private var showingAddSheet = false // モデル追加シートの表示/非表示を制御します
+    @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
+    @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
+    
+    // ソート順を保持するState変数 (ModelListViewにバインディングとして渡します)
     @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
         .init(\.originalIndex, order: .forward)
     ]
 
-    // 現在のソート順に基づいてモデルリストを返すComputed Property
+    // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)
     }
 
-    // 各TableColumnのContentに適用するコンテキストメニューのヘルパービュー
-    // このビューは各セルのコンテンツをラップし、コンテキストメニューを提供します
-    @ViewBuilder
-    private func contextMenuWrapper<Content: View>(for model: OllamaModel, @ViewBuilder content: () -> Content) -> some View {
-        ZStack(alignment: .leading) { // ZStackでセル全体をカバー
-            Color.clear // ZStackの背景として機能し、ヒット領域を確保
-            content() // 元のテキストコンテンツ
-        }
-        .frame(maxWidth: .infinity, alignment: .leading) // ZStackを列幅いっぱいに広げる
-        .contentShape(Rectangle()) // ヒットテスト領域を四角形にする
-        .contextMenu { // コンテキストメニューをZStackに適用
-            Button("モデル名をコピー") {
-                // モデル名をクリップボードにコピーする
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(model.name, forType: .string)
-                print("Copied model name: \(model.name)") // デバッグログ
-            }
-            
-            Button("削除...") {
-                print("Context menu triggered for model: \(model.name)") // デバッグログ
-                modelToDelete = model // 右クリックされたモデルを直接セット
-                showingDeleteConfirmation = true // 確認アラートを表示
-            }
-        }
-    }
-
     var body: some View {
-        HSplitView { // テーブルと詳細パネルを水平に分割
-            // 左側のモデルリスト（Tableビュー）
-            Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
-                // 「番号」列: 最小30、理想50、最大無制限
-                TableColumn("番号", value: \.originalIndex) { model in
-                    contextMenuWrapper(for: model) {
-                        // 0-based indexを1-basedで表示
-                        Text("\(model.originalIndex + 1)")
-                    }
-                }
-                .width(min: 30, ideal: 50, max: .infinity) // 番号列の幅設定を更新
-
-                // 「名前」列: 最小50、理想150、最大無制限
-                TableColumn("名前", value: \.name) { model in
-                    contextMenuWrapper(for: model) {
-                        Text(model.name)
-                    }
-                }
-                .width(min: 100, ideal: 200, max: .infinity) // 名前列の幅設定を更新
-
-                // 「サイズ」列: 最小30、理想50、最大無制限
-                TableColumn("サイズ", value: \.comparableSize) { model in
-                    contextMenuWrapper(for: model) {
-                        Text(model.formattedSize) // formattedSizeを使用
-                    }
-                }
-                .width(min: 50, ideal: 100, max: .infinity) // サイズ列の幅設定を更新
-
-                // 「変更日」列: 最小50、理想80、最大無制限
-                TableColumn("変更日", value: \.comparableModifiedDate) { model in
-                    contextMenuWrapper(for: model) {
-                        Text(model.formattedModifiedAt) // formattedModifiedAtを使用
-                    }
-                }
-                .width(min: 100, ideal: 150, max: .infinity) // 変更日列の幅設定を更新
+        // NavigationSplitView を使って3カラムレイアウトを構築します
+        // sidebar: 左側のナビゲーション (Categories)
+        // content: 中央のコンテンツエリア (Model List)
+        // detail: 右側の詳細エリア (Model Details)
+        NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
+            // MARK: - サイドバー (左端のカラム)
+            List(selection: $sidebarSelection) {
+                // "Models" という項目だけを配置し、選択可能にします
+                Label("Models", systemImage: "macbook.and.ipad")
+                    .tag("models")
             }
-            .background(Color.clear) // 背景色を透明にしてシステム標準に合わせる
-            .frame(minWidth: 400) // テーブルの最小幅を設定
-            .toolbar { // ツールバーにボタンを追加
-                // MARK: - Reload Button
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        // 修正: async関数をTaskでラップする
-                        Task {
-                            await executor.fetchOllamaModelsFromAPI() // モデルリストを再読み込み
-                        }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .help("Refresh model list") // ツールチップ
-                }
-                // MARK: - Add Model Button
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAddSheet = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .help("Add new model") // ツールチップ
-                }
-            }
-            .sheet(isPresented: $showingAddSheet) { // シートの表示
-                AddModelSheetView(showingAddSheet: $showingAddSheet, executor: executor)
-            }
-            // MARK: - Delete Confirmation Alert (remains on ContentView)
-            .alert("モデルの削除", isPresented: $showingDeleteConfirmation) {
-                Button("キャンセル", role: .cancel) {
-                    modelToDelete = nil // 削除対象モデルをクリア
-                }
-                Button("削除", role: .destructive) {
-                    if let model = modelToDelete {
-                        // 修正: async関数をTaskでラップする
-                        Task {
-                            await executor.deleteModel(modelName: model.name)
-                        }
-                        selectedModel = nil // 選択を解除
-                        modelToDelete = nil // 削除対象モデルをクリア
-                    }
-                }
-            } message: {
-                if let model = modelToDelete {
-                    Text("本当にモデル '\(model.name)' を削除しますか？\nこの操作は元に戻せません。")
-                } else {
-                    Text("選択されたモデルがありません。") // 理論上はここには来ないが、念のため
-                }
-            }
-
-            // 右側の詳細表示パネル
+            .navigationTitle("Categories") // サイドバーのタイトル
+        } content: {
+            // MARK: - コンテンツ (中央のカラム: モデルリストとログ)
+            // ModelListView をここに配置し、必要なバインディングを渡します
+            ModelListView(
+                executor: executor,
+                selectedModel: $selectedModel,
+                sortOrder: $sortOrder,
+                showingAddSheet: $showingAddSheet,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                modelToDelete: $modelToDelete
+            )
+        } detail: {
+            // MARK: - ディテール (右端のカラム: モデル詳細)
+            // 選択されたモデルがある場合にのみ詳細を表示します
             if let selectedModelID = selectedModel,
                let model = sortedModels.first(where: { $0.id == selectedModelID }) {
                 ModelDetailsView(model: model)
-                    .frame(minWidth: 300) // 詳細パネルの最小幅を設定
             } else {
-                Text("モデルを選択してください")
-                    .font(.title3)
+                // モデルが選択されていない場合のプレースホルダーテキスト
+                Text("Select a model to view details.") // モデルを選択して詳細を表示するためのプレースホルダーテキスト。
+                    .font(.title2)
                     .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .padding(.vertical) // 上下のパディング
+        .sheet(isPresented: $showingAddSheet) { // シートの表示は ContentView が管理
+            AddModelsSheet(showingAddSheet: $showingAddSheet, executor: executor)
+        }
+        .alert("Delete Model", isPresented: $showingDeleteConfirmation, presenting: modelToDelete) { model in // 削除確認アラートは ContentView が管理
+            Button("Delete", role: .destructive) { // アラートの削除ボタン。
+                if let modelName = model?.name {
+                    Task {
+                        await executor.deleteModel(modelName: modelName)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { // アラートのキャンセルボタン。
+                modelToDelete = nil
+            }
+        } message: { model in
+            Text(String(format: "Are you sure you want to delete model '%@'?\nThis action cannot be undone.", model?.name ?? "Unknown Model")) // モデル削除の確認メッセージ。 // 不明なモデル。
+        }
         .onAppear {
-            print("ContentView Appeared. Fetching Ollama models from API.") // デバッグ用
-            // アプリ起動時にollama APIからモデルリストを取得
-            // 修正: async関数をTaskでラップする
-            Task {
-                await executor.fetchOllamaModelsFromAPI()
-            }
+            // アプリ起動時に「Models」をデフォルトで選択状態にします
+            sidebarSelection = "models"
         }
-        
-        // MARK: - ダウンロード状況表示エリア
-        // テーブルと詳細パネルの下に配置
-        VStack(alignment: .leading, spacing: 5) {
-            if executor.isPulling {
-                Text("ダウンロード状況: \(executor.pullStatus)")
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
-
-                ProgressView(value: executor.pullProgress)
-                    .progressViewStyle(.linear)
-                    .frame(height: 10)
-                
-                // ダウンロード中のファイルサイズ表示
-                if executor.pullTotal > 0 {
-                    Text("\(ByteCountFormatter().string(fromByteCount: executor.pullCompleted)) / \(ByteCountFormatter().string(fromByteCount: executor.pullTotal))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            // APIフェッチのログ表示エリア（以前のTextEditor）
-            TextEditor(text: .constant(executor.output))
-                .font(.footnote)
-                .frame(height: 100) // 高さを制限
-                .padding(.horizontal)
-                .scrollContentBackground(.hidden) // macOS 13以降でTextEditorの背景を透明にするための修飾子
-                .background(Color.black.opacity(0.8)) // ターミナル風の背景色
-                .foregroundColor(.white) // テキストの色
-                .cornerRadius(8) // 角を丸くする
-                .padding([.bottom, .horizontal])
-                .onChange(of: executor.output) { oldValue, newValue in // デバッグ用にoutputの変化を監視
-                    print("Executor Output Changed (first 100 chars): \(newValue.prefix(100))...")
-                }
-        }
-        .padding([.horizontal, .top]) // HStack全体のパディング
     }
 }
 
-/// モデルの詳細情報を表示するビュー (変更なし)
-struct ModelDetailsView: View {
+// カスタムカラー定義 (必要であれば別のファイルに移動します)
+extension Color {
+    static let textEditorBackground = Color(NSColor.textBackgroundColor)
+}
+
+// MARK: - モデル追加シート (変更なし)
+
+struct AddModelsSheet: View {
+    @Binding var showingAddSheet: Bool
+    @ObservedObject var executor: CommandExecutor
+    @State private var modelNameInput: String = ""
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Add Model") // モデル追加シートのタイトル。
+                .font(.title)
+                .bold()
+
+            Text("Enter the name of the model you want to add.") // モデル追加シートの説明。
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            TextField("e.g., llama3, mistral", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+            
+            HStack {
+                Button("Cancel") { // キャンセルボタンのテキスト。
+                    showingAddSheet = false
+                }
+                .keyboardShortcut(.cancelAction) // Escキーでキャンセル
+                
+                Button("Add") { // 追加ボタンのテキスト。
+                    if !modelNameInput.isEmpty {
+                        executor.pullModel(modelName: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                        showingAddSheet = false // シートを閉じます
+                    }
+                }
+                .keyboardShortcut(.defaultAction) // Enterキーで実行
+                .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
+            }
+        }
+        .padding(30)
+        .frame(minWidth: 400, minHeight: 250) // シートの最小サイズ
+    }
+}
+
+// MARK: - モデル詳細ビュー (変更なし)
+
+struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
     let model: OllamaModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("モデル詳細")
+            Text("Model Details") // モデル詳細のタイトル。
                 .font(.title2)
                 .bold()
                 .padding(.bottom, 5)
@@ -207,27 +148,27 @@ struct ModelDetailsView: View {
 
             Group {
                 HStack {
-                    Text("名前:")
+                    Text("Name:") // 名前。
                         .bold()
                     Text(model.name)
                 }
                 HStack {
-                    Text("モデル名:")
+                    Text("Model Name:") // モデル名。
                         .bold()
                     Text(model.model)
                 }
                 HStack {
-                    Text("サイズ:")
+                    Text("Size:") // サイズ。
                         .bold()
                     Text(model.formattedSize)
                 }
                 HStack {
-                    Text("変更日:")
+                    Text("Modified At:") // 変更日。
                         .bold()
                     Text(model.formattedModifiedAt)
                 }
                 HStack {
-                    Text("ダイジェスト:")
+                    Text("Digest:") // ダイジェスト。
                         .bold()
                     Text(model.digest)
                 }
@@ -237,35 +178,35 @@ struct ModelDetailsView: View {
 
             Divider()
 
-            Text("詳細情報 (Details):")
+            Text("Details Information:") // 詳細情報（Details）。
                 .font(.headline)
                 .padding(.horizontal)
 
-            if let details = model.details { // ここでOptionalをアンラップ
+            if let details = model.details { // ここでOptionalをアンラップします
                 VStack(alignment: .leading, spacing: 5) {
                     if let parentModel = details.parent_model, !parentModel.isEmpty {
-                        Text("親モデル: \(parentModel)")
+                        Text("Parent Model: \(parentModel)") // 親モデル。
                     }
                     if let format = details.format {
-                        Text("フォーマット: \(format)")
+                        Text("Format: \(format)") // フォーマット。
                     }
                     if let family = details.family {
-                        Text("ファミリー: \(family)")
+                        Text("Family: \(family)") // ファミリー。
                     }
                     if let families = details.families, !families.isEmpty {
-                        Text("ファミリーズ: \(families.joined(separator: ", "))")
+                        Text("Families: \(families.joined(separator: ", "))") // ファミリーズ。
                     }
                     if let parameterSize = details.parameter_size {
-                        Text("パラメータサイズ: \(parameterSize)")
+                        Text("Parameter Size: \(parameterSize)") // パラメータサイズ。
                     }
                     if let quantizationLevel = details.quantization_level {
-                        Text("量子化レベル: \(quantizationLevel)")
+                        Text("Quantization Level: \(quantizationLevel)") // 量子化レベル。
                     }
                 }
                 .font(.subheadline)
                 .padding(.horizontal)
             } else {
-                Text("詳細情報はありません。")
+                Text("No details available.") // 詳細情報はありません。
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
@@ -278,48 +219,6 @@ struct ModelDetailsView: View {
         .cornerRadius(10)
         .shadow(radius: 5)
         .padding()
-    }
-}
-
-/// モデル追加用のシートビュー
-struct AddModelSheetView: View {
-    @Binding var showingAddSheet: Bool
-    @ObservedObject var executor: CommandExecutor
-    @State private var modelNameInput: String = ""
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("モデルの追加")
-                .font(.title)
-                .bold()
-
-            Text("追加したいモデル名を入力してください。")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            TextField("例: llama3, mistral", text: $modelNameInput)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal)
-            
-            HStack {
-                Button("キャンセル") {
-                    showingAddSheet = false
-                }
-                .keyboardShortcut(.cancelAction) // Escキーでキャンセル
-                
-                Button("追加") {
-                    if !modelNameInput.isEmpty {
-                        executor.pullModel(modelName: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines))
-                        showingAddSheet = false // シートを閉じる
-                    }
-                }
-                .keyboardShortcut(.defaultAction) // Enterキーで実行
-                .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
-            }
-        }
-        .padding(30)
-        .frame(minWidth: 400, minHeight: 250) // シートの最小サイズ
     }
 }
 

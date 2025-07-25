@@ -1,205 +1,120 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ / %2$@"
-          }
-        }
-      }
-    },
     "%lld" : {
 
     },
+    "Add" : {
+
+    },
+    "Add Model" : {
+
+    },
+    "Add New" : {
+
+    },
     "Add new model" : {
-
-    },
-    "APIエラー: HTTPステータスコード %d" : {
-      "comment" : "Error message for HTTP status code."
-    },
-    "APIエラー: 不明なレスポンスタイプです。" : {
-      "comment" : "Error message for unknown API response type."
-    },
-    "APIデコードエラー: " : {
-      "comment" : "API decode error prefix."
-    },
-    "APIリクエストエラー: " : {
-      "comment" : "API request error prefix."
-    },
-    "Refresh model list" : {
-
-    },
-    "エラー" : {
-      "comment" : "Pull status: error."
-    },
-    "エラー: プルリクエストのボディのシリアライズに失敗しました: " : {
-      "comment" : "Error message for failed pull request body serialization."
-    },
-    "エラー: プル用のAPI URLが無効です。" : {
-      "comment" : "Error message for invalid pull API URL."
-    },
-    "エラー: リクエストボディのシリアライズに失敗しました: " : {
-      "comment" : "Error message for failed request body serialization."
-    },
-    "エラー: 削除用のAPI URLが無効です。" : {
-      "comment" : "Error message for invalid delete API URL."
-    },
-    "エラー: 無効なAPI URLです。" : {
-      "comment" : "Error message for invalid API URL."
-    },
-    "キャンセル" : {
-
-    },
-    "サイズ" : {
-
-    },
-    "サイズ:" : {
-
-    },
-    "ダイジェスト:" : {
-
-    },
-    "ダウンロード状況: %@" : {
-
-    },
-    "データなし" : {
-      "comment" : "No data available."
-    },
-    "パラメータサイズ: %@" : {
-
-    },
-    "ファミリー: %@" : {
-
-    },
-    "ファミリーズ: %@" : {
-
-    },
-    "フォーマット: %@" : {
-
-    },
-    "モデル" : {
-
-    },
-    "モデル '%@' をダウンロード中..." : {
-      "comment" : "Status message when downloading model."
-    },
-    "モデル '%@' を削除中..." : {
-      "comment" : "Status message when deleting model."
-    },
-    "モデル '%@' を正常に削除しました。" : {
-      "comment" : "Success message for model deletion."
-    },
-    "モデルの削除" : {
-
-    },
-    "モデルの取得に成功しました。合計: %d" : {
-      "comment" : "Success message for fetching models."
-    },
-    "モデルの追加" : {
-
-    },
-    "モデルプルエラー: HTTPステータスコード %d" : {
-      "comment" : "Model pull error: HTTP status code."
-    },
-    "モデルプル失敗: " : {
-      "comment" : "Model pull failed prefix."
-    },
-    "モデルプル完了: " : {
-      "comment" : "Model pull completed prefix."
-    },
-    "モデルをAPIから取得中..." : {
-      "comment" : "Status message when fetching models from API."
-    },
-    "モデルを選択してください" : {
-
-    },
-    "モデル削除失敗: " : {
-      "comment" : "Model deletion failed prefix."
-    },
-    "モデル名:" : {
-
-    },
-    "モデル名をコピー" : {
-
-    },
-    "モデル詳細" : {
-
-    },
-    "例: llama3, mistral" : {
-
-    },
-    "削除" : {
-
-    },
-    "削除..." : {
-
-    },
-    "削除エラー: HTTP ステータスコード %d - %@" : {
-      "comment" : "Error message for HTTP status code during deletion.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "削除エラー: HTTP ステータスコード %1$d - %2$@"
+            "state" : "translated",
+            "value" : "Add new model"
           }
         }
       }
     },
-    "削除エラー: モデル '%@' が見つかりません (404 Not Found)。" : {
-      "comment" : "Error message for model not found during deletion."
-    },
-    "削除エラー: 不明なレスポンスタイプです。" : {
-      "comment" : "Error message for unknown delete response type."
-    },
-    "名前" : {
+    "Cancel" : {
 
     },
-    "名前:" : {
+    "Categories" : {
 
     },
-    "変更日" : {
+    "Copy Model Name" : {
 
     },
-    "変更日:" : {
+    "Delete" : {
 
     },
-    "失敗" : {
-      "comment" : "Pull status: failed."
-    },
-    "完了" : {
-      "comment" : "Pull status: completed."
-    },
-    "本当にモデル '%@' を削除しますか？\nこの操作は元に戻せません。" : {
+    "Delete Model" : {
 
     },
-    "準備中..." : {
-      "comment" : "Pull status: preparing."
-    },
-    "番号" : {
+    "Delete..." : {
 
     },
-    "親モデル: %@" : {
+    "Details Information:" : {
 
     },
-    "詳細情報 (Details):" : {
+    "Digest:" : {
 
     },
-    "詳細情報はありません。" : {
+    "e.g., llama3, mistral" : {
 
     },
-    "追加" : {
+    "Enter the name of the model you want to add." : {
 
     },
-    "追加したいモデル名を入力してください。" : {
+    "Families: %@" : {
 
     },
-    "選択されたモデルがありません。" : {
+    "Family: %@" : {
 
     },
-    "量子化レベル: %@" : {
+    "Format: %@" : {
+
+    },
+    "Model Details" : {
+
+    },
+    "Model Name:" : {
+
+    },
+    "Models" : {
+
+    },
+    "Modified At" : {
+
+    },
+    "Modified At:" : {
+
+    },
+    "Name" : {
+
+    },
+    "Name:" : {
+
+    },
+    "No details available." : {
+
+    },
+    "No models are currently installed. Click '+' to add a new model." : {
+
+    },
+    "No Models Available" : {
+
+    },
+    "No." : {
+
+    },
+    "Parameter Size: %@" : {
+
+    },
+    "Parent Model: %@" : {
+
+    },
+    "Quantization Level: %@" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "Select a model to view details." : {
+
+    },
+    "Size" : {
+
+    },
+    "Size:" : {
 
     }
   },
