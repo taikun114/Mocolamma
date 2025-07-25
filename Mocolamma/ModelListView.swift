@@ -5,10 +5,12 @@ struct ModelListView: View {
     @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
-
+    
     @Binding var showingAddSheet: Bool // モデル追加シートの表示/非表示を制御するバインディング
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
+
+    let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
 
     // 現在のソート順に基づいてモデルリストを返すComputed Property
     var sortedModels: [OllamaModel] {
@@ -87,14 +89,21 @@ struct ModelListView: View {
                 }
             }
             // プログレスバーとステータステキスト
-            // PullProgressViewを抽出して型チェックの負担を軽減
             if executor.isPulling {
-                PullProgressView(executor: executor)
+                VStack {
+                    ProgressView(value: executor.pullProgress) {
+                        Text(executor.pullStatus)
+                    } currentValueLabel: {
+                        Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                    executor.pullProgress * 100 as CVarArg,
+                                    ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                    ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                    }
+                    .progressViewStyle(.linear)
+                }
+                .padding()
             }
-
-            // コマンド実行の出力表示（以前のTextEditor）
-            // OutputTextViewを抽出して型チェックの負担を軽減
-            OutputTextView(executor: executor)
+            // コマンド実行の出力表示 (TextEditorは削除されました)
         }
         .navigationTitle("Models") // ナビゲーションタイトル: モデル。
         .toolbar { // ここで全てのToolbarItemをまとめます
@@ -118,8 +127,18 @@ struct ModelListView: View {
                 }
                 .disabled(executor.isRunning || executor.isPulling)
             }
+            // MARK: - Toggle Preview Panel Button
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    onTogglePreview() // クロージャを呼び出す
+                    print("ModelListView: Toggle Preview button tapped.")
+                } label: {
+                    Label("Toggle Preview", systemImage: "sidebar.trailing") // ツールバーボタン：プレビューを切り替えます。
+                }
+                .disabled(executor.isRunning || executor.isPulling)
+            }
         }
-        .padding(.vertical) // 上下のパディング
+        // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .onAppear {
             print("ModelListView Appeared. Fetching Ollama models from API.") // デバッグ用
             // ビューが表示されたときにOllama APIからモデルリストを取得します
@@ -130,57 +149,13 @@ struct ModelListView: View {
     }
 }
 
-// MARK: - PullProgressView (抽出されたサブビュー)
-struct PullProgressView: View {
-    @ObservedObject var executor: CommandExecutor
-
-    var body: some View {
-        VStack {
-            ProgressView(value: executor.pullProgress) {
-                Text(executor.pullStatus)
-            } currentValueLabel: {
-                // String Catalogで認識されるようにNSLocalizedStringを使用してフォーマット文字列を取得し、String(format:)で適用します。
-                // CVarArgへの明示的なキャストにより、コンパイラの型推論を助けます。
-                let formatString = NSLocalizedString("%.1f%% completed (%@ / %@)", comment: "Download progress format string. Example: '50.0% completed (100MB / 200MB)'")
-                
-                Text(String(format: formatString,
-                            executor.pullProgress * 100 as CVarArg,
-                            ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                            ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-            }
-            .progressViewStyle(.linear)
-        }
-        .padding()
-    }
-}
-
-// MARK: - OutputTextView (抽出されたサブビュー)
-struct OutputTextView: View {
-    @ObservedObject var executor: CommandExecutor
-
-    var body: some View {
-        TextEditor(text: .constant(executor.output))
-            .font(.footnote)
-            .frame(height: 80) // 高さを制限します
-            .padding(.horizontal)
-            .scrollContentBackground(.hidden) // macOS 13以降で背景を隠します
-            .background(Color.textEditorBackground) // カスタム背景色
-            .cornerRadius(5) // 角を丸くします
-            .padding([.horizontal, .bottom])
-            .onChange(of: executor.output) { oldValue, newValue in // デバッグ用: 出力の変更を監視します
-                print("Executor Output Changed (first 100 chars): \(newValue.prefix(100))...")
-            }
-    }
-}
-
-
 // SwiftUIのプレビュー用
 struct ModelListView_Previews: PreviewProvider {
     @State static var selectedModel: OllamaModel.ID? = nil
     @State static var sortOrder: [KeyPathComparator<OllamaModel>] = [.init(\.originalIndex, order: .forward)]
     @State static var showingAddSheet = false
     @State static var showingDeleteConfirmation = false
-    @State static var modelToDelete: OllamaModel? = nil
+    @State static var modelToDelete: OllamaModel? = nil // @State static var を使用
 
     static var previews: some View {
         ModelListView(
@@ -189,7 +164,10 @@ struct ModelListView_Previews: PreviewProvider {
             sortOrder: $sortOrder,
             showingAddSheet: $showingAddSheet,
             showingDeleteConfirmation: $showingDeleteConfirmation,
-            modelToDelete: $modelToDelete
+            modelToDelete: $modelToDelete, // ここを修正: Bindingとして渡す
+            onTogglePreview: { // PreviewProviderでもダミーのクロージャを渡す
+                print("ModelListView_Previews: Dummy onTogglePreview called.")
+            }
         )
     }
 }

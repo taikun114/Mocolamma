@@ -6,7 +6,7 @@ struct ContentView: View {
     @State private var sidebarSelection: String? = "models" // サイドバーの選択状態を保持します
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトでは全てのカラムを表示
+    @State private var columnVisibility: NavigationSplitViewVisibility = .detailOnly // デフォルトで詳細パネルを閉じる
 
     @State private var showingAddSheet = false // モデル追加シートの表示/非表示を制御します
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
@@ -31,7 +31,7 @@ struct ContentView: View {
             // MARK: - サイドバー (左端のカラム)
             List(selection: $sidebarSelection) {
                 // "Models" という項目だけを配置し、選択可能にします
-                Label("Models", systemImage: "macbook.and.ipad")
+                Label("Models", systemImage: "tray.full") // アイコンをtray.fullに変更
                     .tag("models")
             }
             .navigationTitle("Categories") // サイドバーのタイトル
@@ -44,7 +44,16 @@ struct ContentView: View {
                 sortOrder: $sortOrder,
                 showingAddSheet: $showingAddSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
-                modelToDelete: $modelToDelete
+                modelToDelete: $modelToDelete, // ここを修正: Bindingとして渡す
+                onTogglePreview: { // クロージャを渡す
+                    print("ContentView: onTogglePreview received. Current visibility: \(columnVisibility)")
+                    if columnVisibility == .all {
+                        columnVisibility = .detailOnly
+                    } else {
+                        columnVisibility = .all
+                    }
+                    print("ContentView: New visibility: \(columnVisibility)")
+                }
             )
         } detail: {
             // MARK: - ディテール (右端のカラム: モデル詳細)
@@ -62,23 +71,34 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddSheet) { // シートの表示は ContentView が管理
             AddModelsSheet(showingAddSheet: $showingAddSheet, executor: executor)
         }
-        .alert("Delete Model", isPresented: $showingDeleteConfirmation, presenting: modelToDelete) { model in // 削除確認アラートのタイトル。
+        .alert("Delete Model", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
             Button("Delete", role: .destructive) { // アラートの削除ボタン。
-                if let modelName = model?.name {
+                if let model = modelToDelete { // 手動でアンラップ
                     Task {
-                        await executor.deleteModel(modelName: modelName)
+                        await executor.deleteModel(modelName: model.name)
                     }
                 }
+                showingDeleteConfirmation = false // アラートを閉じる
+                modelToDelete = nil // 削除対象モデルをクリア
             }
             Button("Cancel", role: .cancel) { // アラートのキャンセルボタン。
-                modelToDelete = nil
+                showingDeleteConfirmation = false // アラートを閉じる
+                modelToDelete = nil // 削除対象モデルをクリア
             }
-        } message: { model in
-            Text("Are you sure you want to delete model '\(model?.name ?? "Unknown Model")'?\nThis action cannot be undone.") // モデル削除の確認メッセージ。 // 不明なモデル。
+        } message: {
+            if let model = modelToDelete { // 手動でアンラップ
+                Text(String(localized: "Are you sure you want to delete model '\(model.name)'?\nThis action cannot be undone.")) // モデル削除の確認メッセージ。
+            } else {
+                // modelToDeleteがnilの場合のフォールバックメッセージ
+                Text(String(localized: "Are you sure you want to delete the selected model?\nThis action cannot be undone."))
+            }
         }
         .onAppear {
             // アプリ起動時に「Models」をデフォルトで選択状態にします
             sidebarSelection = "models"
+        }
+        .onChange(of: columnVisibility) { oldVal, newVal in
+            print("ContentView: columnVisibility changed from \(oldVal) to \(newVal)")
         }
     }
 }
@@ -142,121 +162,128 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
             Text(model.name) // モデル詳細のタイトルをモデル名に変更。
                 .font(.title2)
                 .bold()
-                .padding(.bottom, 5) // Keep bottom padding for title
-                .lineLimit(1) // 1行に制限
-                .truncationMode(.tail) // はみ出た場合は省略記号
+                .padding(.bottom, 5)
 
             Divider()
 
             Group {
-                HStack {
+                VStack(alignment: .leading) {
                     Text("Model Name:") // モデル名。
-                        .bold()
                     Text(model.model)
-                        .lineLimit(1) // 1行に制限
-                        .truncationMode(.tail) // はみ出た場合は省略記号
+                        .font(.title3) // フォントサイズを大きく、太字に
+                        .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
-                HStack {
+                VStack(alignment: .leading) {
                     Text("Size:") // サイズ。
-                        .bold()
                     Text(model.formattedSize)
-                        .lineLimit(1) // 1行に制限
-                        .truncationMode(.tail) // はみ出た場合は省略記号
+                        .font(.title3) // フォントサイズを大きく、太字に
+                        .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
-                HStack {
+                VStack(alignment: .leading) {
                     Text("Modified At:") // 変更日。
-                        .bold()
                     Text(model.formattedModifiedAt)
-                        .lineLimit(1) // 1行に制限
-                        .truncationMode(.tail) // はみ出た場合は省略記号
-                }
-                HStack {
-                    Text("Digest:") // ダイジェスト。
+                        .font(.title3) // フォントサイズを大きく、太字に
                         .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+                VStack(alignment: .leading) {
+                    Text("Digest:") // ダイジェスト。
                     Text(model.digest)
-                        .lineLimit(1) // 1行に制限
-                        .truncationMode(.tail) // はみ出た場合は省略記号
+                        .font(.title3) // フォントサイズを大きく、太字に
+                        .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
             }
-            .font(.body)
-            .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
+            .font(.body) // ラベルのフォントサイズは維持
+            .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
 
             Divider()
 
             Text("Details Information:") // 詳細情報（Details）。
                 .font(.headline)
-                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
-
+                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
 
             if let details = model.details { // ここでOptionalをアンラップします
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 10) { // 各VStackの間にスペースを追加
                     if let parentModel = details.parent_model, !parentModel.isEmpty {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Parent Model:") // 親モデル。
-                                .bold()
                             Text(parentModel)
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                     if let format = details.format {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Format:") // フォーマット。
-                                .bold()
                             Text(format)
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                     if let family = details.family {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Family:") // ファミリー。
-                                .bold()
                             Text(family)
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                     if let families = details.families, !families.isEmpty {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Families:") // ファミリーズ。
-                                .bold()
                             Text(families.joined(separator: ", "))
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                     if let parameterSize = details.parameter_size {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Parameter Size:") // パラメータサイズ。
-                                .bold()
                             Text(parameterSize)
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                     if let quantizationLevel = details.quantization_level {
-                        HStack {
+                        VStack(alignment: .leading) {
                             Text("Quantization Level:") // 量子化レベル。
-                                .bold()
                             Text(quantizationLevel)
-                                .lineLimit(1) // 1行に制限
-                                .truncationMode(.tail) // はみ出た場合は省略記号
+                                .font(.title3) // フォントサイズを大きく、太字に
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                     }
                 }
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
+                .font(.subheadline) // ラベルのフォントサイズは維持
+                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
             } else {
                 Text("No details available.") // 詳細情報はありません。
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくすために追加
+                    .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
             }
             
             Spacer()
         }
-        .padding() // 詳細パネル全体の上下左右のパディングは保持 (これ自体が親ビューからのパディング)
+        .padding() // 全体のパディング
     }
 }
 

@@ -1,13 +1,13 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%.1f%% completed (%@ / %@)" : {
-      "comment" : "Download progress format string. Example: '50.0% completed (100MB / 200MB)'",
+    " %.1f%% completed (%@ / %@)" : {
+      "comment" : "ダウンロード進捗: 完了/合計。",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$.1f%% completed (%2$@ / %3$@)"
+            "value" : " %1$.1f%% completed (%2$@ / %3$@)"
           }
         },
         "ja" : {
@@ -81,6 +81,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%@」を削除してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "Are you sure you want to delete the selected model?\nThis action cannot be undone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete the selected model?\nThis action cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルを削除してもよろしいですか？この操作は元に戻せません。"
           }
         }
       }
@@ -545,6 +561,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サイズ:"
+          }
+        }
+      }
+    },
+    "Toggle Preview" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビューを切り替える"
           }
         }
       }
