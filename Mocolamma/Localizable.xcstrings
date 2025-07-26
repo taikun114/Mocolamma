@@ -188,10 +188,38 @@
       }
     },
     "Are you sure you want to delete the selected server?\nThis action cannot be undone." : {
-      "comment" : "選択したサーバー削除の確認メッセージ（フォールバック）。"
+      "comment" : "選択したサーバー削除の確認メッセージ（フォールバック）。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete the selected server?\nThis action cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたサーバーを削除してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
     },
     "Are you sure you want to delete the server \"%@\"\nThis action cannot be undone." : {
-      "comment" : "サーバー削除の確認メッセージ。"
+      "comment" : "サーバー削除の確認メッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete the server \"%@\"\nThis action cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー「%@」を削除してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -275,13 +303,52 @@
       }
     },
     "Connection Status: Checking..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Status: Checking..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続状況: 確認中…"
+          }
+        }
+      }
     },
     "Connection Status: Connected" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Status: Connected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続状況: 接続済み"
+          }
+        }
+      }
     },
     "Connection Status: Not Connected" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Status: Not Connected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続状況: 未接続"
+          }
+        }
+      }
     },
     "Copy" : {
       "localizations" : {
@@ -387,7 +454,20 @@
       }
     },
     "Delete Server" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを削除"
+          }
+        }
+      }
     },
     "Delete..." : {
       "localizations" : {
@@ -592,6 +672,12 @@
             "state" : "translated",
             "value" : "Error: Failed to serialize pull request body: "
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: プルリクエストボディのシリアライズに失敗しました:"
+          }
         }
       }
     },
@@ -602,6 +688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error: Failed to serialize request body: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: リクエストボディーのシリアライズに失敗しました:"
           }
         }
       }
@@ -614,6 +706,12 @@
             "state" : "translated",
             "value" : "Error: Invalid API URL for delete."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: 削除するためのAPI URLが無効です。"
+          }
         }
       }
     },
@@ -625,6 +723,12 @@
             "state" : "translated",
             "value" : "Error: Invalid API URL for pull."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: プルするためのAPI URLが無効です。"
+          }
         }
       }
     },
@@ -635,6 +739,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error: Invalid API URL."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: API URLが無効です。"
           }
         }
       }
@@ -764,7 +874,20 @@
       }
     },
     "Host:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホスト:"
+          }
+        }
+      }
     },
     "Model deletion failed: " : {
       "comment" : "モデル削除失敗のプレフィックス。",
@@ -1176,7 +1299,20 @@
       }
     },
     "Select a server to see the details." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a server to see the details."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細を見るにはサーバーを選択してください。"
+          }
+        }
+      }
     },
     "Server" : {
       "localizations" : {
@@ -1190,17 +1326,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
-          }
-        }
-      }
-    },
-    "Server information will be displayed here." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Server information will be displayed here."
           }
         }
       }
