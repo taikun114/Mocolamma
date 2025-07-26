@@ -123,4 +123,12 @@ class ServerManager: ObservableObject {
     private func saveSelectedServerID() {
         UserDefaults.standard.set(selectedServerID?.uuidString, forKey: selectedServerIDKey)
     }
+
+    /// サーバーのリスト内の項目を移動します。
+    /// - Parameters:
+    ///   - source: 移動元のインデックスセット。
+    ///   - destination: 移動先のインデックス。
+    func moveServer(source: IndexSet, destination: Int) {
+        servers.move(fromOffsets: source, toOffset: destination)
+    }
 }

@@ -23,25 +23,23 @@ struct ServerView: View {
     var body: some View {
         VStack {
             // ListにlistSelectionバインディングを追加し、クリックで選択（ハイライト）されるようにします。
-            List(serverManager.servers, selection: $listSelection) { server in
-                ServerRowContent(
-                    server: server,
-                    serverManager: serverManager,
-                    listSelection: $listSelection,
-                    serverToEdit: $serverToEdit,
-                    showingDeleteConfirmationServer: $showingDeleteConfirmationServer,
-                    serverToDelete: $serverToDelete,
-                    isSelected: server.id == serverManager.selectedServerID
-                )
+            List(selection: $listSelection) {
+                ForEach(serverManager.servers) { server in
+                    ServerRowContent(
+                        server: server,
+                        serverManager: serverManager,
+                        listSelection: $listSelection,
+                        serverToEdit: $serverToEdit,
+                        showingDeleteConfirmationServer: $showingDeleteConfirmationServer,
+                        serverToDelete: $serverToDelete,
+                        isSelected: server.id == serverManager.selectedServerID
+                    )
+                }
+                .onMove(perform: serverManager.moveServer)
             }
             // List全体にprimaryActionを設定し、ダブルクリック/Enterキーで選択を実行します。
             // contextMenu(forSelectionType:menu:primaryAction:)のprimaryAction引数を使用します。
-            .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
-                if let selectedID = selectedIDs.first {
-                    serverManager.selectedServerID = selectedID
-                    listSelection = selectedID // リストのハイライトも連動させる
-                }
-            }
+            
             .navigationTitle("Servers") // ナビゲーションタイトル
             .overlay {
                 if serverManager.servers.isEmpty {
