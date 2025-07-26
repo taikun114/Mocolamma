@@ -30,6 +30,9 @@ class ServerManager: ObservableObject {
         }
     }
 
+    /// 各サーバーの接続状態を保持する辞書 (nil: チェック中, true: 接続済み, false: 未接続)
+    @Published var serverConnectionStatuses: [ServerInfo.ID: Bool?] = [:]
+
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合は、デフォルトのローカルホストを返します。
     var currentServerHost: String {
@@ -101,6 +104,12 @@ class ServerManager: ObservableObject {
             // 最初のサーバーがあればそれ、なければnilにする
             selectedServerID = servers.first?.id
         }
+        serverConnectionStatuses[server.id] = nil
+    }
+
+    /// 指定されたサーバーの接続状態を更新します。
+    func updateServerConnectionStatus(serverID: ServerInfo.ID, status: Bool?) {
+        serverConnectionStatuses[serverID] = status
     }
 
     /// 現在のサーバーリストをUserDefaultsに保存します。

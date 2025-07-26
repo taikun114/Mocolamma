@@ -18,6 +18,8 @@ struct ModelListView: View {
 
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
 
+    
+
     // 現在のソート順に基づいてモデルリストを返すComputed Property
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)

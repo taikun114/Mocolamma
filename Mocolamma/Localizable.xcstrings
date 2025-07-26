@@ -187,6 +187,12 @@
         }
       }
     },
+    "Are you sure you want to delete the selected server?\nThis action cannot be undone." : {
+      "comment" : "選択したサーバー削除の確認メッセージ（フォールバック）。"
+    },
+    "Are you sure you want to delete the server \"%@\"\nThis action cannot be undone." : {
+      "comment" : "サーバー削除の確認メッセージ。"
+    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -379,6 +385,9 @@
           }
         }
       }
+    },
+    "Delete Server" : {
+
     },
     "Delete..." : {
       "localizations" : {

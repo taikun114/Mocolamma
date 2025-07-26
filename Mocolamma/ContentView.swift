@@ -39,7 +39,6 @@ struct ContentView: View {
 
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
-    @State private var serverConnectionStatus: Bool? = nil // Inspectorに表示するサーバーの接続状態 (nil: チェック中, true: 接続済み, false: 未接続)
     
     // ContentViewの初期化。serverManagerを依存性として受け取り、executorを初期化します。
     // このイニシャライザはMocolammaAppから呼び出される際にServerManagerを渡すために必要です。
@@ -64,45 +63,18 @@ struct ContentView: View {
             }
             .navigationTitle("Categories") // サイドバーのタイトル
         } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
-            // MARK: - メインコンテンツ (右側のカラム - 旧 content カラム)
-            // サイドバーの選択状態に基づいて表示するビューを切り替えます
-            if sidebarSelection == "models" {
-                ModelListView(
-                    executor: executor,
-                    selectedModel: $selectedModel,
-                    sortOrder: $sortOrder,
-                    showingAddSheet: $showingAddModelsSheet,
-                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                    modelToDelete: $modelToDelete,
-                    onTogglePreview: {
-                        // Inspector の表示状態を切り替えます
-                        print("ContentView: onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
-                        // レイアウトの競合を避けるため、メインアクターで非同期に切り替えをディスパッチします
-                        Task { @MainActor in
-                            self.showingInspector.toggle()
-                            print("ContentView: 新しいインスペクターの表示状態: \(self.showingInspector)")
-                        }
-                    }
-                )
-            } else if sidebarSelection == "server" {
-                ServerView(
-                    serverManager: serverManager,
-                    executor: executor,
-                    onTogglePreview: {
-                        // Inspector の表示状態を切り替えます
-                        print("ContentView: サーバー用の onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
-                        // レイアウトの競合を避けるため、メインアクターで非同期に切り替えをディスパッチします
-                        Task { @MainActor in
-                            self.showingInspector.toggle()
-                            print("ContentView: 新しいインスペクターの表示状態: \(self.showingInspector)")
-                        }
-                    }
-                ) // ServerViewを表示
-            } else {
-                Text("Select a category.") // カテゴリを選択してください。
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-            }
+            MainContentDetailView(
+                sidebarSelection: $sidebarSelection,
+                selectedModel: $selectedModel,
+                executor: executor,
+                serverManager: serverManager,
+                selectedServerForInspector: $selectedServerForInspector,
+                showingInspector: $showingInspector,
+                sortOrder: $sortOrder,
+                showingAddModelsSheet: $showingAddModelsSheet,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                modelToDelete: $modelToDelete
+            )
         }
         // MARK: - Inspector (右端のプレビューパネル)
         // Inspectorはメインコンテンツビューに追加され、独立して開閉します
@@ -113,7 +85,7 @@ struct ContentView: View {
                 selectedModel: selectedModel,
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector, // Pass new state
-                serverConnectionStatus: serverConnectionStatus // Pass new state
+                serverManager: serverManager // Pass ServerManager to InspectorContentView
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(ideal: 300)
@@ -155,14 +127,27 @@ struct ContentView: View {
         }
         .onChange(of: sidebarSelection) { oldSelection, newSelection in
             if newSelection == "server" {
-                // When server tab is selected, update the server for inspector and check connectivity
                 updateSelectedServerForInspector()
             }
         }
         .onChange(of: serverManager.selectedServerID) { oldID, newID in
-            // When selected server changes, update the server for inspector and check connectivity
-            if sidebarSelection == "server" {
-                updateSelectedServerForInspector()
+            // API通信用の選択IDが変更されても、Inspectorの表示はServerViewのlistSelectionに任せる
+            // ここでは何もしない
+        }
+        .onChange(of: selectedModel) { oldModel, newModel in
+            // モデル選択が変更されたら、Inspectorの表示状態を更新
+            // ここでは何もしない
+        }
+        .onChange(of: selectedServerForInspector) { oldServer, newServer in
+            // selectedServerForInspector が変更されたら、接続状況を再チェック
+            if let server = newServer {
+                // serverConnectionStatus = nil // チェック中にリセット
+                Task {
+                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
+                    await MainActor.run {
+                        // serverConnectionStatus = isConnected
+                    }
+                }
             }
         }
     }
@@ -172,17 +157,9 @@ struct ContentView: View {
         guard let selectedID = serverManager.selectedServerID,
               let server = serverManager.servers.first(where: { $0.id == selectedID }) else {
             selectedServerForInspector = nil
-            serverConnectionStatus = nil
             return
         }
         selectedServerForInspector = server
-        serverConnectionStatus = nil // Reset status to checking
-        Task {
-            let isConnected = await executor.checkAPIConnectivity(host: server.host)
-            await MainActor.run {
-                serverConnectionStatus = isConnected
-            }
-        }
     }
 }
 
@@ -193,7 +170,7 @@ private struct InspectorContentView: View {
     let selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
     let selectedServerForInspector: ServerInfo? // New parameter
-    let serverConnectionStatus: Bool? // New parameter
+    @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
 
     var body: some View {
         Group {
@@ -204,7 +181,7 @@ private struct InspectorContentView: View {
                     .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
                 if let server = selectedServerForInspector {
-                    ServerInspectorView(server: server, connectionStatus: serverConnectionStatus)
+                    ServerInspectorView(server: server, connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil)
                         .id(server.id) // Use server ID for view identity
                 } else {
                     Text("Select a server to see the details.") // Fallback if no server is selected
@@ -225,6 +202,60 @@ private struct InspectorContentView: View {
 // カスタムカラー定義 (必要であれば別のファイルに移動します)
 extension Color {
     static let textEditorBackground = Color(NSColor.textBackgroundColor)
+}
+
+// MARK: - Main Content Detail Helper View
+private struct MainContentDetailView: View {
+    @Binding var sidebarSelection: String?
+    @Binding var selectedModel: OllamaModel.ID?
+    @ObservedObject var executor: CommandExecutor
+    @ObservedObject var serverManager: ServerManager
+    @Binding var selectedServerForInspector: ServerInfo?
+    @Binding var showingInspector: Bool
+    @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var showingAddModelsSheet: Bool
+    @Binding var showingDeleteConfirmation: Bool
+    @Binding var modelToDelete: OllamaModel?
+
+    var body: some View {
+        Group {
+            // MARK: - メインコンテンツ (右側のカラム - 旧 content カラム)
+            // サイドバーの選択状態に基づいて表示するビューを切り替えます
+            if sidebarSelection == "models" {
+                ModelListView(
+                    executor: executor,
+                    selectedModel: $selectedModel,
+                    sortOrder: $sortOrder,
+                    showingAddSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    onTogglePreview: {
+                        // Inspector の表示状態を切り替えます
+                        print("ContentView: onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
+                        showingInspector.toggle()
+                        print("ContentView: 新しいインスペクターの表示状態: \(showingInspector)")
+                    }
+                )
+            } else if sidebarSelection == "server" {
+                ServerView(
+                    serverManager: serverManager,
+                    executor: executor,
+                    onTogglePreview: {
+                        // Inspector の表示状態を切り替えます
+                        print("ContentView: サーバー用の onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
+                        showingInspector.toggle()
+                        print("ContentView: 新しいインスペクターの表示状態: \(showingInspector)")
+                        
+                    },
+                    selectedServerForInspector: $selectedServerForInspector
+                ) // ServerViewを表示
+            } else {
+                Text("Select a category.") // カテゴリを選択してください。
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
 }
 
 // MARK: - プレビュー用
