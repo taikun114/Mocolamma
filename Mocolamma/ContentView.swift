@@ -62,6 +62,7 @@ struct ContentView: View {
                     .tag("models")
             }
             .navigationTitle("Categories") // サイドバーのタイトル
+            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 500)
         } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
@@ -88,7 +89,7 @@ struct ContentView: View {
                 serverManager: serverManager // Pass ServerManager to InspectorContentView
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
-            .inspectorColumnWidth(ideal: 300)
+            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
         }
         // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
         // .animation(.default, value: showingInspector)
@@ -143,7 +144,7 @@ struct ContentView: View {
             if let server = newServer {
                 // serverConnectionStatus = nil // チェック中にリセット
                 Task {
-                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
+                    _ = await executor.checkAPIConnectivity(host: server.host)
                     await MainActor.run {
                         // serverConnectionStatus = isConnected
                     }
