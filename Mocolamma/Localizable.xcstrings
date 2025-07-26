@@ -79,7 +79,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "サーバーを追加"
           }
         }
@@ -96,7 +96,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "APIデコードエラー:"
           }
         }
@@ -113,7 +113,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "APIエラー: HTTPステータスコード %d"
           }
         }
@@ -130,7 +130,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "APIエラー: 不明なレスポンスタイプです。"
           }
         }
@@ -147,25 +147,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "APIリクエストエラー:"
-          }
-        }
-      }
-    },
-    "Are you sure you want to delete model '%@'?\nThis action cannot be undone." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to delete model '%@'?\nThis action cannot be undone."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル「%@」を削除してもよろしいですか？この操作は元に戻せません。"
           }
         }
       }
@@ -281,6 +264,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続に失敗しました"
+          }
+        }
+      }
+    },
+    "Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー"
           }
         }
       }
@@ -567,50 +566,6 @@
         }
       }
     },
-    "Error decoding pull stream JSON: %@ - Line data unreadable." : {
-      "comment" : "プルストリームJSONのデコードエラー。行データが読み取り不能です。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error decoding pull stream JSON: %@ - Line data unreadable."
-          }
-        }
-      }
-    },
-    "Error decoding pull stream JSON: %@ - Line: %@" : {
-      "comment" : "プルストリームJSONのデコードエラー。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Error decoding pull stream JSON: %1$@ - Line: %2$@"
-          }
-        }
-      }
-    },
-    "Error: Could not convert line to Data: %@" : {
-      "comment" : "エラー: 行をDataに変換できませんでした。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error: Could not convert line to Data: %@"
-          }
-        }
-      }
-    },
-    "Error: Could not decode incoming data as UTF-8 string." : {
-      "comment" : "エラー: 受信データをUTF-8文字列としてデコードできませんでした。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error: Could not decode incoming data as UTF-8 string."
-          }
-        }
-      }
-    },
     "Error: Failed to serialize pull request body: " : {
       "comment" : "プルリクエストボディのシリアライズ失敗のエラーメッセージ。",
       "localizations" : {
@@ -840,23 +795,6 @@
         }
       }
     },
-    "Model pull completed." : {
-      "comment" : "モデルプルが完了しました。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model pull completed."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルのプルが完了しました。"
-          }
-        }
-      }
-    },
     "Model pull error: HTTP Status Code %d" : {
       "comment" : "モデルプルエラー: HTTPステータスコード。",
       "localizations" : {
@@ -870,23 +808,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルのプルエラー: HTTPステータスコード %d"
-          }
-        }
-      }
-    },
-    "Model pull failed with error: %@" : {
-      "comment" : "モデルプルがエラーで失敗しました。",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model pull failed with error: %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルのプルがエラーで失敗しました: %@"
           }
         }
       }
@@ -1137,23 +1058,6 @@
         }
       }
     },
-    "Pull Status: %@, Completed: %lld, Total: %lld, Progress: %.2f" : {
-      "comment" : "プルステータス、完了、合計、進捗",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Pull Status: %1$@, Completed: %2$lld, Total: %3$lld, Progress: %4$.2f"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プル状況: %1$@、完了: %2$lld、合計: %3$lld、進捗: %4$.2f"
-          }
-        }
-      }
-    },
     "Quantization Level:" : {
       "localizations" : {
         "en" : {
@@ -1246,23 +1150,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "詳細を表示するにはモデルを選択してください。"
-          }
-        }
-      }
-    },
-    "Select a model to view details." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a model to view details."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細を表示するモデルを選択してください。"
           }
         }
       }

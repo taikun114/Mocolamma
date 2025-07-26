@@ -12,6 +12,8 @@ struct ServerView: View {
     @State private var serverToEdit: ServerInfo? // 編集対象のサーバーを保持します (sheet(item:)にIdentifiableとして渡す)
     @State private var listSelection: ServerInfo.ID? // リストのハイライト表示のみを制御するID
 
+    let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
+
     var body: some View {
         VStack {
             // ListにlistSelectionバインディングを追加し、クリックで選択（ハイライト）されるようにします。
@@ -68,6 +70,15 @@ struct ServerView: View {
                     Label("Add Server", systemImage: "plus")
                 }
             }
+            // MARK: - Toggle Preview Panel Button
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    onTogglePreview() // クロージャを呼び出す
+                    print("ServerView: Toggle Preview button tapped.")
+                } label: {
+                    Label("Toggle Preview", systemImage: "sidebar.trailing") // ツールバーボタン：プレビューを切り替えます。
+                }
+            }
         }
         .sheet(isPresented: $showingAddServerSheet) {
             // 新しいサーバー追加シートを表示
@@ -115,5 +126,9 @@ struct ServerView: View {
     ]
     previewServerManager.selectedServerID = previewServerManager.servers.first?.id
 
-    return ServerView(serverManager: previewServerManager, executor: previewCommandExecutor)
+    return ServerView(
+        serverManager: previewServerManager,
+        executor: previewCommandExecutor,
+        onTogglePreview: { print("ServerView_Preview: Dummy onTogglePreview called.") }
+    )
 }

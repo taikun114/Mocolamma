@@ -1,10 +1,21 @@
 import SwiftUI
+import AppKit // NSPasteboard のため
 
 // MARK: - モデル詳細ビュー
 
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
 struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
     let model: OllamaModel
+
+    // サイズのフルバイト表記を取得するヘルパー
+    private var fullSizeText: String {
+        return "\(model.size)"
+    }
+
+    // サイズのツールチップ用テキスト（読みやすいサイズ + フルサイズ表記）
+    private var sizeTooltipText: String {
+        return "\(model.formattedSize)、\(model.size)バイト"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -24,6 +35,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                         .bold()
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .help(model.model) // ツールチップにフルテキストを表示
+                        .contextMenu {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(model.model, forType: .string)
+                            }
+                        }
                 }
                 VStack(alignment: .leading) {
                     Text("Size:") // サイズ。
@@ -32,6 +50,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                         .bold()
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .help(sizeTooltipText) // 読みやすいサイズ + フルサイズ表記をツールチップに表示
+                        .contextMenu {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(fullSizeText, forType: .string) // フルサイズ表記のみをコピー
+                            }
+                        }
                 }
                 VStack(alignment: .leading) {
                     Text("Modified At:") // 変更日。
@@ -40,6 +65,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                         .bold()
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
+                        .contextMenu {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
+                            }
+                        }
                 }
                 VStack(alignment: .leading) {
                     Text("Digest:") // ダイジェスト。
@@ -48,6 +80,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                         .bold()
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .help(model.digest) // ツールチップにフルテキストを表示
+                        .contextMenu {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(model.digest, forType: .string)
+                            }
+                        }
                 }
             }
             .font(.body) // ラベルのフォントサイズは維持
@@ -69,6 +108,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(parentModel) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(parentModel, forType: .string)
+                                    }
+                                }
                         }
                     }
                     if let format = details.format {
@@ -79,6 +125,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(format) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(format, forType: .string)
+                                    }
+                                }
                         }
                     }
                     if let family = details.family {
@@ -89,16 +142,31 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(family) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(family, forType: .string)
+                                    }
+                                }
                         }
                     }
                     if let families = details.families, !families.isEmpty {
                         VStack(alignment: .leading) {
                             Text("Families:") // ファミリーズ。
-                            Text(families.joined(separator: ", "))
+                            let familiesText = families.joined(separator: ", ")
+                            Text(familiesText)
                                 .font(.title3) // フォントサイズを大きく、太字に
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(familiesText) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(familiesText, forType: .string)
+                                    }
+                                }
                         }
                     }
                     if let parameterSize = details.parameter_size {
@@ -109,6 +177,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(parameterSize) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(parameterSize, forType: .string)
+                                    }
+                                }
                         }
                     }
                     if let quantizationLevel = details.quantization_level {
@@ -119,6 +194,13 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                                 .bold()
                                 .lineLimit(1)
                                 .truncationMode(.tail)
+                                .help(quantizationLevel) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy") {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(quantizationLevel, forType: .string)
+                                    }
+                                }
                         }
                     }
                 }

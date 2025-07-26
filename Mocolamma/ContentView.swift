@@ -72,16 +72,28 @@ struct ContentView: View {
                     modelToDelete: $modelToDelete,
                     onTogglePreview: {
                         // Inspector の表示状態を切り替えます
-                        print("ContentView: onTogglePreview received. Current inspector visibility: \(showingInspector)")
+                        print("ContentView: onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
                         // レイアウトの競合を避けるため、メインアクターで非同期に切り替えをディスパッチします
                         Task { @MainActor in
                             self.showingInspector.toggle()
-                            print("ContentView: New inspector visibility: \(self.showingInspector)")
+                            print("ContentView: 新しいインスペクターの表示状態: \(self.showingInspector)")
                         }
                     }
                 )
             } else if sidebarSelection == "server" {
-                ServerView(serverManager: serverManager, executor: executor) // ServerViewを表示
+                ServerView(
+                    serverManager: serverManager,
+                    executor: executor,
+                    onTogglePreview: {
+                        // Inspector の表示状態を切り替えます
+                        print("ContentView: サーバー用の onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
+                        // レイアウトの競合を避けるため、メインアクターで非同期に切り替えをディスパッチします
+                        Task { @MainActor in
+                            self.showingInspector.toggle()
+                            print("ContentView: 新しいインスペクターの表示状態: \(self.showingInspector)")
+                        }
+                    }
+                ) // ServerViewを表示
             } else {
                 Text("Select a category.") // カテゴリを選択してください。
                     .font(.title2)
@@ -133,7 +145,7 @@ struct ContentView: View {
             sidebarSelection = "server"
         }
         .onChange(of: columnVisibility) { oldVal, newVal in
-            print("ContentView: columnVisibility changed from \(oldVal) to \(newVal)")
+            print("ContentView: カラムの表示状態が \(oldVal) から \(newVal) に変更されました")
         }
     }
 }

@@ -23,63 +23,47 @@ struct ModelListView: View {
         executor.models.sorted(using: sortOrder)
     }
 
-    // 各TableColumnのContentに適用するコンテキストメニューのヘルパービュー
-    // このビューは各セルのコンテンツをラップし、コンテキストメニューを提供します
-    @ViewBuilder
-    private func contextMenuWrapper<Content: View>(for model: OllamaModel, @ViewBuilder content: () -> Content) -> some View {
-        ZStack(alignment: .leading) { // ZStackでセル全体をカバーします
-            Color.clear // ZStackの背景として機能し、ヒット領域を確保します
-            content() // 元のテキストコンテンツ
-        }
-        .frame(maxWidth: .infinity, alignment: .leading) // ZStackを列幅いっぱいに広げます
-        .contentShape(Rectangle()) // コンテキストメニューのトリガー範囲をZStack全体に設定します
-        .contextMenu { // コンテキストメニューの定義
-            Button("Copy Model Name") { // コンテキストメニューのアクション：モデル名をコピーします。
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(model.name, forType: .string)
-            }
-            Button("Delete...", role: .destructive) { // コンテキストメニューのアクション：モデルを削除します。
-                modelToDelete = model
-                showingDeleteConfirmation = true
-            }
-        }
-    }
-
     var body: some View {
         VStack {
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
-                    contextMenuWrapper(for: model) {
-                        // 0-based indexを1-basedで表示します
-                        Text("\(model.originalIndex + 1)")
-                    }
+                    Text("\(model.originalIndex + 1)")
                 }
                 .width(min: 30, ideal: 50, max: .infinity) // 番号列の幅設定を更新します
 
                 // 「名前」列: 最小50、理想150、最大無制限
                 TableColumn("Name", value: \.name) { model in // テーブル列ヘッダー：名前。
-                    contextMenuWrapper(for: model) {
-                        Text(model.name)
-                    }
+                    Text(model.name)
                 }
                 .width(min: 100, ideal: 200, max: .infinity) // 名前列の幅設定を更新します
 
                 // 「サイズ」列: 最小30、理想50、最大無制限
                 TableColumn("Size", value: \.comparableSize) { model in // テーブル列ヘッダー：サイズ。
-                    contextMenuWrapper(for: model) {
-                        Text(model.formattedSize) // formattedSizeを使用します
-                    }
+                    Text(model.formattedSize) // formattedSizeを使用します
                 }
                 .width(min: 50, ideal: 100, max: .infinity) // サイズ列の幅設定を更新します
 
                 // 「変更日」列: 最小50、理想80、最大無制限
                 TableColumn("Modified At", value: \.comparableModifiedDate) { model in // テーブル列ヘッダー：変更日。
-                    contextMenuWrapper(for: model) {
-                        Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
-                    }
+                    Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
                 }
                 .width(min: 100, ideal: 150, max: .infinity) // 変更日列の幅設定を更新します
+            }
+            // Tableレベルでコンテキストメニューを設定
+            .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
+                // 選択されたモデルIDから最初のモデルを取得
+                if let selectedID = selectedIDs.first,
+                   let model = sortedModels.first(where: { $0.id == selectedID }) {
+                    Button("Copy Model Name") { // コンテキストメニューのアクション：モデル名をコピーします。
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(model.name, forType: .string)
+                    }
+                    Button("Delete...", role: .destructive) { // コンテキストメニューのアクション：モデルを削除します。
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    }
+                }
             }
             .overlay {
                 if executor.apiConnectionError { // API接続エラーの場合
@@ -143,7 +127,7 @@ struct ModelListView: View {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     onTogglePreview() // クロージャを呼び出す
-                    print("ModelListView: Toggle Preview button tapped.")
+                    print("ModelListView: プレビュー表示切替ボタンタップ")
                 } label: {
                     Label("Toggle Preview", systemImage: "sidebar.trailing") // ツールバーボタン：プレビューを切り替えます。
                 }
