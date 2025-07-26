@@ -268,6 +268,15 @@
         }
       }
     },
+    "Connection Status: Checking..." : {
+
+    },
+    "Connection Status: Connected" : {
+
+    },
+    "Connection Status: Not Connected" : {
+
+    },
     "Copy" : {
       "localizations" : {
         "en" : {
@@ -745,6 +754,9 @@
         }
       }
     },
+    "Host:" : {
+
+    },
     "Model deletion failed: " : {
       "comment" : "モデル削除失敗のプレフィックス。",
       "localizations" : {
@@ -1154,6 +1166,9 @@
         }
       }
     },
+    "Select a server to see the details." : {
+
+    },
     "Server" : {
       "localizations" : {
         "en" : {
@@ -1171,6 +1186,7 @@
       }
     },
     "Server information will be displayed here." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

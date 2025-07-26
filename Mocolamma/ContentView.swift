@@ -36,6 +36,10 @@ struct ContentView: View {
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)
     }
+
+    // MARK: - Server Inspector related states
+    @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
+    @State private var serverConnectionStatus: Bool? = nil // Inspectorに表示するサーバーの接続状態 (nil: チェック中, true: 接続済み, false: 未接続)
     
     // ContentViewの初期化。serverManagerを依存性として受け取り、executorを初期化します。
     // このイニシャライザはMocolammaAppから呼び出される際にServerManagerを渡すために必要です。
@@ -107,7 +111,9 @@ struct ContentView: View {
             InspectorContentView(
                 sidebarSelection: sidebarSelection,
                 selectedModel: selectedModel,
-                sortedModels: sortedModels
+                sortedModels: sortedModels,
+                selectedServerForInspector: selectedServerForInspector, // Pass new state
+                serverConnectionStatus: serverConnectionStatus // Pass new state
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(ideal: 300)
@@ -147,6 +153,36 @@ struct ContentView: View {
         .onChange(of: columnVisibility) { oldVal, newVal in
             print("ContentView: カラムの表示状態が \(oldVal) から \(newVal) に変更されました")
         }
+        .onChange(of: sidebarSelection) { oldSelection, newSelection in
+            if newSelection == "server" {
+                // When server tab is selected, update the server for inspector and check connectivity
+                updateSelectedServerForInspector()
+            }
+        }
+        .onChange(of: serverManager.selectedServerID) { oldID, newID in
+            // When selected server changes, update the server for inspector and check connectivity
+            if sidebarSelection == "server" {
+                updateSelectedServerForInspector()
+            }
+        }
+    }
+
+    // Helper function to update selectedServerForInspector and check connectivity
+    private func updateSelectedServerForInspector() {
+        guard let selectedID = serverManager.selectedServerID,
+              let server = serverManager.servers.first(where: { $0.id == selectedID }) else {
+            selectedServerForInspector = nil
+            serverConnectionStatus = nil
+            return
+        }
+        selectedServerForInspector = server
+        serverConnectionStatus = nil // Reset status to checking
+        Task {
+            let isConnected = await executor.checkAPIConnectivity(host: server.host)
+            await MainActor.run {
+                serverConnectionStatus = isConnected
+            }
+        }
     }
 }
 
@@ -156,6 +192,8 @@ private struct InspectorContentView: View {
     let sidebarSelection: String?
     let selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
+    let selectedServerForInspector: ServerInfo? // New parameter
+    let serverConnectionStatus: Bool? // New parameter
 
     var body: some View {
         Group {
@@ -165,10 +203,15 @@ private struct InspectorContentView: View {
                 ModelDetailsView(model: model)
                     .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
-                Text("Server information will be displayed here.")
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-                    .id("server_info_placeholder") // ユニークなIDを付与
+                if let server = selectedServerForInspector {
+                    ServerInspectorView(server: server, connectionStatus: serverConnectionStatus)
+                        .id(server.id) // Use server ID for view identity
+                } else {
+                    Text("Select a server to see the details.") // Fallback if no server is selected
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                        .id("server_selection_placeholder")
+                }
             } else {
                 Text("Select a model to see the details.")
                     .font(.title2)
