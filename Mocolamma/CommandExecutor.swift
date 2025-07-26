@@ -7,6 +7,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var output: String = "" // 公開用の生のコマンド出力（stdout + stderr + 終了メッセージ）
     @Published var isRunning: Bool = false
     @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
+    @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
 
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -66,6 +67,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "APIからモデルを取得中のステータスメッセージ。"), apiBaseURL)
         self.isRunning = true
+        self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
+        // モデルリストを一旦クリア
+        self.models = []
 
         // defer を使って関数終了時に必ず isRunning を false に設定します
         defer {
@@ -74,6 +78,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
 
         guard let url = URL(string: "http://\(apiBaseURL)/api/tags") else {
             self.output = NSLocalizedString("Error: Invalid API URL.", comment: "無効なAPI URLのエラーメッセージ。")
+            self.models = [] // エラー時もモデルリストをクリア
+            self.apiConnectionError = true // API接続エラーを設定
             return
         }
 
@@ -83,6 +89,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("API Error: Unknown response type.", comment: "不明なAPIレスポンスタイプのエラーメッセージ。")
                 print("API Error: Invalid response type.")
+                self.models = [] // エラー時もモデルリストをクリア
+                self.apiConnectionError = true // API接続エラーを設定
                 return
             }
 
@@ -93,6 +101,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 if let errorString = String(data: data, encoding: .utf8) {
                     print("API Error Response: \(errorString)")
                 }
+                self.models = [] // エラー時もモデルリストをクリア
+                self.apiConnectionError = true // API接続エラーを設定
                 return
             }
             
@@ -107,10 +117,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "モデル取得成功のメッセージ。"), self.models.count)
             self.output = successMessage
             print("Models fetched successfully. Total: \(self.models.count)")
+            self.apiConnectionError = false // 成功時はエラーなし
 
         } catch let decodingError as DecodingError {
             self.output = NSLocalizedString("API Decode Error: ", comment: "APIデコードエラーのプレフィックス。") + decodingError.localizedDescription
             print("API Decode Error: \(decodingError.localizedDescription)")
+            self.models = [] // デコードエラー時もモデルリストをクリア
+            self.apiConnectionError = true // API接続エラーを設定
 
             switch decodingError {
             case .keyNotFound(let key, let context):
@@ -132,6 +145,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         } catch {
             self.output = NSLocalizedString("API Request Error: ", comment: "APIリクエストエラーのプレフィックス。") + error.localizedDescription
             print("API Request Error (other): \(error.localizedDescription)")
+            self.models = [] // その他のエラー時もモデルリストをクリア
+            self.apiConnectionError = true // API接続エラーを設定
         }
     }
 

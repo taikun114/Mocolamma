@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation // Task { @MainActor in } を使用するため
 
 // MARK: - コンテンツビュー
 
@@ -16,7 +17,11 @@ struct ContentView: View {
     @State private var sidebarSelection: String? = "server"
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
-    @State private var columnVisibility: NavigationSplitViewVisibility = .detailOnly // デフォルトで詳細パネルを閉じる
+    // 全てのカラムを表示する初期設定とし、Inspectorの表示を別途制御します
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
+
+    // Inspector（プレビューパネル）の表示/非表示を制御するState変数
+    @State private var showingInspector: Bool = false
 
     @State private var showingAddModelsSheet = false // モデル追加シートの表示/非表示を制御します
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
@@ -40,24 +45,22 @@ struct ContentView: View {
     }
 
     var body: some View {
-        // NavigationSplitView を使って3カラムレイアウトを構築します
-        // sidebar: 左側のナビゲーション (Categories)
-        // content: 中央のコンテンツエリア (Model List or Server View)
-        // detail: 右側の詳細エリア (Model Details)
+        // NavigationSplitView を使って2カラムレイアウトを構築します (サイドバーとメインコンテンツ)
+        // ディテールはInspectorとして別に管理します
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
             // MARK: - サイドバー (左端のカラム)
             List(selection: $sidebarSelection) {
                 // "Server" という項目を配置し、選択可能にします
-                Label("サーバー", systemImage: "server.rack") // アイコンをserver.rackに
+                Label("Server", systemImage: "server.rack") // アイコンをserver.rackに
                     .tag("server")
                 
                 // "Models" という項目を配置し、選択可能にします
-                Label("モデル", systemImage: "tray.full") // アイコンをtray.fullに
+                Label("Models", systemImage: "tray.full") // アイコンをtray.fullに
                     .tag("models")
             }
-            .navigationTitle("カテゴリ") // サイドバーのタイトル
-        } content: {
-            // MARK: - コンテンツ (中央のカラム)
+            .navigationTitle("Categories") // サイドバーのタイトル
+        } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
+            // MARK: - メインコンテンツ (右側のカラム - 旧 content カラム)
             // サイドバーの選択状態に基づいて表示するビューを切り替えます
             if sidebarSelection == "models" {
                 ModelListView(
@@ -68,42 +71,43 @@ struct ContentView: View {
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
                     onTogglePreview: {
-                        print("ContentView: onTogglePreview received. Current visibility: \(columnVisibility)")
-                        if columnVisibility == .all {
-                            columnVisibility = .detailOnly
-                        } else {
-                            columnVisibility = .all
+                        // Inspector の表示状態を切り替えます
+                        print("ContentView: onTogglePreview received. Current inspector visibility: \(showingInspector)")
+                        // レイアウトの競合を避けるため、メインアクターで非同期に切り替えをディスパッチします
+                        Task { @MainActor in
+                            self.showingInspector.toggle()
+                            print("ContentView: New inspector visibility: \(self.showingInspector)")
                         }
-                        print("ContentView: New visibility: \(columnVisibility)")
                     }
                 )
             } else if sidebarSelection == "server" {
                 ServerView(serverManager: serverManager, executor: executor) // ServerViewを表示
             } else {
-                Text("カテゴリを選択してください。") // カテゴリを選択してください。
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-            }
-        } detail: {
-            // MARK: - ディテール (右端のカラム: モデル詳細)
-            // 選択されたモデルがある場合にのみ詳細を表示します (Modelsタブが選択されている場合のみ)
-            if sidebarSelection == "models",
-               let selectedModelID = selectedModel,
-               let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                ModelDetailsView(model: model)
-            } else {
-                // モデルが選択されていない場合のプレースホルダーテキスト、またはServerタブ選択時の詳細
-                Text("モデルを選択して詳細を表示するためのプレースホルダーテキスト。") // モデルを選択して詳細を表示するためのプレースホルダーテキスト。
+                Text("Select a category.") // カテゴリを選択してください。
                     .font(.title2)
                     .foregroundColor(.secondary)
             }
         }
+        // MARK: - Inspector (右端のプレビューパネル)
+        // Inspectorはメインコンテンツビューに追加され、独立して開閉します
+        .inspector(isPresented: $showingInspector) {
+            // Inspectorのコンテンツを分離したヘルパービューで管理
+            InspectorContentView(
+                sidebarSelection: sidebarSelection,
+                selectedModel: selectedModel,
+                sortedModels: sortedModels
+            )
+            // Inspectorのデフォルト幅を設定（必要に応じて調整）
+            .inspectorColumnWidth(ideal: 300)
+        }
+        // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
+        // .animation(.default, value: showingInspector)
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
             // ServerFormView (旧 AddModelsSheet) に executor を渡す
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
         }
-        .alert("モデルを削除", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
-            Button("削除", role: .destructive) { // アラートの削除ボタン。
+        .alert("Delete Model", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
+            Button("Delete", role: .destructive) { // アラートの削除ボタン。
                 if let model = modelToDelete { // 手動でアンラップ
                     Task {
                         await executor.deleteModel(modelName: model.name)
@@ -112,16 +116,16 @@ struct ContentView: View {
                 showingDeleteConfirmation = false // アラートを閉じる
                 modelToDelete = nil // 削除対象モデルをクリア
             }
-            Button("キャンセル", role: .cancel) { // アラートのキャンセルボタン。
+            Button("Cancel", role: .cancel) { // アラートのキャンセルボタン。
                 showingDeleteConfirmation = false // アラートを閉じる
                 modelToDelete = nil // 削除対象モデルをクリア
             }
         } message: {
             if let model = modelToDelete { // 手動でアンラップ
-                Text(String(localized: "モデル「\(model.name)」を削除してもよろしいですか？\nこの操作は元に戻せません。", comment: "モデル削除の確認メッセージ。"))
+                Text(String(localized: "Are you sure you want to delete the model \"\(model.name)\"?\nThis action cannot be undone.", comment: "モデル削除の確認メッセージ。"))
             } else {
                 // modelToDeleteがnilの場合のフォールバックメッセージ
-                Text(String(localized: "選択したモデルを削除してもよろしいですか？\nこの操作は元に戻せません。", comment: "選択したモデル削除の確認メッセージ（フォールバック）。"))
+                Text(String(localized: "Are you sure you want to delete the selected model?\nThis action cannot be undone.", comment: "選択したモデル削除の確認メッセージ（フォールバック）。"))
             }
         }
         .onAppear {
@@ -130,6 +134,35 @@ struct ContentView: View {
         }
         .onChange(of: columnVisibility) { oldVal, newVal in
             print("ContentView: columnVisibility changed from \(oldVal) to \(newVal)")
+        }
+    }
+}
+
+// MARK: - Inspector Content Helper View
+/// Inspector内部のコンテンツを表示するためのヘルパービュー
+private struct InspectorContentView: View {
+    let sidebarSelection: String?
+    let selectedModel: OllamaModel.ID?
+    let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
+
+    var body: some View {
+        Group {
+            if sidebarSelection == "models",
+               let selectedModelID = selectedModel,
+               let model = sortedModels.first(where: { $0.id == selectedModelID }) {
+                ModelDetailsView(model: model)
+                    .id(model.id) // モデルのIDに基づいてビューの同一性を管理
+            } else if sidebarSelection == "server" {
+                Text("Server information will be displayed here.")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+                    .id("server_info_placeholder") // ユニークなIDを付与
+            } else {
+                Text("Select a model to see the details.")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+                    .id("model_selection_placeholder") // ユニークなIDを付与
+            }
         }
     }
 }

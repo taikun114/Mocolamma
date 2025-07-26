@@ -70,19 +70,88 @@
       }
     },
     "Add Server" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サーバーを追加"
+          }
+        }
+      }
     },
     "API Decode Error: " : {
-      "comment" : "APIデコードエラーのプレフィックス。"
+      "comment" : "APIデコードエラーのプレフィックス。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Decode Error: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "APIデコードエラー:"
+          }
+        }
+      }
     },
     "API Error: HTTP Status Code %d" : {
-      "comment" : "HTTPステータスコードのエラーメッセージ。"
+      "comment" : "HTTPステータスコードのエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Error: HTTP Status Code %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "APIエラー: HTTPステータスコード %d"
+          }
+        }
+      }
     },
     "API Error: Unknown response type." : {
-      "comment" : "不明なAPIレスポンスタイプのエラーメッセージ。"
+      "comment" : "不明なAPIレスポンスタイプのエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Error: Unknown response type."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "APIエラー: 不明なレスポンスタイプです。"
+          }
+        }
+      }
     },
     "API Request Error: " : {
-      "comment" : "APIリクエストエラーのプレフィックス。"
+      "comment" : "APIリクエストエラーのプレフィックス。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Request Error: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "APIリクエストエラー:"
+          }
+        }
+      }
     },
     "Are you sure you want to delete model '%@'?\nThis action cannot be undone." : {
       "extractionState" : "stale",
@@ -101,8 +170,25 @@
         }
       }
     },
+    "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone." : {
+      "comment" : "モデル削除の確認メッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%@」を削除してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "Are you sure you want to delete the selected model?\nThis action cannot be undone." : {
-      "extractionState" : "stale",
+      "comment" : "選択したモデル削除の確認メッセージ（フォールバック）。",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -135,7 +221,6 @@
       }
     },
     "Categories" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -152,10 +237,53 @@
       }
     },
     "Completed" : {
-      "comment" : "プルステータス: 完了。"
+      "comment" : "プルステータス: 完了。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了しました"
+          }
+        }
+      }
     },
     "Connection Error" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続エラー"
+          }
+        }
+      }
+    },
+    "Connection Failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続に失敗しました"
+          }
+        }
+      }
     },
     "Copy Model Name" : {
       "localizations" : {
@@ -212,10 +340,23 @@
       }
     },
     "Delete Error: Unknown response type." : {
-      "comment" : "削除エラー: 不明なレスポンスタイプのエラーメッセージ。"
+      "comment" : "削除エラー: 不明なレスポンスタイプのエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Error: Unknown response type."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: 不明なレスポンスタイプです。"
+          }
+        }
+      }
     },
     "Delete Model" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -254,6 +395,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Deleting model '%1$@' from %2$@..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」から削除しています…"
           }
         }
       }
@@ -298,6 +445,12 @@
             "state" : "new",
             "value" : "Downloading model '%1$@' from %2$@..."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」からダウンロードしています…"
+          }
         }
       }
     },
@@ -318,16 +471,68 @@
       }
     },
     "e.g., localhost:11434 or 192.168.1.50:11434" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g., localhost:11434 or 192.168.1.50:11434"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: localhost:11434または192.168.1.50:11434など"
+          }
+        }
+      }
     },
     "e.g., My Local Server" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g., My Local Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: マイローカルサーバー"
+          }
+        }
+      }
     },
     "Edit Server" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Server"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを編集"
+          }
+        }
+      }
     },
     "Edit..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集…"
+          }
+        }
+      }
     },
     "Enter the name of the model you want to add." : {
       "localizations" : {
@@ -346,10 +551,32 @@
       }
     },
     "Error" : {
-      "comment" : "プルステータス: エラー。"
+      "comment" : "プルステータス: エラー。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        }
+      }
     },
     "Error decoding pull stream JSON: %@ - Line data unreadable." : {
-      "comment" : "プルストリームJSONのデコードエラー。行データが読み取り不能です。"
+      "comment" : "プルストリームJSONのデコードエラー。行データが読み取り不能です。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error decoding pull stream JSON: %@ - Line data unreadable."
+          }
+        }
+      }
     },
     "Error decoding pull stream JSON: %@ - Line: %@" : {
       "comment" : "プルストリームJSONのデコードエラー。",
@@ -363,28 +590,114 @@
       }
     },
     "Error: Could not convert line to Data: %@" : {
-      "comment" : "エラー: 行をDataに変換できませんでした。"
+      "comment" : "エラー: 行をDataに変換できませんでした。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Could not convert line to Data: %@"
+          }
+        }
+      }
     },
     "Error: Could not decode incoming data as UTF-8 string." : {
-      "comment" : "エラー: 受信データをUTF-8文字列としてデコードできませんでした。"
+      "comment" : "エラー: 受信データをUTF-8文字列としてデコードできませんでした。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Could not decode incoming data as UTF-8 string."
+          }
+        }
+      }
     },
     "Error: Failed to serialize pull request body: " : {
-      "comment" : "プルリクエストボディのシリアライズ失敗のエラーメッセージ。"
+      "comment" : "プルリクエストボディのシリアライズ失敗のエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Failed to serialize pull request body: "
+          }
+        }
+      }
     },
     "Error: Failed to serialize request body: " : {
-      "comment" : "リクエストボディのシリアライズ失敗のエラーメッセージ。"
+      "comment" : "リクエストボディのシリアライズ失敗のエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Failed to serialize request body: "
+          }
+        }
+      }
     },
     "Error: Invalid API URL for delete." : {
-      "comment" : "削除用API URLが無効な場合のエラーメッセージ。"
+      "comment" : "削除用API URLが無効な場合のエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Invalid API URL for delete."
+          }
+        }
+      }
     },
     "Error: Invalid API URL for pull." : {
-      "comment" : "プル用API URLが無効な場合のエラーメッセージ。"
+      "comment" : "プル用API URLが無効な場合のエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Invalid API URL for pull."
+          }
+        }
+      }
     },
     "Error: Invalid API URL." : {
-      "comment" : "無効なAPI URLのエラーメッセージ。"
+      "comment" : "無効なAPI URLのエラーメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: Invalid API URL."
+          }
+        }
+      }
     },
     "Failed" : {
-      "comment" : "プルステータス: 失敗。"
+      "comment" : "プルステータス: 失敗。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗しました"
+          }
+        }
+      }
+    },
+    "Failed to connect to the Ollama API. Please check your network connection or server settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to connect to the Ollama API. Please check your network connection or server settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama APIとの接続に失敗しました。ネットワーク接続やサーバーの設定をご確認ください。"
+          }
+        }
+      }
     },
     "Families:" : {
       "localizations" : {
@@ -419,7 +732,21 @@
       }
     },
     "Fetching models from API (%@)..." : {
-      "comment" : "APIからモデルを取得中のステータスメッセージ。"
+      "comment" : "APIからモデルを取得中のステータスメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetching models from API (%@)..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API（%@）からモデルを取得中…"
+          }
+        }
+      }
     },
     "Format:" : {
       "localizations" : {
@@ -438,13 +765,47 @@
       }
     },
     "General settings will go here." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General settings will go here."
+          }
+        }
+      }
     },
     "Host" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホスト"
+          }
+        }
+      }
     },
     "Model deletion failed: " : {
-      "comment" : "モデル削除失敗のプレフィックス。"
+      "comment" : "モデル削除失敗のプレフィックス。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model deletion failed: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの削除に失敗しました:"
+          }
+        }
+      }
     },
     "Model Name:" : {
       "localizations" : {
@@ -463,19 +824,89 @@
       }
     },
     "Model pull completed: " : {
-      "comment" : "モデルプルの完了プレフィックス。"
+      "comment" : "モデルプルの完了プレフィックス。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull completed: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルが完了しました:"
+          }
+        }
+      }
     },
     "Model pull completed." : {
-      "comment" : "モデルプルが完了しました。"
+      "comment" : "モデルプルが完了しました。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull completed."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルが完了しました。"
+          }
+        }
+      }
     },
     "Model pull error: HTTP Status Code %d" : {
-      "comment" : "モデルプルエラー: HTTPステータスコード。"
+      "comment" : "モデルプルエラー: HTTPステータスコード。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull error: HTTP Status Code %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルエラー: HTTPステータスコード %d"
+          }
+        }
+      }
     },
     "Model pull failed with error: %@" : {
-      "comment" : "モデルプルがエラーで失敗しました。"
+      "comment" : "モデルプルがエラーで失敗しました。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull failed with error: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルがエラーで失敗しました: %@"
+          }
+        }
+      }
     },
     "Model pull failed: " : {
-      "comment" : "モデルプルの失敗プレフィックス。"
+      "comment" : "モデルプルの失敗プレフィックス。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull failed: "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルに失敗しました:"
+          }
+        }
+      }
     },
     "Models" : {
       "localizations" : {
@@ -542,7 +973,21 @@
       }
     },
     "No data available" : {
-      "comment" : "データなし。"
+      "comment" : "データなし。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No data available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データがありません"
+          }
+        }
+      }
     },
     "No details available." : {
       "localizations" : {
@@ -593,10 +1038,36 @@
       }
     },
     "No servers are currently configured. Click '+' to add a new server." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No servers are currently configured. Click '+' to add a new server."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーが設定されていません。「+」をクリックして新しいサーバーを追加してください。"
+          }
+        }
+      }
     },
     "No Servers Available" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Servers Available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーがありません"
+          }
+        }
+      }
     },
     "No." : {
       "localizations" : {
@@ -615,7 +1086,7 @@
       }
     },
     "OK" : {
-
+      "shouldTranslate" : false
     },
     "Parameter Size:" : {
       "localizations" : {
@@ -650,7 +1121,21 @@
       }
     },
     "Preparing..." : {
-      "comment" : "プルステータス: 準備中。"
+      "comment" : "プルステータス: 準備中。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備中…"
+          }
+        }
+      }
     },
     "Pull Status: %@, Completed: %lld, Total: %lld, Progress: %.2f" : {
       "comment" : "プルステータス、完了、合計、進捗",
@@ -659,6 +1144,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Pull Status: %1$@, Completed: %2$lld, Total: %3$lld, Progress: %4$.2f"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プル状況: %1$@、完了: %2$lld、合計: %3$lld、進捗: %4$.2f"
           }
         }
       }
@@ -696,10 +1187,68 @@
       }
     },
     "Save" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        }
+      }
     },
     "Select" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択"
+          }
+        }
+      }
+    },
+    "Select a category." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a category."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを選択してください。"
+          }
+        }
+      }
+    },
+    "Select a model to see the details." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a model to see the details."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細を表示するにはモデルを選択してください。"
+          }
+        }
+      }
     },
     "Select a model to view details." : {
       "extractionState" : "stale",
@@ -719,7 +1268,6 @@
       }
     },
     "Server" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -735,8 +1283,31 @@
         }
       }
     },
+    "Server information will be displayed here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server information will be displayed here."
+          }
+        }
+      }
+    },
     "Servers" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー"
+          }
+        }
+      }
     },
     "Size" : {
       "localizations" : {
@@ -778,11 +1349,31 @@
             "state" : "new",
             "value" : "Successfully deleted model '%1$@' from %2$@."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」からの削除に成功しました。"
+          }
         }
       }
     },
     "Successfully fetched models. Total: %d" : {
-      "comment" : "モデル取得成功のメッセージ。"
+      "comment" : "モデル取得成功のメッセージ。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully fetched models. Total: %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの取得に成功しました。合計: %d"
+          }
+        }
+      }
     },
     "Toggle Preview" : {
       "localizations" : {
@@ -801,37 +1392,20 @@
       }
     },
     "Update" : {
-
-    },
-    "カテゴリ" : {
-
-    },
-    "カテゴリを選択してください。" : {
-
-    },
-    "キャンセル" : {
-
-    },
-    "サーバー" : {
-      "comment" : "ナビゲーションタイトル: サーバー。"
-    },
-    "モデル" : {
-
-    },
-    "モデル「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。" : {
-      "comment" : "モデル削除の確認メッセージ。"
-    },
-    "モデルを削除" : {
-
-    },
-    "モデルを選択して詳細を表示するためのプレースホルダーテキスト。" : {
-
-    },
-    "削除" : {
-      "comment" : "削除ボタン"
-    },
-    "選択したモデルを削除してもよろしいですか？\nこの操作は元に戻せません。" : {
-      "comment" : "選択したモデル削除の確認メッセージ（フォールバック）。"
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

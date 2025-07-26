@@ -82,7 +82,13 @@ struct ModelListView: View {
                 .width(min: 100, ideal: 150, max: .infinity) // 変更日列の幅設定を更新します
             }
             .overlay {
-                if executor.models.isEmpty && !executor.isRunning && !executor.isPulling { // pull中も表示されないように条件追加
+                if executor.apiConnectionError { // API接続エラーの場合
+                    ContentUnavailableView(
+                        "Connection Failed", // 接続失敗のタイトル。
+                        systemImage: "network.slash",
+                        description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.") // 接続失敗の説明。
+                    )
+                } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling { // pull中も表示されないように条件追加
                     ContentUnavailableView(
                         "No Models Available", // 利用可能なモデルなしのタイトル。
                         systemImage: "internaldrive.fill",
