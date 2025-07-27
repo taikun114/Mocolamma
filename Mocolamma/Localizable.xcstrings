@@ -37,6 +37,22 @@
         }
       }
     },
+    "Add Anyway" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Anyway"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま追加"
+          }
+        }
+      }
+    },
     "Add Model" : {
       "localizations" : {
         "en" : {
@@ -302,22 +318,6 @@
         }
       }
     },
-    "Connection Error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connection Error"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続エラー"
-          }
-        }
-      }
-    },
     "Connection Failed" : {
       "localizations" : {
         "en" : {
@@ -330,6 +330,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続に失敗しました"
+          }
+        }
+      }
+    },
+    "ConnectionError.message" : {
+      "comment" : "Connection error message when adding a server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Could not connect to the API. Please check if the host is correct and the Ollama server is running."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIに接続できませんでした。ホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
+          }
+        }
+      }
+    },
+    "ConnectionError.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続エラー"
           }
         }
       }
@@ -390,6 +423,12 @@
             "state" : "new",
             "value" : "Delete Error: HTTP Status Code %1$d - %2$@ on %3$@"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: HTTPステータスコード %1$d - %2$@（%3$@）"
+          }
         }
       }
     },
@@ -400,6 +439,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Delete Error: Model '%1$@' not found (404 Not Found) on %2$@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: モデル「%1$@」は%2$@で見つかりませんでした（404 Not Found）。"
           }
         }
       }
@@ -1456,6 +1501,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更新"
+          }
+        }
+      }
+    },
+    "Update Anyway" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Anyway"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま更新"
           }
         }
       }

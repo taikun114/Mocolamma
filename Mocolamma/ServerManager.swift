@@ -10,6 +10,8 @@ class ServerManager: ObservableObject {
     private let serversKey = "saved_ollama_servers"
     // 選択されたサーバーIDのUserDefaultsキー
     private let selectedServerIDKey = "selected_ollama_server_id"
+    // ユーザーがデフォルトサーバーを削除したかどうかを追跡するUserDefaultsキー
+    private let didUserDeleteDefaultServerKey = "did_user_delete_default_server"
 
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     @Published var servers: [ServerInfo] {
@@ -55,9 +57,11 @@ class ServerManager: ObservableObject {
             self.servers = []
         }
 
-        // デフォルトの「ローカル」サーバーが存在するか確認し、なければ追加
-        let localServer = ServerInfo(name: "Local", host: "localhost:11434")
-        if !servers.contains(where: { $0.id == localServer.id || ($0.name == localServer.name && $0.host == localServer.host) }) {
+        // デフォルトの「ローカル」サーバーが存在するか、またはユーザーが削除したかを確認
+        let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
+        let didUserDeleteDefaultServer = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
+
+        if !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteDefaultServer {
             servers.insert(localServer, at: 0)
         }
         
@@ -66,8 +70,8 @@ class ServerManager: ObservableObject {
            let savedSelectedID = UUID(uuidString: savedSelectedIDString) {
             self.selectedServerID = savedSelectedID
         } else {
-            // 以前の選択がない場合は「ローカル」サーバーをデフォルトで選択
-            self.selectedServerID = servers.first(where: { $0.name == "Local" && $0.host == "localhost:11434" })?.id
+            // 以前の選択がない場合はデフォルトの「ローカル」サーバーをデフォルトで選択
+            self.selectedServerID = ServerInfo.defaultServerID
         }
 
         // selectedServerIDがnilの場合、最初のサーバーを選択（ローカルサーバーがあればそれが選択される）
@@ -105,6 +109,11 @@ class ServerManager: ObservableObject {
             selectedServerID = servers.first?.id
         }
         serverConnectionStatuses[server.id] = nil
+
+        // 削除されたサーバーがデフォルトサーバーの場合、フラグを設定
+        if server.id == ServerInfo.defaultServerID {
+            UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
+        }
     }
 
     /// 指定されたサーバーの接続状態を更新します。

@@ -12,8 +12,6 @@ struct ServerFormView: View {
     @State private var serverNameInput: String
     @State private var serverHostInput: String
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
-    @State private var connectionErrorMessage: String = "" // 接続エラーメッセージ
-
     // 編集中のサーバー情報 (追加の場合はnil)
     var editingServer: ServerInfo?
 
@@ -75,7 +73,6 @@ struct ServerFormView: View {
                             dismiss() // シートを閉じる
                         } else {
                             // 接続失敗: アラートを表示
-                            connectionErrorMessage = "Could not connect to the API. Please check if the host is correct and the Ollama server is running."
                             showingConnectionErrorAlert = true
                         }
                     }
@@ -86,10 +83,22 @@ struct ServerFormView: View {
         }
         .padding(30)
         .frame(minWidth: 400, minHeight: 300) // シートの最小サイズ
-        .alert("Connection Error", isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
+        .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
             Button("OK") { }
+            Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
+                if let server = editingServer {
+                    // 編集モード: サーバーを更新
+                    serverManager.updateServer(
+                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                    )
+                } else {
+                    // 追加モード: 新しいサーバーを追加
+                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                }
+                dismiss() // シートを閉じる
+            }
         } message: {
-            Text(connectionErrorMessage)
+            Text(LocalizedStringKey("ConnectionError.message"))
         }
     }
 }
