@@ -125,16 +125,6 @@ struct ModelListView: View {
                 }
                 .disabled(executor.isRunning || executor.isPulling)
             }
-            // MARK: - Toggle Preview Panel Button
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    onTogglePreview() // クロージャを呼び出す
-                    print("ModelListView: プレビュー表示切替ボタンタップ")
-                } label: {
-                    Label("Toggle Preview", systemImage: "sidebar.trailing") // ツールバーボタン：プレビューを切り替えます。
-                }
-                .disabled(executor.isRunning || executor.isPulling)
-            }
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .onAppear {

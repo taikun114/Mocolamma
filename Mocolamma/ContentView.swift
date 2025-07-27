@@ -23,7 +23,8 @@ struct ContentView: View {
     // Inspector（プレビューパネル）の表示/非表示を制御するState変数
     @State private var showingInspector: Bool = false
 
-    @State private var showingAddModelsSheet = false // モデル追加シートの表示/非表示を制御します
+    // モデル追加シートの表示/非表示を制御します
+    @State private var showingAddModelsSheet = false
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
     
@@ -48,51 +49,21 @@ struct ContentView: View {
     }
 
     var body: some View {
-        // NavigationSplitView を使って2カラムレイアウトを構築します (サイドバーとメインコンテンツ)
-        // ディテールはInspectorとして別に管理します
-        NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
-            // MARK: - サイドバー (左端のカラム)
-            List(selection: $sidebarSelection) {
-                // "Server" という項目を配置し、選択可能にします
-                Label("Server", systemImage: "server.rack") // アイコンをserver.rackに
-                    .tag("server")
-                
-                // "Models" という項目を配置し、選択可能にします
-                Label("Models", systemImage: "tray.full") // アイコンをtray.fullに
-                    .tag("models")
-            }
-            .navigationTitle("Categories") // サイドバーのタイトル
-            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 500)
-        } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
-            MainContentDetailView(
-                sidebarSelection: $sidebarSelection,
-                selectedModel: $selectedModel,
-                executor: executor,
-                serverManager: serverManager,
-                selectedServerForInspector: $selectedServerForInspector,
-                showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
-                showingAddModelsSheet: $showingAddModelsSheet,
-                showingDeleteConfirmation: $showingDeleteConfirmation,
-                modelToDelete: $modelToDelete
-            )
-        }
-        // MARK: - Inspector (右端のプレビューパネル)
-        // Inspectorはメインコンテンツビューに追加され、独立して開閉します
-        .inspector(isPresented: $showingInspector) {
-            // Inspectorのコンテンツを分離したヘルパービューで管理
-            InspectorContentView(
-                sidebarSelection: sidebarSelection,
-                selectedModel: selectedModel,
-                sortedModels: sortedModels,
-                selectedServerForInspector: selectedServerForInspector, // Pass new state
-                serverManager: serverManager // Pass ServerManager to InspectorContentView
-            )
-            // Inspectorのデフォルト幅を設定（必要に応じて調整）
-            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
-        }
-        // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
-        // .animation(.default, value: showingInspector)
+        // メインナビゲーションビューを呼び出し、必要なバインディングとオブジェクトを渡します
+        MainNavigationView(
+            sidebarSelection: $sidebarSelection,
+            selectedModel: $selectedModel,
+            executor: executor,
+            serverManager: serverManager,
+            selectedServerForInspector: $selectedServerForInspector,
+            showingInspector: $showingInspector,
+            sortOrder: $sortOrder,
+            showingAddModelsSheet: $showingAddModelsSheet,
+            showingDeleteConfirmation: $showingDeleteConfirmation,
+            modelToDelete: $modelToDelete,
+            columnVisibility: $columnVisibility,
+            sortedModels: sortedModels
+        )
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
             // ServerFormView (旧 AddModelsSheet) に executor を渡す
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
@@ -164,6 +135,71 @@ struct ContentView: View {
     }
 }
 
+// MARK: - Main Navigation View Helper
+/// NavigationSplitViewとInspectorを含むメインナビゲーション構造をカプセル化するヘルパービュー
+private struct MainNavigationView: View {
+    @Binding var sidebarSelection: String?
+    @Binding var selectedModel: OllamaModel.ID?
+    @ObservedObject var executor: CommandExecutor
+    @ObservedObject var serverManager: ServerManager
+    @Binding var selectedServerForInspector: ServerInfo?
+    @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
+    @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var showingAddModelsSheet: Bool
+    @Binding var showingDeleteConfirmation: Bool
+    @Binding var modelToDelete: OllamaModel?
+    @Binding var columnVisibility: NavigationSplitViewVisibility
+    let sortedModels: [OllamaModel]
+
+    var body: some View {
+        NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
+            // MARK: - サイドバー (左端のカラム)
+            List(selection: $sidebarSelection) {
+                // "Server" という項目を配置し、選択可能にします
+                Label("Server", systemImage: "server.rack") // アイコンをserver.rackに
+                    .tag("server")
+                
+                // "Models" という項目を配置し、選択可能にします
+                Label("Models", systemImage: "tray.full") // アイコンをtray.fullに
+                    .tag("models")
+            }
+            .navigationTitle("Categories") // サイドバーのタイトル
+            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 500)
+        } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
+            MainContentDetailView(
+                sidebarSelection: $sidebarSelection,
+                selectedModel: $selectedModel,
+                executor: executor,
+                serverManager: serverManager,
+                selectedServerForInspector: $selectedServerForInspector,
+                showingInspector: $showingInspector,
+                sortOrder: $sortOrder,
+                showingAddModelsSheet: $showingAddModelsSheet,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                modelToDelete: $modelToDelete
+            )
+        }
+        // MARK: - Inspector (右端のプレビューパネル)
+        // Inspectorはメインコンテンツビューに追加され、独立して開閉します
+        .inspector(isPresented: $showingInspector) {
+            // Inspectorのコンテンツを分離したヘルパービューで管理
+            InspectorContentView(
+                sidebarSelection: sidebarSelection,
+                selectedModel: selectedModel,
+                sortedModels: sortedModels,
+                selectedServerForInspector: selectedServerForInspector, // Pass new state
+                serverManager: serverManager, // Pass ServerManager to InspectorContentView
+                showingInspector: $showingInspector // InspectorContentViewにバインディングを渡す
+            )
+            // Inspectorのデフォルト幅を設定（必要に応じて調整）
+            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+        }
+        // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
+        // .animation(.default, value: showingInspector)
+    }
+}
+
+
 // MARK: - Inspector Content Helper View
 /// Inspector内部のコンテンツを表示するためのヘルパービュー
 private struct InspectorContentView: View {
@@ -172,6 +208,8 @@ private struct InspectorContentView: View {
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
     let selectedServerForInspector: ServerInfo? // New parameter
     @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
+
+    @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
 
     var body: some View {
         Group {
@@ -197,12 +235,20 @@ private struct InspectorContentView: View {
                     .id("model_selection_placeholder") // ユニークなIDを付与
             }
         }
+        // InspectorContentViewにツールバーを追加
+        .toolbar {
+            Spacer()
+            Button {
+                // Inspector の表示状態を切り替えます
+                print("InspectorContentView: インスペクター内のボタンが押されました。現在のインスペクターの表示状態: \(showingInspector)")
+                showingInspector.toggle()
+                print("InspectorContentView: 新しいインスペクターの表示状態: \(showingInspector)")
+            } label: {
+                Image(systemName: "sidebar.right") // サイドバーの右側を示すアイコン
+            }
+            .help("Toggle Inspector") // ツールチップ
+        }
     }
-}
-
-// カスタムカラー定義 (必要であれば別のファイルに移動します)
-extension Color {
-    static let textEditorBackground = Color(NSColor.textBackgroundColor)
 }
 
 // MARK: - Main Content Detail Helper View

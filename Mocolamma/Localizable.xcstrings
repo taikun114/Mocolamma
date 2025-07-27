@@ -1412,7 +1412,11 @@
         }
       }
     },
+    "Toggle Inspector" : {
+
+    },
     "Toggle Preview" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

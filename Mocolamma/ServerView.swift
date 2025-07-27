@@ -50,15 +50,6 @@ struct ServerView: View {
                     Label("Add Server", systemImage: "plus")
                 }
             }
-            // MARK: - Toggle Preview Panel Button
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    onTogglePreview() // クロージャを呼び出す
-                    print("ServerView: Toggle Preview button tapped.")
-                } label: {
-                    Label("Toggle Preview", systemImage: "sidebar.trailing") // ツールバーボタン：プレビューを切り替えます。
-                }
-            }
         }
         .sheet(isPresented: $showingAddServerSheet) {
             // 新しいサーバー追加シートを表示
