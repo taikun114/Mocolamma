@@ -241,7 +241,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     }
     
     /// モデルの詳細情報を取得します (async/await版)
-    func fetchModelInfo(modelName: String) async -> [String: JSONValue]? {
+    func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
         print("モデル \(modelName) の詳細情報を \(apiBaseURL) から取得中...")
         
         guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
@@ -272,7 +272,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             
             let apiResponse = try JSONDecoder().decode(OllamaShowResponse.self, from: data)
             print("モデル \(modelName) の詳細情報を正常に取得しました。")
-            return apiResponse.model_info
+            return apiResponse
             
         } catch {
             print("APIリクエストエラー: /api/show - \(error.localizedDescription)")
@@ -466,6 +466,8 @@ struct OllamaShowResponse: Decodable {
     let template: String?
     let details: OllamaModelDetails?
     let model_info: [String: JSONValue]?
+    let capabilities: [String]?
+
 }
 
 struct OllamaPullResponse: Decodable {

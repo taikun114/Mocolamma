@@ -8,6 +8,7 @@ struct ModelDetailsView: View {
     let model: OllamaModel
     let modelInfo: [String: JSONValue]? // 追加
     let isLoading: Bool // 追加
+    let fetchedCapabilities: [String]? // 追加
 
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
@@ -49,7 +50,27 @@ struct ModelDetailsView: View {
                 Text(model.name) // モデル詳細のタイトルをモデル名に変更。
                     .font(.title2)
                     .bold()
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                     .padding(.bottom, 5)
+
+                // Capabilities Section
+                if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(capabilities, id: \.self) { capability in
+                                Text(capability)
+                                    .font(.caption)
+                                    .bold() // Make text bold
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Capsule().fill(Color.accentColor.opacity(0.2)))
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                        
+                    }
+                }
 
                 Divider()
 
@@ -324,7 +345,8 @@ struct ModelDetailsView: View {
             "families": ["llama", "example"],
             "parameter_size": "7B",
             "quantization_level": "Q4_0"
-        }
+        },
+        "capabilities": ["completion", "vision"]
     }
     """.data(using: .utf8)!)
 
@@ -334,13 +356,13 @@ struct ModelDetailsView: View {
     ]
 
     return Group {
-        ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: false)
+        ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: false, fetchedCapabilities: ["completion", "vision"])
             .previewDisplayName("Loaded State")
         
-        ModelDetailsView(model: model, modelInfo: nil, isLoading: true)
+        ModelDetailsView(model: model, modelInfo: nil, isLoading: true, fetchedCapabilities: nil)
             .previewDisplayName("Loading State")
         
-        ModelDetailsView(model: model, modelInfo: nil, isLoading: false)
+        ModelDetailsView(model: model, modelInfo: nil, isLoading: false, fetchedCapabilities: nil)
             .previewDisplayName("Error State")
     }
     .frame(width: 300)

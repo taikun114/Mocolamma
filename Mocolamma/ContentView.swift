@@ -215,6 +215,7 @@ private struct InspectorContentView: View {
     
     // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
+    @State private var capabilities: [String]? // Add this line
     @State private var isLoadingInfo: Bool = false // ローディング状態
 
     var body: some View {
@@ -223,7 +224,7 @@ private struct InspectorContentView: View {
                let selectedModelID = selectedModel,
                let model = sortedModels.first(where: { $0.id == selectedModelID }) {
                 // ModelDetailsViewにmodelInfoとisLoadingInfoを渡す
-                ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: isLoadingInfo)
+                ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: isLoadingInfo, fetchedCapabilities: capabilities)
                     .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
                 if let server = selectedServerForInspector {
@@ -254,11 +255,12 @@ private struct InspectorContentView: View {
             }
             
             Task {
-                let fetchedInfo = await commandExecutor.fetchModelInfo(modelName: model.name)
+                let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
                 // このタスクがキャンセルされていないか、または選択が再度変更されていないか確認
                 if selectedModel == newID {
                     await MainActor.run {
-                        self.modelInfo = fetchedInfo
+                        self.modelInfo = fetchedResponse?.model_info
+                        self.capabilities = fetchedResponse?.capabilities
                         self.isLoadingInfo = false
                     }
                 }

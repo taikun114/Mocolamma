@@ -116,6 +116,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let size: Int64 // バイト単位の数値
     let digest: String
     let details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
+    var capabilities: [String]?
 
     // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)
     enum CodingKeys: String, CodingKey {
@@ -125,6 +126,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         case size
         case digest
         case details
+        case capabilities
     }
 
     // Decodable のカスタムイニシャライザ
@@ -136,6 +138,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.size = try container.decode(Int64.self, forKey: .size)
         self.digest = try container.decode(String.self, forKey: .digest)
         self.details = try container.decodeIfPresent(OllamaModelDetails.self, forKey: .details)
+        self.capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities)
 
         // originalIndex は API レスポンスに含まれないため、ここでは初期化しない
         // CommandExecutor で API 応答後に設定する
