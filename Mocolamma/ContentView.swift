@@ -164,7 +164,7 @@ private struct MainNavigationView: View {
                     .tag("models")
             }
             .navigationTitle("Categories") // サイドバーのタイトル
-            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 500)
+            .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
         } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
