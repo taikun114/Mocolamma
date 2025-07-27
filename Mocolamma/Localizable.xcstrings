@@ -367,6 +367,9 @@
         }
       }
     },
+    "Context Length:" : {
+
+    },
     "Copy" : {
       "localizations" : {
         "en" : {
@@ -398,6 +401,9 @@
           }
         }
       }
+    },
+    "Could not load model information." : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -918,6 +924,9 @@
         }
       }
     },
+    "Loading model info..." : {
+
+    },
     "Model deletion failed: " : {
       "comment" : "モデル削除失敗のプレフィックス。",
       "localizations" : {
@@ -934,6 +943,9 @@
           }
         }
       }
+    },
+    "Model Information:" : {
+
     },
     "Model Name:" : {
       "localizations" : {
@@ -1099,6 +1111,9 @@
         }
       }
     },
+    "No model information available." : {
+
+    },
     "No models are currently installed. Click '+' to add a new model." : {
       "localizations" : {
         "en" : {
@@ -1213,6 +1228,9 @@
           }
         }
       }
+    },
+    "Parameter Count:" : {
+
     },
     "Parameter Size:" : {
       "localizations" : {

@@ -239,6 +239,64 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("モデル削除に失敗しました: \(error.localizedDescription)")
         }
     }
+    
+    /// モデルの詳細情報を取得します (async/await版)
+    func fetchModelInfo(modelName: String) async -> [String: JSONValue]? {
+        print("モデル \(modelName) の詳細情報を \(apiBaseURL) から取得中...")
+        
+        guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
+            print("エラー: /api/show のURLが無効です。")
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body = ["model": modelName]
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(body)
+        } catch {
+            print("エラー: リクエストボディのエンコードに失敗しました: \(error)")
+            return nil
+        }
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                print("APIエラー: /api/show - HTTPステータスコード \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+                return nil
+            }
+            
+            let apiResponse = try JSONDecoder().decode(OllamaShowResponse.self, from: data)
+            print("モデル \(modelName) の詳細情報を正常に取得しました。")
+            return apiResponse.model_info
+            
+        } catch {
+            print("APIリクエストエラー: /api/show - \(error.localizedDescription)")
+            if let decodingError = error as? DecodingError {
+                 switch decodingError {
+                 case .keyNotFound(let key, let context):
+                     print("DecodingError.keyNotFound: キー '\(key.stringValue)' が見つかりません。\(context.debugDescription)")
+                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                 case .typeMismatch(let type, let context):
+                     print("DecodingError.typeMismatch: タイプ '\(type)' が一致しません。\(context.debugDescription)")
+                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                 case .valueNotFound(let type, let context):
+                     print("DecodingError.valueNotFound: タイプ '\(type)' の値が見つかりません。\(context.debugDescription)")
+                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                 case .dataCorrupted(let context):
+                     print("DecodingError.dataCorrupted: データが破損しています。\(context.debugDescription)")
+                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                 @unknown default:
+                     print("不明なDecodingError: \(decodingError.localizedDescription)")
+                 }
+            }
+            return nil
+        }
+    }
 
     /// 指定されたホストにOllama APIが接続可能かを確認します。
     /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
@@ -399,6 +457,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
 
 struct OllamaAPIModelsResponse: Decodable {
     let models: [OllamaModel]
+}
+
+/// /api/show エンドポイントからのレスポンス
+struct OllamaShowResponse: Decodable {
+    let modelfile: String?
+    let parameters: String?
+    let template: String?
+    let details: OllamaModelDetails?
+    let model_info: [String: JSONValue]?
 }
 
 struct OllamaPullResponse: Decodable {

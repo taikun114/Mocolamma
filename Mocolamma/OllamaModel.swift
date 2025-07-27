@@ -10,6 +10,101 @@ struct OllamaModelDetails: Codable, Hashable {
     let quantization_level: String?
 }
 
+/// APIレスポンスの多様なJSON値をデコードするための汎用enum
+enum JSONValue: Codable, Hashable {
+    case int(Int)
+    case int64(Int64)
+    case string(String)
+    case double(Double)
+    case bool(Bool)
+    case null
+    case array([JSONValue])
+    case object([String: JSONValue])
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        
+        // 型のチェック順序を最適化：複雑な型（オブジェクト、配列）を先に試す
+        if let objectValue = try? container.decode([String: JSONValue].self) {
+            self = .object(objectValue)
+        } else if let arrayValue = try? container.decode([JSONValue].self) {
+            self = .array(arrayValue)
+        } else if let stringValue = try? container.decode(String.self) {
+            self = .string(stringValue)
+        } else if let doubleValue = try? container.decode(Double.self) {
+            self = .double(doubleValue)
+        } else if let int64Value = try? container.decode(Int64.self) {
+            self = .int64(int64Value)
+        } else if let intValue = try? container.decode(Int.self) {
+            self = .int(intValue)
+        } else if let boolValue = try? container.decode(Bool.self) {
+            self = .bool(boolValue)
+        } else if container.decodeNil() { // null値のチェックを追加
+            self = .null
+        } else {
+            throw DecodingError.typeMismatch(JSONValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unsupported JSON value"))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .int(let value):
+            try container.encode(value)
+        case .int64(let value):
+            try container.encode(value)
+        case .string(let value):
+            try container.encode(value)
+        case .double(let value):
+            try container.encode(value)
+        case .bool(let value):
+            try container.encode(value)
+        case .null:
+            try container.encodeNil() // null値のエンコードを追加
+        case .array(let value):
+            try container.encode(value)
+        case .object(let value):
+            try container.encode(value)
+        }
+    }
+    
+    // 値を文字列として取り出すヘルパー
+    var stringValue: String {
+        switch self {
+        case .int(let value): return String(value)
+        case .int64(let value): return String(value)
+        case .string(let value): return value
+        case .double(let value): return String(value)
+        case .bool(let value): return String(value)
+        case .null: return "null"
+        default: return "" // Array/Objectの場合は空文字
+        }
+    }
+
+    // 値をIntとして取り出すヘルパー
+    var intValue: Int? {
+        switch self {
+        case .int(let value): return value
+        case .int64(let value): return Int(value)
+        case .string(let value): return Int(value)
+        case .double(let value): return Int(value)
+        default: return nil
+        }
+    }
+
+    // 値をInt64として取り出すヘルパー
+    var int64Value: Int64? {
+        switch self {
+        case .int(let value): return Int64(value)
+        case .int64(let value): return value
+        case .string(let value): return Int64(value)
+        case .double(let value): return Int64(value)
+        default: return nil
+        }
+    }
+}
+
+
 /// Ollama APIの /api/tags エンドポイントから返される個々のモデル情報を表すデータモデル
 struct OllamaModel: Identifiable, Hashable, Codable {
     let id = UUID() // テーブルビューで各行を一意に識別するためのID (Codableの対象外)

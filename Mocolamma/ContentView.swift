@@ -212,13 +212,18 @@ private struct InspectorContentView: View {
     @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
 
     @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
+    
+    // Model Infoを保持するState
+    @State private var modelInfo: [String: JSONValue]?
+    @State private var isLoadingInfo: Bool = false // ローディング状態
 
     var body: some View {
         Group {
             if sidebarSelection == "models",
                let selectedModelID = selectedModel,
                let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                ModelDetailsView(model: model)
+                // ModelDetailsViewにmodelInfoとisLoadingInfoを渡す
+                ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: isLoadingInfo)
                     .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
                 if let server = selectedServerForInspector {
@@ -235,6 +240,28 @@ private struct InspectorContentView: View {
                     .font(.title2)
                     .foregroundColor(.secondary)
                     .id("model_selection_placeholder") // ユニークなIDを付与
+            }
+        }
+        .onChange(of: selectedModel) { _, newID in
+            // 選択が変更されたらリセット
+            modelInfo = nil
+            isLoadingInfo = true
+            
+            guard let newID = newID,
+                  let model = sortedModels.first(where: { $0.id == newID }) else {
+                isLoadingInfo = false
+                return
+            }
+            
+            Task {
+                let fetchedInfo = await commandExecutor.fetchModelInfo(modelName: model.name)
+                // このタスクがキャンセルされていないか、または選択が再度変更されていないか確認
+                if selectedModel == newID {
+                    await MainActor.run {
+                        self.modelInfo = fetchedInfo
+                        self.isLoadingInfo = false
+                    }
+                }
             }
         }
         // InspectorContentViewにツールバーを追加

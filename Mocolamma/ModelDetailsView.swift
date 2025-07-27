@@ -1,12 +1,13 @@
-
 import SwiftUI
 import AppKit // NSPasteboard のため
 
 // MARK: - モデル詳細ビュー
 
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
-struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
+struct ModelDetailsView: View {
     let model: OllamaModel
+    let modelInfo: [String: JSONValue]? // 追加
+    let isLoading: Bool // 追加
 
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
@@ -16,6 +17,29 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
     // サイズのツールチップ用テキスト（読みやすいサイズ + フルサイズ表記）
     private var sizeTooltipText: String {
         return "\(model.formattedSize)、\(model.size)バイト"
+    }
+    
+    // modelInfoからパラメーターカウントを取得するヘルパー
+    private var parameterCount: String? {
+        guard let count = modelInfo?["general.parameter_count"]?.int64Value else { return nil }
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
+        return numberFormatter.string(from: NSNumber(value: count))
+    }
+
+    // modelInfoからコンテキスト長を取得するヘルパー
+    private var contextLength: String? {
+        guard let info = modelInfo else { return nil }
+        // ".context_length"で終わるキーを探す
+        if let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) {
+            guard let length = info[key]?.intValue else { return nil }
+            let numberFormatter = NumberFormatter()
+            numberFormatter.numberStyle = .decimal
+            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
+            return numberFormatter.string(from: NSNumber(value: length))
+        }
+        return nil
     }
 
     var body: some View {
@@ -214,8 +238,110 @@ struct ModelDetailsView: View { // 構造体名 ModelDetailsView はそのまま
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
                 }
+                
+                Divider()
+
+                Text("Model Information:") // モデル情報セクションのタイトル
+                    .font(.headline)
+
+                if isLoading {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(0.5, anchor: .center)
+                        Text("Loading model info...") // モデル情報を読み込み中...
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                } else if modelInfo != nil {
+                    VStack(alignment: .leading, spacing: 10) {
+                        // パラメーターカウント
+                        if let count = parameterCount {
+                            VStack(alignment: .leading) {
+                                Text("Parameter Count:") // パラメーターカウント
+                                Text(count)
+                                    .font(.title3).bold()
+                                    .contextMenu {
+                                        Button("Copy") {
+                                            NSPasteboard.general.clearContents()
+                                            NSPasteboard.general.setString(count, forType: .string)
+                                        }
+                                    }
+                            }
+                        }
+                        // コンテキストレングス
+                        if let length = contextLength {
+                            VStack(alignment: .leading) {
+                                Text("Context Length:") // コンテキスト長
+                                Text(length)
+                                    .font(.title3).bold()
+                                    .contextMenu {
+                                        Button("Copy") {
+                                            NSPasteboard.general.clearContents()
+                                            NSPasteboard.general.setString(length, forType: .string)
+                                        }
+                                    }
+                            }
+                        }
+                        
+                        // もし情報が一つもなければ
+                        if parameterCount == nil && contextLength == nil {
+                             Text("No model information available.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+
+                    }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text("Could not load model information.") // モデル情報を読み込めませんでした。
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
             .padding() // ここにパディングを追加
         }
     }
+}
+
+
+// MARK: - プレビュー用
+
+#Preview {
+    // ModelDetailsViewのプレビュー
+    var details = OllamaModelDetails(parent_model: "parent_model_example", format: "gguf", family: "llama", families: ["llama", "example"], parameter_size: "7B", quantization_level: "Q4_0")
+    var model = try! JSONDecoder().decode(OllamaModel.self, from: """
+    {
+        "name": "Test Model",
+        "model": "test:latest",
+        "modified_at": "2023-08-11T08:30:00.12345Z",
+        "size": 1234567890,
+        "digest": "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456",
+        "details": {
+            "parent_model": "parent_model_example",
+            "format": "gguf",
+            "family": "llama",
+            "families": ["llama", "example"],
+            "parameter_size": "7B",
+            "quantization_level": "Q4_0"
+        }
+    }
+    """.data(using: .utf8)!)
+
+    let modelInfo: [String: JSONValue] = [
+        "general.parameter_count": .int64(8030261248),
+        "llama.context_length": .int(8192)
+    ]
+
+    return Group {
+        ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: false)
+            .previewDisplayName("Loaded State")
+        
+        ModelDetailsView(model: model, modelInfo: nil, isLoading: true)
+            .previewDisplayName("Loading State")
+        
+        ModelDetailsView(model: model, modelInfo: nil, isLoading: false)
+            .previewDisplayName("Error State")
+    }
+    .frame(width: 300)
 }
