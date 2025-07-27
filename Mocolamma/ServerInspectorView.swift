@@ -70,6 +70,12 @@ struct ServerInspectorView: View {
                         .font(.title3)
                         .bold()
                         .foregroundColor(.primary)
+                        .contextMenu {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
+                            }
+                        }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onAppear {
