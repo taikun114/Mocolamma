@@ -253,6 +253,22 @@
         }
       }
     },
+    "Checking..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認中…"
+          }
+        }
+      }
+    },
     "Completed" : {
       "comment" : "プルステータス: 完了。",
       "localizations" : {
@@ -266,6 +282,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了しました"
+          }
+        }
+      }
+    },
+    "Connected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続済み"
           }
         }
       }
@@ -298,54 +330,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続に失敗しました"
-          }
-        }
-      }
-    },
-    "Connection Status: Checking..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connection Status: Checking..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続状況: 確認中…"
-          }
-        }
-      }
-    },
-    "Connection Status: Connected" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connection Status: Connected"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続状況: 接続済み"
-          }
-        }
-      }
-    },
-    "Connection Status: Not Connected" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connection Status: Not Connected"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続状況: 未接続"
           }
         }
       }
@@ -1150,6 +1134,22 @@
         }
       }
     },
+    "Not Connected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Connected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続"
+          }
+        }
+      }
+    },
     "OK" : {
       "shouldTranslate" : false
     },
@@ -1413,21 +1413,17 @@
       }
     },
     "Toggle Inspector" : {
-
-    },
-    "Toggle Preview" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle Preview"
+            "value" : "Toggle Inspector"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "プレビューを切り替える"
+            "value" : "インスペクタを切り替える"
           }
         }
       }

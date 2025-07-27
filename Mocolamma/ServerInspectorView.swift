@@ -7,7 +7,7 @@ struct ServerInspectorView: View {
 
     var body: some View {
         ScrollView { // ScrollViewを追加
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 5) {
                 // Name styled like the model name in the model inspector
                 Text(server.name)
                     .font(.title2)
@@ -16,12 +16,20 @@ struct ServerInspectorView: View {
 
                 // Connection status below the name in a secondary color
                 if let status = connectionStatus {
-                    Text(status ? "Connection Status: Connected" : "Connection Status: Not Connected")
-                        .font(.subheadline)
-                        .foregroundColor(status ? .green : .secondary)
+                    HStack(spacing: 4) { // HStackで囲む
+                        Circle() // インジケーターの追加
+                            .fill(status ? .green : .red) // 接続状況に応じて色を変更
+                            .frame(width: 8, height: 8) // サイズ調整
+                        Text(status ? "Connected" : "Not Connected")
+                            .font(.subheadline)
+                            .foregroundColor(status ? .green : .secondary)
+                    }
                 } else {
                     HStack(spacing: 4) {
-                        Text("Connection Status: Checking...")
+                        Circle() // インジケーターの追加
+                            .fill(.gray) // Checking中は灰色
+                            .frame(width: 8, height: 8) // サイズ調整
+                        Text("Checking...")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         ProgressView()
@@ -36,11 +44,14 @@ struct ServerInspectorView: View {
                 // Host information
                 VStack(alignment: .leading) {
                     Text("Host:")
-                        .font(.headline)
+                        .font(.subheadline)
                     Text(server.host)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .textSelection(.enabled)
+                        .font(.title3)
+                        .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(server.host)
+                        .foregroundColor(.primary)
                         .contextMenu {
                             Button("Copy") {
                                 NSPasteboard.general.clearContents()
