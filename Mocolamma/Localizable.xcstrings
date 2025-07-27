@@ -1153,6 +1153,22 @@
     "OK" : {
       "shouldTranslate" : false
     },
+    "Ollama Version:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama Version:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama バージョン:"
+          }
+        }
+      }
+    },
     "Parameter Size:" : {
       "localizations" : {
         "en" : {

@@ -2,17 +2,18 @@ import SwiftUI
 import AppKit // For NSPasteboard
 
 struct ServerInspectorView: View {
+    @EnvironmentObject var commandExecutor: CommandExecutor
     let server: ServerInfo
     let connectionStatus: Bool? // Can be nil while checking
+    @State private var ollamaVersion: String? // New state variable for Ollama version
 
     var body: some View {
         ScrollView { // ScrollViewを追加
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 10) {
                 // Name styled like the model name in the model inspector
                 Text(server.name)
                     .font(.title2)
                     .bold()
-                    .padding(.bottom, 1) // Less padding
 
                 // Connection status below the name in a secondary color
                 if let status = connectionStatus {
@@ -58,6 +59,28 @@ struct ServerInspectorView: View {
                                 NSPasteboard.general.setString(server.host, forType: .string)
                             }
                         }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // Ollama Version information
+                VStack(alignment: .leading) {
+                    Text("Ollama Version:")
+                        .font(.subheadline)
+                    Text(ollamaVersion ?? "-")
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(.primary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onAppear {
+                    Task {
+                        do {
+                            ollamaVersion = try await commandExecutor.fetchOllamaVersion(host: server.host)
+                        } catch {
+                            ollamaVersion = "-"
+                            print("Error fetching Ollama version: \(error)")
+                        }
+                    }
                 }
 
                 Spacer()

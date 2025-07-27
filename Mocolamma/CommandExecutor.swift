@@ -267,6 +267,19 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
 
+    /// Ollamaのバージョンを取得します。
+    /// - Parameter host: OllamaホストのURL。
+    /// - Returns: Ollamaのバージョン文字列。
+    func fetchOllamaVersion(host: String) async throws -> String {
+        guard let url = URL(string: "http://\(host)/api/version") else {
+            throw URLError(.badURL)
+        }
+
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let response = try JSONDecoder().decode(OllamaVersionResponse.self, from: data)
+        return response.version
+    }
+
     // MARK: - URLSessionDataDelegate Methods (バックグラウンドスレッドで呼び出されます)
     // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
     // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
@@ -393,4 +406,8 @@ struct OllamaPullResponse: Decodable {
     let digest: String?
     let total: Int64?
     let completed: Int64?
+}
+
+struct OllamaVersionResponse: Decodable {
+    let version: String
 }

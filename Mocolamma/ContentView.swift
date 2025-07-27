@@ -64,6 +64,7 @@ struct ContentView: View {
             columnVisibility: $columnVisibility,
             sortedModels: sortedModels
         )
+        .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
             // ServerFormView (旧 AddModelsSheet) に executor を渡す
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
@@ -203,6 +204,7 @@ private struct MainNavigationView: View {
 // MARK: - Inspector Content Helper View
 /// Inspector内部のコンテンツを表示するためのヘルパービュー
 private struct InspectorContentView: View {
+    @EnvironmentObject var commandExecutor: CommandExecutor
     let sidebarSelection: String?
     let selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
