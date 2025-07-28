@@ -318,6 +318,22 @@
         }
       }
     },
+    "Completion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンプリーション"
+          }
+        }
+      }
+    },
     "Connected" : {
       "localizations" : {
         "en" : {
@@ -1671,6 +1687,22 @@
         }
       }
     },
+    "Tools" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tools"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ツール"
+          }
+        }
+      }
+    },
     "Update" : {
       "localizations" : {
         "en" : {
@@ -1699,6 +1731,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま更新"
+          }
+        }
+      }
+    },
+    "Vision" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビジョン"
           }
         }
       }

@@ -77,6 +77,37 @@ struct ModelDetailsView: View {
         }
     }
 
+    // MARK: - ヘルパー関数
+
+    private func tagView(for capability: String) -> some View {
+        let displayText: String
+        let iconName: String
+        switch capability.lowercased() {
+        case "completion":
+            displayText = String(localized: "Completion")
+            iconName = "character.cursor.ibeam"
+        case "vision":
+            displayText = String(localized: "Vision")
+            iconName = "eye"
+        case "tools":
+            displayText = String(localized: "Tools")
+            iconName = "wrench.and.screwdriver"
+        default:
+            displayText = capability
+            iconName = "tag"
+        }
+        return HStack(spacing: 4) {
+            Image(systemName: iconName)
+            Text(displayText)
+        }
+        .font(.caption)
+        .bold()
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Capsule().fill(Color.accentColor.opacity(0.2)))
+        .foregroundColor(.accentColor)
+    }
+
     var body: some View {
         ScrollView { // ScrollViewを追加
             VStack(alignment: .leading, spacing: 10) {
@@ -86,20 +117,13 @@ struct ModelDetailsView: View {
                     .bold()
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .padding(.bottom, 5)
 
                 // Capabilities Section
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
-                                Text(capability)
-                                    .font(.caption)
-                                    .bold() // Make text bold
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Capsule().fill(Color.accentColor.opacity(0.2)))
-                                    .foregroundColor(.accentColor)
+                                tagView(for: capability)
                             }
                         }
                         
