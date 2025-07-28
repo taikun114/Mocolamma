@@ -215,7 +215,8 @@ private struct InspectorContentView: View {
     
     // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
-    @State private var capabilities: [String]? // Add this line
+    @State private var capabilities: [String]?
+    @State private var licenseBody: String? // 新しく追加
     @State private var isLoadingInfo: Bool = false // ローディング状態
 
     var body: some View {
@@ -223,13 +224,21 @@ private struct InspectorContentView: View {
             if sidebarSelection == "models",
                let selectedModelID = selectedModel,
                let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                // ModelDetailsViewにmodelInfoとisLoadingInfoを渡す
-                ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: isLoadingInfo, fetchedCapabilities: capabilities)
-                    .id(model.id) // モデルのIDに基づいてビューの同一性を管理
+                ModelInspectorDetailView(
+                    model: model,
+                    modelInfo: modelInfo,
+                    isLoading: isLoadingInfo,
+                    fetchedCapabilities: capabilities,
+                    licenseBody: licenseBody
+                )
+                .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
                 if let server = selectedServerForInspector {
-                    ServerInspectorView(server: server, connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil)
-                        .id(server.id) // Use server ID for view identity
+                    ServerInspectorDetailView(
+                        server: server,
+                        connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
+                    )
+                    .id(server.id) // Use server ID for view identity
                 } else {
                     Text("Select a server to see the details.") // Fallback if no server is selected
                         .font(.title2)
@@ -247,6 +256,7 @@ private struct InspectorContentView: View {
             // 選択が変更されたらリセット
             modelInfo = nil
             isLoadingInfo = true
+            licenseBody = nil // Reset licenseBody as well
             
             guard let newID = newID,
                   let model = sortedModels.first(where: { $0.id == newID }) else {
@@ -261,6 +271,7 @@ private struct InspectorContentView: View {
                     await MainActor.run {
                         self.modelInfo = fetchedResponse?.model_info
                         self.capabilities = fetchedResponse?.capabilities
+                        self.licenseBody = fetchedResponse?.license // 新しく追加
                         self.isLoadingInfo = false
                     }
                 }
@@ -279,6 +290,38 @@ private struct InspectorContentView: View {
             }
             .help("Toggle Inspector") // ツールチップ
         }
+    }
+}
+
+// MARK: - Model Inspector Detail View Helper
+private struct ModelInspectorDetailView: View {
+    let model: OllamaModel
+    let modelInfo: [String: JSONValue]?
+    let isLoading: Bool
+    let fetchedCapabilities: [String]?
+    let licenseBody: String?
+
+    var body: some View {
+        ModelDetailsView(
+            model: model,
+            modelInfo: modelInfo,
+            isLoading: isLoading,
+            fetchedCapabilities: fetchedCapabilities,
+            licenseBody: licenseBody
+        )
+    }
+}
+
+// MARK: - Server Inspector Detail View Helper
+private struct ServerInspectorDetailView: View {
+    let server: ServerInfo
+    let connectionStatus: Bool?
+
+    var body: some View {
+        ServerInspectorView(
+            server: server,
+            connectionStatus: connectionStatus
+        )
     }
 }
 

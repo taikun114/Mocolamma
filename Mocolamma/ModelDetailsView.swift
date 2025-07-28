@@ -9,6 +9,9 @@ struct ModelDetailsView: View {
     let modelInfo: [String: JSONValue]? // 追加
     let isLoading: Bool // 追加
     let fetchedCapabilities: [String]? // 追加
+    let licenseBody: String? // 新しく追加: ライセンス本文
+
+    @State private var showingLicenseSheet = false // 新しく追加: ライセンスシート表示制御
 
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
@@ -45,7 +48,7 @@ struct ModelDetailsView: View {
         return nil
     }
 
-    // modelInfoからエンベディング長を取得するヘルパー
+    // modelInfoからエンベディング長を取得するヘルper
     private var embeddingLength: (formatted: String, raw: Int)? {
         guard let info = modelInfo else { return nil }
         // ".embedding_length"で終わるキーを探す
@@ -58,6 +61,19 @@ struct ModelDetailsView: View {
             return (formattedLength, length)
         }
         return nil
+    }
+
+    // 新しく追加: general.license を取得するヘルパー
+    private var licenseName: String {
+        let rawLicense = modelInfo?["general.license"]?.stringValue ?? "Other"
+        switch rawLicense.lowercased() {
+        case "mit":
+            return "MIT License"
+        case "apache-2.0":
+            return "Apache License 2.0"
+        default:
+            return rawLicense
+        }
     }
 
     var body: some View {
@@ -292,6 +308,25 @@ struct ModelDetailsView: View {
                     }
                 } else if modelInfo != nil {
                     VStack(alignment: .leading, spacing: 10) {
+                        // 新しく追加: ライセンス
+                        VStack(alignment: .leading) {
+                            Text("License:") // ライセンス
+                            if licenseBody != nil {
+                                Button(action: {
+                                    showingLicenseSheet = true
+                                }) {
+                                    Text(licenseName)
+                                        .font(.title3).bold()
+                                        .underline()
+                                        .foregroundColor(.accentColor)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            } else {
+                                Text(licenseName)
+                                    .font(.title3).bold()
+                            }
+                        }
+                        
                         // パラメーターカウント
                         if let count = parameterCount {
                             VStack(alignment: .leading) {
@@ -336,7 +371,7 @@ struct ModelDetailsView: View {
                         }
                         
                         // もし情報が一つもなければ
-                        if parameterCount == nil && contextLength == nil && embeddingLength == nil {
+                        if parameterCount == nil && contextLength == nil && embeddingLength == nil && licenseBody == nil {
                              Text("No model information available.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -353,8 +388,10 @@ struct ModelDetailsView: View {
             }
             .padding() // ここにパディングを追加
         }
+        .sheet(isPresented: $showingLicenseSheet) {
+            if let licenseBody = licenseBody {
+                LicenseTextView(licenseText: licenseBody)
+            }
+        }
     }
 }
-
-
-

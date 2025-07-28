@@ -478,6 +478,7 @@ struct OllamaAPIModelsResponse: Decodable {
 
 /// /api/show エンドポイントからのレスポンス
 struct OllamaShowResponse: Decodable {
+    let license: String?
     let modelfile: String?
     let parameters: String?
     let template: String?

@@ -285,6 +285,9 @@
         }
       }
     },
+    "Close" : {
+
+    },
     "Completed" : {
       "comment" : "プルステータス: 完了。",
       "localizations" : {
@@ -971,6 +974,12 @@
           }
         }
       }
+    },
+    "License" : {
+
+    },
+    "License:" : {
+
     },
     "Loading model info..." : {
       "localizations" : {
