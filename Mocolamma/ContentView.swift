@@ -163,6 +163,9 @@ private struct MainNavigationView: View {
                 // "Models" という項目を配置し、選択可能にします
                 Label("Models", systemImage: "tray.full") // アイコンをtray.fullに
                     .tag("models")
+
+                Label("Chat", systemImage: "message") // 新しいチャットタブ
+                    .tag("chat")
             }
             .navigationTitle("Categories") // サイドバーのタイトル
             .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
@@ -375,6 +378,9 @@ private struct MainContentDetailView: View {
                     },
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
+            } else if sidebarSelection == "chat" {
+                ChatView()
+                    .environmentObject(executor)
             } else {
                 Text("Select a category.") // カテゴリを選択してください。
                     .font(.title2)

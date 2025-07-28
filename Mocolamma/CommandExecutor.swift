@@ -19,6 +19,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
+    private var chatContinuations: [URLSessionTask: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation] = [:]
+    private var chatLineBuffers: [URLSessionTask: String] = [:]
 
     // Ollama APIのベースURL
     // ServerManagerから現在のサーバーホストを受け取るように変更
@@ -57,10 +59,19 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
 
         serverManager.$selectedServerID
             .compactMap { selectedID in
-                // selectedServerIDが変更された場合、対応するサーバーのホストを返す
+                // selectedIDが変更された場合、対応するサーバーのホストを返す
                 serverManager.servers.first(where: { $0.id == selectedID })?.host
             }
             .assign(to: \.apiBaseURL, on: self)
+            .store(in: &cancellables)
+
+        // apiBaseURLの変更を監視し、モデルリストを再取得
+        $apiBaseURL
+            .sink { [weak self] _ in
+                Task {
+                    await self?.fetchOllamaModelsFromAPI()
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -109,7 +120,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 return
             }
             
-            print("デコードを試行中。データサイズ: \(data.count) バイト。最初の10バイト: \(data.prefix(10).map { String(format: "%02x", $0) }.joined())")
+            print("デコードを試行中。データサイズ: \(data.count) バイト。最初の10バイト: \(data.prefix(10).map { String(format: "%02x", $0) }.joined())...")
 
             let apiResponse = try JSONDecoder().decode(OllamaAPIModelsResponse.self, from: data)
             self.models = apiResponse.models.enumerated().map { (index, model) in
@@ -355,6 +366,40 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         print("モデル情報キャッシュをクリアしました。")
     }
 
+    /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
+    /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
+    /// - Returns: ChatResponseChunkのAsyncThrowingStream。
+    func chat(chatRequest: ChatRequest) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+        return AsyncThrowingStream { continuation in
+            Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
+                guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
+                    continuation.finish(throwing: URLError(.badURL))
+                    return
+                }
+
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+                do {
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = .prettyPrinted // デバッグ用に整形
+                    request.httpBody = try encoder.encode(chatRequest)
+                    print("Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+                } catch {
+                    continuation.finish(throwing: error)
+                    return
+                }
+
+                let task = urlSession.dataTask(with: request)
+                self.chatContinuations[task] = continuation
+                self.chatLineBuffers[task] = "" // Initialize buffer for this task
+
+                task.resume()
+            }
+        }
+    }
+
     // MARK: - URLSessionDataDelegate Methods (バックグラウンドスレッドで呼び出されます)
     // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
     // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
@@ -387,58 +432,87 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         Task { @MainActor [weak self] in
             guard let self = self else { return }
 
-            // 受信したデータを既存のバッファに追加します
-            if let newString = String(data: data, encoding: .utf8) {
-                self.pullLineBuffer.append(newString)
-            } else {
-                print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
-                return
-            }
-            
-            // バッファを改行で分割し、完全な行を処理します
-            var lines = self.pullLineBuffer.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-            
-            // 最後の行が改行で終わっていない場合（不完全な行）、それをバッファに残します
-            if !self.pullLineBuffer.hasSuffix("\n") && !lines.isEmpty {
-                self.pullLineBuffer = lines.removeLast()
-            } else {
-                self.pullLineBuffer = ""
-            }
-
-            // 各完全なJSON行を処理します
-            for line in lines {
-                guard !line.isEmpty else { continue } // 空行はスキップします
-                guard let jsonData = line.data(using: .utf8) else {
-                    print("エラー: 行をDataに変換できませんでした: \(line)")
-                    continue
+            if dataTask == self.pullTask {
+                // プルタスクの処理
+                if let newString = String(data: data, encoding: .utf8) {
+                    self.pullLineBuffer.append(newString)
+                } else {
+                    print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
+                    return
+                }
+                
+                var lines = self.pullLineBuffer.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+                
+                if !self.pullLineBuffer.hasSuffix("\n") && !lines.isEmpty {
+                    self.pullLineBuffer = lines.removeLast()
+                } else {
+                    self.pullLineBuffer = ""
                 }
 
-                do {
-                    let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
-                    self.pullStatus = response.status
-                    
-                    if let total = response.total {
-                        self.pullTotal = total
+                for line in lines {
+                    guard !line.isEmpty else { continue } // 空行はスキップします
+                    guard let jsonData = line.data(using: .utf8) else {
+                        print("エラー: 行をDataに変換できませんでした: \(line)")
+                        continue
                     }
-                    if let completed = response.completed {
-                        self.pullCompleted = completed
+
+                    do {
+                        let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
+                        self.pullStatus = response.status
+                        
+                        if let total = response.total {
+                            self.pullTotal = total
+                        }
+                        if let completed = response.completed {
+                            self.pullCompleted = completed
+                        }
+                        
+                        if self.pullTotal > 0 {
+                            var calculatedProgress = Double(self.pullCompleted) / Double(self.pullTotal)
+                            calculatedProgress = min(max(0.0, calculatedProgress), 1.0)
+                            self.pullProgress = calculatedProgress
+                        } else {
+                            self.pullProgress = 0.0
+                        }
+                        
+                        print("プルステータス: \(self.pullStatus), 完了: \(self.pullCompleted), 合計: \(self.pullTotal), 進捗: \(String(format: "%.2f", self.pullProgress))")
+                    } catch {
+                        if let debugString = String(data: jsonData, encoding: .utf8) {
+                            print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行: \(debugString)")
+                        } else {
+                            print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行データが読み取り不能です。")
+                        }
                     }
-                    
-                    if self.pullTotal > 0 {
-                        var calculatedProgress = Double(self.pullCompleted) / Double(self.pullTotal)
-                        // 進捗値を0.0から1.0の間にクランプします
-                        calculatedProgress = min(max(0.0, calculatedProgress), 1.0)
-                        self.pullProgress = calculatedProgress
-                    } else {
-                        self.pullProgress = 0.0
+                }
+            } else if let continuation = self.chatContinuations[dataTask] {
+                // チャットタスクの処理
+                if let newString = String(data: data, encoding: .utf8) {
+                    self.chatLineBuffers[dataTask, default: ""].append(newString)
+                } else {
+                    print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
+                    return
+                }
+
+                var lines = self.chatLineBuffers[dataTask, default: ""].split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+
+                if !self.chatLineBuffers[dataTask, default: ""].hasSuffix("\n") && !lines.isEmpty {
+                    self.chatLineBuffers[dataTask] = lines.removeLast()
+                } else {
+                    self.chatLineBuffers[dataTask] = ""
+                }
+
+                for line in lines {
+                    guard !line.isEmpty else { continue }
+                    guard let jsonData = line.data(using: .utf8) else {
+                        print("エラー: 行をDataに変換できませんでした: \(line)")
+                        continue
                     }
-                    
-                    print("プルステータス: \(self.pullStatus), 完了: \(self.pullCompleted), 合計: \(self.pullTotal), 進捗: \(String(format: "%.2f", self.pullProgress))")
-                } catch {
-                    if let debugString = String(data: jsonData, encoding: .utf8) {
-                        print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行: \(debugString)")
-                    } else {
-                        print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行データが読み取り不能です。")
+
+                    do {
+                        let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                        continuation.yield(chunk)
+                    } catch {
+                        print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
                     }
                 }
             }
@@ -449,22 +523,32 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         Task { @MainActor [weak self] in
             guard let self = self else { return }
 
-            self.pullTask = nil
-            self.pullLineBuffer = ""
+            if task == self.pullTask {
+                self.pullTask = nil
+                self.pullLineBuffer = ""
 
-            if let error = error {
-                self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
-                self.isPulling = false
-                self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
-                print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
-            } else {
-                self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
-                self.isPulling = false
-                self.pullProgress = 1.0
-                self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
-                print("モデルプルが完了しました。")
-                // モデルリストを更新するために API から再取得します
-                await self.fetchOllamaModelsFromAPI()
+                if let error = error {
+                    self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
+                    self.isPulling = false
+                    self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
+                    print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
+                } else {
+                    self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
+                    self.isPulling = false
+                    self.pullProgress = 1.0
+                    self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
+                    print("モデルプルが完了しました。")
+                    // モデルリストを更新するために API から再取得します
+                    await self.fetchOllamaModelsFromAPI()
+                }
+            } else if let continuation = self.chatContinuations[task] {
+                if let error = error {
+                    continuation.finish(throwing: error)
+                } else {
+                    continuation.finish()
+                }
+                self.chatContinuations.removeValue(forKey: task)
+                self.chatLineBuffers.removeValue(forKey: task)
             }
         }
     }

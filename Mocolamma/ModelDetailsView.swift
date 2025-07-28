@@ -25,8 +25,8 @@ struct ModelDetailsView: View {
     }
     
     // modelInfoからパラメーターカウントを取得するヘルパー
-    private var parameterCount: (formatted: String, raw: Int64)? {
-        guard let count = modelInfo?["general.parameter_count"]?.int64Value else { return nil }
+    private var parameterCount: (formatted: String, raw: Int)? {
+        guard let count = modelInfo?["general.parameter_count"]?.intValue else { return nil }
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない

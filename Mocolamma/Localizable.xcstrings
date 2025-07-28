@@ -269,6 +269,22 @@
         }
       }
     },
+    "Chat" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット"
+          }
+        }
+      }
+    },
     "Checking..." : {
       "localizations" : {
         "en" : {
@@ -1216,6 +1232,22 @@
         }
       }
     },
+    "New Chat" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規チャット"
+          }
+        }
+      }
+    },
     "No data available" : {
       "comment" : "データなし。",
       "localizations" : {
@@ -1541,6 +1573,22 @@
         }
       }
     },
+    "Select a Model" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a Model"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを選択"
+          }
+        }
+      }
+    },
     "Select a model to see the details." : {
       "localizations" : {
         "en" : {
@@ -1569,6 +1617,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "詳細を見るにはサーバーを選択してください。"
+          }
+        }
+      }
+    },
+    "Selected Model:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected Model:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル:"
           }
         }
       }
@@ -1699,6 +1763,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ツール"
+          }
+        }
+      }
+    },
+    "Type your message..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type your message..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メッセージを入力…"
           }
         }
       }
