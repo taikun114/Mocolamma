@@ -342,7 +342,6 @@ struct ModelDetailsView: View {
                                 }) {
                                     Text(licenseName)
                                         .font(.title3).bold()
-                                        .underline()
                                         .foregroundColor(.accentColor)
                                 }
                                 .buttonStyle(PlainButtonStyle())
