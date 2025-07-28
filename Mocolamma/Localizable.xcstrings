@@ -692,6 +692,22 @@
         }
       }
     },
+    "Embedding Length:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embedding Length:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エンベディング長:"
+          }
+        }
+      }
+    },
     "Enter the name of the model you want to add." : {
       "localizations" : {
         "en" : {

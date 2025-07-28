@@ -45,6 +45,21 @@ struct ModelDetailsView: View {
         return nil
     }
 
+    // modelInfoからエンベディング長を取得するヘルパー
+    private var embeddingLength: (formatted: String, raw: Int)? {
+        guard let info = modelInfo else { return nil }
+        // ".embedding_length"で終わるキーを探す
+        if let key = info.keys.first(where: { $0.hasSuffix(".embedding_length") }) {
+            guard let length = info[key]?.intValue else { return nil }
+            let numberFormatter = NumberFormatter()
+            numberFormatter.numberStyle = .decimal
+            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
+            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
+            return (formattedLength, length)
+        }
+        return nil
+    }
+
     var body: some View {
         ScrollView { // ScrollViewを追加
             VStack(alignment: .leading, spacing: 10) {
@@ -305,9 +320,23 @@ struct ModelDetailsView: View {
                                     }
                             }
                         }
+                        // エンベディング長
+                        if let length = embeddingLength {
+                            VStack(alignment: .leading) {
+                                Text("Embedding Length:") // エンベディング長
+                                Text(length.formatted)
+                                    .font(.title3).bold()
+                                    .contextMenu {
+                                        Button("Copy") {
+                                            NSPasteboard.general.clearContents()
+                                            NSPasteboard.general.setString(String(length.raw), forType: .string)
+                                        }
+                                    }
+                            }
+                        }
                         
                         // もし情報が一つもなければ
-                        if parameterCount == nil && contextLength == nil {
+                        if parameterCount == nil && contextLength == nil && embeddingLength == nil {
                              Text("No model information available.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
