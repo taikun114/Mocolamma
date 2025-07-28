@@ -74,8 +74,6 @@ struct ChatView: View {
             }
             .padding()
             .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
-            .padding(.horizontal)
         }
         .navigationTitle("Chat")
         .toolbar {
@@ -233,20 +231,21 @@ struct ModelSelectionSheet: View {
             }) {
                 HStack {
                     Text(model.name)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(model.name)
                     Spacer()
                     if selectedModel?.id == model.id {
                         Image(systemName: "checkmark")
                     }
                 }
+                .padding(.vertical, 5)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(PlainButtonStyle())
         }
+        .listStyle(.plain)
+        .background(Color.clear)
         .navigationTitle("Select a Model")
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Cancel") {
-                    dismiss()
-                }
-            }
-        }
     }
 }
