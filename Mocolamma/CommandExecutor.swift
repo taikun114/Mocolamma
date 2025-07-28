@@ -26,6 +26,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
 
     private var cancellables = Set<AnyCancellable>() // ServerManagerの変更を監視するためのSet
 
+    // MARK: - モデル情報キャッシュ
+    private var modelInfoCache: [String: OllamaShowResponse] = [:]
+
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
     init(serverManager: ServerManager) {
@@ -242,6 +245,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// モデルの詳細情報を取得します (async/await版)
     func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
+        // キャッシュに存在すればそれを返す
+        if let cachedInfo = modelInfoCache[modelName] {
+            print("モデル \(modelName) の詳細情報をキャッシュから取得しました。")
+            return cachedInfo
+        }
+
         print("モデル \(modelName) の詳細情報を \(apiBaseURL) から取得中...")
         
         guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
@@ -272,6 +281,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             
             let apiResponse = try JSONDecoder().decode(OllamaShowResponse.self, from: data)
             print("モデル \(modelName) の詳細情報を正常に取得しました。")
+            // 取得した情報をキャッシュに保存
+            modelInfoCache[modelName] = apiResponse
             return apiResponse
             
         } catch {
@@ -336,6 +347,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         let (data, _) = try await URLSession.shared.data(from: url)
         let response = try JSONDecoder().decode(OllamaVersionResponse.self, from: data)
         return response.version
+    }
+
+    /// モデル情報キャッシュをクリアします。
+    func clearModelInfoCache() {
+        modelInfoCache.removeAll()
+        print("モデル情報キャッシュをクリアしました。")
     }
 
     // MARK: - URLSessionDataDelegate Methods (バックグラウンドスレッドで呼び出されます)

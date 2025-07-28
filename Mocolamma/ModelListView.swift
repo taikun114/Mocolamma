@@ -109,6 +109,7 @@ struct ModelListView: View {
             ToolbarItem(placement: .primaryAction) { // primaryActionに配置
                 Button(action: {
                     Task {
+                        executor.clearModelInfoCache() // モデル情報キャッシュをクリアします
                         await executor.fetchOllamaModelsFromAPI() // モデルリストを再読み込みします
                     }
                 }) {

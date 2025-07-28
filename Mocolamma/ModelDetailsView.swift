@@ -17,7 +17,7 @@ struct ModelDetailsView: View {
 
     // サイズのツールチップ用テキスト（読みやすいサイズ + フルサイズ表記）
     private var sizeTooltipText: String {
-        return "\(model.formattedSize)、\(model.size)バイト"
+        return "\(model.formattedSize)、\(model.size) B"
     }
     
     // modelInfoからパラメーターカウントを取得するヘルパー
