@@ -217,6 +217,7 @@ private struct InspectorContentView: View {
     @State private var modelInfo: [String: JSONValue]?
     @State private var capabilities: [String]?
     @State private var licenseBody: String? // 新しく追加
+    @State private var licenseLink: String? // 新しく追加
     @State private var isLoadingInfo: Bool = false // ローディング状態
 
     var body: some View {
@@ -229,7 +230,8 @@ private struct InspectorContentView: View {
                     modelInfo: modelInfo,
                     isLoading: isLoadingInfo,
                     fetchedCapabilities: capabilities,
-                    licenseBody: licenseBody
+                    licenseBody: licenseBody,
+                    licenseLink: licenseLink
                 )
                 .id(model.id) // モデルのIDに基づいてビューの同一性を管理
             } else if sidebarSelection == "server" {
@@ -271,7 +273,8 @@ private struct InspectorContentView: View {
                     await MainActor.run {
                         self.modelInfo = fetchedResponse?.model_info
                         self.capabilities = fetchedResponse?.capabilities
-                        self.licenseBody = fetchedResponse?.license // 新しく追加
+                        self.licenseBody = fetchedResponse?.license
+                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
                         self.isLoadingInfo = false
                     }
                 }
@@ -300,6 +303,7 @@ private struct ModelInspectorDetailView: View {
     let isLoading: Bool
     let fetchedCapabilities: [String]?
     let licenseBody: String?
+    let licenseLink: String? // 新しく追加
 
     var body: some View {
         ModelDetailsView(
@@ -307,7 +311,8 @@ private struct ModelInspectorDetailView: View {
             modelInfo: modelInfo,
             isLoading: isLoading,
             fetchedCapabilities: fetchedCapabilities,
-            licenseBody: licenseBody
+            licenseBody: licenseBody,
+            licenseLink: licenseLink
         )
     }
 }

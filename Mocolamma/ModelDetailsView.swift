@@ -10,6 +10,7 @@ struct ModelDetailsView: View {
     let isLoading: Bool // 追加
     let fetchedCapabilities: [String]? // 追加
     let licenseBody: String? // 新しく追加: ライセンス本文
+    let licenseLink: String? // 新しく追加: ライセンスリンク
 
     @State private var showingLicenseSheet = false // 新しく追加: ライセンスシート表示制御
 
@@ -390,7 +391,7 @@ struct ModelDetailsView: View {
         }
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {
-                LicenseTextView(licenseText: licenseBody)
+                LicenseTextView(licenseText: licenseBody, licenseLink: licenseLink)
             }
         }
     }

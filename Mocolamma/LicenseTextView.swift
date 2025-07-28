@@ -21,17 +21,32 @@ struct VisualEffectView: NSViewRepresentable {
 
 struct LicenseTextView: View {
     let licenseText: String
+    let licenseLink: String? // 新しく追加
     @Environment(\.dismiss) var dismiss
+    @Environment(\.openURL) var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading) {
-                    Text("License") // タイトル
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.vertical, 10) // 上下に10ポイントのパディングを追加
-                        .padding(.horizontal)
+                    HStack {
+                        Text("License") // タイトル
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .padding(.vertical, 10) // 上下に10ポイントのパディングを追加
+                            .padding(.horizontal)
+
+                        Spacer()
+
+                        if let link = licenseLink, let url = URL(string: link) {
+                            Button("Open License Page") {
+                                openURL(url)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .padding(.horizontal)
+                        }
+                    }
 
                     Text(licenseText)
                         .font(.body)

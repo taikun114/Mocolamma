@@ -1364,6 +1364,22 @@
         }
       }
     },
+    "Open License Page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open License Page"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンスページを開く"
+          }
+        }
+      }
+    },
     "Parameter Count:" : {
       "localizations" : {
         "en" : {
