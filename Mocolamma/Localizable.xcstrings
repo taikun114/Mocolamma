@@ -368,7 +368,20 @@
       }
     },
     "Context Length:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Context Length:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンテキスト長:"
+          }
+        }
+      }
     },
     "Copy" : {
       "localizations" : {
@@ -403,7 +416,20 @@
       }
     },
     "Could not load model information." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load model information."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報を読み込めませんでした。"
+          }
+        }
+      }
     },
     "Delete" : {
       "localizations" : {
@@ -889,6 +915,12 @@
             "state" : "translated",
             "value" : "General settings will go here."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General settings will go here."
+          }
         }
       }
     },
@@ -925,7 +957,20 @@
       }
     },
     "Loading model info..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading model info..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報を読み込み中…"
+          }
+        }
+      }
     },
     "Model deletion failed: " : {
       "comment" : "モデル削除失敗のプレフィックス。",
@@ -945,7 +990,20 @@
       }
     },
     "Model Information:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Information:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報:"
+          }
+        }
+      }
     },
     "Model Name:" : {
       "localizations" : {
@@ -1112,7 +1170,20 @@
       }
     },
     "No model information available." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No model information available."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報がありません。"
+          }
+        }
+      }
     },
     "No models are currently installed. Click '+' to add a new model." : {
       "localizations" : {
@@ -1230,7 +1301,20 @@
       }
     },
     "Parameter Count:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parameter Count:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パラメーター数:"
+          }
+        }
+      }
     },
     "Parameter Size:" : {
       "localizations" : {

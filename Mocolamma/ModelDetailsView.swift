@@ -21,16 +21,17 @@ struct ModelDetailsView: View {
     }
     
     // modelInfoからパラメーターカウントを取得するヘルパー
-    private var parameterCount: String? {
+    private var parameterCount: (formatted: String, raw: Int64)? {
         guard let count = modelInfo?["general.parameter_count"]?.int64Value else { return nil }
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-        return numberFormatter.string(from: NSNumber(value: count))
+        let formattedCount = numberFormatter.string(from: NSNumber(value: count)) ?? String(count)
+        return (formattedCount, count)
     }
 
     // modelInfoからコンテキスト長を取得するヘルパー
-    private var contextLength: String? {
+    private var contextLength: (formatted: String, raw: Int)? {
         guard let info = modelInfo else { return nil }
         // ".context_length"で終わるキーを探す
         if let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) {
@@ -38,7 +39,8 @@ struct ModelDetailsView: View {
             let numberFormatter = NumberFormatter()
             numberFormatter.numberStyle = .decimal
             numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-            return numberFormatter.string(from: NSNumber(value: length))
+            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
+            return (formattedLength, length)
         }
         return nil
     }
@@ -279,12 +281,12 @@ struct ModelDetailsView: View {
                         if let count = parameterCount {
                             VStack(alignment: .leading) {
                                 Text("Parameter Count:") // パラメーターカウント
-                                Text(count)
+                                Text(count.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
                                         Button("Copy") {
                                             NSPasteboard.general.clearContents()
-                                            NSPasteboard.general.setString(count, forType: .string)
+                                            NSPasteboard.general.setString(String(count.raw), forType: .string)
                                         }
                                     }
                             }
@@ -293,12 +295,12 @@ struct ModelDetailsView: View {
                         if let length = contextLength {
                             VStack(alignment: .leading) {
                                 Text("Context Length:") // コンテキスト長
-                                Text(length)
+                                Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
                                         Button("Copy") {
                                             NSPasteboard.general.clearContents()
-                                            NSPasteboard.general.setString(length, forType: .string)
+                                            NSPasteboard.general.setString(String(length.raw), forType: .string)
                                         }
                                     }
                             }
