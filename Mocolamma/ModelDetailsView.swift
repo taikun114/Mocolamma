@@ -328,44 +328,4 @@ struct ModelDetailsView: View {
 }
 
 
-// MARK: - プレビュー用
 
-#Preview {
-    // ModelDetailsViewのプレビュー
-    var details = OllamaModelDetails(parent_model: "parent_model_example", format: "gguf", family: "llama", families: ["llama", "example"], parameter_size: "7B", quantization_level: "Q4_0")
-    var model = try! JSONDecoder().decode(OllamaModel.self, from: """
-    {
-        "name": "Test Model",
-        "model": "test:latest",
-        "modified_at": "2023-08-11T08:30:00.12345Z",
-        "size": 1234567890,
-        "digest": "abcdef123456abcdef123456abcdef123456abcdef123456abcdef123456",
-        "details": {
-            "parent_model": "parent_model_example",
-            "format": "gguf",
-            "family": "llama",
-            "families": ["llama", "example"],
-            "parameter_size": "7B",
-            "quantization_level": "Q4_0"
-        },
-        "capabilities": ["completion", "vision"]
-    }
-    """.data(using: .utf8)!)
-
-    let modelInfo: [String: JSONValue] = [
-        "general.parameter_count": .int64(8030261248),
-        "llama.context_length": .int(8192)
-    ]
-
-    return Group {
-        ModelDetailsView(model: model, modelInfo: modelInfo, isLoading: false, fetchedCapabilities: ["completion", "vision"])
-            .previewDisplayName("Loaded State")
-        
-        ModelDetailsView(model: model, modelInfo: nil, isLoading: true, fetchedCapabilities: nil)
-            .previewDisplayName("Loading State")
-        
-        ModelDetailsView(model: model, modelInfo: nil, isLoading: false, fetchedCapabilities: nil)
-            .previewDisplayName("Error State")
-    }
-    .frame(width: 300)
-}

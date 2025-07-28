@@ -348,7 +348,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// `@preconcurrency`属性がクラスに付与されている場合、この警告は抑制されるべきですが、
     /// 特定のSwiftバージョンやビルド設定によっては表示され続けることがあります。
     /// これは機能的な問題ではなく、コンパイラの振る舞いによるものです。
-    nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceiveResponse response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+    nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         Task { @MainActor [weak self] in
             guard let self = self else {
                 completionHandler(.cancel)
