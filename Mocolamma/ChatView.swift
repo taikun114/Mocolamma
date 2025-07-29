@@ -1,6 +1,5 @@
-// ChatView.swift
-
 import SwiftUI
+import MarkdownUI
 
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
@@ -52,29 +51,29 @@ struct ChatView: View {
                         scrollViewProxy.scrollTo(lastMessageId, anchor: .bottom)
                     }
                 }
-            }
 
-            // Message Input
-            HStack {
-                TextField("Type your message...", text: $inputText, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .disabled(isSending || selectedModel == nil)
+                // Message Input
+                HStack {
+                    TextField("Type your message...", text: $inputText, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .disabled(isSending || selectedModel == nil)
 
-                if isSending {
-                    ProgressView()
+                    if isSending {
+                        ProgressView()
+                    }
+
+                    Button(action: { sendMessage(scrollViewProxy: scrollViewProxy) }) {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.title)
+                            .foregroundColor(inputText.isEmpty || isSending || selectedModel == nil ? .gray : .accentColor)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(inputText.isEmpty || isSending || selectedModel == nil)
                 }
-
-                Button(action: sendMessage) {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.title)
-                        .foregroundColor(inputText.isEmpty || isSending || selectedModel == nil ? .gray : .accentColor)
-                }
-                .buttonStyle(.plain)
-                .disabled(inputText.isEmpty || isSending || selectedModel == nil)
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-        }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+            } // End of ScrollViewReader
+        } // End of VStack for body
         .navigationTitle("Chat")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -112,7 +111,7 @@ struct ChatView: View {
         }
     }
 
-    private func sendMessage() {
+    private func sendMessage(scrollViewProxy: ScrollViewProxy) {
         guard let model = selectedModel else {
             errorMessage = "Please select a model first."
             return
@@ -148,10 +147,12 @@ struct ChatView: View {
                             messages.append(newAssistantMessage)
                             assistantMessageId = newAssistantMessage.id
                             lastAssistantMessageIndex = messages.count - 1
+                            scrollViewProxy.scrollTo(newAssistantMessage.id, anchor: .bottom)
                         } else if let index = messages.firstIndex(where: { $0.id == assistantMessageId }) {
                             // Append content to existing assistant message
                             messages[index].content += messageChunk.content
                             lastAssistantMessageIndex = index
+                            scrollViewProxy.scrollTo(messages[index].id, anchor: .bottom)
                         }
                     }
 
@@ -176,15 +177,55 @@ struct ChatView: View {
 struct MessageView: View {
     let message: ChatMessage
     @State private var isHovering: Bool = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
-            Text(message.content)
+            Markdown(message.content)
                 .padding(10)
-                .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.2))
-                .foregroundColor(message.role == "user" ? .white : .primary)
+                .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
                 .cornerRadius(15)
+                .lineSpacing(4) // 行間を調整
+                .markdownTextStyle(\.text) {
+                    ForegroundColor(message.role == "user" ? .white : .primary)
+                }
+                .markdownTextStyle(\.code) {
+                    FontFamilyVariant(.monospaced)
+                    BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
+                }
+                .markdownBlockStyle(\.paragraph) { configuration in
+                    configuration.label
+                        .relativeLineSpacing(.em(0.3))
+                        .markdownMargin(top: .zero, bottom: .em(0.8))
+                }
+                .markdownBlockStyle(\.listItem) { configuration in
+                    configuration.label
+                        .markdownMargin(top: .em(0.3))
+                }
+                .markdownBlockStyle(\.blockquote) { configuration in
+                  configuration.label
+                    .padding()
+                    .overlay(alignment: .leading) {
+                      Rectangle()
+                        .fill(Color.gray)
+                        .frame(width: 4)
+                    }
+                }
 
+                .markdownBlockStyle(\.codeBlock) { configuration in
+                    ScrollView(.horizontal) {
+                        configuration.label
+                            .markdownTextStyle {
+                              FontFamilyVariant(.monospaced)
+                            }
+                            .markdownMargin(top: .em(0.3))
+                            .padding()
+                    }
+                    .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.vertical, 8)
+                }
+            
             if message.role == "assistant" && isHovering {
                 HStack {
                     Text(dateFormatter.string(from: ISO8601DateFormatter().date(from: message.createdAt ?? "") ?? Date()))
