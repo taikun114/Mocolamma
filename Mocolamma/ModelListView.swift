@@ -9,6 +9,7 @@ import AppKit // NSPasteboard のため
 /// ContentViewから必要なデータとバインディングを受け取って表示を更新します。
 struct ModelListView: View {
     @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
+    @EnvironmentObject var serverManager: ServerManager
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
     
@@ -103,7 +104,8 @@ struct ModelListView: View {
             }
             // コマンド実行の出力表示 (TextEditorは削除されました)
         }
-        .navigationTitle("Models") // ナビゲーションタイトル: モデル。
+        .navigationTitle("Models")
+        .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected")
         .toolbar { // ここで全てのToolbarItemをまとめます
             // MARK: - Reload Button (Primary Action, before Add New)
             ToolbarItem(placement: .primaryAction) { // primaryActionに配置

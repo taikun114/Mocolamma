@@ -30,7 +30,8 @@ struct ServerView: View {
                 showingDeleteConfirmationServer: $showingDeleteConfirmationServer,
                 serverToDelete: $serverToDelete
             )
-            .navigationTitle("Servers") // ナビゲーションタイトル
+            .navigationTitle("Servers")
+            .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected") // ナビゲーションタイトル
             .overlay {
                 if serverManager.servers.isEmpty {
                     ContentUnavailableView(

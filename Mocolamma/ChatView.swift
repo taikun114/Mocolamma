@@ -3,6 +3,7 @@ import MarkdownUI
 
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
+    @EnvironmentObject var serverManager: ServerManager
     @State private var selectedModel: OllamaModel?
     @State private var messages: [ChatMessage] = []
     @State private var inputText: String = ""
@@ -24,6 +25,7 @@ struct ChatView: View {
             }
         }
         .navigationTitle("Chat")
+        .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(action: {

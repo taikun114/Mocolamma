@@ -365,6 +365,7 @@ private struct MainContentDetailView: View {
                         print("ContentView: 新しいインスペクターの表示状態: \(showingInspector)")
                     }
                 )
+                .environmentObject(serverManager)
             } else if sidebarSelection == "server" {
                 ServerView(
                     serverManager: serverManager,
@@ -381,6 +382,7 @@ private struct MainContentDetailView: View {
             } else if sidebarSelection == "chat" {
                 ChatView()
                     .environmentObject(executor)
+                    .environmentObject(serverManager)
             } else {
                 Text("Select a category.") // カテゴリを選択してください。
                     .font(.title2)

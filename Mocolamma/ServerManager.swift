@@ -32,6 +32,11 @@ class ServerManager: ObservableObject {
         }
     }
 
+    /// 現在選択されているサーバー。
+    var selectedServer: ServerInfo? {
+        servers.first(where: { $0.id == selectedServerID })
+    }
+
     /// 各サーバーの接続状態を保持する辞書 (nil: チェック中, true: 接続済み, false: 未接続)
     @Published var serverConnectionStatuses: [ServerInfo.ID: Bool?] = [:]
 

@@ -12,8 +12,7 @@ struct MocolammaApp: App {
     @StateObject private var serverManager = ServerManager()
 
     var body: some Scene {
-        // WindowGroup の初期化時に文字列を渡すことで、ウィンドウタイトルを設定します
-        WindowGroup("Models") { // モデル
+        WindowGroup() {
             // ContentViewにServerManagerのインスタンスを渡します
             ContentView(serverManager: serverManager)
         }
