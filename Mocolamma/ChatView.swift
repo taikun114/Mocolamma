@@ -11,53 +11,17 @@ struct ChatView: View {
     @State private var showingModelSelectionSheet = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Model Selection Header
-            HStack {
-                Text("Selected Model:")
-                    .font(.headline)
-                Button(action: {
-                    showingModelSelectionSheet = true
-                }) {
-                    Text(selectedModel?.name ?? "Select Model")
-                        .font(.headline)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(Color.accentColor.opacity(0.2)))
-                        .cornerRadius(8)
-                }
-                .buttonStyle(PlainButtonStyle()) // ボタンのスタイルをリセット
-                .popover(isPresented: $showingModelSelectionSheet, attachmentAnchor: .point(.bottom), arrowEdge: .bottom) {
-                    ModelSelectionSheet(selectedModel: $selectedModel, models: executor.models)
-                }
+        ZStack {
+            ChatMessagesView(messages: $messages)
+
+            VStack {
+                ChatHeaderView(selectedModel: $selectedModel, showingModelSelectionSheet: $showingModelSelectionSheet, models: executor.models)
                 Spacer()
+                ChatInputView(inputText: $inputText, isSending: $isSending, selectedModel: selectedModel) {
+                    sendMessage()
+                }
             }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-
-            // Chat Messages Display
-            ScrollViewReader { scrollViewProxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(messages) { message in
-                            MessageView(message: message)
-                                .id(message.id)
-                        }
-                    }
-                    .padding()
-                }
-                .onChange(of: messages.count) { _, _ in
-                    if let lastMessageId = messages.last?.id {
-                        scrollViewProxy.scrollTo(lastMessageId, anchor: .bottom)
-                    }
-                }
-
-                // Message Input
-                MessageInputView(inputText: $inputText, isSending: $isSending, selectedModel: selectedModel) {
-                    sendMessage(scrollViewProxy: scrollViewProxy)
-                }
-            } // End of ScrollViewReader
-        } // End of VStack for body
+        }
         .navigationTitle("Chat")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -95,7 +59,7 @@ struct ChatView: View {
         }
     }
 
-    private func sendMessage(scrollViewProxy: ScrollViewProxy) {
+    private func sendMessage() {
         guard let model = selectedModel else {
             errorMessage = "Please select a model first."
             return
@@ -131,12 +95,14 @@ struct ChatView: View {
                             messages.append(newAssistantMessage)
                             assistantMessageId = newAssistantMessage.id
                             lastAssistantMessageIndex = messages.count - 1
-                            scrollViewProxy.scrollTo(newAssistantMessage.id, anchor: .bottom)
+                            
+                            
                         } else if let index = messages.firstIndex(where: { $0.id == assistantMessageId }) {
                             // Append content to existing assistant message
                             messages[index].content += messageChunk.content
                             lastAssistantMessageIndex = index
-                            scrollViewProxy.scrollTo(messages[index].id, anchor: .bottom)
+                            
+                            
                         }
                     }
 
@@ -167,7 +133,7 @@ struct MessageView: View {
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             Markdown(message.content)
-                .padding()
+                .padding(10)
                 .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
                 .cornerRadius(16)
                 .lineSpacing(4) // 行間を調整
