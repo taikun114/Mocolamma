@@ -53,25 +53,9 @@ struct ChatView: View {
                 }
 
                 // Message Input
-                HStack {
-                    TextField("Type your message...", text: $inputText, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .disabled(isSending || selectedModel == nil)
-
-                    if isSending {
-                        ProgressView()
-                    }
-
-                    Button(action: { sendMessage(scrollViewProxy: scrollViewProxy) }) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title)
-                            .foregroundColor(inputText.isEmpty || isSending || selectedModel == nil ? .gray : .accentColor)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(inputText.isEmpty || isSending || selectedModel == nil)
+                MessageInputView(inputText: $inputText, isSending: $isSending, selectedModel: selectedModel) {
+                    sendMessage(scrollViewProxy: scrollViewProxy)
                 }
-                .padding()
-                .background(Color.gray.opacity(0.1))
             } // End of ScrollViewReader
         } // End of VStack for body
         .navigationTitle("Chat")
@@ -142,7 +126,7 @@ struct ChatView: View {
                     if let messageChunk = chunk.message {
                         if assistantMessageId == nil {
                             // First chunk for a new assistant message
-                            var newAssistantMessage = ChatMessage(role: messageChunk.role, content: messageChunk.content)
+                            var newAssistantMessage = ChatMessage(role: messageChunk.role, content: messageChunk.content, isStreaming: true)
                             newAssistantMessage.createdAt = chunk.createdAt // Set createdAt from the first chunk
                             messages.append(newAssistantMessage)
                             assistantMessageId = newAssistantMessage.id
@@ -157,10 +141,11 @@ struct ChatView: View {
                     }
 
                     if chunk.done, let index = lastAssistantMessageIndex {
-                        // Final chunk, update performance metrics
+                        // Final chunk, update performance metrics and set isStreaming to false
                         messages[index].totalDuration = chunk.totalDuration
                         messages[index].evalCount = chunk.evalCount
                         messages[index].evalDuration = chunk.evalDuration
+                        messages[index].isStreaming = false
                     }
                 }
             } catch {
@@ -182,9 +167,9 @@ struct MessageView: View {
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             Markdown(message.content)
-                .padding(10)
+                .padding()
                 .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
-                .cornerRadius(15)
+                .cornerRadius(16)
                 .lineSpacing(4) // 行間を調整
                 .markdownTextStyle(\.text) {
                     ForegroundColor(message.role == "user" ? .white : .primary)
@@ -225,8 +210,9 @@ struct MessageView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(.vertical, 8)
                 }
+                .textSelection(.enabled)
             
-            if message.role == "assistant" && isHovering {
+            if message.role == "assistant" && isHovering && !message.isStreaming {
                 HStack {
                     Text(dateFormatter.string(from: ISO8601DateFormatter().date(from: message.createdAt ?? "") ?? Date()))
                         .font(.caption2)
