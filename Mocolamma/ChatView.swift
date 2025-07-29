@@ -9,6 +9,7 @@ struct ChatView: View {
     @State private var isSending: Bool = false
     @State private var errorMessage: String?
     @State private var showingModelSelectionSheet = false
+    @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
 
     var body: some View {
         ZStack {
@@ -71,7 +72,7 @@ struct ChatView: View {
         inputText = "" // Clear input field immediately
 
         // Add user message to chat history
-        let userMessage = ChatMessage(role: "user", content: userMessageContent, createdAt: ISO8601DateFormatter().string(from: Date()))
+        let userMessage = ChatMessage(role: "user", content: userMessageContent, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         messages.append(userMessage)
 
         // Prepare messages for API request (including history)
@@ -101,8 +102,14 @@ struct ChatView: View {
                             // Append content to existing assistant message
                             messages[index].content += messageChunk.content
                             lastAssistantMessageIndex = index
-                            
-                            
+
+                            // UI更新のバッファリング
+                            let now = Date()
+                            if now.timeIntervalSince(lastUpdateTime) > 0.1 || chunk.done {
+                                lastUpdateTime = now
+                                // Force UI update by re-assigning messages array
+                                messages = messages
+                            }
                         }
                     }
 
@@ -129,6 +136,13 @@ struct MessageView: View {
     let message: ChatMessage
     @State private var isHovering: Bool = false
     @Environment(\.colorScheme) private var colorScheme
+
+    // For parsing ISO8601 date strings from API
+    static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone]
+        return formatter
+    }()
 
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
@@ -178,21 +192,37 @@ struct MessageView: View {
                 }
                 .textSelection(.enabled)
             
-            if message.role == "assistant" && isHovering && !message.isStreaming {
-                HStack {
-                    Text(dateFormatter.string(from: ISO8601DateFormatter().date(from: message.createdAt ?? "") ?? Date()))
+            HStack {
+                if message.role == "user" {
+                    Spacer()
+                }
+                Text(dateFormatter.string(from: {
+                    if let createdAtString = message.createdAt,
+                       let createdAtDate = MessageView.iso8601Formatter.date(from: createdAtString) {
+                        if message.role == "assistant", let evalDuration = message.evalDuration {
+                            // eval_durationはナノ秒なので、秒に変換して加算
+                            return createdAtDate.addingTimeInterval(Double(evalDuration) / 1_000_000_000.0)
+                        } else {
+                            return createdAtDate
+                        }
+                    }
+                    return Date() // Fallback to current date if createdAt is nil or invalid
+                }()))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                if message.role == "assistant", let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
+                    let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
+                    Text(String(format: "%.2f tok/s", tokensPerSecond))
                         .font(.caption2)
                         .foregroundColor(.secondary)
-
-                    if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
-                        let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
-                        Text(String(format: "%.2f tok/s", tokensPerSecond))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
+                }
+                if message.role == "assistant" {
                     Spacer()
                 }
             }
+            .opacity(isHovering && !message.isStreaming ? 1.0 : 0.0)
+            .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(.horizontal, 5)

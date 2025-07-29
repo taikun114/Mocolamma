@@ -7,11 +7,11 @@ struct MessageInputView: View {
     var sendMessage: () -> Void
 
     var body: some View {
-        HStack {
+        HStack(alignment: .bottom) {
             ZStack(alignment: .leading) {
                 if #available(macOS 26, *) {
                     Color.clear
-                        .glassEffect()
+                        .glassEffect(in: .rect(cornerRadius: 16.0))
                 } else {
                     VisualEffectView(material: .headerView, blendingMode: .withinWindow)
                         .cornerRadius(16)
@@ -33,6 +33,8 @@ struct MessageInputView: View {
                         if NSEvent.modifierFlags.contains(.shift) {
                             inputText += "\n"
                             return .handled
+                        } else if isSending {
+                            return .handled // 送信中はEnterキーを無効化
                         } else {
                             sendMessage()
                             return .handled
@@ -43,21 +45,27 @@ struct MessageInputView: View {
 
             if #available(macOS 26, *) {
                 Button(action: sendMessage) {
-                    Image(systemName: "arrow.up")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .glassEffect(.regular.tint(.accentColor).interactive())
+                    ZStack {
+                        Image(systemName: "arrow.up")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(7)
+                            .glassEffect(.regular.tint(.accentColor).interactive())
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .disabled(inputText.isEmpty || isSending || selectedModel == nil)
             } else {
                 Button(action: sendMessage) {
-                    Image(systemName: "arrow.up")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(Circle().fill(Color.accentColor))
+                    ZStack {
+                        Image(systemName: "arrow.up")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(7)
+                            .background(Circle().fill(Color.accentColor))
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .disabled(inputText.isEmpty || isSending || selectedModel == nil)
