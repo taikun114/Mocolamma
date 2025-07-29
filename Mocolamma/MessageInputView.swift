@@ -41,15 +41,28 @@ struct MessageInputView: View {
             }
             .fixedSize(horizontal: false, vertical: true)
 
-            Button(action: sendMessage) {
-                Image(systemName: "arrow.up")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding(8)
-                    .background(Circle().fill(Color.accentColor))
+            if #available(macOS 26, *) {
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .glassEffect(.regular.tint(.accentColor).interactive())
+                }
+                .buttonStyle(.plain)
+                .disabled(inputText.isEmpty || isSending || selectedModel == nil)
+            } else {
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Circle().fill(Color.accentColor))
+                }
+                .buttonStyle(.plain)
+                .disabled(inputText.isEmpty || isSending || selectedModel == nil)
             }
-            .buttonStyle(.plain)
-            .disabled(inputText.isEmpty || isSending || selectedModel == nil)
+
         }
         .padding()
         .background(Color.clear)
