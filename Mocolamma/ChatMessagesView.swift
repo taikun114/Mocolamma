@@ -28,6 +28,5 @@ struct ChatMessagesView: View {
                 .padding(.bottom, 50) // Height of the bottom overlay
             }
         }
-
     }
 }

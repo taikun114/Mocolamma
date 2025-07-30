@@ -141,7 +141,7 @@ struct ChatView: View {
         let assistantMessageId = placeholderMessage.id
 
         Task {
-            var lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
+            let lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
             var accumulatedContent = ""
             var lastUIUpdateTime = Date()
             let updateInterval = 0.1 // 100ms
@@ -239,8 +239,8 @@ struct MessageView: View {
                   configuration.label
                     .padding()
                     .overlay(alignment: .leading) {
-                      Rectangle()
-                        .fill(Color.gray)
+                    Rectangle()
+                        .fill(message.role == "user" ? .white : .gray)
                         .frame(width: 4)
                     }
                 }
@@ -303,8 +303,8 @@ struct MessageView: View {
     private var messageContentView: some View {
         if message.isStreaming && message.content.isEmpty {
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-                .frame(width: 20, height: 20)
+                .controlSize(.small)
+                .padding(2)
         } else {
             Markdown(message.content)
         }
