@@ -135,48 +135,63 @@ struct ChatView: View {
 
         let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: true, options: nil, tools: nil)
 
+        // Add a placeholder for the assistant's response
+        let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+        messages.append(placeholderMessage)
+        let assistantMessageId = placeholderMessage.id
+
         Task {
-            var assistantMessageId: UUID?
-            var lastAssistantMessageIndex: Int?
+            var lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
+            var accumulatedContent = ""
+            var lastUIUpdateTime = Date()
+            let updateInterval = 0.1 // 100ms
+            let updateCharacterCount = 20 // 20文字ごと
+            var isFirstChunk = true
 
             do {
                 for try await chunk in executor.chat(chatRequest: chatRequest) {
                     if let messageChunk = chunk.message {
-                        if assistantMessageId == nil {
-                            // First chunk for a new assistant message
-                            var newAssistantMessage = ChatMessage(role: messageChunk.role, content: messageChunk.content, isStreaming: true)
-                            newAssistantMessage.createdAt = chunk.createdAt // Set createdAt from the first chunk
-                            messages.append(newAssistantMessage)
-                            assistantMessageId = newAssistantMessage.id
-                            lastAssistantMessageIndex = messages.count - 1
-                            
-                            
-                        } else if let index = messages.firstIndex(where: { $0.id == assistantMessageId }) {
-                            // Append content to existing assistant message
-                            messages[index].content += messageChunk.content
-                            lastAssistantMessageIndex = index
-
-                            // UI更新のバッファリング
-                            let now = Date()
-                            if now.timeIntervalSince(lastUpdateTime) > 0.1 || chunk.done {
-                                lastUpdateTime = now
-                                // Force UI update by re-assigning messages array
-                                messages = messages
+                        if isFirstChunk {
+                            // On the first chunk, update the placeholder's creation date and initial content
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].createdAt = chunk.createdAt
+                                accumulatedContent = messageChunk.content
+                                messages[index].content = accumulatedContent
+                                lastUIUpdateTime = Date()
                             }
+                            isFirstChunk = false
+                        } else {
+                            // Subsequent chunks
+                            accumulatedContent += messageChunk.content
+                        }
+
+                        let now = Date()
+                        let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
+                        
+                        // Update UI based on buffer size or time interval
+                        if let index = lastAssistantMessageIndex, (accumulatedContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
+                            messages[index].content = accumulatedContent
+                            lastUIUpdateTime = now
                         }
                     }
 
                     if chunk.done, let index = lastAssistantMessageIndex {
                         // Final chunk, update performance metrics and set isStreaming to false
-                        messages[index].totalDuration = chunk.totalDuration
-                        messages[index].evalCount = chunk.evalCount
-                        messages[index].evalDuration = chunk.evalDuration
-                        messages[index].isStreaming = false
+                        if messages.indices.contains(index) {
+                            messages[index].content = accumulatedContent // Ensure final content is set
+                            messages[index].totalDuration = chunk.totalDuration
+                            messages[index].evalCount = chunk.evalCount
+                            messages[index].evalDuration = chunk.evalDuration
+                            messages[index].isStreaming = false
+                        }
                     }
                 }
             } catch {
                 errorMessage = "Chat API Error: \(error.localizedDescription)"
                 print("Chat API Error: \(error)")
+                if let index = lastAssistantMessageIndex, messages.indices.contains(index) {
+                    messages[index].isStreaming = false // Stop streaming indicator on error
+                }
             }
             isSending = false
         }
@@ -199,7 +214,7 @@ struct MessageView: View {
 
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
-            Markdown(message.content)
+            messageContentView
                 .padding(10)
                 .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
                 .cornerRadius(16)
@@ -281,6 +296,17 @@ struct MessageView: View {
         .padding(.horizontal, 5)
         .onHover { hovering in
             isHovering = hovering
+        }
+    }
+
+    @ViewBuilder
+    private var messageContentView: some View {
+        if message.isStreaming && message.content.isEmpty {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .frame(width: 20, height: 20)
+        } else {
+            Markdown(message.content)
         }
     }
 
