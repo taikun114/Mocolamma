@@ -454,6 +454,10 @@ struct MessageView: View {
             ProgressView()
                 .controlSize(.small)
                 .padding(2)
+        } else if message.isStopped && message.content.isEmpty {
+            Text("*No message*")
+                .font(.caption)
+                .foregroundColor(.secondary)
         } else {
             Markdown(message.content)
         }

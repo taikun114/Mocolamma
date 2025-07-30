@@ -18,6 +18,22 @@
         }
       }
     },
+    "*No message*" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*No message*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*メッセージがありません*"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
