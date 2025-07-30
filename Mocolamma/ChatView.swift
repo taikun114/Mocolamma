@@ -213,16 +213,32 @@ struct ChatView: View {
     }
 
     private func retryMessage(for messageId: UUID) {
-        guard let indexToRetry = messages.firstIndex(where: { $0.id == messageId }) else { return }
+        guard let indexToRetry = messages.firstIndex(where: { $0.id == messageId }) else {
+            print("Retry failed: Message with ID \(messageId) not found.")
+            return
+        }
 
         // 再試行するアシスタントメッセージが最後のメッセージであることを確認
-        guard indexToRetry == messages.count - 1 else { return }
+        guard indexToRetry == messages.count - 1 else {
+            print("Retry failed: Message is not the last one.")
+            return
+        }
 
         // 再試行するアシスタントメッセージが停止済みであることを確認
-        guard messages[indexToRetry].isStopped else { return }
+        guard messages[indexToRetry].isStopped else {
+            print("Retry failed: Message is not stopped.")
+            return
+        }
 
         // ユーザーメッセージのインデックスを見つける
-        guard let userMessageIndex = messages.lastIndex(where: { $0.role == "user" && $0.id < messageId }) else { return }
+        // 停止されたアシスタントメッセージの直前のメッセージがユーザーメッセージであることを期待
+        let userMessageIndex: Int
+        if indexToRetry > 0 && messages[indexToRetry - 1].role == "user" {
+            userMessageIndex = indexToRetry - 1
+        } else {
+            print("Retry failed: User message not found immediately before assistant message at index \(indexToRetry).")
+            return
+        }
 
         // 再試行するアシスタントメッセージとその後のメッセージを削除
         messages.removeSubrange(indexToRetry..<messages.count)
