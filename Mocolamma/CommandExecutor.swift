@@ -21,6 +21,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
     private var chatContinuations: [URLSessionTask: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
+    private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
 
     // Ollama APIのベースURL
     // ServerManagerから現在のサーバーホストを受け取るように変更
@@ -394,13 +395,19 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 let task = urlSession.dataTask(with: request)
                 self.chatContinuations[task] = continuation
                 self.chatLineBuffers[task] = "" // Initialize buffer for this task
+                self.currentChatTask = task // 現在のチャットタスクを保持
 
                 task.resume()
             }
         }
     }
 
-    // MARK: - URLSessionDataDelegate Methods (バックグラウンドスレッドで呼び出されます)
+    /// 現在進行中のチャットストリームをキャンセルします。
+    func cancelChatStreaming() {
+        currentChatTask?.cancel()
+        currentChatTask = nil
+        print("Chat streaming cancelled.")
+    }
     // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
     // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
 
@@ -542,7 +549,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     await self.fetchOllamaModelsFromAPI()
                 }
             } else if let continuation = self.chatContinuations[task] {
-                if let error = error {
+                if let error = error as? URLError, error.code == .cancelled {
+                    print("Chat streaming task cancelled by user.")
+                    // isStoppedはChatViewで設定されるため、ここではcontinuationをエラーなしで終了させる
+                    continuation.finish()
+                } else if let error = error {
                     continuation.finish(throwing: error)
                 } else {
                     continuation.finish()

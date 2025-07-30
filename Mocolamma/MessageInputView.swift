@@ -2,9 +2,10 @@ import SwiftUI
 
 struct MessageInputView: View {
     @Binding var inputText: String
-    @Binding var isSending: Bool
+    @Binding var isStreaming: Bool
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
+    var stopMessage: (() -> Void)? = nil // 新しいクロージャを追加
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -33,7 +34,7 @@ struct MessageInputView: View {
                         if NSEvent.modifierFlags.contains(.shift) {
                             inputText += "\n"
                             return .handled
-                        } else if isSending {
+                        } else if isStreaming { // isSending を isStreaming に変更
                             return .handled // 送信中はEnterキーを無効化
                         } else {
                             sendMessage()
@@ -44,9 +45,9 @@ struct MessageInputView: View {
             .fixedSize(horizontal: false, vertical: true)
 
             if #available(macOS 26, *) {
-                Button(action: sendMessage) {
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) { // isStreaming の状態に応じてアクションを切り替え
                     ZStack {
-                        Image(systemName: "arrow.up")
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up") // アイコンを切り替え
                             .font(.title2)
                             .foregroundColor(.white)
                             .padding(7)
@@ -55,11 +56,11 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(inputText.isEmpty || isSending || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil)) // isStreaming の場合は常に有効
             } else {
-                Button(action: sendMessage) {
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) { // isStreaming の状態に応じてアクションを切り替え
                     ZStack {
-                        Image(systemName: "arrow.up")
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up") // アイコンを切り替え
                             .font(.title2)
                             .foregroundColor(.white)
                             .padding(7)
@@ -68,7 +69,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(inputText.isEmpty || isSending || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil)) // isStreaming の場合は常に有効
             }
 
         }

@@ -19,6 +19,7 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     var evalCount: Int? // 応答内のトークン数
     var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
     var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
+    var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
 
     enum CodingKeys: String, CodingKey {
         case role

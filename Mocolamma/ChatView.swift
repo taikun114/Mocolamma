@@ -7,7 +7,7 @@ struct ChatView: View {
     @State private var selectedModel: OllamaModel?
     @State private var messages: [ChatMessage] = []
     @State private var inputText: String = ""
-    @State private var isSending: Bool = false
+    @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
     @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
 
@@ -26,8 +26,16 @@ struct ChatView: View {
             VStack {
                 
                 Spacer()
-                ChatInputView(inputText: $inputText, isSending: $isSending, selectedModel: selectedModel) {
+                ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: selectedModel) {
                     sendMessage()
+                } stopMessage: {
+                    // ストリーミング中のアシスタントメッセージを見つけて、その状態を即座に更新
+                    if let lastAssistantMessageIndex = messages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                        messages[lastAssistantMessageIndex].isStreaming = false
+                        messages[lastAssistantMessageIndex].isStopped = true
+                    }
+                    isStreaming = false // ChatView全体のストリーミング状態をfalseに設定
+                    executor.cancelChatStreaming()
                 }
             }
         }
@@ -94,7 +102,7 @@ struct ChatView: View {
             Button(action: {
                 messages.removeAll()
                 inputText = ""
-                isSending = false
+                isStreaming = false
                 errorMessage = nil
             }) {
                 Label("New Chat", systemImage: "square.and.pencil")
@@ -120,7 +128,7 @@ struct ChatView: View {
         }
         guard !inputText.isEmpty else { return }
 
-        isSending = true
+        isStreaming = true
         let userMessageContent = inputText
         inputText = "" // Clear input field immediately
 
@@ -187,13 +195,20 @@ struct ChatView: View {
                     }
                 }
             } catch {
-                errorMessage = "Chat API Error: \(error.localizedDescription)"
-                print("Chat API Error: \(error)")
+                print("Chat streaming error or cancelled: \(error)")
                 if let index = lastAssistantMessageIndex, messages.indices.contains(index) {
-                    messages[index].isStreaming = false // Stop streaming indicator on error
+                    var updatedMessage = messages[index]
+                    updatedMessage.isStreaming = false // Streaming stopped due to error or cancellation
+                    if let urlError = error as? URLError, urlError.code == .cancelled {
+                        updatedMessage.isStopped = true // Explicitly stopped by user
+                    } else {
+                        updatedMessage.isStopped = false // Stopped due to other error
+                        errorMessage = "Chat API Error: \(error.localizedDescription)" // Only show error for non-cancellation errors
+                    }
+                    messages[index] = updatedMessage // Update the message in the array
                 }
             }
-            isSending = false
+            isStreaming = false // Reset ChatView's overall streaming state
         }
     }
 }
@@ -267,7 +282,7 @@ struct MessageView: View {
                 Text(dateFormatter.string(from: {
                     if let createdAtString = message.createdAt,
                        let createdAtDate = MessageView.iso8601Formatter.date(from: createdAtString) {
-                        if message.role == "assistant", let evalDuration = message.evalDuration {
+                        if message.role == "assistant", !message.isStopped, let evalDuration = message.evalDuration { // isStoppedでない場合にのみ加算
                             // eval_durationはナノ秒なので、秒に変換して加算
                             return createdAtDate.addingTimeInterval(Double(evalDuration) / 1_000_000_000.0)
                         } else {
@@ -279,23 +294,30 @@ struct MessageView: View {
                     .font(.caption2)
                     .foregroundColor(.secondary)
 
-                if message.role == "assistant", let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
-                    let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
-                    Text(String(format: "%.2f tok/s", tokensPerSecond))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                if message.role == "assistant" {
+                    if message.isStopped {
+                        Text("Stopped")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
+                        let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
+                        Text(String(format: "%.2f tok/s", tokensPerSecond))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 if message.role == "assistant" {
                     Spacer()
                 }
             }
-            .opacity(isHovering && !message.isStreaming ? 1.0 : 0.0)
+            .opacity(isHovering && (!message.isStreaming || message.isStopped) ? 1.0 : 0.0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(.horizontal, 5)
         .onHover { hovering in
             isHovering = hovering
+            print("MessageView: isHovering=\(isHovering), isStreaming=\(message.isStreaming), isStopped=\(message.isStopped)")
         }
     }
 

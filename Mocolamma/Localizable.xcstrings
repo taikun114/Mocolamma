@@ -1717,6 +1717,22 @@
         }
       }
     },
+    "Stopped" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止済み"
+          }
+        }
+      }
+    },
     "Successfully deleted model '%@' from %@." : {
       "comment" : "モデル削除成功のメッセージ。",
       "localizations" : {
