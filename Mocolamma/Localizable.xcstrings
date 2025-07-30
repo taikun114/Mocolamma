@@ -301,6 +301,22 @@
         }
       }
     },
+    "Chat Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット設定"
+          }
+        }
+      }
+    },
     "Checking..." : {
       "localizations" : {
         "en" : {
@@ -1761,6 +1777,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "停止済み"
+          }
+        }
+      }
+    },
+    "Stream Response" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stream Response"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ストリームレスポンス"
           }
         }
       }

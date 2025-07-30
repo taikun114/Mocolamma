@@ -22,6 +22,7 @@ struct ContentView: View {
 
     // Inspector（プレビューパネル）の表示/非表示を制御するState変数
     @State private var showingInspector: Bool = false
+    @State private var isChatStreamingEnabled: Bool = true // ChatViewのストリーム設定
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -62,7 +63,8 @@ struct ContentView: View {
             showingDeleteConfirmation: $showingDeleteConfirmation,
             modelToDelete: $modelToDelete,
             columnVisibility: $columnVisibility,
-            sortedModels: sortedModels
+            sortedModels: sortedModels,
+            isChatStreamingEnabled: $isChatStreamingEnabled
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -151,6 +153,7 @@ private struct MainNavigationView: View {
     @Binding var modelToDelete: OllamaModel?
     @Binding var columnVisibility: NavigationSplitViewVisibility
     let sortedModels: [OllamaModel]
+    @Binding var isChatStreamingEnabled: Bool // 新しく追加
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -180,7 +183,8 @@ private struct MainNavigationView: View {
                 sortOrder: $sortOrder,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
-                modelToDelete: $modelToDelete
+                modelToDelete: $modelToDelete,
+                isChatStreamingEnabled: $isChatStreamingEnabled
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -193,7 +197,8 @@ private struct MainNavigationView: View {
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector, // Pass new state
                 serverManager: serverManager, // Pass ServerManager to InspectorContentView
-                showingInspector: $showingInspector // InspectorContentViewにバインディングを渡す
+                showingInspector: $showingInspector, // InspectorContentViewにバインディングを渡す
+                isChatStreamingEnabled: $isChatStreamingEnabled
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
@@ -213,8 +218,8 @@ private struct InspectorContentView: View {
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
     let selectedServerForInspector: ServerInfo? // New parameter
     @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
-
     @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
+    @Binding var isChatStreamingEnabled: Bool // ChatViewのストリーム設定をバインディングとして受け取る
     
     // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
@@ -250,6 +255,14 @@ private struct InspectorContentView: View {
                         .foregroundColor(.secondary)
                         .id("server_selection_placeholder")
                 }
+            } else if sidebarSelection == "chat" {
+                Form {
+                    Section("Chat Settings") {
+                        Toggle("Stream Response", isOn: $isChatStreamingEnabled)
+                    }
+                }
+                .formStyle(.grouped)
+                .frame(minWidth: 200)
             } else {
                 Text("Select a model to see the details.")
                     .font(.title2)
@@ -345,6 +358,7 @@ private struct MainContentDetailView: View {
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
+    @Binding var isChatStreamingEnabled: Bool
 
     var body: some View {
         Group {
@@ -380,7 +394,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView()
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {

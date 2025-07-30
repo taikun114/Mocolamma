@@ -19,7 +19,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
-    private var chatContinuations: [URLSessionTask: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation] = [:]
+    private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
 
@@ -393,7 +393,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 }
 
                 let task = urlSession.dataTask(with: request)
-                self.chatContinuations[task] = continuation
+                self.chatContinuations[task] = (continuation: continuation, isStreaming: chatRequest.stream)
                 self.chatLineBuffers[task] = "" // Initialize buffer for this task
                 self.currentChatTask = task // 現在のチャットタスクを保持
 
@@ -491,35 +491,47 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         }
                     }
                 }
-            } else if let continuation = self.chatContinuations[dataTask] {
-                // チャットタスクの処理
-                if let newString = String(data: data, encoding: .utf8) {
-                    self.chatLineBuffers[dataTask, default: ""].append(newString)
-                } else {
-                    print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
-                    return
-                }
-
-                var lines = self.chatLineBuffers[dataTask, default: ""].split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-
-                if !self.chatLineBuffers[dataTask, default: ""].hasSuffix("\n") && !lines.isEmpty {
-                    self.chatLineBuffers[dataTask] = lines.removeLast()
-                } else {
-                    self.chatLineBuffers[dataTask] = ""
-                }
-
-                for line in lines {
-                    guard !line.isEmpty else { continue }
-                    guard let jsonData = line.data(using: .utf8) else {
-                        print("エラー: 行をDataに変換できませんでした: \(line)")
-                        continue
+            } else if let (continuation, isStreaming) = self.chatContinuations[dataTask] {
+                if isStreaming {
+                    // ストリーミングチャットの処理
+                    if let newString = String(data: data, encoding: .utf8) {
+                        self.chatLineBuffers[dataTask, default: ""].append(newString)
+                    } else {
+                        print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
+                        return
                     }
 
+                    var lines = self.chatLineBuffers[dataTask, default: ""].split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+
+                    if !self.chatLineBuffers[dataTask, default: ""].hasSuffix("\n") && !lines.isEmpty {
+                        self.chatLineBuffers[dataTask] = lines.removeLast()
+                    } else {
+                        self.chatLineBuffers[dataTask] = ""
+                    }
+
+                    for line in lines {
+                        guard !line.isEmpty else { continue }
+                        guard let jsonData = line.data(using: .utf8) else {
+                            print("エラー: 行をDataに変換できませんでした: \(line)")
+                            continue
+                        }
+
+                        do {
+                            let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                            continuation.yield(chunk)
+                        } catch {
+                            print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+                        }
+                    }
+                } else {
+                    // 非ストリーミングチャットの処理
                     do {
-                        let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                        let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: data)
                         continuation.yield(chunk)
+                        continuation.finish() // 非ストリーミングなので、一度だけyieldして終了
                     } catch {
-                        print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+                        print("Non-streaming chat response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+                        continuation.finish(throwing: error)
                     }
                 }
             }
@@ -548,7 +560,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     // モデルリストを更新するために API から再取得します
                     await self.fetchOllamaModelsFromAPI()
                 }
-            } else if let continuation = self.chatContinuations[task] {
+            } else if let (continuation, _) = self.chatContinuations[task] {
                 if let error = error as? URLError, error.code == .cancelled {
                     print("Chat streaming task cancelled by user.")
                     // isStoppedはChatViewで設定されるため、ここではcontinuationをエラーなしで終了させる

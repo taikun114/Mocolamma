@@ -10,6 +10,8 @@ struct ChatView: View {
     @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
     @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
+    @Binding var isStreamingEnabled: Bool
+    @Binding var showingInspector: Bool
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -133,7 +135,7 @@ struct ChatView: View {
             ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
         }
 
-        let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: true, options: nil, tools: nil)
+        let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: isStreamingEnabled, options: nil, tools: nil)
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -247,7 +249,7 @@ struct ChatView: View {
             return
         }
 
-        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: true, options: nil, tools: nil)
+        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: isStreamingEnabled, options: nil, tools: nil)
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
