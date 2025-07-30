@@ -292,7 +292,7 @@ private struct InspectorContentView: View {
                 showingInspector.toggle()
                 print("InspectorContentView: 新しいインスペクターの表示状態: \(showingInspector)")
             } label: {
-                Image(systemName: "sidebar.right") // サイドバーの右側を示すアイコン
+                Label("Toggle Inspector", systemImage: "sidebar.trailing") // サイドバーの右側を示すアイコン
             }
             .help("Toggle Inspector") // ツールチップ
         }

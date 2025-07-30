@@ -46,10 +46,7 @@ struct ChatView: View {
         }
         .onAppear {
             print("ChatView appeared. Models: \(executor.models.count)")
-            // 初期モデルの選択 (もしあれば)
-            if selectedModel == nil, let firstModel = executor.models.first {
-                selectedModel = firstModel
-            }
+            // 初期モデルの選択は行わない (「Select Model」をデフォルトにするため)
         }
         .onChange(of: executor.models) { _, newModels in
             print("Models changed. New models count: \(newModels.count)")
@@ -73,27 +70,22 @@ struct ChatView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
-            Menu {
+            Picker("Select Model", selection: $selectedModel) {
+                Text("Select Model").tag(nil as OllamaModel?)
+                Divider()
                 if executor.models.isEmpty {
                     Text("No models available")
-                        .disabled(true)
+                        .tag(OllamaModel.noModelsAvailable as OllamaModel?)
+                        .selectionDisabled()
                 } else {
                     ForEach(executor.models) { model in
-                        Button(action: {
-                            selectedModel = model
-                        }) {
-                            HStack {
-                                Text(model.name)
-                                if selectedModel?.id == model.id {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
+                        Text(model.name)
+                            .tag(model as OllamaModel?)
                     }
                 }
-            } label: {
-                menuLabel
             }
+            .pickerStyle(.menu)
+            .frame(width: 150) // Adjust width as needed
         }
         if #available(macOS 26, *) {
             ToolbarSpacer()

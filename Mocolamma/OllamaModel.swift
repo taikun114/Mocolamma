@@ -97,6 +97,19 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     }
 }
 
+extension OllamaModel {
+    static let noModelsAvailable = OllamaModel(
+        name: "No models available",
+        model: "no_models_available",
+        modifiedAt: ISO8601DateFormatter().string(from: Date()),
+        size: 0,
+        digest: "dummy",
+        details: nil,
+        capabilities: nil,
+        originalIndex: -1
+    )
+}
+
 /// Ollama APIの /api/tags エンドポイントからのレスポンス構造体
 struct OllamaApiModelsResponse: Codable {
     let models: [OllamaModel]
