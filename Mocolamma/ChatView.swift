@@ -21,7 +21,7 @@ struct ChatView: View {
 
     var body: some View {
         ZStack {
-            ChatMessagesView(messages: $messages)
+            ChatMessagesView(messages: $messages, onRetry: retryMessage) // onRetryを渡す
 
             VStack {
                 
@@ -211,12 +211,114 @@ struct ChatView: View {
             isStreaming = false // Reset ChatView's overall streaming state
         }
     }
+
+    private func retryMessage(for messageId: UUID) {
+        guard let indexToRetry = messages.firstIndex(where: { $0.id == messageId }) else { return }
+
+        // 再試行するアシスタントメッセージが最後のメッセージであることを確認
+        guard indexToRetry == messages.count - 1 else { return }
+
+        // 再試行するアシスタントメッセージが停止済みであることを確認
+        guard messages[indexToRetry].isStopped else { return }
+
+        // ユーザーメッセージのインデックスを見つける
+        guard let userMessageIndex = messages.lastIndex(where: { $0.role == "user" && $0.id < messageId }) else { return }
+
+        // 再試行するアシスタントメッセージとその後のメッセージを削除
+        messages.removeSubrange(indexToRetry..<messages.count)
+
+        // Prepare messages for API request (including history) up to the user message
+        let apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
+            ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
+        }
+
+        print("Retrying with API messages: \(apiMessages.map { $0.content })") // デバッグ用ログを追加
+
+        guard let model = selectedModel else {
+            errorMessage = "Please select a model first."
+            return
+        }
+
+        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: true, options: nil, tools: nil)
+
+        // Add a placeholder for the assistant's response
+        let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+        messages.append(placeholderMessage)
+        let assistantMessageId = placeholderMessage.id
+
+        isStreaming = true // 全体のストリーミング状態をtrueに設定
+
+        Task {
+            let lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
+            var accumulatedContent = ""
+            var lastUIUpdateTime = Date()
+            let updateInterval = 0.1 // 100ms
+            let updateCharacterCount = 20 // 20文字ごと
+            var isFirstChunk = true
+
+            do {
+                for try await chunk in executor.chat(chatRequest: chatRequest) {
+                    if let messageChunk = chunk.message {
+                        if isFirstChunk {
+                            // On the first chunk, update the placeholder's creation date and initial content
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].createdAt = chunk.createdAt
+                                accumulatedContent = messageChunk.content
+                                messages[index].content = accumulatedContent
+                                lastUIUpdateTime = Date()
+                            }
+                            isFirstChunk = false
+                        } else {
+                            // Subsequent chunks
+                            accumulatedContent += messageChunk.content
+                        }
+
+                        let now = Date()
+                        let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
+
+                        // Update UI based on buffer size or time interval
+                        if let index = lastAssistantMessageIndex, (accumulatedContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
+                            messages[index].content = accumulatedContent
+                            lastUIUpdateTime = now
+                        }
+                    }
+
+                    if chunk.done, let index = lastAssistantMessageIndex {
+                        // Final chunk, update performance metrics and set isStreaming to false
+                        if messages.indices.contains(index) {
+                            messages[index].content = accumulatedContent // Ensure final content is set
+                            messages[index].totalDuration = chunk.totalDuration
+                            messages[index].evalCount = chunk.evalCount
+                            messages[index].evalDuration = chunk.evalDuration
+                            messages[index].isStreaming = false
+                        }
+                    }
+                }
+            } catch {
+                print("Chat streaming error or cancelled: \(error)")
+                if let index = lastAssistantMessageIndex, messages.indices.contains(index) {
+                    var updatedMessage = messages[index]
+                    updatedMessage.isStreaming = false // Streaming stopped due to error or cancellation
+                    if let urlError = error as? URLError, urlError.code == .cancelled {
+                        updatedMessage.isStopped = true // Explicitly stopped by user
+                    } else {
+                        updatedMessage.isStopped = false // Stopped due to other error
+                        errorMessage = "Chat API Error: \(error.localizedDescription)" // Only show error for non-cancellation errors
+                    }
+                    messages[index] = updatedMessage // Update the message in the array
+                }
+            }
+            isStreaming = false // Reset ChatView's overall streaming state
+        }
+    }
 }
 
 // MARK: - MessageView
 
 struct MessageView: View {
     let message: ChatMessage
+    let isLastAssistantMessage: Bool // 新しいプロパティ
+    let onRetry: ((UUID) -> Void)? // 新しいクロージャ
     @State private var isHovering: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
@@ -306,6 +408,15 @@ struct MessageView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                // 「Retry」ボタンの追加
+                if message.role == "assistant" && message.isStopped && isLastAssistantMessage {
+                    Button("Retry") {
+                        onRetry?(message.id)
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.link)
+                }
+
                 if message.role == "assistant" {
                     Spacer()
                 }
