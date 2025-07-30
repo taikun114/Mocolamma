@@ -26,6 +26,15 @@ struct ModelListView: View {
         executor.models.sorted(using: sortOrder)
     }
 
+    // ナビゲーションのサブタイトルを生成するComputed Property
+    private var subtitle: Text {
+        if let serverName = serverManager.selectedServer?.name {
+            return Text(LocalizedStringKey(serverName))
+        } else {
+            return Text("No Server Selected")
+        }
+    }
+
     var body: some View {
         VStack {
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
@@ -105,7 +114,8 @@ struct ModelListView: View {
             // コマンド実行の出力表示 (TextEditorは削除されました)
         }
         .navigationTitle("Models")
-        .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected")
+        .navigationSubtitle(subtitle)
+
         .toolbar { // ここで全てのToolbarItemをまとめます
             // MARK: - Reload Button (Primary Action, before Add New)
             ToolbarItem(placement: .primaryAction) { // primaryActionに配置

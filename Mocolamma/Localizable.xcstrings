@@ -1313,6 +1313,22 @@
         }
       }
     },
+    "No models available" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No models available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルがありません"
+          }
+        }
+      }
+    },
     "No Models Available" : {
       "localizations" : {
         "en" : {
@@ -1325,6 +1341,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルがありません"
+          }
+        }
+      }
+    },
+    "No Server Selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Server Selected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーが選択されていません"
           }
         }
       }
@@ -1573,22 +1605,6 @@
         }
       }
     },
-    "Select a Model" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a Model"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを選択"
-          }
-        }
-      }
-    },
     "Select a model to see the details." : {
       "localizations" : {
         "en" : {
@@ -1621,18 +1637,18 @@
         }
       }
     },
-    "Selected Model:" : {
+    "Select Model" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selected Model:"
+            "value" : "Select Model"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択されたモデル:"
+            "value" : "モデルを選択"
           }
         }
       }

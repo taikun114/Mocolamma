@@ -9,15 +9,22 @@ struct ChatView: View {
     @State private var inputText: String = ""
     @State private var isSending: Bool = false
     @State private var errorMessage: String?
-    @State private var showingModelSelectionSheet = false
     @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
+
+    private var subtitle: Text {
+        if let serverName = serverManager.selectedServer?.name {
+            return Text(LocalizedStringKey(serverName))
+        } else {
+            return Text("No Server Selected")
+        }
+    }
 
     var body: some View {
         ZStack {
             ChatMessagesView(messages: $messages)
 
             VStack {
-                ChatHeaderView(selectedModel: $selectedModel, showingModelSelectionSheet: $showingModelSelectionSheet, models: executor.models)
+                
                 Spacer()
                 ChatInputView(inputText: $inputText, isSending: $isSending, selectedModel: selectedModel) {
                     sendMessage()
@@ -25,26 +32,19 @@ struct ChatView: View {
             }
         }
         .navigationTitle("Chat")
-        .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected")
+        .navigationSubtitle(subtitle)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: {
-                    messages.removeAll()
-                    inputText = ""
-                    isSending = false
-                    errorMessage = nil
-                }) {
-                    Label("New Chat", systemImage: "square.and.pencil")
-                }
-            }
+            toolbarContent
         }
         .onAppear {
+            print("ChatView appeared. Models: \(executor.models.count)")
             // 初期モデルの選択 (もしあれば)
             if selectedModel == nil, let firstModel = executor.models.first {
                 selectedModel = firstModel
             }
         }
         .onChange(of: executor.models) { _, newModels in
+            print("Models changed. New models count: \(newModels.count)")
             // モデルリストが更新された場合、現在選択されているモデルがまだ存在するか確認
             if let currentSelectedModel = selectedModel, !newModels.contains(where: { $0.id == currentSelectedModel.id }) {
                 selectedModel = newModels.first // 存在しない場合は最初のモデルを選択
@@ -59,6 +59,57 @@ struct ChatView: View {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "An unknown error occurred.")
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                if executor.models.isEmpty {
+                    Text("No models available")
+                        .disabled(true)
+                } else {
+                    ForEach(executor.models) { model in
+                        Button(action: {
+                            selectedModel = model
+                        }) {
+                            HStack {
+                                Text(model.name)
+                                if selectedModel?.id == model.id {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                }
+            } label: {
+                menuLabel
+            }
+        }
+        if #available(macOS 26, *) {
+            ToolbarSpacer()
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                messages.removeAll()
+                inputText = ""
+                isSending = false
+                errorMessage = nil
+            }) {
+                Label("New Chat", systemImage: "square.and.pencil")
+            }
+        }
+    }
+
+    private var menuLabel: some View {
+        HStack {
+            Image(systemName: "tray.full")
+            if let modelName = selectedModel?.name {
+                Text(modelName.prefix(15).appending(modelName.count > 15 ? "..." : ""))
+            } else {
+                Text("Select Model")
+            }
         }
     }
 
@@ -241,36 +292,4 @@ struct MessageView: View {
     }
 }
 
-// MARK: - ModelSelectionSheet
 
-struct ModelSelectionSheet: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var selectedModel: OllamaModel?
-    let models: [OllamaModel]
-
-    var body: some View {
-        List(models, id: \.id) { model in
-            Button(action: {
-                selectedModel = model
-                dismiss()
-            }) {
-                HStack {
-                    Text(model.name)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .help(model.name)
-                    Spacer()
-                    if selectedModel?.id == model.id {
-                        Image(systemName: "checkmark")
-                    }
-                }
-                .padding(.vertical, 5)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-        .listStyle(.plain)
-        .background(Color.clear)
-        .navigationTitle("Select a Model")
-    }
-}

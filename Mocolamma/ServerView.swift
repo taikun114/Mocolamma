@@ -18,7 +18,13 @@ struct ServerView: View {
 
     @Binding var selectedServerForInspector: ServerInfo? // Inspectorに表示する選択されたサーバー情報
 
-    
+    private var subtitle: Text {
+        if let serverName = serverManager.selectedServer?.name {
+            return Text(LocalizedStringKey(serverName))
+        } else {
+            return Text("No Server Selected")
+        }
+    }
 
     var body: some View {
         VStack {
@@ -31,7 +37,8 @@ struct ServerView: View {
                 serverToDelete: $serverToDelete
             )
             .navigationTitle("Servers")
-            .navigationSubtitle(serverManager.selectedServer?.name ?? "No Server Selected") // ナビゲーションタイトル
+            .navigationSubtitle(subtitle)
+ // ナビゲーションタイトル
             .overlay {
                 if serverManager.servers.isEmpty {
                     ContentUnavailableView(
