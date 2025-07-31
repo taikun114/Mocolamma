@@ -18,7 +18,7 @@ struct ChatMessagesView: View {
                 .padding()
                 .padding(.bottom, 50) // Height of the bottom overlay
             }
-            .scrollEdgeEffectStyle(.hard, for: .bottom)
+            .scrollEdgeEffectStyle(.soft, for: .bottom)
 
         } else {
             ScrollView {

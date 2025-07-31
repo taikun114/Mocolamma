@@ -511,6 +511,22 @@
         }
       }
     },
+    "Custom Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム設定"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "en" : {
@@ -784,6 +800,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エンベディング長:"
+          }
+        }
+      }
+    },
+    "Enable Custom Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Custom Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム設定を有効にする"
           }
         }
       }
@@ -1827,6 +1859,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルの取得に成功しました。合計: %d"
+          }
+        }
+      }
+    },
+    "Temperature" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temperature"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "温度"
           }
         }
       }

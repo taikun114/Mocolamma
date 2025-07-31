@@ -12,6 +12,8 @@ struct ChatView: View {
     @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
     @Binding var isStreamingEnabled: Bool
     @Binding var showingInspector: Bool
+    @Binding var useCustomChatSettings: Bool
+    @Binding var chatTemperature: Double
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -135,7 +137,14 @@ struct ChatView: View {
             ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
         }
 
-        let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: isStreamingEnabled, options: nil, tools: nil)
+        let chatOptions: ChatRequestOptions?
+        if useCustomChatSettings {
+            chatOptions = ChatRequestOptions(temperature: chatTemperature)
+        } else {
+            chatOptions = nil
+        }
+
+        let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: isStreamingEnabled, options: chatOptions, tools: nil)
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -249,7 +258,14 @@ struct ChatView: View {
             return
         }
 
-        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: isStreamingEnabled, options: nil, tools: nil)
+        let chatOptions: ChatRequestOptions?
+        if useCustomChatSettings {
+            chatOptions = ChatRequestOptions(temperature: chatTemperature)
+        } else {
+            chatOptions = nil
+        }
+
+        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: isStreamingEnabled, options: chatOptions, tools: nil)
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -347,7 +363,7 @@ struct MessageView: View {
                 .cornerRadius(16)
                 .lineSpacing(4) // 行間を調整
                 .markdownTextStyle(\.text) {
-                    ForegroundColor(message.role == "user" ? .white : .primary)
+                    ForegroundColor(message.role == "user" ? .white : nil)
                 }
                 .markdownTextStyle(\.code) {
                     FontFamilyVariant(.monospaced)
@@ -363,12 +379,12 @@ struct MessageView: View {
                         .markdownMargin(top: .em(0.3))
                 }
                 .markdownBlockStyle(\.blockquote) { configuration in
-                  configuration.label
-                    .padding()
-                    .overlay(alignment: .leading) {
-                    Rectangle()
-                        .fill(message.role == "user" ? .white : .gray)
-                        .frame(width: 4)
+                    configuration.label
+                        .padding()
+                        .overlay(alignment: .leading) {
+                            Rectangle()
+                                .fill(message.role == "user" ? .white : .gray)
+                                .frame(width: 4)
                     }
                 }
 
@@ -376,7 +392,7 @@ struct MessageView: View {
                     ScrollView(.horizontal) {
                         configuration.label
                             .markdownTextStyle {
-                              FontFamilyVariant(.monospaced)
+                                FontFamilyVariant(.monospaced)
                             }
                             .markdownMargin(top: .em(0.3))
                             .padding()

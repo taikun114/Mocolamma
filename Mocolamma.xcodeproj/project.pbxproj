@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D6AF25D2E37C253008E569D /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6D6AF25C2E37C253008E569D /* MarkdownUI */; };
+		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D6AF25D2E37C253008E569D /* MarkdownUI in Frameworks */,
+				6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 			name = Mocolamma;
 			packageProductDependencies = (
 				6D6AF25C2E37C253008E569D /* MarkdownUI */,
+				6D7D84A02E3B68FA006EDB4D /* CompactSlider */,
 			);
 			productName = Mocolamma;
 			productReference = 6DC81A322E3236B3005F2E03 /* Mocolamma.app */;
@@ -204,6 +207,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D6AF25B2E37C253008E569D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DC81A332E3236B3005F2E03 /* Products */;
@@ -416,7 +420,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -450,7 +454,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -480,7 +484,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -499,7 +503,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -517,7 +521,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -534,7 +538,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 658;
+				CURRENT_PROJECT_VERSION = 707;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -597,6 +601,14 @@
 				version = 2.4.1;
 			};
 		};
+		6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/buh/CompactSlider";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.9;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -604,6 +616,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6D6AF25B2E37C253008E569D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
+		};
+		6D7D84A02E3B68FA006EDB4D /* CompactSlider */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */;
+			productName = CompactSlider;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

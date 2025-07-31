@@ -144,7 +144,57 @@ struct ChatRequestOptions: Codable {
         case numThread = "num_thread"
         case keepAlive = "keep_alive"
     }
+
+    // Custom initializer to allow partial initialization
+    init(
+        numKeep: Int? = nil,
+        seed: Int? = nil,
+        numPredict: Int? = nil,
+        topK: Int? = nil,
+        topP: Double? = nil,
+        minP: Double? = nil,
+        typicalP: Double? = nil,
+        repeatLastN: Int? = nil,
+        temperature: Double? = nil,
+        repeatPenalty: Double? = nil,
+        presencePenalty: Double? = nil,
+        frequencyPenalty: Double? = nil,
+        penalizeNewline: Bool? = nil,
+        stop: [String]? = nil,
+        numa: Bool? = nil,
+        numCtx: Int? = nil,
+        numBatch: Int? = nil,
+        numGpu: Int? = nil,
+        mainGpu: Int? = nil,
+        useMmap: Bool? = nil,
+        numThread: Int? = nil,
+        keepAlive: String? = nil
+    ) {
+        self.numKeep = numKeep
+        self.seed = seed
+        self.numPredict = numPredict
+        self.topK = topK
+        self.topP = topP
+        self.minP = minP
+        self.typicalP = typicalP
+        self.repeatLastN = repeatLastN
+        self.temperature = temperature
+        self.repeatPenalty = repeatPenalty
+        self.presencePenalty = presencePenalty
+        self.frequencyPenalty = frequencyPenalty
+        self.penalizeNewline = penalizeNewline
+        self.stop = stop
+        self.numa = numa
+        self.numCtx = numCtx
+        self.numBatch = numBatch
+        self.numGpu = numGpu
+        self.mainGpu = mainGpu
+        self.useMmap = useMmap
+        self.numThread = numThread
+        self.keepAlive = keepAlive
+    }
 }
+
 
 /// Represents a streaming response chunk from the /api/chat endpoint.
 struct ChatResponseChunk: Codable {

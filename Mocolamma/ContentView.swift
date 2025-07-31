@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation // Task { @MainActor in } を使用するため
+import CompactSlider
 
 // MARK: - コンテンツビュー
 
@@ -23,6 +24,8 @@ struct ContentView: View {
     // Inspector（プレビューパネル）の表示/非表示を制御するState変数
     @State private var showingInspector: Bool = false
     @State private var isChatStreamingEnabled: Bool = true // ChatViewのストリーム設定
+    @State private var useCustomChatSettings: Bool = false // カスタムチャット設定の有効化
+    @State private var chatTemperature: Double = 0.8 // Temperatureの初期値
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -64,7 +67,9 @@ struct ContentView: View {
             modelToDelete: $modelToDelete,
             columnVisibility: $columnVisibility,
             sortedModels: sortedModels,
-            isChatStreamingEnabled: $isChatStreamingEnabled
+            isChatStreamingEnabled: $isChatStreamingEnabled,
+            useCustomChatSettings: $useCustomChatSettings,
+            chatTemperature: $chatTemperature
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -154,6 +159,8 @@ private struct MainNavigationView: View {
     @Binding var columnVisibility: NavigationSplitViewVisibility
     let sortedModels: [OllamaModel]
     @Binding var isChatStreamingEnabled: Bool // 新しく追加
+    @Binding var useCustomChatSettings: Bool // 新しく追加
+    @Binding var chatTemperature: Double // 新しく追加
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -184,7 +191,9 @@ private struct MainNavigationView: View {
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
-                isChatStreamingEnabled: $isChatStreamingEnabled
+                isChatStreamingEnabled: $isChatStreamingEnabled,
+                useCustomChatSettings: $useCustomChatSettings,
+                chatTemperature: $chatTemperature
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -198,7 +207,9 @@ private struct MainNavigationView: View {
                 selectedServerForInspector: selectedServerForInspector, // Pass new state
                 serverManager: serverManager, // Pass ServerManager to InspectorContentView
                 showingInspector: $showingInspector, // InspectorContentViewにバインディングを渡す
-                isChatStreamingEnabled: $isChatStreamingEnabled
+                isChatStreamingEnabled: $isChatStreamingEnabled,
+                useCustomChatSettings: $useCustomChatSettings,
+                chatTemperature: $chatTemperature
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
@@ -220,6 +231,8 @@ private struct InspectorContentView: View {
     @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
     @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
     @Binding var isChatStreamingEnabled: Bool // ChatViewのストリーム設定をバインディングとして受け取る
+    @Binding var useCustomChatSettings: Bool
+    @Binding var chatTemperature: Double
     
     // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
@@ -259,6 +272,24 @@ private struct InspectorContentView: View {
                 Form {
                     Section("Chat Settings") {
                         Toggle("Stream Response", isOn: $isChatStreamingEnabled)
+                    }
+                    
+                    Section("Custom Settings") {
+                        Toggle("Enable Custom Settings", isOn: $useCustomChatSettings)
+                        
+                        VStack {
+                            HStack {
+                                Text("Temperature")
+                                Spacer()
+                                Text(String(format: "%.1f", chatTemperature))
+                                    .font(.body.monospaced())
+                            }
+                            CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
+                                .frame(height: 16)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .disabled(!useCustomChatSettings)
+                        .foregroundColor(useCustomChatSettings ? .primary : .secondary)
                     }
                 }
                 .formStyle(.grouped)
@@ -359,6 +390,8 @@ private struct MainContentDetailView: View {
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
     @Binding var isChatStreamingEnabled: Bool
+    @Binding var useCustomChatSettings: Bool
+    @Binding var chatTemperature: Double
 
     var body: some View {
         Group {
@@ -394,7 +427,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector)
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {
