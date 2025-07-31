@@ -370,7 +370,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(chatRequest: ChatRequest) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
                 guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
@@ -383,17 +383,30 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
                 do {
+                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature)")
+                    var chatOptions: ChatRequestOptions?
+                    if useCustomChatSettings {
+                        var options = ChatRequestOptions()
+                        if isTemperatureEnabled {
+                            options.temperature = chatTemperature
+                        }
+                        chatOptions = options
+                        print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1)")
+                    }
+
+                    let chatRequest = ChatRequest(model: model, messages: messages, stream: stream, options: chatOptions, tools: tools)
+
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .prettyPrinted // デバッグ用に整形
                     request.httpBody = try encoder.encode(chatRequest)
-                    print("Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+                    print("DEBUG: Final Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
                 } catch {
                     continuation.finish(throwing: error)
                     return
                 }
 
                 let task = urlSession.dataTask(with: request)
-                self.chatContinuations[task] = (continuation: continuation, isStreaming: chatRequest.stream)
+                self.chatContinuations[task] = (continuation: continuation, isStreaming: stream)
                 self.chatLineBuffers[task] = "" // Initialize buffer for this task
                 self.currentChatTask = task // 現在のチャットタスクを保持
 

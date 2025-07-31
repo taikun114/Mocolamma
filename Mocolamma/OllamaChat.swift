@@ -105,7 +105,7 @@ struct ChatRequestOptions: Codable {
     let minP: Double?
     let typicalP: Double?
     let repeatLastN: Int?
-    let temperature: Double?
+    var temperature: Double?
     let repeatPenalty: Double?
     let presencePenalty: Double?
     let frequencyPenalty: Double?

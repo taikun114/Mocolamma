@@ -14,6 +14,7 @@ struct ChatView: View {
     @Binding var showingInspector: Bool
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
+    @Binding var isTemperatureEnabled: Bool
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -137,14 +138,7 @@ struct ChatView: View {
             ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
         }
 
-        let chatOptions: ChatRequestOptions?
-        if useCustomChatSettings {
-            chatOptions = ChatRequestOptions(temperature: chatTemperature)
-        } else {
-            chatOptions = nil
-        }
-
-        let chatRequest = ChatRequest(model: model.name, messages: apiMessages, stream: isStreamingEnabled, options: chatOptions, tools: nil)
+        
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -160,7 +154,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(chatRequest: chatRequest) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
@@ -258,14 +252,7 @@ struct ChatView: View {
             return
         }
 
-        let chatOptions: ChatRequestOptions?
-        if useCustomChatSettings {
-            chatOptions = ChatRequestOptions(temperature: chatTemperature)
-        } else {
-            chatOptions = nil
-        }
-
-        let chatRequest = ChatRequest(model: model.name, messages: Array(apiMessages), stream: isStreamingEnabled, options: chatOptions, tools: nil)
+        
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -283,7 +270,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(chatRequest: chatRequest) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content

@@ -26,6 +26,7 @@ struct ContentView: View {
     @State private var isChatStreamingEnabled: Bool = true // ChatViewのストリーム設定
     @State private var useCustomChatSettings: Bool = false // カスタムチャット設定の有効化
     @State private var chatTemperature: Double = 0.8 // Temperatureの初期値
+    @State private var isTemperatureEnabled: Bool = false // 新しく追加
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -69,7 +70,8 @@ struct ContentView: View {
             sortedModels: sortedModels,
             isChatStreamingEnabled: $isChatStreamingEnabled,
             useCustomChatSettings: $useCustomChatSettings,
-            chatTemperature: $chatTemperature
+            chatTemperature: $chatTemperature,
+            isTemperatureEnabled: $isTemperatureEnabled
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -161,6 +163,7 @@ private struct MainNavigationView: View {
     @Binding var isChatStreamingEnabled: Bool // 新しく追加
     @Binding var useCustomChatSettings: Bool // 新しく追加
     @Binding var chatTemperature: Double // 新しく追加
+    @Binding var isTemperatureEnabled: Bool // 新しく追加
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -193,7 +196,8 @@ private struct MainNavigationView: View {
                 modelToDelete: $modelToDelete,
                 isChatStreamingEnabled: $isChatStreamingEnabled,
                 useCustomChatSettings: $useCustomChatSettings,
-                chatTemperature: $chatTemperature
+                chatTemperature: $chatTemperature,
+                isTemperatureEnabled: $isTemperatureEnabled
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -209,7 +213,8 @@ private struct MainNavigationView: View {
                 showingInspector: $showingInspector, // InspectorContentViewにバインディングを渡す
                 isChatStreamingEnabled: $isChatStreamingEnabled,
                 useCustomChatSettings: $useCustomChatSettings,
-                chatTemperature: $chatTemperature
+                chatTemperature: $chatTemperature,
+                isTemperatureEnabled: $isTemperatureEnabled
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
@@ -240,6 +245,7 @@ private struct InspectorContentView: View {
     @State private var licenseBody: String? // 新しく追加
     @State private var licenseLink: String? // 新しく追加
     @State private var isLoadingInfo: Bool = false // ローディング状態
+    @Binding var isTemperatureEnabled: Bool // 新しく追加
 
     var body: some View {
         Group {
@@ -278,17 +284,21 @@ private struct InspectorContentView: View {
                         Toggle("Enable Custom Settings", isOn: $useCustomChatSettings)
                         
                         VStack {
-                            HStack {
+                            Toggle(isOn: $isTemperatureEnabled) { // This is the new toggle for temperature
                                 Text("Temperature")
-                                Spacer()
+                            }
+                            .padding(.bottom, 4)
+                            HStack { // This HStack will contain the slider and its value
+                                CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
+                                    .frame(height: 16)
                                 Text(String(format: "%.1f", chatTemperature))
                                     .font(.body.monospaced())
                             }
-                            CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
-                                .frame(height: 16)
+                            .disabled(!isTemperatureEnabled) // Disable slider and value if temperature is not enabled
+                            .foregroundColor(isTemperatureEnabled ? .primary : .secondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .disabled(!useCustomChatSettings)
+                        .disabled(!useCustomChatSettings) // Existing disable for the whole custom settings section
                         .foregroundColor(useCustomChatSettings ? .primary : .secondary)
                     }
                 }
@@ -392,6 +402,7 @@ private struct MainContentDetailView: View {
     @Binding var isChatStreamingEnabled: Bool
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
+    @Binding var isTemperatureEnabled: Bool // 新しく追加
 
     var body: some View {
         Group {
@@ -427,7 +438,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature)
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {
