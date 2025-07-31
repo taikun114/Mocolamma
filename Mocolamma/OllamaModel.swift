@@ -8,6 +8,7 @@ struct OllamaModelDetails: Codable, Hashable {
     let families: [String]?
     let parameter_size: String?
     let quantization_level: String?
+    let context_length: Int?
 }
 
 

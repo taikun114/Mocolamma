@@ -497,6 +497,22 @@
         }
       }
     },
+    "Context Window" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Context Window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンテキストウィンドウ"
+          }
+        }
+      }
+    },
     "Copy" : {
       "localizations" : {
         "en" : {

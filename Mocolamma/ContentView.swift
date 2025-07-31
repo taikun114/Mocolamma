@@ -27,6 +27,8 @@ struct ContentView: View {
     @State private var useCustomChatSettings: Bool = false // カスタムチャット設定の有効化
     @State private var chatTemperature: Double = 0.8 // Temperatureの初期値
     @State private var isTemperatureEnabled: Bool = false // 新しく追加
+    @State private var isContextWindowEnabled: Bool = false // ここを追加
+    @State private var contextWindowValue: Double = 2048.0 // ここを2048.0に変更
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -71,7 +73,9 @@ struct ContentView: View {
             isChatStreamingEnabled: $isChatStreamingEnabled,
             useCustomChatSettings: $useCustomChatSettings,
             chatTemperature: $chatTemperature,
-            isTemperatureEnabled: $isTemperatureEnabled
+            isTemperatureEnabled: $isTemperatureEnabled,
+            isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
+            contextWindowValue: $contextWindowValue // ここを追加
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -164,6 +168,8 @@ private struct MainNavigationView: View {
     @Binding var useCustomChatSettings: Bool // 新しく追加
     @Binding var chatTemperature: Double // 新しく追加
     @Binding var isTemperatureEnabled: Bool // 新しく追加
+    @Binding var isContextWindowEnabled: Bool // ここを追加
+    @Binding var contextWindowValue: Double // ここを追加
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -197,7 +203,9 @@ private struct MainNavigationView: View {
                 isChatStreamingEnabled: $isChatStreamingEnabled,
                 useCustomChatSettings: $useCustomChatSettings,
                 chatTemperature: $chatTemperature,
-                isTemperatureEnabled: $isTemperatureEnabled
+                isTemperatureEnabled: $isTemperatureEnabled,
+                isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
+                contextWindowValue: $contextWindowValue // ここを追加
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -214,11 +222,14 @@ private struct MainNavigationView: View {
                 isChatStreamingEnabled: $isChatStreamingEnabled,
                 useCustomChatSettings: $useCustomChatSettings,
                 chatTemperature: $chatTemperature,
-                isTemperatureEnabled: $isTemperatureEnabled
+                isTemperatureEnabled: $isTemperatureEnabled,
+                isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
+                contextWindowValue: $contextWindowValue // ここを追加
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
         }
+        
         // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
         // .animation(.default, value: showingInspector)
     }
@@ -246,6 +257,8 @@ private struct InspectorContentView: View {
     @State private var licenseLink: String? // 新しく追加
     @State private var isLoadingInfo: Bool = false // ローディング状態
     @Binding var isTemperatureEnabled: Bool // 新しく追加
+    @Binding var isContextWindowEnabled: Bool // ここを追加
+    @Binding var contextWindowValue: Double // ここを追加
 
     var body: some View {
         Group {
@@ -288,7 +301,7 @@ private struct InspectorContentView: View {
                                 Text("Temperature")
                             }
                             .padding(.bottom, 4)
-                            HStack { // This HStack will contain the slider and its value
+                            HStack {
                                 CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
                                     .frame(height: 16)
                                 Text(String(format: "%.1f", chatTemperature))
@@ -299,6 +312,24 @@ private struct InspectorContentView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .disabled(!useCustomChatSettings) // Existing disable for the whole custom settings section
+                        .foregroundColor(useCustomChatSettings ? .primary : .secondary)
+
+                        VStack {
+                            Toggle(isOn: $isContextWindowEnabled) {
+                                Text("Context Window")
+                            }
+                            .padding(.bottom, 4)
+                            HStack {
+                                                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0) // ここを修正
+                                    .frame(height: 16)
+                                Text("\(Int(contextWindowValue))")
+                                    .font(.body.monospaced())
+                            }
+                            .disabled(!isContextWindowEnabled)
+                            .foregroundColor(isContextWindowEnabled ? .primary : .secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .disabled(!useCustomChatSettings)
                         .foregroundColor(useCustomChatSettings ? .primary : .secondary)
                     }
                 }
@@ -351,7 +382,9 @@ private struct InspectorContentView: View {
             .help("Toggle Inspector") // ツールチップ
         }
     }
-}
+        
+
+} // InspectorContentViewの閉じブレース
 
 // MARK: - Model Inspector Detail View Helper
 private struct ModelInspectorDetailView: View {
@@ -387,6 +420,8 @@ private struct ServerInspectorDetailView: View {
     }
 }
 
+
+
 // MARK: - Main Content Detail Helper View
 private struct MainContentDetailView: View {
     @Binding var sidebarSelection: String?
@@ -403,6 +438,8 @@ private struct MainContentDetailView: View {
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
     @Binding var isTemperatureEnabled: Bool // 新しく追加
+    @Binding var isContextWindowEnabled: Bool // ここを追加
+    @Binding var contextWindowValue: Double // ここを追加
 
     var body: some View {
         Group {
@@ -438,7 +475,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled)
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {

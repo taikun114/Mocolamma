@@ -15,6 +15,8 @@ struct ChatView: View {
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
     @Binding var isTemperatureEnabled: Bool
+    @Binding var isContextWindowEnabled: Bool
+    @Binding var contextWindowValue: Double
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -154,7 +156,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
@@ -270,7 +272,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content

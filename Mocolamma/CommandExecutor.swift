@@ -8,6 +8,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var isRunning: Bool = false
     @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
     @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
+    @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
 
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -295,6 +296,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("モデル \(modelName) の詳細情報を正常に取得しました。")
             // 取得した情報をキャッシュに保存
             modelInfoCache[modelName] = apiResponse
+
+            // context_length を抽出して selectedModelContextLength に設定
+            if let modelInfo = apiResponse.model_info,
+               let contextLengthValue = modelInfo.first(where: { $0.key.contains("context_length") })?.value,
+               case .int(let length) = contextLengthValue {
+                self.selectedModelContextLength = length
+                print("DEBUG: Extracted context_length: \(length) for model \(modelName)")
+            } else {
+                self.selectedModelContextLength = nil
+                print("DEBUG: No context_length found for model \(modelName) or it's not an integer.")
+            }
+
             return apiResponse
             
         } catch {
@@ -370,7 +383,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
                 guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
@@ -383,15 +396,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
                 do {
-                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature)")
+                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue)")
                     var chatOptions: ChatRequestOptions?
                     if useCustomChatSettings {
                         var options = ChatRequestOptions()
                         if isTemperatureEnabled {
                             options.temperature = chatTemperature
                         }
+                        if isContextWindowEnabled {
+                            options.numCtx = Int(contextWindowValue) // DoubleをIntにキャスト
+                        }
                         chatOptions = options
-                        print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1)")
+                        print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1), numCtx: \(chatOptions?.numCtx ?? -1)")
                     }
 
                     let chatRequest = ChatRequest(model: model, messages: messages, stream: stream, options: chatOptions, tools: tools)
@@ -431,7 +447,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// 特定のSwiftバージョンやビルド設定によっては表示され続けることがあります。
     /// これは機能的な問題ではなく、コンパイラの振る舞いによるものです。
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        Task { @MainActor [weak self] in
+        Task { @MainActor [weak self, completionHandler] in // completionHandlerをキャプチャリストに追加
             guard let self = self else {
                 completionHandler(.cancel)
                 return

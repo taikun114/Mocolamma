@@ -1,4 +1,3 @@
-
 // OllamaChat.swift
 
 import SwiftUI
@@ -106,13 +105,13 @@ struct ChatRequestOptions: Codable {
     let typicalP: Double?
     let repeatLastN: Int?
     var temperature: Double?
+    var numCtx: Int? // ここを var に変更
     let repeatPenalty: Double?
     let presencePenalty: Double?
     let frequencyPenalty: Double?
     let penalizeNewline: Bool?
     let stop: [String]?
     let numa: Bool?
-    let numCtx: Int?
     let numBatch: Int?
     let numGpu: Int?
     let mainGpu: Int?
@@ -162,7 +161,7 @@ struct ChatRequestOptions: Codable {
         penalizeNewline: Bool? = nil,
         stop: [String]? = nil,
         numa: Bool? = nil,
-        numCtx: Int? = nil,
+        numCtx: Int? = nil, // ここを追加
         numBatch: Int? = nil,
         numGpu: Int? = nil,
         mainGpu: Int? = nil,
@@ -185,7 +184,7 @@ struct ChatRequestOptions: Codable {
         self.penalizeNewline = penalizeNewline
         self.stop = stop
         self.numa = numa
-        self.numCtx = numCtx
+        self.numCtx = numCtx // ここを追加
         self.numBatch = numBatch
         self.numGpu = numGpu
         self.mainGpu = mainGpu
