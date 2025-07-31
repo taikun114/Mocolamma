@@ -374,7 +374,6 @@ struct MessageView: View {
                                 .frame(width: 4)
                     }
                 }
-
                 .markdownBlockStyle(\.codeBlock) { configuration in
                     ScrollView(.horizontal) {
                         configuration.label
@@ -415,8 +414,11 @@ struct MessageView: View {
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
+                        Text("\(evalCount) Tokens")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                         let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
-                        Text(String(format: "%.2f tok/s", tokensPerSecond))
+                        Text(String(format: "%.2f Tok/s", tokensPerSecond))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -467,5 +469,3 @@ struct MessageView: View {
         return formatter
     }
 }
-
-
