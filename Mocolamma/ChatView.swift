@@ -19,6 +19,7 @@ struct ChatView: View {
     @Binding var contextWindowValue: Double
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
+    @Binding var isThinkingEnabled: Bool
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -198,7 +199,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, isThinkingEnabled: isThinkingEnabled, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
@@ -320,7 +321,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, isThinkingEnabled: isThinkingEnabled, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content

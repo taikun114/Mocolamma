@@ -1847,6 +1847,22 @@
         }
       }
     },
+    "Specifies whether to perform inference when using a reasoning model." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies whether to perform inference when using a reasoning model."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部の推論モデルを使う場合に推論を行うかどうかを指定します。"
+          }
+        }
+      }
+    },
     "Stopped" : {
       "localizations" : {
         "en" : {
@@ -1941,6 +1957,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "温度"
+          }
+        }
+      }
+    },
+    "Thinking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thinking"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推論"
           }
         }
       }

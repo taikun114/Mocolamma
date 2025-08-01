@@ -49,6 +49,7 @@ struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
     let stream: Bool
+    var think: Bool
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
 
@@ -56,8 +57,21 @@ struct ChatRequest: Codable {
         case model
         case messages
         case stream
+        case think
         case options
         case tools
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(model, forKey: .model)
+        try container.encode(messages, forKey: .messages)
+        try container.encode(stream, forKey: .stream)
+        if !think {
+            try container.encode(think, forKey: .think)
+        }
+        try container.encodeIfPresent(options, forKey: .options)
+        try container.encodeIfPresent(tools, forKey: .tools)
     }
 }
 

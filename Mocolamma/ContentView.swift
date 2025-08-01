@@ -31,6 +31,7 @@ struct ContentView: View {
     @State private var contextWindowValue: Double = 2048.0 // ここを2048.0に変更
     @State private var isSystemPromptEnabled: Bool = false
     @State private var systemPrompt: String = ""
+    @State private var isThinkingEnabled: Bool = true
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -79,7 +80,8 @@ struct ContentView: View {
             isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
             contextWindowValue: $contextWindowValue, // ここを追加
             isSystemPromptEnabled: $isSystemPromptEnabled,
-            systemPrompt: $systemPrompt
+            systemPrompt: $systemPrompt,
+            isThinkingEnabled: $isThinkingEnabled
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -176,6 +178,7 @@ private struct MainNavigationView: View {
     @Binding var contextWindowValue: Double // ここを追加
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
+    @Binding var isThinkingEnabled: Bool
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -213,7 +216,8 @@ private struct MainNavigationView: View {
                 isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
                 contextWindowValue: $contextWindowValue, // ここを追加
                 isSystemPromptEnabled: $isSystemPromptEnabled,
-                systemPrompt: $systemPrompt
+                systemPrompt: $systemPrompt,
+                isThinkingEnabled: $isThinkingEnabled
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -234,7 +238,8 @@ private struct MainNavigationView: View {
                 isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
                 contextWindowValue: $contextWindowValue, // ここを追加
                 isSystemPromptEnabled: $isSystemPromptEnabled,
-                systemPrompt: $systemPrompt
+                systemPrompt: $systemPrompt,
+                isThinkingEnabled: $isThinkingEnabled
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
@@ -271,6 +276,7 @@ private struct InspectorContentView: View {
     @Binding var contextWindowValue: Double // ここを追加
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
+    @Binding var isThinkingEnabled: Bool
 
     var body: some View {
         Group {
@@ -303,6 +309,13 @@ private struct InspectorContentView: View {
                 Form {
                     Section("Chat Settings") {
                         Toggle("Stream Response", isOn: $isChatStreamingEnabled)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Toggle("Thinking", isOn: $isThinkingEnabled)
+                            Text("Specifies whether to perform inference when using a reasoning model.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                         
                         VStack {
                             Toggle(isOn: $isSystemPromptEnabled) {
@@ -466,6 +479,7 @@ private struct MainContentDetailView: View {
     @Binding var contextWindowValue: Double // ここを追加
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
+    @Binding var isThinkingEnabled: Bool
 
     var body: some View {
         Group {
@@ -501,7 +515,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt)
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt, isThinkingEnabled: $isThinkingEnabled)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {

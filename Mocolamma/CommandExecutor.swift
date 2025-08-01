@@ -374,7 +374,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, isThinkingEnabled: Bool, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
                 guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
@@ -412,7 +412,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         }
                     }
 
-                    let chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, options: chatOptions, tools: tools)
+                    let chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: isThinkingEnabled, options: chatOptions, tools: tools)
 
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .prettyPrinted // デバッグ用に整形
