@@ -226,7 +226,7 @@ private struct MainNavigationView: View {
             // Inspectorのコンテンツを分離したヘルパービューで管理
             InspectorContentView(
                 sidebarSelection: sidebarSelection,
-                selectedModel: selectedModel,
+                selectedModel: $selectedModel,
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector, // Pass new state
                 serverManager: serverManager, // Pass ServerManager to InspectorContentView
@@ -256,7 +256,7 @@ private struct MainNavigationView: View {
 private struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     let sidebarSelection: String?
-    let selectedModel: OllamaModel.ID?
+    @Binding var selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
     let selectedServerForInspector: ServerInfo? // New parameter
     @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
@@ -267,7 +267,6 @@ private struct InspectorContentView: View {
     
     // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
-    @State private var capabilities: [String]?
     @State private var licenseBody: String? // 新しく追加
     @State private var licenseLink: String? // 新しく追加
     @State private var isLoadingInfo: Bool = false // ローディング状態
@@ -287,7 +286,7 @@ private struct InspectorContentView: View {
                     model: model,
                     modelInfo: modelInfo,
                     isLoading: isLoadingInfo,
-                    fetchedCapabilities: capabilities,
+                    fetchedCapabilities: commandExecutor.selectedModelCapabilities,
                     licenseBody: licenseBody,
                     licenseLink: licenseLink
                 )
@@ -317,6 +316,7 @@ private struct InspectorContentView: View {
                                 }
                             }
                             .pickerStyle(.menu)
+                            .disabled(!(commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false))
                             Text("Specifies whether to perform inference when using a reasoning model.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -397,15 +397,25 @@ private struct InspectorContentView: View {
             }
             
             Task {
+                print("InspectorContentView: selectedModel changed to \(newID.uuidString)")
                 let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
                 // このタスクがキャンセルされていないか、または選択が再度変更されていないか確認
                 if selectedModel == newID {
                     await MainActor.run {
                         self.modelInfo = fetchedResponse?.model_info
-                        self.capabilities = fetchedResponse?.capabilities
                         self.licenseBody = fetchedResponse?.license
                         self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
                         self.isLoadingInfo = false
+
+                        print("InspectorContentView: Fetched capabilities for \(model.name): \(self.commandExecutor.selectedModelCapabilities ?? [])")
+
+                        // thinking capabilityがない場合、thinkingOptionを.noneに設定し、無効化
+                        let hasThinkingCapability = self.commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false
+                        print("InspectorContentView: Model \(model.name) has thinking capability: \(hasThinkingCapability)")
+                        if !hasThinkingCapability {
+                            self.thinkingOption = .none
+                            print("InspectorContentView: thinkingOption set to .none for \(model.name)")
+                        }
                     }
                 }
             }
@@ -520,7 +530,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt, thinkingOption: $thinkingOption)
+                                ChatView(selectedModelID: $selectedModel, isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt, thinkingOption: $thinkingOption)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {

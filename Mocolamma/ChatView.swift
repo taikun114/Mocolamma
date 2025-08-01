@@ -4,7 +4,7 @@ import MarkdownUI
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
     @EnvironmentObject var serverManager: ServerManager
-    @State private var selectedModel: OllamaModel?
+    @Binding var selectedModelID: OllamaModel.ID?
     @State private var messages: [ChatMessage] = []
     @State private var inputText: String = ""
     @State private var isStreaming: Bool = false
@@ -22,6 +22,13 @@ struct ChatView: View {
     @Binding var thinkingOption: ThinkingOption
     @State private var isInsideThinkingBlock: Bool = false
 
+    private var currentSelectedModel: OllamaModel? {
+        if let id = selectedModelID {
+            return executor.models.first(where: { $0.id == id })
+        }
+        return nil
+    }
+
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
             return Text(LocalizedStringKey(serverName))
@@ -37,7 +44,7 @@ struct ChatView: View {
             VStack {
                 
                 Spacer()
-                ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: selectedModel) {
+                ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
                     sendMessage()
                 } stopMessage: {
                     // ストリーミング中のアシスタントメッセージを見つけて、その状態を即座に更新
@@ -62,20 +69,21 @@ struct ChatView: View {
         .onChange(of: executor.models) { _, newModels in
             print("Models changed. New models count: \(newModels.count)")
             // モデルリストが更新された場合、現在選択されているモデルがまだ存在するか確認
-            if let currentSelectedModel = selectedModel, !newModels.contains(where: { $0.id == currentSelectedModel.id }) {
-                selectedModel = newModels.first // 存在しない場合は最初のモデルを選択
-            } else if selectedModel == nil, let firstModel = newModels.first {
-                selectedModel = firstModel // まだ何も選択されていない場合は最初のモデルを選択
+            if let currentSelectedModelID = selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+                selectedModelID = newModels.first?.id // 存在しない場合は最初のモデルを選択
+            } else if selectedModelID == nil, let firstModel = newModels.first {
+                selectedModelID = firstModel.id // まだ何も選択されていない場合は最初のモデルを選択
             }
         }
         // 変更点: selectedModel の変更を監視してコンテキスト長を更新する
-        .onChange(of: selectedModel) { _, newModel in
+        .onChange(of: selectedModelID) { _, newModelID in
             // モデルが変更されたら、コンテキストウィンドウの値をリセット
             contextWindowValue = 2048.0
             
-            guard let model = newModel else {
+            guard let model = currentSelectedModel else {
                 Task { @MainActor in
                     executor.selectedModelContextLength = nil
+                    executor.selectedModelCapabilities = nil // capabilitiesもリセット
                 }
                 return
             }
@@ -95,11 +103,14 @@ struct ChatView: View {
                     // MainActorでプロパティを更新
                     await MainActor.run {
                         executor.selectedModelContextLength = contextLength
+                        executor.selectedModelCapabilities = response.capabilities // capabilitiesを更新
                         print("ChatView: Updated context length to \(contextLength ?? -1) for model \(model.name)")
+                        print("ChatView: Updated capabilities to \(response.capabilities ?? []) for model \(model.name)")
                     }
                 } else {
                     await MainActor.run {
                         executor.selectedModelContextLength = nil
+                        executor.selectedModelCapabilities = nil
                     }
                 }
             }
@@ -117,17 +128,17 @@ struct ChatView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
-            Picker("Select Model", selection: $selectedModel) {
-                Text("Select Model").tag(nil as OllamaModel?)
+            Picker("Select Model", selection: $selectedModelID) {
+                Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
                 if executor.models.isEmpty {
                     Text("No models available")
-                        .tag(OllamaModel.noModelsAvailable as OllamaModel?)
+                        .tag(OllamaModel.noModelsAvailable.id as OllamaModel.ID?)
                         .selectionDisabled()
                 } else {
                     ForEach(executor.models) { model in
                         Text(model.name)
-                            .tag(model as OllamaModel?)
+                            .tag(model.id as OllamaModel.ID?)
                     }
                 }
             }
@@ -152,7 +163,7 @@ struct ChatView: View {
     private var menuLabel: some View {
         HStack {
             Image(systemName: "tray.full")
-            if let modelName = selectedModel?.name {
+            if let modelName = currentSelectedModel?.name {
                 Text(modelName.prefix(15).appending(modelName.count > 15 ? "..." : ""))
             } else {
                 Text("Select Model")
@@ -161,7 +172,7 @@ struct ChatView: View {
     }
 
     private func sendMessage() {
-        guard let model = selectedModel else {
+        guard let model = currentSelectedModel else {
             errorMessage = "Please select a model first."
             return
         }
@@ -334,7 +345,7 @@ struct ChatView: View {
 
         print("Retrying with API messages: \(apiMessages.map { $0.content })") // デバッグ用ログを追加
 
-        guard let model = selectedModel else {
+        guard let model = currentSelectedModel else {
             errorMessage = "Please select a model first."
             return
         }
