@@ -1102,6 +1102,22 @@
         }
       }
     },
+    "Here you can perform a simple chat to check the model." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Here you can perform a simple chat to check the model."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここでは、モデルの確認に使用できる簡易的なチャットを行うことができます。"
+          }
+        }
+      }
+    },
     "Host" : {
       "localizations" : {
         "en" : {

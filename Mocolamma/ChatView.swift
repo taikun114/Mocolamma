@@ -39,7 +39,15 @@ struct ChatView: View {
 
     var body: some View {
         ZStack {
-            ChatMessagesView(messages: $messages, onRetry: retryMessage) // onRetryを渡す
+            if messages.isEmpty {
+                ContentUnavailableView {
+                    Label("Chat", systemImage: "message.fill")
+                } description: {
+                    Text("Here you can perform a simple chat to check the model.")
+                }
+            } else {
+                ChatMessagesView(messages: $messages, onRetry: retryMessage) // onRetryを渡す
+            }
 
             VStack {
                 
@@ -591,7 +599,6 @@ struct MessageView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } label: {
                     Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
-                        .font(.caption)
                         .foregroundColor(.secondary)
                         .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
                 }
