@@ -10,6 +10,7 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     let id = UUID()
     var role: String
     var content: String
+    var thinking: String?
     var images: [String]? // Base64 encoded images
     var toolCalls: [ToolCall]?
     var toolName: String?
@@ -23,6 +24,7 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     enum CodingKeys: String, CodingKey {
         case role
         case content
+        case thinking
         case images
         case toolCalls = "tool_calls"
         case toolName = "tool_name"
@@ -67,9 +69,7 @@ struct ChatRequest: Codable {
         try container.encode(model, forKey: .model)
         try container.encode(messages, forKey: .messages)
         try container.encode(stream, forKey: .stream)
-        if !think {
-            try container.encode(think, forKey: .think)
-        }
+        try container.encode(think, forKey: .think)
         try container.encodeIfPresent(options, forKey: .options)
         try container.encodeIfPresent(tools, forKey: .tools)
     }

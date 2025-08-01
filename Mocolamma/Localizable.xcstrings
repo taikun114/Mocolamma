@@ -1977,6 +1977,22 @@
         }
       }
     },
+    "Thinking..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thinking..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推論中..."
+          }
+        }
+      }
+    },
     "Toggle Inspector" : {
       "localizations" : {
         "en" : {

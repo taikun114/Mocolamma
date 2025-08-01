@@ -207,12 +207,20 @@ struct ChatView: View {
                                 messages[index].createdAt = chunk.createdAt
                                 accumulatedContent = messageChunk.content
                                 messages[index].content = accumulatedContent
+                                if let thinking = messageChunk.thinking {
+                                    messages[index].thinking = thinking
+                                }
                                 lastUIUpdateTime = Date()
                             }
                             isFirstChunk = false
                         } else {
                             // Subsequent chunks
                             accumulatedContent += messageChunk.content
+                            if let thinking = messageChunk.thinking {
+                                if let index = lastAssistantMessageIndex {
+                                    messages[index].thinking = (messages[index].thinking ?? "") + thinking
+                                }
+                            }
                         }
 
                         let now = Date()
@@ -329,12 +337,20 @@ struct ChatView: View {
                                 messages[index].createdAt = chunk.createdAt
                                 accumulatedContent = messageChunk.content
                                 messages[index].content = accumulatedContent
+                                if let thinking = messageChunk.thinking {
+                                    messages[index].thinking = thinking
+                                }
                                 lastUIUpdateTime = Date()
                             }
                             isFirstChunk = false
                         } else {
                             // Subsequent chunks
                             accumulatedContent += messageChunk.content
+                            if let thinking = messageChunk.thinking {
+                                if let index = lastAssistantMessageIndex {
+                                    messages[index].thinking = (messages[index].thinking ?? "") + thinking
+                                }
+                            }
                         }
 
                         let now = Date()
@@ -500,16 +516,43 @@ struct MessageView: View {
 
     @ViewBuilder
     private var messageContentView: some View {
-        if message.isStreaming && message.content.isEmpty {
-            ProgressView()
-                .controlSize(.small)
-                .padding(2)
-        } else if message.isStopped && message.content.isEmpty {
-            Text("*No message*")
-                .font(.caption)
-                .foregroundColor(.secondary)
+        if let thinking = message.thinking, !thinking.isEmpty {
+            VStack(alignment: .leading) {
+                DisclosureGroup {
+                    Text(thinking)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } label: {
+                    Label("Thinking...", systemImage: "brain.filled.head.profile")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.bottom, 4)
+
+                if message.isStreaming && message.content.isEmpty {
+                    ProgressView()
+                        .controlSize(.small)
+                        .padding(2)
+                } else if message.isStopped && message.content.isEmpty {
+                    Text("*No message*")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Markdown(message.content)
+                }
+            }
         } else {
-            Markdown(message.content)
+            if message.isStreaming && message.content.isEmpty {
+                ProgressView()
+                    .controlSize(.small)
+                    .padding(2)
+            } else if message.isStopped && message.content.isEmpty {
+                Text("*No message*")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                Markdown(message.content)
+            }
         }
     }
 
