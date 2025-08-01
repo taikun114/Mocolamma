@@ -258,6 +258,16 @@ struct ChatView: View {
                         if let index = lastAssistantMessageIndex {
                             messages[index].thinking = accumulatedThinkingContent
                             messages[index].content = accumulatedMainContent
+
+                            // 思考完了のロジックを更新
+                            if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
+                                if thinkingOption == .on {
+                                    // thinkingOptionが.onの場合、thinkingコンテンツがあり、かつメインコンテンツが流れ始めたら思考完了
+                                    if !accumulatedThinkingContent.isEmpty && !accumulatedMainContent.isEmpty {
+                                        messages[index].isThinkingCompleted = true
+                                    }
+                                }
+                            }
                         }
 
                         if isFirstChunk {
@@ -415,6 +425,16 @@ struct ChatView: View {
                         if let index = lastAssistantMessageIndex {
                             messages[index].thinking = accumulatedThinkingContent
                             messages[index].content = accumulatedMainContent
+
+                            // 思考完了のロジックを更新
+                            if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
+                                if thinkingOption == .on {
+                                    // thinkingOptionが.onの場合、thinkingコンテンツがあり、かつメインコンテンツが流れ始めたら思考完了
+                                    if !accumulatedThinkingContent.isEmpty && !accumulatedMainContent.isEmpty {
+                                        messages[index].isThinkingCompleted = true
+                                    }
+                                }
+                            }
                         }
 
                         if isFirstChunk {
