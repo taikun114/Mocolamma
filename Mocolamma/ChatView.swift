@@ -64,6 +64,42 @@ struct ChatView: View {
                 selectedModel = firstModel // まだ何も選択されていない場合は最初のモデルを選択
             }
         }
+        // 変更点: selectedModel の変更を監視してコンテキスト長を更新する
+        .onChange(of: selectedModel) { _, newModel in
+            // モデルが変更されたら、コンテキストウィンドウの値をリセット
+            contextWindowValue = 2048.0
+            
+            guard let model = newModel else {
+                Task { @MainActor in
+                    executor.selectedModelContextLength = nil
+                }
+                return
+            }
+            Task {
+                if let response = await executor.fetchModelInfo(modelName: model.name) {
+                    // コンテキスト長を抽出
+                    let contextLength: Int?
+                    if let modelInfo = response.model_info,
+                       // .context_length で終わるキーを検索
+                       let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
+                       case .int(let length) = contextLengthValue {
+                        contextLength = length
+                    } else {
+                        contextLength = nil
+                    }
+                    
+                    // MainActorでプロパティを更新
+                    await MainActor.run {
+                        executor.selectedModelContextLength = contextLength
+                        print("ChatView: Updated context length to \(contextLength ?? -1) for model \(model.name)")
+                    }
+                } else {
+                    await MainActor.run {
+                        executor.selectedModelContextLength = nil
+                    }
+                }
+            }
+        }
         .alert("Error", isPresented: Binding<Bool>(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }

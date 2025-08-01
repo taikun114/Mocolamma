@@ -296,18 +296,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("モデル \(modelName) の詳細情報を正常に取得しました。")
             // 取得した情報をキャッシュに保存
             modelInfoCache[modelName] = apiResponse
-
-            // context_length を抽出して selectedModelContextLength に設定
-            if let modelInfo = apiResponse.model_info,
-               let contextLengthValue = modelInfo.first(where: { $0.key.contains("context_length") })?.value,
-               case .int(let length) = contextLengthValue {
-                self.selectedModelContextLength = length
-                print("DEBUG: Extracted context_length: \(length) for model \(modelName)")
-            } else {
-                self.selectedModelContextLength = nil
-                print("DEBUG: No context_length found for model \(modelName) or it's not an integer.")
-            }
-
+            
+            // 変更点: selectedModelContextLength の更新ロジックを削除
+            
             return apiResponse
             
         } catch {
