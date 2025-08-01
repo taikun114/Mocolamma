@@ -328,9 +328,11 @@ private struct InspectorContentView: View {
                             }
                             TextEditor(text: $systemPrompt)
                                 .frame(height: 100)
-                                .border(Color.secondary, width: 0.5)
                                 .disabled(!isSystemPromptEnabled)
                                 .foregroundColor(isSystemPromptEnabled ? .primary : .secondary)
+                                .scrollContentBackground(Visibility.hidden)
+                                .background(isSystemPromptEnabled ? Color.primary.opacity(0.05) : Color.secondary.opacity(0.05))
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -362,7 +364,7 @@ private struct InspectorContentView: View {
                             }
                             .padding(.bottom, 4)
                             HStack {
-                                                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0) // ここを修正
+                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0) // ここを修正
                                     .frame(height: 16)
                                 Text("\(Int(contextWindowValue))")
                                     .font(.body.monospaced())
