@@ -17,6 +17,8 @@ struct ChatView: View {
     @Binding var isTemperatureEnabled: Bool
     @Binding var isContextWindowEnabled: Bool
     @Binding var contextWindowValue: Double
+    @Binding var isSystemPromptEnabled: Bool
+    @Binding var systemPrompt: String
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -172,11 +174,15 @@ struct ChatView: View {
         messages.append(userMessage)
 
         // Prepare messages for API request (including history)
-        let apiMessages = messages.map { msg in
-            ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
+        var apiMessages = messages.map {
+            ChatMessage(role: $0.role, content: $0.content, images: $0.images, toolCalls: $0.toolCalls, toolName: $0.toolName)
         }
 
-        
+        // Add system prompt if enabled
+        if isSystemPromptEnabled && !systemPrompt.isEmpty {
+            let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+            apiMessages.insert(systemMessage, at: 0)
+        }
 
         // Add a placeholder for the assistant's response
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -192,7 +198,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
@@ -279,8 +285,14 @@ struct ChatView: View {
         messages.removeSubrange(indexToRetry..<messages.count)
 
         // Prepare messages for API request (including history) up to the user message
-        let apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
+        var apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
             ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
+        }
+
+        // Add system prompt if enabled
+        if isSystemPromptEnabled && !systemPrompt.isEmpty {
+            let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+            apiMessages.insert(systemMessage, at: 0)
         }
 
         print("Retrying with API messages: \(apiMessages.map { $0.content })") // デバッグ用ログを追加
@@ -308,7 +320,7 @@ struct ChatView: View {
             var isFirstChunk = true
 
             do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, tools: nil) {
+                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, tools: nil) {
                     if let messageChunk = chunk.message {
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content

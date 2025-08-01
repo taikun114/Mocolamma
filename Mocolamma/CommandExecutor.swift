@@ -374,7 +374,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
                 guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
@@ -387,7 +387,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
                 do {
-                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue)")
+                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt)")
                     var chatOptions: ChatRequestOptions?
                     if useCustomChatSettings {
                         var options = ChatRequestOptions()
@@ -401,7 +401,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1), numCtx: \(chatOptions?.numCtx ?? -1)")
                     }
 
-                    let chatRequest = ChatRequest(model: model, messages: messages, stream: stream, options: chatOptions, tools: tools)
+                    var finalMessages = messages
+                    if useCustomChatSettings && isSystemPromptEnabled && !systemPrompt.isEmpty {
+                        // Check if a system message already exists
+                        if let systemMessageIndex = finalMessages.firstIndex(where: { $0.role == "system" }) {
+                            // It's generally better to modify the existing one if needed, but for now we assume it's correctly set up by ChatView
+                        } else {
+                            // Or insert a new one if it doesn't exist
+                            finalMessages.insert(ChatMessage(role: "system", content: systemPrompt), at: 0)
+                        }
+                    }
+
+                    let chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, options: chatOptions, tools: tools)
 
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .prettyPrinted // デバッグ用に整形

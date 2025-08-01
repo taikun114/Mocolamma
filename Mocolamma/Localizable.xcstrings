@@ -1913,6 +1913,22 @@
         }
       }
     },
+    "System Prompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Prompt"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムプロンプト"
+          }
+        }
+      }
+    },
     "Temperature" : {
       "localizations" : {
         "en" : {

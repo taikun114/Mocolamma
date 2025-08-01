@@ -29,6 +29,8 @@ struct ContentView: View {
     @State private var isTemperatureEnabled: Bool = false // 新しく追加
     @State private var isContextWindowEnabled: Bool = false // ここを追加
     @State private var contextWindowValue: Double = 2048.0 // ここを2048.0に変更
+    @State private var isSystemPromptEnabled: Bool = false
+    @State private var systemPrompt: String = ""
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -75,7 +77,9 @@ struct ContentView: View {
             chatTemperature: $chatTemperature,
             isTemperatureEnabled: $isTemperatureEnabled,
             isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-            contextWindowValue: $contextWindowValue // ここを追加
+            contextWindowValue: $contextWindowValue, // ここを追加
+            isSystemPromptEnabled: $isSystemPromptEnabled,
+            systemPrompt: $systemPrompt
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
         .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
@@ -170,6 +174,8 @@ private struct MainNavigationView: View {
     @Binding var isTemperatureEnabled: Bool // 新しく追加
     @Binding var isContextWindowEnabled: Bool // ここを追加
     @Binding var contextWindowValue: Double // ここを追加
+    @Binding var isSystemPromptEnabled: Bool
+    @Binding var systemPrompt: String
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
@@ -205,7 +211,9 @@ private struct MainNavigationView: View {
                 chatTemperature: $chatTemperature,
                 isTemperatureEnabled: $isTemperatureEnabled,
                 isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-                contextWindowValue: $contextWindowValue // ここを追加
+                contextWindowValue: $contextWindowValue, // ここを追加
+                isSystemPromptEnabled: $isSystemPromptEnabled,
+                systemPrompt: $systemPrompt
             )
         }
         // MARK: - Inspector (右端のプレビューパネル)
@@ -224,7 +232,9 @@ private struct MainNavigationView: View {
                 chatTemperature: $chatTemperature,
                 isTemperatureEnabled: $isTemperatureEnabled,
                 isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-                contextWindowValue: $contextWindowValue // ここを追加
+                contextWindowValue: $contextWindowValue, // ここを追加
+                isSystemPromptEnabled: $isSystemPromptEnabled,
+                systemPrompt: $systemPrompt
             )
             // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
@@ -259,6 +269,8 @@ private struct InspectorContentView: View {
     @Binding var isTemperatureEnabled: Bool // 新しく追加
     @Binding var isContextWindowEnabled: Bool // ここを追加
     @Binding var contextWindowValue: Double // ここを追加
+    @Binding var isSystemPromptEnabled: Bool
+    @Binding var systemPrompt: String
 
     var body: some View {
         Group {
@@ -291,6 +303,18 @@ private struct InspectorContentView: View {
                 Form {
                     Section("Chat Settings") {
                         Toggle("Stream Response", isOn: $isChatStreamingEnabled)
+                        
+                        VStack {
+                            Toggle(isOn: $isSystemPromptEnabled) {
+                                Text("System Prompt")
+                            }
+                            TextEditor(text: $systemPrompt)
+                                .frame(height: 100)
+                                .border(Color.secondary, width: 0.5)
+                                .disabled(!isSystemPromptEnabled)
+                                .foregroundColor(isSystemPromptEnabled ? .primary : .secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     
                     Section("Custom Settings") {
@@ -440,6 +464,8 @@ private struct MainContentDetailView: View {
     @Binding var isTemperatureEnabled: Bool // 新しく追加
     @Binding var isContextWindowEnabled: Bool // ここを追加
     @Binding var contextWindowValue: Double // ここを追加
+    @Binding var isSystemPromptEnabled: Bool
+    @Binding var systemPrompt: String
 
     var body: some View {
         Group {
@@ -475,7 +501,7 @@ private struct MainContentDetailView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 ) // ServerViewを表示
             } else if sidebarSelection == "chat" {
-                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue)
+                ChatView(isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt)
                     .environmentObject(executor)
                     .environmentObject(serverManager)
             } else {
