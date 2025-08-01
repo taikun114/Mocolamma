@@ -206,7 +206,9 @@ struct ChatView: View {
         }
 
         // Add a placeholder for the assistant's response
-        let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+        var placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+        placeholderMessage.revisions = [] // Initialize revisions
+        placeholderMessage.currentRevisionIndex = 0 // Set initial index
         messages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
 
@@ -319,7 +321,7 @@ struct ChatView: View {
         }
     }
 
-    private func retryMessage(for messageId: UUID) {
+    private func retryMessage(for messageId: UUID, with messageToRetry: ChatMessage) {
         guard let indexToRetry = messages.firstIndex(where: { $0.id == messageId }) else {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
@@ -332,13 +334,12 @@ struct ChatView: View {
         }
 
         // 再試行するアシスタントメッセージが停止済みであることを確認
-        guard !messages[indexToRetry].isStreaming else { // ストリーミング中でないことを確認
-            print("Retry failed: Message is still streaming.") // エラーメッセージも変更
+        guard !messages[indexToRetry].isStreaming else {
+            print("Retry failed: Message is still streaming.")
             return
         }
 
         // ユーザーメッセージのインデックスを見つける
-        // 停止されたアシスタントメッセージの直前のメッセージがユーザーメッセージであることを期待
         let userMessageIndex: Int
         if indexToRetry > 0 && messages[indexToRetry - 1].role == "user" {
             userMessageIndex = indexToRetry - 1
@@ -347,8 +348,20 @@ struct ChatView: View {
             return
         }
 
-        // 再試行するアシスタントメッセージとその後のメッセージを削除
-        messages.removeSubrange(indexToRetry..<messages.count)
+        // 既存のメッセージを更新するために、まずそのメッセージの現在の内容を履歴に追加
+        messages[indexToRetry].revisions.append(messages[indexToRetry])
+        messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count // 新しい履歴のインデックスを設定
+
+        // メッセージの内容をクリアし、ストリーミング状態をリセット
+        messages[indexToRetry].content = ""
+        messages[indexToRetry].thinking = nil
+        messages[indexToRetry].isStreaming = true
+        messages[indexToRetry].isStopped = false
+        messages[indexToRetry].isThinkingCompleted = false
+        messages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
+        messages[indexToRetry].totalDuration = nil
+        messages[indexToRetry].evalCount = nil
+        messages[indexToRetry].evalDuration = nil
 
         // Prepare messages for API request (including history) up to the user message
         var apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
@@ -361,24 +374,20 @@ struct ChatView: View {
             apiMessages.insert(systemMessage, at: 0)
         }
 
-        print("Retrying with API messages: \(apiMessages.map { $0.content })") // デバッグ用ログを追加
+        print("Retrying with API messages: \(apiMessages.map { $0.content })")
 
         guard let model = currentSelectedModel else {
             errorMessage = "Please select a model first."
             return
         }
 
-        
-
-        // Add a placeholder for the assistant's response
-        let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
-        messages.append(placeholderMessage)
-        let assistantMessageId = placeholderMessage.id
+        // assistantMessageId は indexToRetry のメッセージIDを使用
+        let assistantMessageId = messages[indexToRetry].id
 
         isStreaming = true // 全体のストリーミング状態をtrueに設定
 
         Task {
-            let lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
+            let currentAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
             var lastUIUpdateTime = Date()
             let updateInterval = 0.1 // 100ms
             let updateCharacterCount = 20 // 20文字ごと
@@ -411,7 +420,7 @@ struct ChatView: View {
                                 isInsideThinkingBlock = false
                                 accumulatedThinkingContent += String(currentContentChunk[..<thinkEndIndex.lowerBound])
                                 accumulatedMainContent += String(currentContentChunk[thinkEndIndex.upperBound...])
-                                if let index = lastAssistantMessageIndex {
+                                if let index = currentAssistantMessageIndex {
                                     messages[index].isThinkingCompleted = true
                                 }
                             } else if isInsideThinkingBlock {
@@ -422,7 +431,7 @@ struct ChatView: View {
                         }
 
                         // Update message object
-                        if let index = lastAssistantMessageIndex {
+                        if let index = currentAssistantMessageIndex {
                             messages[index].thinking = accumulatedThinkingContent
                             messages[index].content = accumulatedMainContent
 
@@ -438,7 +447,7 @@ struct ChatView: View {
                         }
 
                         if isFirstChunk {
-                            if let index = lastAssistantMessageIndex {
+                            if let index = currentAssistantMessageIndex {
                                 messages[index].createdAt = chunk.createdAt
                                 lastUIUpdateTime = Date()
                             }
@@ -449,12 +458,12 @@ struct ChatView: View {
                         let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
 
                         // Update UI based on buffer size or time interval
-                        if let index = lastAssistantMessageIndex, (accumulatedMainContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
+                        if let index = currentAssistantMessageIndex, (accumulatedMainContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
                             lastUIUpdateTime = now
                         }
                     }
 
-                    if chunk.done, let index = lastAssistantMessageIndex {
+                    if chunk.done, let index = currentAssistantMessageIndex {
                         // Final chunk, update performance metrics and set isStreaming to false
                         if messages.indices.contains(index) {
                             messages[index].totalDuration = chunk.totalDuration
@@ -470,7 +479,7 @@ struct ChatView: View {
                 }
             } catch {
                 print("Chat streaming error or cancelled: \(error)")
-                if let index = lastAssistantMessageIndex, messages.indices.contains(index) {
+                if let index = currentAssistantMessageIndex, messages.indices.contains(index) {
                     var updatedMessage = messages[index]
                     updatedMessage.isStreaming = false // Streaming stopped due to error or cancellation
                     if let urlError = error as? URLError, urlError.code == .cancelled {
@@ -490,9 +499,9 @@ struct ChatView: View {
 // MARK: - MessageView
 
 struct MessageView: View {
-    let message: ChatMessage
-    let isLastAssistantMessage: Bool // 新しいプロパティ
-    let onRetry: ((UUID) -> Void)? // 新しいクロージャ
+    @Binding var message: ChatMessage // @Binding に変更
+    let isLastAssistantMessage: Bool
+    let onRetry: ((UUID, ChatMessage) -> Void)? // 引数を変更
     @State private var isHovering: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
@@ -557,14 +566,13 @@ struct MessageView: View {
                 Text(dateFormatter.string(from: {
                     if let createdAtString = message.createdAt,
                        let createdAtDate = MessageView.iso8601Formatter.date(from: createdAtString) {
-                        if message.role == "assistant", !message.isStopped, let evalDuration = message.evalDuration { // isStoppedでない場合にのみ加算
-                            // eval_durationはナノ秒なので、秒に変換して加算
+                        if message.role == "assistant", !message.isStopped, let evalDuration = message.evalDuration {
                             return createdAtDate.addingTimeInterval(Double(evalDuration) / 1_000_000_000.0)
                         } else {
                             return createdAtDate
                         }
                     }
-                    return Date() // Fallback to current date if createdAt is nil or invalid
+                    return Date()
                 }()))
                     .font(.caption2)
                     .foregroundColor(.secondary)
@@ -584,10 +592,43 @@ struct MessageView: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                // 「Retry」ボタンの追加
+
+                // 戻るボタン
+                Button(action: {
+                    message.currentRevisionIndex -= 1
+                    message.content = message.revisions[message.currentRevisionIndex].content
+                }) {
+                    Image(systemName: "chevron.backward")
+                }
+                .font(.caption2)
+                .buttonStyle(.link)
+                .disabled(message.currentRevisionIndex == 0) // グレイアウト条件
+
+                // 履歴の数字
+                if message.role == "assistant" && message.revisions.count > 0 {
+                    Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+
+                // 進むボタン
+                Button(action: {
+                    message.currentRevisionIndex += 1
+                    message.content = message.revisions[message.currentRevisionIndex].content
+                }) {
+                    Image(systemName: "chevron.forward")
+                }
+                .font(.caption2)
+                .buttonStyle(.link)
+                .disabled(message.currentRevisionIndex == message.revisions.count) // グレイアウト条件
+
+                // 「Retry」ボタンの追加 (右側に移動)
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
                     Button("Retry") {
-                        onRetry?(message.id)
+                        var messageToRetry = message
+                        messageToRetry.revisions.append(message)
+                        messageToRetry.currentRevisionIndex = messageToRetry.revisions.count
+                        onRetry?(message.id, messageToRetry)
                     }
                     .font(.caption2)
                     .buttonStyle(.link)

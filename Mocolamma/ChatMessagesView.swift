@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ChatMessagesView: View {
     @Binding var messages: [ChatMessage]
-    let onRetry: ((UUID) -> Void)? // 新しいプロパティ: [ChatMessage]
+    let onRetry: ((UUID, ChatMessage) -> Void)?
     var body: some View {
         if #available(macOS 26, *) {
             ScrollView {
@@ -11,7 +11,7 @@ struct ChatMessagesView: View {
                         let message = messages[index]
                         // 最後のメッセージかどうかを判定
                         let isLastAssistantMessage = message.role == "assistant" && index == messages.count - 1
-                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        MessageView(message: $messages[index], isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
                             .id(message.id)
                     }
                 }
@@ -27,7 +27,7 @@ struct ChatMessagesView: View {
                         let message = messages[index]
                         // 最後のメッセージかどうかを判定
                         let isLastAssistantMessage = message.role == "assistant" && index == messages.count - 1
-                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        MessageView(message: $messages[index], isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
                             .id(message.id)
                     }
                 }

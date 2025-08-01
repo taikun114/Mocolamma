@@ -22,6 +22,10 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
 
+    // 新しいプロパティ
+    var revisions: [ChatMessage] = [] // やり直し履歴
+    var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
+
     enum CodingKeys: String, CodingKey {
         case role
         case content
