@@ -20,6 +20,7 @@ struct ChatView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var isThinkingEnabled: Bool
+    @State private var isInsideThinkingBlock: Bool = false
 
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -197,29 +198,51 @@ struct ChatView: View {
             let updateInterval = 0.1 // 100ms
             let updateCharacterCount = 20 // 20文字ごと
             var isFirstChunk = true
+            isInsideThinkingBlock = false // Reset for new message
 
             do {
                 for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, isThinkingEnabled: isThinkingEnabled, tools: nil) {
                     if let messageChunk = chunk.message {
+                        // Check for <think> tag
+                        if let thinkStartIndex = messageChunk.content.range(of: "<think>") {
+                            isInsideThinkingBlock = true
+                            // Append content before <think> to accumulatedContent
+                            accumulatedContent += String(messageChunk.content[..<thinkStartIndex.lowerBound])
+                            // Append content after <think> to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + String(messageChunk.content[thinkStartIndex.upperBound...])
+                            }
+                        } else if let thinkEndIndex = messageChunk.content.range(of: "</think>") {
+                            isInsideThinkingBlock = false
+                            // Append content before </think> to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + String(messageChunk.content[..<thinkEndIndex.lowerBound])
+                                messages[index].isThinkingCompleted = true
+                            }
+                            // Append content after </think> to accumulatedContent
+                            accumulatedContent += String(messageChunk.content[thinkEndIndex.upperBound...])
+                        } else if isInsideThinkingBlock {
+                            // If inside <think> block, append to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + messageChunk.content
+                            }
+                        } else {
+                            // Otherwise, append to accumulatedContent
+                            accumulatedContent += messageChunk.content
+                        }
+
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
                             if let index = lastAssistantMessageIndex {
                                 messages[index].createdAt = chunk.createdAt
-                                accumulatedContent = messageChunk.content
                                 messages[index].content = accumulatedContent
-                                if let thinking = messageChunk.thinking {
-                                    messages[index].thinking = thinking
-                                }
                                 lastUIUpdateTime = Date()
                             }
                             isFirstChunk = false
                         } else {
                             // Subsequent chunks
-                            accumulatedContent += messageChunk.content
-                            if let thinking = messageChunk.thinking {
-                                if let index = lastAssistantMessageIndex {
-                                    messages[index].thinking = (messages[index].thinking ?? "") + thinking
-                                }
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].content = accumulatedContent
                             }
                         }
 
@@ -330,29 +353,51 @@ struct ChatView: View {
             let updateInterval = 0.1 // 100ms
             let updateCharacterCount = 20 // 20文字ごと
             var isFirstChunk = true
+            isInsideThinkingBlock = false // Reset for new message
 
             do {
                 for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, isThinkingEnabled: isThinkingEnabled, tools: nil) {
                     if let messageChunk = chunk.message {
+                        // Check for <think> tag
+                        if let thinkStartIndex = messageChunk.content.range(of: "<think>") {
+                            isInsideThinkingBlock = true
+                            // Append content before <think> to accumulatedContent
+                            accumulatedContent += String(messageChunk.content[..<thinkStartIndex.lowerBound])
+                            // Append content after <think> to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + String(messageChunk.content[thinkStartIndex.upperBound...])
+                            }
+                        } else if let thinkEndIndex = messageChunk.content.range(of: "</think>") {
+                            isInsideThinkingBlock = false
+                            // Append content before </think> to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + String(messageChunk.content[..<thinkEndIndex.lowerBound])
+                                messages[index].isThinkingCompleted = true
+                            }
+                            // Append content after </think> to accumulatedContent
+                            accumulatedContent += String(messageChunk.content[thinkEndIndex.upperBound...])
+                        } else if isInsideThinkingBlock {
+                            // If inside <think> block, append to thinking
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].thinking = (messages[index].thinking ?? "") + messageChunk.content
+                            }
+                        } else {
+                            // Otherwise, append to accumulatedContent
+                            accumulatedContent += messageChunk.content
+                        }
+
                         if isFirstChunk {
                             // On the first chunk, update the placeholder's creation date and initial content
                             if let index = lastAssistantMessageIndex {
                                 messages[index].createdAt = chunk.createdAt
-                                accumulatedContent = messageChunk.content
                                 messages[index].content = accumulatedContent
-                                if let thinking = messageChunk.thinking {
-                                    messages[index].thinking = thinking
-                                }
                                 lastUIUpdateTime = Date()
                             }
                             isFirstChunk = false
                         } else {
                             // Subsequent chunks
-                            accumulatedContent += messageChunk.content
-                            if let thinking = messageChunk.thinking {
-                                if let index = lastAssistantMessageIndex {
-                                    messages[index].thinking = (messages[index].thinking ?? "") + thinking
-                                }
+                            if let index = lastAssistantMessageIndex {
+                                messages[index].content = accumulatedContent
                             }
                         }
 
@@ -528,6 +573,7 @@ struct MessageView: View {
                     Text(thinking)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 } label: {
                     Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
                         .foregroundColor(.secondary)
