@@ -332,8 +332,8 @@ struct ChatView: View {
         }
 
         // 再試行するアシスタントメッセージが停止済みであることを確認
-        guard messages[indexToRetry].isStopped else {
-            print("Retry failed: Message is not stopped.")
+        guard !messages[indexToRetry].isStreaming else { // ストリーミング中でないことを確認
+            print("Retry failed: Message is still streaming.") // エラーメッセージも変更
             return
         }
 
@@ -585,7 +585,7 @@ struct MessageView: View {
                     }
                 }
                 // 「Retry」ボタンの追加
-                if message.role == "assistant" && message.isStopped && isLastAssistantMessage {
+                if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
                     Button("Retry") {
                         onRetry?(message.id)
                     }
