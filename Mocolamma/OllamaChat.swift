@@ -52,7 +52,7 @@ struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
     let stream: Bool
-    var think: Bool
+    let think: Bool?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
 
@@ -70,9 +70,22 @@ struct ChatRequest: Codable {
         try container.encode(model, forKey: .model)
         try container.encode(messages, forKey: .messages)
         try container.encode(stream, forKey: .stream)
-        try container.encode(think, forKey: .think)
+        try container.encodeIfPresent(think, forKey: .think)
         try container.encodeIfPresent(options, forKey: .options)
         try container.encodeIfPresent(tools, forKey: .tools)
+    }
+}
+
+/// Represents the thinking option for a chat request.
+enum ThinkingOption: String, CaseIterable, Identifiable {
+    case none = "ThinkingOption_None"
+    case on = "ThinkingOption_On"
+    case off = "ThinkingOption_Off"
+
+    var id: String { self.rawValue }
+
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
     }
 }
 

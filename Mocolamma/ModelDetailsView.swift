@@ -92,6 +92,9 @@ struct ModelDetailsView: View {
         case "tools":
             displayText = String(localized: "Tools")
             iconName = "wrench.and.screwdriver"
+        case "thinking":
+            displayText = String(localized: "Thinking")
+            iconName = "brain.filled.head.profile"
         default:
             displayText = capability
             iconName = "tag"
