@@ -241,6 +241,9 @@ struct ChatView: View {
                             messages[index].evalCount = chunk.evalCount
                             messages[index].evalDuration = chunk.evalDuration
                             messages[index].isStreaming = false
+                            if messages[index].thinking != nil {
+                                messages[index].isThinkingCompleted = true
+                            }
                         }
                     }
                 }
@@ -371,6 +374,9 @@ struct ChatView: View {
                             messages[index].evalCount = chunk.evalCount
                             messages[index].evalDuration = chunk.evalDuration
                             messages[index].isStreaming = false
+                            if messages[index].thinking != nil {
+                                messages[index].isThinkingCompleted = true
+                            }
                         }
                     }
                 }
@@ -523,13 +529,13 @@ struct MessageView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } label: {
-                    Label("Thinking...", systemImage: "brain.filled.head.profile")
-                        .font(.caption)
+                    Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
                         .foregroundColor(.secondary)
+                        .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
                 }
                 .padding(.bottom, 4)
 
-                if message.isStreaming && message.content.isEmpty {
+                if message.isStreaming && message.content.isEmpty && message.thinking == nil {
                     ProgressView()
                         .controlSize(.small)
                         .padding(2)

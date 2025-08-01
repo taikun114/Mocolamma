@@ -1972,7 +1972,23 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "推論"
+            "value" : "思考"
+          }
+        }
+      }
+    },
+    "Thinking completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thinking completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考完了"
           }
         }
       }
@@ -1988,7 +2004,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "推論中..."
+            "value" : "思考中..."
           }
         }
       }
