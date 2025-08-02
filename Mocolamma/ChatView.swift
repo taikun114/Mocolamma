@@ -354,9 +354,19 @@ struct ChatView: View {
         }
 
         // 既存のメッセージを更新するために、まずそのメッセージの現在の内容を履歴に追加
-        messages[indexToRetry].originalContent = messages[indexToRetry].content // 現在のcontentをoriginalContentとして保存
-        messages[indexToRetry].latestContent = messages[indexToRetry].content // 現在のcontentをlatestContentとして保存
-        messages[indexToRetry].revisions.append(messages[indexToRetry])
+        // 現在のメッセージの最新の状態を保存
+        var messageToArchive = messages[indexToRetry]
+        messageToArchive.content = messageToArchive.latestContent ?? messageToArchive.content // 最新のコンテンツを保存
+        messageToArchive.thinking = messageToArchive.finalThinking // 最終的な思考内容を保存
+        messageToArchive.isThinkingCompleted = messageToArchive.finalIsThinkingCompleted // 最終的な思考完了状態を保存
+        messageToArchive.revisions = [] // リビジョン自体は履歴を持たない
+        messageToArchive.currentRevisionIndex = 0 // リビジョン自体はインデックスを持たない
+        messageToArchive.originalContent = nil // リビジョン自体はoriginalContentを持たない
+        messageToArchive.latestContent = nil // リビジョン自体はlatestContentを持たない
+        messageToArchive.finalThinking = nil // リビジョン自体はfinalThinkingを持たない
+        messageToArchive.finalIsThinkingCompleted = false // リビジョン自体はfinalIsThinkingCompletedを持たない
+
+        messages[indexToRetry].revisions.append(messageToArchive)
         messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count // 新しい履歴のインデックスを設定
 
         // メッセージの内容をクリアし、ストリーミング状態をリセット
@@ -604,7 +614,7 @@ struct MessageView: View {
                     }
                 }
 
-                if message.role == "assistant" {
+                if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
                     // 戻るボタン
                     Button(action: {
                         message.currentRevisionIndex -= 1
@@ -614,6 +624,8 @@ struct MessageView: View {
                         message.isThinkingCompleted = revision.isThinkingCompleted
                     }) {
                         Image(systemName: "chevron.backward")
+                            .contentShape(Rectangle()) // クリック可能領域を拡大
+                            .padding(5) // パディングを追加
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
@@ -641,6 +653,8 @@ struct MessageView: View {
                         }
                     }) {
                         Image(systemName: "chevron.forward")
+                            .contentShape(Rectangle()) // クリック可能領域を拡大
+                            .padding(5) // パディングを追加
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
@@ -649,11 +663,15 @@ struct MessageView: View {
 
                 // 「Retry」ボタンの追加 (右側に移動)
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
-                    Button("Retry") {
+                    Button(action: {
                         var messageToRetry = message
                         messageToRetry.revisions.append(message)
                         messageToRetry.currentRevisionIndex = messageToRetry.revisions.count
                         onRetry?(message.id, messageToRetry)
+                    }) {
+                        Image(systemName: "arrow.trianglehead.clockwise.rotate.90") // アイコンを変更
+                            .contentShape(Rectangle()) // クリック可能領域を拡大
+                            .padding(5) // パディングを追加
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
