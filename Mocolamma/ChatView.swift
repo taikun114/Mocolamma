@@ -171,16 +171,14 @@ struct ChatView: View {
         let userMessage = ChatMessage(role: "user", content: userMessageContent, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         messages.append(userMessage)
 
-        var apiMessages = messages.map {
-            ChatMessage(role: $0.role, content: $0.content, images: $0.images, toolCalls: $0.toolCalls, toolName: $0.toolName)
-        }
-
+        var apiMessages = messages // ChatMessageがクラスになったため、直接渡す
+        
         if isSystemPromptEnabled && !systemPrompt.isEmpty {
             let systemMessage = ChatMessage(role: "system", content: systemPrompt)
             apiMessages.insert(systemMessage, at: 0)
         }
 
-        var placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+        let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
         placeholderMessage.revisions = []
         placeholderMessage.currentRevisionIndex = 0
         placeholderMessage.originalContent = ""
@@ -215,27 +213,18 @@ struct ChatView: View {
             return
         }
 
-        var messageToArchive = messages[indexToRetry]
-        messageToArchive.content = messages[indexToRetry].latestContent ?? ""
-        messageToArchive.thinking = messages[indexToRetry].finalThinking
-        messageToArchive.isThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
-        messageToArchive.createdAt = messages[indexToRetry].finalCreatedAt
-        messageToArchive.totalDuration = messages[indexToRetry].finalTotalDuration
-        messageToArchive.evalCount = messages[indexToRetry].finalEvalCount
-        messageToArchive.evalDuration = messages[indexToRetry].finalEvalDuration
-        messageToArchive.isStopped = messages[indexToRetry].finalIsStopped
-        
-        messageToArchive.revisions = []
-        messageToArchive.currentRevisionIndex = 0
-        messageToArchive.originalContent = nil
-        messageToArchive.latestContent = nil
-        messageToArchive.finalThinking = nil
-        messageToArchive.finalIsThinkingCompleted = false
-        messageToArchive.finalCreatedAt = nil
-        messageToArchive.finalTotalDuration = nil
-        messageToArchive.finalEvalCount = nil
-        messageToArchive.finalEvalDuration = nil
-        messageToArchive.finalIsStopped = false
+        let messageToArchive = ChatMessage(role: messages[indexToRetry].role, content: messages[indexToRetry].content, thinking: messages[indexToRetry].thinking, images: messages[indexToRetry].images, toolCalls: messages[indexToRetry].toolCalls, toolName: messages[indexToRetry].toolName, createdAt: messages[indexToRetry].createdAt, totalDuration: messages[indexToRetry].totalDuration, evalCount: messages[indexToRetry].evalCount, evalDuration: messages[indexToRetry].evalDuration, isStreaming: messages[indexToRetry].isStreaming, isStopped: messages[indexToRetry].isStopped, isThinkingCompleted: messages[indexToRetry].isThinkingCompleted)
+        messageToArchive.revisions = messages[indexToRetry].revisions
+        messageToArchive.currentRevisionIndex = messages[indexToRetry].currentRevisionIndex
+        messageToArchive.originalContent = messages[indexToRetry].originalContent
+        messageToArchive.latestContent = messages[indexToRetry].latestContent
+        messageToArchive.finalThinking = messages[indexToRetry].finalThinking
+        messageToArchive.finalIsThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
+        messageToArchive.finalCreatedAt = messages[indexToRetry].finalCreatedAt
+        messageToArchive.finalTotalDuration = messages[indexToRetry].finalTotalDuration
+        messageToArchive.finalEvalCount = messages[indexToRetry].finalEvalCount
+        messageToArchive.finalEvalDuration = messages[indexToRetry].finalEvalDuration
+        messageToArchive.finalIsStopped = messages[indexToRetry].finalIsStopped
 
         messages[indexToRetry].revisions.append(messageToArchive)
         messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count
@@ -250,9 +239,7 @@ struct ChatView: View {
         messages[indexToRetry].evalCount = nil
         messages[indexToRetry].evalDuration = nil
 
-        var apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
-            ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
-        }
+        var apiMessages = Array(messages.prefix(userMessageIndex + 1)) // ChatMessageがクラスになったため、直接渡す
 
         if isSystemPromptEnabled && !systemPrompt.isEmpty {
             let systemMessage = ChatMessage(role: "system", content: systemPrompt)
@@ -363,15 +350,13 @@ struct ChatView: View {
         } catch {
             print("Chat streaming error or cancelled: \(error)")
             if let index = messages.firstIndex(where: { $0.id == messageId }), messages.indices.contains(index) {
-                var updatedMessage = messages[index]
-                updatedMessage.isStreaming = false
+                messages[index].isStreaming = false
                 if let urlError = error as? URLError, urlError.code == .cancelled {
-                    updatedMessage.isStopped = true
+                    messages[index].isStopped = true
                 } else {
-                    updatedMessage.isStopped = false
+                    messages[index].isStopped = false
                     errorMessage = "Chat API Error: \(error.localizedDescription)"
                 }
-                messages[index] = updatedMessage
             }
         }
         isStreaming = false
@@ -381,7 +366,7 @@ struct ChatView: View {
 // MARK: - MessageView
 
 struct MessageView: View {
-    @Binding var message: ChatMessage
+    @ObservedObject var message: ChatMessage // @ObservedObject に変更
     let isLastAssistantMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @State private var isHovering: Bool = false
@@ -537,10 +522,22 @@ struct MessageView: View {
 
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
                     Button(action: {
-                        var messageToRetry = message
-                        messageToRetry.revisions.append(message)
-                        messageToRetry.currentRevisionIndex = messageToRetry.revisions.count
-                        onRetry?(message.id, messageToRetry)
+                        let messageToRetry = ChatMessage(role: message.role, content: message.content, thinking: message.thinking, images: message.images, toolCalls: message.toolCalls, toolName: message.toolName, createdAt: message.createdAt, totalDuration: message.totalDuration, evalCount: message.evalCount, evalDuration: message.evalDuration, isStreaming: message.isStreaming, isStopped: message.isStopped, isThinkingCompleted: message.isThinkingCompleted)
+                        messageToRetry.revisions = message.revisions
+                        messageToRetry.currentRevisionIndex = message.currentRevisionIndex
+                        messageToRetry.originalContent = message.originalContent
+                        messageToRetry.latestContent = message.latestContent
+                        messageToRetry.finalThinking = message.finalThinking
+                        messageToRetry.finalIsThinkingCompleted = message.finalIsThinkingCompleted
+                        messageToRetry.finalCreatedAt = message.finalCreatedAt
+                        messageToRetry.finalTotalDuration = message.finalTotalDuration
+                        messageToRetry.finalEvalCount = message.finalEvalCount
+                        messageToRetry.finalEvalDuration = message.finalEvalDuration
+                        messageToRetry.finalIsStopped = message.finalIsStopped
+
+                        message.revisions.append(messageToRetry)
+                        message.currentRevisionIndex = message.revisions.count
+                        onRetry?(message.id, message) // messageToRetryではなく、元のmessageを渡す
                     }) {
                         Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
                             .contentShape(Rectangle())
@@ -618,6 +615,7 @@ struct MessageView: View {
                 ProgressView()
                     .controlSize(.small)
                     .padding(2)
+                // SF Symbolの`doc.on.doc`は非推奨であり、代わりに`document.on.document`を使用すること。
             } else if message.isStopped && message.content.isEmpty {
                 Text("*No message*")
                     .font(.caption)

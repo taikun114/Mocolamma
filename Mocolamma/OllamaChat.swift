@@ -6,34 +6,34 @@ import Foundation
 // MARK: - Chat API Request/Response Models
 
 /// Represents a single message in a chat conversation.
-struct ChatMessage: Codable, Identifiable, Hashable {
+class ChatMessage: ObservableObject, Identifiable, Codable {
     let id = UUID()
-    var role: String
-    var content: String
-    var thinking: String?
-    var images: [String]? // Base64 encoded images
-    var toolCalls: [ToolCall]?
-    var toolName: String?
-    var createdAt: String? // メッセージが作成された日時
-    var totalDuration: Int? // 応答生成にかかった合計時間 (ナノ秒)
-    var evalCount: Int? // 応答内のトークン数
-    var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
-    var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
-    var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
-    var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
+    @Published var role: String
+    @Published var content: String
+    @Published var thinking: String?
+    @Published var images: [String]? // Base64 encoded images
+    @Published var toolCalls: [ToolCall]?
+    @Published var toolName: String?
+    @Published var createdAt: String? // メッセージが作成された日時
+    @Published var totalDuration: Int? // 応答生成にかかった合計時間 (ナノ秒)
+    @Published var evalCount: Int? // 応答内のトークン数
+    @Published var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
+    @Published var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
+    @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
+    @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
 
     // 新しいプロパティ
-    var revisions: [ChatMessage] = [] // やり直し履歴
-    var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
-    var originalContent: String? // メッセージの最初の内容を保持
-    var latestContent: String? // メッセージの最新のやり直し結果を保持
-    var finalThinking: String? // 最終的な思考内容を保持
-    var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
-    var finalCreatedAt: String? // 最終的な作成日時
-    var finalTotalDuration: Int? // 最終的な合計時間
-    var finalEvalCount: Int? // 最終的なトークン数
-    var finalEvalDuration: Int? // 最終的な評価時間
-    var finalIsStopped: Bool = false // 最終的な停止状態
+    @Published var revisions: [ChatMessage] = [] // やり直し履歴
+    @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
+    @Published var originalContent: String? // メッセージの最初の内容を保持
+    @Published var latestContent: String? // メッセージの最新のやり直し結果を保持
+    @Published var finalThinking: String? // 最終的な思考内容を保持
+    @Published var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
+    @Published var finalCreatedAt: String? // 最終的な作成日時
+    @Published var finalTotalDuration: Int? // 最終的な合計時間
+    @Published var finalEvalCount: Int? // 最終的なトークン数
+    @Published var finalEvalDuration: Int? // 最終的な評価時間
+    @Published var finalIsStopped: Bool = false // 最終的な停止状態
 
     enum CodingKeys: String, CodingKey {
         case role
@@ -46,6 +46,51 @@ struct ChatMessage: Codable, Identifiable, Hashable {
         case totalDuration = "total_duration"
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.role = try container.decode(String.self, forKey: .role)
+        self.content = try container.decode(String.self, forKey: .content)
+        self.thinking = try container.decodeIfPresent(String.self, forKey: .thinking)
+        self.images = try container.decodeIfPresent([String].self, forKey: .images)
+        self.toolCalls = try container.decodeIfPresent([ToolCall].self, forKey: .toolCalls)
+        self.toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
+        self.createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
+        self.totalDuration = try container.decodeIfPresent(Int.self, forKey: .totalDuration)
+        self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
+        self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(role, forKey: .role)
+        try container.encode(content, forKey: .content)
+        try container.encodeIfPresent(thinking, forKey: .thinking)
+        try container.encodeIfPresent(images, forKey: .images)
+        try container.encodeIfPresent(toolCalls, forKey: .toolCalls)
+        try container.encodeIfPresent(toolName, forKey: .toolName)
+        try container.encodeIfPresent(createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(totalDuration, forKey: .totalDuration)
+        try container.encodeIfPresent(evalCount, forKey: .evalCount)
+        try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
+    }
+
+    // Default initializer for creating new messages
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false) {
+        self.role = role
+        self.content = content
+        self.thinking = thinking
+        self.images = images
+        self.toolCalls = toolCalls
+        self.toolName = toolName
+        self.createdAt = createdAt
+        self.totalDuration = totalDuration
+        self.evalCount = evalCount
+        self.evalDuration = evalDuration
+        self.isStreaming = isStreaming
+        self.isStopped = isStopped
+        self.isThinkingCompleted = isThinkingCompleted
     }
 }
 

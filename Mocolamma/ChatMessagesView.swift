@@ -7,11 +7,10 @@ struct ChatMessagesView: View {
         if #available(macOS 26, *) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(messages.indices, id: \.self) { index in
-                        let message = messages[index]
+                    ForEach(messages) { message in // messages.indices から messages に変更
                         // 最後のメッセージかどうかを判定
-                        let isLastAssistantMessage = message.role == "assistant" && index == messages.count - 1
-                        MessageView(message: $messages[index], isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        let isLastAssistantMessage = message.role == "assistant" && messages.last?.id == message.id
+                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
                             .id(message.id)
                     }
                 }
@@ -23,11 +22,10 @@ struct ChatMessagesView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(messages.indices, id: \.self) { index in
-                        let message = messages[index]
+                    ForEach(messages) { message in // messages.indices から messages に変更
                         // 最後のメッセージかどうかを判定
-                        let isLastAssistantMessage = message.role == "assistant" && index == messages.count - 1
-                        MessageView(message: $messages[index], isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        let isLastAssistantMessage = message.role == "assistant" && messages.last?.id == message.id
+                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
                             .id(message.id)
                     }
                 }
