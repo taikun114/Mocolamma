@@ -1,4 +1,6 @@
-# API
+# How to use Ollama API
+
+Original: https://github.com/ollama/ollama/blob/3515cc377ce2506c95a0ea408fd5d15d306fc6aa/docs/api.md
 
 ## Endpoints
 
