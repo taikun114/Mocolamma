@@ -209,6 +209,8 @@ struct ChatView: View {
         var placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
         placeholderMessage.revisions = [] // Initialize revisions
         placeholderMessage.currentRevisionIndex = 0 // Set initial index
+        placeholderMessage.originalContent = "" // Initialize originalContent
+        placeholderMessage.latestContent = "" // Initialize latestContent
         messages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
 
@@ -256,10 +258,10 @@ struct ChatView: View {
                             }
                         }
 
-                        // Update message object
                         if let index = lastAssistantMessageIndex {
                             messages[index].thinking = accumulatedThinkingContent
                             messages[index].content = accumulatedMainContent
+                            messages[index].latestContent = accumulatedMainContent // latestContentも更新
 
                             // 思考完了のロジックを更新
                             if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
@@ -300,6 +302,9 @@ struct ChatView: View {
                             if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
                                 messages[index].isThinkingCompleted = true
                             }
+                            // finalThinkingとfinalIsThinkingCompletedを更新
+                            messages[index].finalThinking = messages[index].thinking
+                            messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
                         }
                     }
                 }
@@ -349,6 +354,8 @@ struct ChatView: View {
         }
 
         // 既存のメッセージを更新するために、まずそのメッセージの現在の内容を履歴に追加
+        messages[indexToRetry].originalContent = messages[indexToRetry].content // 現在のcontentをoriginalContentとして保存
+        messages[indexToRetry].latestContent = messages[indexToRetry].content // 現在のcontentをlatestContentとして保存
         messages[indexToRetry].revisions.append(messages[indexToRetry])
         messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count // 新しい履歴のインデックスを設定
 
@@ -434,6 +441,7 @@ struct ChatView: View {
                         if let index = currentAssistantMessageIndex {
                             messages[index].thinking = accumulatedThinkingContent
                             messages[index].content = accumulatedMainContent
+                            messages[index].latestContent = accumulatedMainContent // latestContentも更新
 
                             // 思考完了のロジックを更新
                             if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
@@ -474,6 +482,9 @@ struct ChatView: View {
                             if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
                                 messages[index].isThinkingCompleted = true
                             }
+                            // finalThinkingとfinalIsThinkingCompletedを更新
+                            messages[index].finalThinking = messages[index].thinking
+                            messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
                         }
                     }
                 }
@@ -593,34 +604,48 @@ struct MessageView: View {
                     }
                 }
 
-                // 戻るボタン
-                Button(action: {
-                    message.currentRevisionIndex -= 1
-                    message.content = message.revisions[message.currentRevisionIndex].content
-                }) {
-                    Image(systemName: "chevron.backward")
-                }
-                .font(.caption2)
-                .buttonStyle(.link)
-                .disabled(message.currentRevisionIndex == 0) // グレイアウト条件
+                if message.role == "assistant" {
+                    // 戻るボタン
+                    Button(action: {
+                        message.currentRevisionIndex -= 1
+                        let revision = message.revisions[message.currentRevisionIndex]
+                        message.content = revision.content
+                        message.thinking = revision.thinking
+                        message.isThinkingCompleted = revision.isThinkingCompleted
+                    }) {
+                        Image(systemName: "chevron.backward")
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.link)
+                    .disabled(message.currentRevisionIndex == 0) // グレイアウト条件
 
-                // 履歴の数字
-                if message.role == "assistant" && message.revisions.count > 0 {
-                    Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
+                    // 履歴の数字
+                    if message.revisions.count > 0 {
+                        Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
 
-                // 進むボタン
-                Button(action: {
-                    message.currentRevisionIndex += 1
-                    message.content = message.revisions[message.currentRevisionIndex].content
-                }) {
-                    Image(systemName: "chevron.forward")
+                    // 進むボタン
+                    Button(action: {
+                        message.currentRevisionIndex += 1
+                        if message.currentRevisionIndex < message.revisions.count {
+                            let revision = message.revisions[message.currentRevisionIndex]
+                            message.content = revision.content
+                            message.thinking = revision.thinking
+                            message.isThinkingCompleted = revision.isThinkingCompleted
+                        } else { // 最新のメッセージに戻る場合
+                            message.content = message.latestContent ?? "" // latestContent を使用
+                        message.thinking = message.finalThinking // finalThinking を使用
+                        message.isThinkingCompleted = message.finalIsThinkingCompleted // finalIsThinkingCompleted を使用
+                        }
+                    }) {
+                        Image(systemName: "chevron.forward")
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.link)
+                    .disabled(message.currentRevisionIndex == message.revisions.count) // グレイアウト条件
                 }
-                .font(.caption2)
-                .buttonStyle(.link)
-                .disabled(message.currentRevisionIndex == message.revisions.count) // グレイアウト条件
 
                 // 「Retry」ボタンの追加 (右側に移動)
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {

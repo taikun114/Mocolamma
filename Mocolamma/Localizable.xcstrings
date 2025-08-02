@@ -79,7 +79,8 @@
             "value" : "%1$lld/%2$lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Add" : {
       "localizations" : {

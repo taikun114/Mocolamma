@@ -25,6 +25,10 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     // 新しいプロパティ
     var revisions: [ChatMessage] = [] // やり直し履歴
     var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
+    var originalContent: String? // メッセージの最初の内容を保持
+    var latestContent: String? // メッセージの最新のやり直し結果を保持
+    var finalThinking: String? // 最終的な思考内容を保持
+    var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
 
     enum CodingKeys: String, CodingKey {
         case role
