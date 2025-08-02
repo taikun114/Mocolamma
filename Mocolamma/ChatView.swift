@@ -9,7 +9,6 @@ struct ChatView: View {
     @State private var inputText: String = ""
     @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
-    @State private var lastUpdateTime: Date = Date() // UI更新バッファリング用
     @Binding var isStreamingEnabled: Bool
     @Binding var showingInspector: Bool
     @Binding var useCustomChatSettings: Bool
@@ -20,8 +19,7 @@ struct ChatView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
-    @State private var isInsideThinkingBlock: Bool = false
-
+    
     private var currentSelectedModel: OllamaModel? {
         if let id = selectedModelID {
             return executor.models.first(where: { $0.id == id })
@@ -46,21 +44,19 @@ struct ChatView: View {
                     Text("Here you can perform a simple chat to check the model.")
                 }
             } else {
-                ChatMessagesView(messages: $messages, onRetry: retryMessage) // onRetryを渡す
+                ChatMessagesView(messages: $messages, onRetry: retryMessage)
             }
 
             VStack {
-                
                 Spacer()
                 ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
                     sendMessage()
                 } stopMessage: {
-                    // ストリーミング中のアシスタントメッセージを見つけて、その状態を即座に更新
                     if let lastAssistantMessageIndex = messages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
                         messages[lastAssistantMessageIndex].isStreaming = false
                         messages[lastAssistantMessageIndex].isStopped = true
                     }
-                    isStreaming = false // ChatView全体のストリーミング状態をfalseに設定
+                    isStreaming = false
                     executor.cancelChatStreaming()
                 }
             }
@@ -72,35 +68,29 @@ struct ChatView: View {
         }
         .onAppear {
             print("ChatView appeared. Models: \(executor.models.count)")
-            // 初期モデルの選択は行わない (「Select Model」をデフォルトにするため)
         }
         .onChange(of: executor.models) { _, newModels in
             print("Models changed. New models count: \(newModels.count)")
-            // モデルリストが更新された場合、現在選択されているモデルがまだ存在するか確認
             if let currentSelectedModelID = selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
-                selectedModelID = newModels.first?.id // 存在しない場合は最初のモデルを選択
+                selectedModelID = newModels.first?.id
             } else if selectedModelID == nil, let firstModel = newModels.first {
-                selectedModelID = firstModel.id // まだ何も選択されていない場合は最初のモデルを選択
+                selectedModelID = firstModel.id
             }
         }
-        // 変更点: selectedModel の変更を監視してコンテキスト長を更新する
         .onChange(of: selectedModelID) { _, newModelID in
-            // モデルが変更されたら、コンテキストウィンドウの値をリセット
             contextWindowValue = 2048.0
             
             guard let model = currentSelectedModel else {
                 Task { @MainActor in
                     executor.selectedModelContextLength = nil
-                    executor.selectedModelCapabilities = nil // capabilitiesもリセット
+                    executor.selectedModelCapabilities = nil
                 }
                 return
             }
             Task {
                 if let response = await executor.fetchModelInfo(modelName: model.name) {
-                    // コンテキスト長を抽出
                     let contextLength: Int?
                     if let modelInfo = response.model_info,
-                       // .context_length で終わるキーを検索
                        let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
                        case .int(let length) = contextLengthValue {
                         contextLength = length
@@ -108,10 +98,9 @@ struct ChatView: View {
                         contextLength = nil
                     }
                     
-                    // MainActorでプロパティを更新
                     await MainActor.run {
                         executor.selectedModelContextLength = contextLength
-                        executor.selectedModelCapabilities = response.capabilities // capabilitiesを更新
+                        executor.selectedModelCapabilities = response.capabilities
                         print("ChatView: Updated context length to \(contextLength ?? -1) for model \(model.name)")
                         print("ChatView: Updated capabilities to \(response.capabilities ?? []) for model \(model.name)")
                     }
@@ -151,7 +140,7 @@ struct ChatView: View {
                 }
             }
             .pickerStyle(.menu)
-            .frame(width: 150) // Adjust width as needed
+            .frame(width: 150)
         }
         if #available(macOS 26, *) {
             ToolbarSpacer()
@@ -168,17 +157,6 @@ struct ChatView: View {
         }
     }
 
-    private var menuLabel: some View {
-        HStack {
-            Image(systemName: "tray.full")
-            if let modelName = currentSelectedModel?.name {
-                Text(modelName.prefix(15).appending(modelName.count > 15 ? "..." : ""))
-            } else {
-                Text("Select Model")
-            }
-        }
-    }
-
     private func sendMessage() {
         guard let model = currentSelectedModel else {
             errorMessage = "Please select a model first."
@@ -188,146 +166,30 @@ struct ChatView: View {
 
         isStreaming = true
         let userMessageContent = inputText
-        inputText = "" // Clear input field immediately
+        inputText = ""
 
-        // Add user message to chat history
         let userMessage = ChatMessage(role: "user", content: userMessageContent, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         messages.append(userMessage)
 
-        // Prepare messages for API request (including history)
         var apiMessages = messages.map {
             ChatMessage(role: $0.role, content: $0.content, images: $0.images, toolCalls: $0.toolCalls, toolName: $0.toolName)
         }
 
-        // Add system prompt if enabled
         if isSystemPromptEnabled && !systemPrompt.isEmpty {
             let systemMessage = ChatMessage(role: "system", content: systemPrompt)
             apiMessages.insert(systemMessage, at: 0)
         }
 
-        // Add a placeholder for the assistant's response
         var placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
-        placeholderMessage.revisions = [] // Initialize revisions
-        placeholderMessage.currentRevisionIndex = 0 // Set initial index
-        placeholderMessage.originalContent = "" // Initialize originalContent
-        placeholderMessage.latestContent = "" // Initialize latestContent
+        placeholderMessage.revisions = []
+        placeholderMessage.currentRevisionIndex = 0
+        placeholderMessage.originalContent = ""
+        placeholderMessage.latestContent = ""
         messages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
 
         Task {
-            let lastAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
-            var lastUIUpdateTime = Date()
-            let updateInterval = 0.1 // 100ms
-            let updateCharacterCount = 20 // 20文字ごと
-            var isFirstChunk = true
-            isInsideThinkingBlock = false // Reset for new message
-            var accumulatedThinkingContent = ""
-            var accumulatedMainContent = ""
-
-            do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, thinkingOption: thinkingOption, tools: nil) {
-                    if let messageChunk = chunk.message {
-                        // Prioritize messageChunk.thinking if thinkingOption is .on
-                        if thinkingOption == .on {
-                            if let apiThinking = messageChunk.thinking {
-                                accumulatedThinkingContent += apiThinking
-                            }
-                            // If thinkingOption is .on, assume main content is just messageChunk.content
-                            accumulatedMainContent += messageChunk.content
-                        } else {
-                            // If thinkingOption is .none or .off, parse <think> tags from messageChunk.content
-                            var currentContentChunk = messageChunk.content
-
-                            if let thinkStartIndex = currentContentChunk.range(of: "<think>") {
-                                isInsideThinkingBlock = true
-                                accumulatedMainContent += String(currentContentChunk[..<thinkStartIndex.lowerBound])
-                                currentContentChunk = String(currentContentChunk[thinkStartIndex.upperBound...])
-                            }
-
-                            if let thinkEndIndex = currentContentChunk.range(of: "</think>") {
-                                isInsideThinkingBlock = false
-                                accumulatedThinkingContent += String(currentContentChunk[..<thinkEndIndex.lowerBound])
-                                accumulatedMainContent += String(currentContentChunk[thinkEndIndex.upperBound...])
-                                if let index = lastAssistantMessageIndex {
-                                    messages[index].isThinkingCompleted = true
-                                }
-                            } else if isInsideThinkingBlock {
-                                accumulatedThinkingContent += currentContentChunk
-                            } else {
-                                accumulatedMainContent += currentContentChunk
-                            }
-                        }
-
-                        if let index = lastAssistantMessageIndex {
-                            messages[index].thinking = accumulatedThinkingContent
-                            messages[index].content = accumulatedMainContent
-                            messages[index].latestContent = accumulatedMainContent // latestContentも更新
-
-                            // 思考完了のロジックを更新
-                            if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
-                                if thinkingOption == .on {
-                                    // thinkingOptionが.onの場合、thinkingコンテンツがあり、かつメインコンテンツが流れ始めたら思考完了
-                                    if !accumulatedThinkingContent.isEmpty && !accumulatedMainContent.isEmpty {
-                                        messages[index].isThinkingCompleted = true
-                                    }
-                                }
-                            }
-                        }
-
-                        if isFirstChunk {
-                            if let index = lastAssistantMessageIndex {
-                                messages[index].createdAt = chunk.createdAt
-                                lastUIUpdateTime = Date()
-                            }
-                            isFirstChunk = false
-                        }
-
-                        let now = Date()
-                        let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
-
-                        // Update UI based on buffer size or time interval
-                        if let index = lastAssistantMessageIndex, (accumulatedMainContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
-                            lastUIUpdateTime = now
-                        }
-                    }
-
-                    if chunk.done, let index = lastAssistantMessageIndex {
-                        // Final chunk, update performance metrics and set isStreaming to false
-                        if messages.indices.contains(index) {
-                            messages[index].totalDuration = chunk.totalDuration
-                            messages[index].evalCount = chunk.evalCount
-                            messages[index].evalDuration = chunk.evalDuration
-                            messages[index].isStreaming = false
-                            // If thinkingOption is .on and thinking content exists, mark as completed if not already by </think>
-                            if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
-                                messages[index].isThinkingCompleted = true
-                            }
-                            messages[index].finalThinking = messages[index].thinking
-                            messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
-                            // 新しく追加したfinalプロパティを更新
-                            messages[index].finalCreatedAt = messages[index].createdAt
-                            messages[index].finalTotalDuration = messages[index].totalDuration
-                            messages[index].finalEvalCount = messages[index].evalCount
-                            messages[index].finalEvalDuration = messages[index].evalDuration
-                            messages[index].finalIsStopped = messages[index].isStopped
-                        }
-                    }
-                }
-            } catch {
-                print("Chat streaming error or cancelled: \(error)")
-                if let index = lastAssistantMessageIndex, messages.indices.contains(index) {
-                    var updatedMessage = messages[index]
-                    updatedMessage.isStreaming = false // Streaming stopped due to error or cancellation
-                    if let urlError = error as? URLError, urlError.code == .cancelled {
-                        updatedMessage.isStopped = true // Explicitly stopped by user
-                    } else {
-                        updatedMessage.isStopped = false // Stopped due to other error
-                        errorMessage = "Chat API Error: \(error.localizedDescription)" // Only show error for non-cancellation errors
-                    }
-                    messages[index] = updatedMessage // Update the message in the array
-                }
-            }
-            isStreaming = false // Reset ChatView's overall streaming state
+            await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
         }
     }
 
@@ -336,20 +198,15 @@ struct ChatView: View {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
         }
-
-        // 再試行するアシスタントメッセージが最後のメッセージであることを確認
         guard indexToRetry == messages.count - 1 else {
             print("Retry failed: Message is not the last one.")
             return
         }
-
-        // 再試行するアシスタントメッセージが停止済みであることを確認
         guard !messages[indexToRetry].isStreaming else {
             print("Retry failed: Message is still streaming.")
             return
         }
-
-        // ユーザーメッセージのインデックスを見つける
+        
         let userMessageIndex: Int
         if indexToRetry > 0 && messages[indexToRetry - 1].role == "user" {
             userMessageIndex = indexToRetry - 1
@@ -358,8 +215,6 @@ struct ChatView: View {
             return
         }
 
-        // 既存のメッセージを更新するために、まずそのメッセージの現在の内容を履歴に追加
-        // やり直し前の最新のデータをfinalプロパティから取得してアーカイブを作成
         var messageToArchive = messages[indexToRetry]
         messageToArchive.content = messages[indexToRetry].latestContent ?? ""
         messageToArchive.thinking = messages[indexToRetry].finalThinking
@@ -370,7 +225,6 @@ struct ChatView: View {
         messageToArchive.evalDuration = messages[indexToRetry].finalEvalDuration
         messageToArchive.isStopped = messages[indexToRetry].finalIsStopped
         
-        // アーカイブするリビジョン自体のリビジョン情報はクリア
         messageToArchive.revisions = []
         messageToArchive.currentRevisionIndex = 0
         messageToArchive.originalContent = nil
@@ -384,9 +238,8 @@ struct ChatView: View {
         messageToArchive.finalIsStopped = false
 
         messages[indexToRetry].revisions.append(messageToArchive)
-        messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count // 新しい履歴のインデックスを設定
+        messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count
 
-        // メッセージの内容をクリアし、ストリーミング状態をリセット
         messages[indexToRetry].content = ""
         messages[indexToRetry].thinking = nil
         messages[indexToRetry].isStreaming = true
@@ -397,12 +250,10 @@ struct ChatView: View {
         messages[indexToRetry].evalCount = nil
         messages[indexToRetry].evalDuration = nil
 
-        // Prepare messages for API request (including history) up to the user message
         var apiMessages = messages.prefix(userMessageIndex + 1).map { msg in
             ChatMessage(role: msg.role, content: msg.content, images: msg.images, toolCalls: msg.toolCalls, toolName: msg.toolName)
         }
 
-        // Add system prompt if enabled
         if isSystemPromptEnabled && !systemPrompt.isEmpty {
             let systemMessage = ChatMessage(role: "system", content: systemPrompt)
             apiMessages.insert(systemMessage, at: 0)
@@ -415,140 +266,127 @@ struct ChatView: View {
             return
         }
 
-        // assistantMessageId は indexToRetry のメッセージIDを使用
-        let assistantMessageId = messages[indexToRetry].id
-
-        isStreaming = true // 全体のストリーミング状態をtrueに設定
-
+        isStreaming = true
+        
         Task {
-            let currentAssistantMessageIndex: Int? = messages.firstIndex(where: { $0.id == assistantMessageId })
-            var lastUIUpdateTime = Date()
-            let updateInterval = 0.1 // 100ms
-            let updateCharacterCount = 20 // 20文字ごと
-            var isFirstChunk = true
-            isInsideThinkingBlock = false // Reset for new message
-            var accumulatedThinkingContent = ""
-            var accumulatedMainContent = ""
+            await streamAssistantResponse(for: messageId, with: apiMessages, model: model)
+        }
+    }
+    
+    /// ストリーミング応答を処理し、UIをバッファリングしながら更新する共通メソッド
+    private func streamAssistantResponse(for messageId: UUID, with apiMessages: [ChatMessage], model: OllamaModel) async {
+        var lastUIUpdateTime = Date()
+        let updateInterval = 0.1 // 100ms
+        var isFirstChunk = true
+        var isInsideThinkingBlock = false
+        var accumulatedThinkingContent = ""
+        var accumulatedMainContent = ""
 
-            do {
-                for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, thinkingOption: thinkingOption, tools: nil) {
-                    if let messageChunk = chunk.message {
-                        // Prioritize messageChunk.thinking if thinkingOption is .on
-                        if thinkingOption == .on {
-                            if let apiThinking = messageChunk.thinking {
-                                accumulatedThinkingContent += apiThinking
+        do {
+            for try await chunk in executor.chat(model: model.name, messages: apiMessages, stream: isStreamingEnabled, useCustomChatSettings: useCustomChatSettings, isTemperatureEnabled: isTemperatureEnabled, chatTemperature: chatTemperature, isContextWindowEnabled: isContextWindowEnabled, contextWindowValue: contextWindowValue, isSystemPromptEnabled: isSystemPromptEnabled, systemPrompt: systemPrompt, thinkingOption: thinkingOption, tools: nil) {
+                
+                guard let assistantMessageIndex = messages.firstIndex(where: { $0.id == messageId }) else { continue }
+                
+                if let messageChunk = chunk.message {
+                    if thinkingOption == .on {
+                        if let apiThinking = messageChunk.thinking {
+                            accumulatedThinkingContent += apiThinking
+                        }
+                        accumulatedMainContent += messageChunk.content
+                    } else {
+                        var currentContentChunk = messageChunk.content
+                        if let thinkStartIndex = currentContentChunk.range(of: "<think>") {
+                            isInsideThinkingBlock = true
+                            accumulatedMainContent += String(currentContentChunk[..<thinkStartIndex.lowerBound])
+                            currentContentChunk = String(currentContentChunk[thinkStartIndex.upperBound...])
+                        }
+                        if let thinkEndIndex = currentContentChunk.range(of: "</think>") {
+                            isInsideThinkingBlock = false
+                            accumulatedThinkingContent += String(currentContentChunk[..<thinkEndIndex.lowerBound])
+                            accumulatedMainContent += String(currentContentChunk[thinkEndIndex.upperBound...])
+                            if messages.indices.contains(assistantMessageIndex) {
+                                messages[assistantMessageIndex].isThinkingCompleted = true
                             }
-                            // If thinkingOption is .on, assume main content is just messageChunk.content
-                            accumulatedMainContent += messageChunk.content
+                        } else if isInsideThinkingBlock {
+                            accumulatedThinkingContent += currentContentChunk
                         } else {
-                            // If thinkingOption is .none or .off, parse <think> tags from messageChunk.content
-                            var currentContentChunk = messageChunk.content
-
-                            if let thinkStartIndex = currentContentChunk.range(of: "<think>") {
-                                isInsideThinkingBlock = true
-                                accumulatedMainContent += String(currentContentChunk[..<thinkStartIndex.lowerBound])
-                                currentContentChunk = String(currentContentChunk[thinkStartIndex.upperBound...])
-                            }
-
-                            if let thinkEndIndex = currentContentChunk.range(of: "</think>") {
-                                isInsideThinkingBlock = false
-                                accumulatedThinkingContent += String(currentContentChunk[..<thinkEndIndex.lowerBound])
-                                accumulatedMainContent += String(currentContentChunk[thinkEndIndex.upperBound...])
-                                if let index = currentAssistantMessageIndex {
-                                    messages[index].isThinkingCompleted = true
-                                }
-                            } else if isInsideThinkingBlock {
-                                accumulatedThinkingContent += currentContentChunk
-                            } else {
-                                accumulatedMainContent += currentContentChunk
-                            }
-                        }
-
-                        // Update message object
-                        if let index = currentAssistantMessageIndex {
-                            messages[index].thinking = accumulatedThinkingContent
-                            messages[index].content = accumulatedMainContent
-                            messages[index].latestContent = accumulatedMainContent // latestContentも更新
-
-                            // 思考完了のロジックを更新
-                            if !messages[index].isThinkingCompleted { // まだ思考完了になっていない場合のみチェック
-                                if thinkingOption == .on {
-                                    // thinkingOptionが.onの場合、thinkingコンテンツがあり、かつメインコンテンツが流れ始めたら思考完了
-                                    if !accumulatedThinkingContent.isEmpty && !accumulatedMainContent.isEmpty {
-                                        messages[index].isThinkingCompleted = true
-                                    }
-                                }
-                            }
-                        }
-
-                        if isFirstChunk {
-                            if let index = currentAssistantMessageIndex {
-                                messages[index].createdAt = chunk.createdAt
-                                lastUIUpdateTime = Date()
-                            }
-                            isFirstChunk = false
-                        }
-
-                        let now = Date()
-                        let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
-
-                        // Update UI based on buffer size or time interval
-                        if let index = currentAssistantMessageIndex, (accumulatedMainContent.count > messages[index].content.count + updateCharacterCount || timeSinceLastUpdate > updateInterval || chunk.done) {
-                            lastUIUpdateTime = now
+                            accumulatedMainContent += currentContentChunk
                         }
                     }
 
-                    if chunk.done, let index = currentAssistantMessageIndex {
-                        // Final chunk, update performance metrics and set isStreaming to false
-                        if messages.indices.contains(index) {
-                            messages[index].totalDuration = chunk.totalDuration
-                            messages[index].evalCount = chunk.evalCount
-                            messages[index].evalDuration = chunk.evalDuration
-                            messages[index].isStreaming = false
-                            // If thinkingOption is .on and thinking content exists, mark as completed if not already by </think>
-                            if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
-                                messages[index].isThinkingCompleted = true
-                            }
-                            messages[index].finalThinking = messages[index].thinking
-                            messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
-                            // 新しく追加したfinalプロパティを更新
-                            messages[index].finalCreatedAt = messages[index].createdAt
-                            messages[index].finalTotalDuration = messages[index].totalDuration
-                            messages[index].finalEvalCount = messages[index].evalCount
-                            messages[index].finalEvalDuration = messages[index].evalDuration
-                            messages[index].finalIsStopped = messages[index].isStopped
+                    if isFirstChunk {
+                        if messages.indices.contains(assistantMessageIndex) {
+                            messages[assistantMessageIndex].createdAt = chunk.createdAt
                         }
+                        isFirstChunk = false
+                    }
+
+                    let now = Date()
+                    let timeSinceLastUpdate = now.timeIntervalSince(lastUIUpdateTime)
+
+                    // バッファリング条件に基づいてUIを更新 (時間ベースのみ)
+                    if timeSinceLastUpdate > updateInterval || chunk.done {
+                        if messages.indices.contains(assistantMessageIndex) {
+                            messages[assistantMessageIndex].thinking = accumulatedThinkingContent
+                            messages[assistantMessageIndex].content = accumulatedMainContent
+                            messages[assistantMessageIndex].latestContent = accumulatedMainContent
+
+                            if !messages[assistantMessageIndex].isThinkingCompleted {
+                                if thinkingOption == .on && !accumulatedThinkingContent.isEmpty && !accumulatedMainContent.isEmpty {
+                                    messages[assistantMessageIndex].isThinkingCompleted = true
+                                }
+                            }
+                        }
+                        lastUIUpdateTime = now
                     }
                 }
-            } catch {
-                print("Chat streaming error or cancelled: \(error)")
-                if let index = currentAssistantMessageIndex, messages.indices.contains(index) {
-                    var updatedMessage = messages[index]
-                    updatedMessage.isStreaming = false // Streaming stopped due to error or cancellation
-                    if let urlError = error as? URLError, urlError.code == .cancelled {
-                        updatedMessage.isStopped = true // Explicitly stopped by user
-                    } else {
-                        updatedMessage.isStopped = false // Stopped due to other error
-                        errorMessage = "Chat API Error: \(error.localizedDescription)" // Only show error for non-cancellation errors
+
+                if chunk.done {
+                    if let index = messages.firstIndex(where: { $0.id == messageId }), messages.indices.contains(index) {
+                        messages[index].totalDuration = chunk.totalDuration
+                        messages[index].evalCount = chunk.evalCount
+                        messages[index].evalDuration = chunk.evalDuration
+                        messages[index].isStreaming = false
+                        if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
+                            messages[index].isThinkingCompleted = true
+                        }
+                        messages[index].finalThinking = messages[index].thinking
+                        messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
+                        messages[index].finalCreatedAt = messages[index].createdAt
+                        messages[index].finalTotalDuration = messages[index].totalDuration
+                        messages[index].finalEvalCount = messages[index].evalCount
+                        messages[index].finalEvalDuration = messages[index].evalDuration
+                        messages[index].finalIsStopped = messages[index].isStopped
                     }
-                    messages[index] = updatedMessage // Update the message in the array
                 }
             }
-            isStreaming = false // Reset ChatView's overall streaming state
+        } catch {
+            print("Chat streaming error or cancelled: \(error)")
+            if let index = messages.firstIndex(where: { $0.id == messageId }), messages.indices.contains(index) {
+                var updatedMessage = messages[index]
+                updatedMessage.isStreaming = false
+                if let urlError = error as? URLError, urlError.code == .cancelled {
+                    updatedMessage.isStopped = true
+                } else {
+                    updatedMessage.isStopped = false
+                    errorMessage = "Chat API Error: \(error.localizedDescription)"
+                }
+                messages[index] = updatedMessage
+            }
         }
+        isStreaming = false
     }
 }
 
 // MARK: - MessageView
 
 struct MessageView: View {
-    @Binding var message: ChatMessage // @Binding に変更
+    @Binding var message: ChatMessage
     let isLastAssistantMessage: Bool
-    let onRetry: ((UUID, ChatMessage) -> Void)? // 引数を変更
+    let onRetry: ((UUID, ChatMessage) -> Void)?
     @State private var isHovering: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
-    // For parsing ISO8601 date strings from API
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone]
@@ -561,7 +399,7 @@ struct MessageView: View {
                 .padding(10)
                 .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
                 .cornerRadius(16)
-                .lineSpacing(4) // 行間を調整
+                .lineSpacing(4)
                 .markdownTextStyle(\.text) {
                     ForegroundColor(message.role == "user" ? .white : nil)
                 }
@@ -637,14 +475,12 @@ struct MessageView: View {
                 }
 
                 if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
-                    // 戻るボタン
                     Button(action: {
                         message.currentRevisionIndex -= 1
                         let revision = message.revisions[message.currentRevisionIndex]
                         message.content = revision.content
                         message.thinking = revision.thinking
                         message.isThinkingCompleted = revision.isThinkingCompleted
-                        // メタデータを復元
                         message.createdAt = revision.createdAt
                         message.totalDuration = revision.totalDuration
                         message.evalCount = revision.evalCount
@@ -652,22 +488,20 @@ struct MessageView: View {
                         message.isStopped = revision.isStopped
                     }) {
                         Image(systemName: "chevron.backward")
-                            .contentShape(Rectangle()) // クリック可能領域を拡大
-                            .padding(5) // パディングを追加
+                            .contentShape(Rectangle())
+                            .padding(5)
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
-                    .help("Previous Revision") // ツールチップを追加
-                    .disabled(message.currentRevisionIndex == 0) // グレイアウト条件
+                    .help("Previous Revision")
+                    .disabled(message.currentRevisionIndex == 0)
 
-                    // 履歴の数字
                     if message.revisions.count > 0 {
                         Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
 
-                    // 進むボタン
                     Button(action: {
                         message.currentRevisionIndex += 1
                         if message.currentRevisionIndex < message.revisions.count {
@@ -675,17 +509,15 @@ struct MessageView: View {
                             message.content = revision.content
                             message.thinking = revision.thinking
                             message.isThinkingCompleted = revision.isThinkingCompleted
-                            // メタデータを復元
                             message.createdAt = revision.createdAt
                             message.totalDuration = revision.totalDuration
                             message.evalCount = revision.evalCount
                             message.evalDuration = revision.evalDuration
                             message.isStopped = revision.isStopped
-                        } else { // 最新のメッセージに戻る場合
+                        } else {
                             message.content = message.latestContent ?? ""
                             message.thinking = message.finalThinking
                             message.isThinkingCompleted = message.finalIsThinkingCompleted
-                            // finalからメタデータを復元
                             message.createdAt = message.finalCreatedAt
                             message.totalDuration = message.finalTotalDuration
                             message.evalCount = message.finalEvalCount
@@ -694,16 +526,15 @@ struct MessageView: View {
                         }
                     }) {
                         Image(systemName: "chevron.forward")
-                            .contentShape(Rectangle()) // クリック可能領域を拡大
-                            .padding(5) // パディングを追加
+                            .contentShape(Rectangle())
+                            .padding(5)
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
-                    .help("Next Revision") // ツールチップを追加
-                    .disabled(message.currentRevisionIndex == message.revisions.count) // グレイアウト条件
+                    .help("Next Revision")
+                    .disabled(message.currentRevisionIndex == message.revisions.count)
                 }
 
-                // 「Retry」ボタンの追加 (右側に移動)
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
                     Button(action: {
                         var messageToRetry = message
@@ -711,16 +542,15 @@ struct MessageView: View {
                         messageToRetry.currentRevisionIndex = messageToRetry.revisions.count
                         onRetry?(message.id, messageToRetry)
                     }) {
-                        Image(systemName: "arrow.trianglehead.clockwise.rotate.90") // アイコンを変更
-                            .contentShape(Rectangle()) // クリック可能領域を拡大
-                            .padding(5) // パディングを追加
+                        Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
+                            .contentShape(Rectangle())
+                            .padding(5)
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
-                    .help("Retry") // ツールチップを追加
+                    .help("Retry")
                 }
 
-                // コピーボタンの追加
                 if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
                     Button(action: {
                         let pasteboard = NSPasteboard.general
@@ -737,7 +567,7 @@ struct MessageView: View {
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
-                    .help("Copy") // ツールチップを追加
+                    .help("Copy")
                 }
 
                 if message.role == "assistant" {
@@ -749,10 +579,9 @@ struct MessageView: View {
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(.horizontal, 5)
-        .contentShape(Rectangle()) // ホバーエフェクトのヒットエリアをVStack全体に拡大
+        .contentShape(Rectangle())
         .onHover { hovering in
             isHovering = hovering
-            print("MessageView: isHovering=\(isHovering), isStreaming=\(message.isStreaming), isStopped=\(message.isStopped)")
         }
     }
 
