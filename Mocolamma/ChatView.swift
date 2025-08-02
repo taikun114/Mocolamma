@@ -726,6 +726,7 @@ struct MessageView: View {
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(.horizontal, 5)
+        .contentShape(Rectangle()) // ホバーエフェクトのヒットエリアをVStack全体に拡大
         .onHover { hovering in
             isHovering = hovering
             print("MessageView: isHovering=\(isHovering), isStreaming=\(message.isStreaming), isStopped=\(message.isStopped)")
