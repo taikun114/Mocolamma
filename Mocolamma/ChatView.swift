@@ -725,7 +725,11 @@ struct MessageView: View {
                     Button(action: {
                         let pasteboard = NSPasteboard.general
                         pasteboard.clearContents()
-                        pasteboard.setString(message.content, forType: .string)
+                        var contentToCopy = message.content
+                        if let thinking = message.thinking, !thinking.isEmpty {
+                            contentToCopy = "<think>\(thinking)</think>\n\(message.content)"
+                        }
+                        pasteboard.setString(contentToCopy, forType: .string)
                     }) {
                         Image(systemName: "document.on.document")
                             .contentShape(Rectangle())
