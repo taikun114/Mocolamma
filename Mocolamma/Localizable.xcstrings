@@ -1389,6 +1389,22 @@
         }
       }
     },
+    "Next Revision" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Revision"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のリビジョン"
+          }
+        }
+      }
+    },
     "No data available" : {
       "comment" : "データなし。",
       "localizations" : {
@@ -1666,6 +1682,22 @@
         }
       }
     },
+    "Previous Revision" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Revision"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前のリビジョン"
+          }
+        }
+      }
+    },
     "Quantization Level:" : {
       "localizations" : {
         "en" : {
@@ -1694,6 +1726,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更新"
+          }
+        }
+      }
+    },
+    "Retry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やり直す"
           }
         }
       }

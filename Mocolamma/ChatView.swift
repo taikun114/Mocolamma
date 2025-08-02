@@ -657,6 +657,7 @@ struct MessageView: View {
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
+                    .help("Previous Revision") // ツールチップを追加
                     .disabled(message.currentRevisionIndex == 0) // グレイアウト条件
 
                     // 履歴の数字
@@ -698,6 +699,7 @@ struct MessageView: View {
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
+                    .help("Next Revision") // ツールチップを追加
                     .disabled(message.currentRevisionIndex == message.revisions.count) // グレイアウト条件
                 }
 
@@ -715,6 +717,23 @@ struct MessageView: View {
                     }
                     .font(.caption2)
                     .buttonStyle(.link)
+                    .help("Retry") // ツールチップを追加
+                }
+
+                // コピーボタンの追加
+                if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
+                    Button(action: {
+                        let pasteboard = NSPasteboard.general
+                        pasteboard.clearContents()
+                        pasteboard.setString(message.content, forType: .string)
+                    }) {
+                        Image(systemName: "document.on.document")
+                            .contentShape(Rectangle())
+                            .padding(5)
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.link)
+                    .help("Copy") // ツールチップを追加
                 }
 
                 if message.role == "assistant" {
