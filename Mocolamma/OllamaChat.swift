@@ -29,6 +29,11 @@ struct ChatMessage: Codable, Identifiable, Hashable {
     var latestContent: String? // メッセージの最新のやり直し結果を保持
     var finalThinking: String? // 最終的な思考内容を保持
     var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
+    var finalCreatedAt: String? // 最終的な作成日時
+    var finalTotalDuration: Int? // 最終的な合計時間
+    var finalEvalCount: Int? // 最終的なトークン数
+    var finalEvalDuration: Int? // 最終的な評価時間
+    var finalIsStopped: Bool = false // 最終的な停止状態
 
     enum CodingKeys: String, CodingKey {
         case role

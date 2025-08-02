@@ -302,9 +302,14 @@ struct ChatView: View {
                             if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
                                 messages[index].isThinkingCompleted = true
                             }
-                            // finalThinkingとfinalIsThinkingCompletedを更新
                             messages[index].finalThinking = messages[index].thinking
                             messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
+                            // 新しく追加したfinalプロパティを更新
+                            messages[index].finalCreatedAt = messages[index].createdAt
+                            messages[index].finalTotalDuration = messages[index].totalDuration
+                            messages[index].finalEvalCount = messages[index].evalCount
+                            messages[index].finalEvalDuration = messages[index].evalDuration
+                            messages[index].finalIsStopped = messages[index].isStopped
                         }
                     }
                 }
@@ -354,17 +359,29 @@ struct ChatView: View {
         }
 
         // 既存のメッセージを更新するために、まずそのメッセージの現在の内容を履歴に追加
-        // 現在のメッセージの最新の状態を保存
+        // やり直し前の最新のデータをfinalプロパティから取得してアーカイブを作成
         var messageToArchive = messages[indexToRetry]
-        messageToArchive.content = messageToArchive.latestContent ?? messageToArchive.content // 最新のコンテンツを保存
-        messageToArchive.thinking = messageToArchive.finalThinking // 最終的な思考内容を保存
-        messageToArchive.isThinkingCompleted = messageToArchive.finalIsThinkingCompleted // 最終的な思考完了状態を保存
-        messageToArchive.revisions = [] // リビジョン自体は履歴を持たない
-        messageToArchive.currentRevisionIndex = 0 // リビジョン自体はインデックスを持たない
-        messageToArchive.originalContent = nil // リビジョン自体はoriginalContentを持たない
-        messageToArchive.latestContent = nil // リビジョン自体はlatestContentを持たない
-        messageToArchive.finalThinking = nil // リビジョン自体はfinalThinkingを持たない
-        messageToArchive.finalIsThinkingCompleted = false // リビジョン自体はfinalIsThinkingCompletedを持たない
+        messageToArchive.content = messages[indexToRetry].latestContent ?? ""
+        messageToArchive.thinking = messages[indexToRetry].finalThinking
+        messageToArchive.isThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
+        messageToArchive.createdAt = messages[indexToRetry].finalCreatedAt
+        messageToArchive.totalDuration = messages[indexToRetry].finalTotalDuration
+        messageToArchive.evalCount = messages[indexToRetry].finalEvalCount
+        messageToArchive.evalDuration = messages[indexToRetry].finalEvalDuration
+        messageToArchive.isStopped = messages[indexToRetry].finalIsStopped
+        
+        // アーカイブするリビジョン自体のリビジョン情報はクリア
+        messageToArchive.revisions = []
+        messageToArchive.currentRevisionIndex = 0
+        messageToArchive.originalContent = nil
+        messageToArchive.latestContent = nil
+        messageToArchive.finalThinking = nil
+        messageToArchive.finalIsThinkingCompleted = false
+        messageToArchive.finalCreatedAt = nil
+        messageToArchive.finalTotalDuration = nil
+        messageToArchive.finalEvalCount = nil
+        messageToArchive.finalEvalDuration = nil
+        messageToArchive.finalIsStopped = false
 
         messages[indexToRetry].revisions.append(messageToArchive)
         messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count // 新しい履歴のインデックスを設定
@@ -492,9 +509,14 @@ struct ChatView: View {
                             if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
                                 messages[index].isThinkingCompleted = true
                             }
-                            // finalThinkingとfinalIsThinkingCompletedを更新
                             messages[index].finalThinking = messages[index].thinking
                             messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
+                            // 新しく追加したfinalプロパティを更新
+                            messages[index].finalCreatedAt = messages[index].createdAt
+                            messages[index].finalTotalDuration = messages[index].totalDuration
+                            messages[index].finalEvalCount = messages[index].evalCount
+                            messages[index].finalEvalDuration = messages[index].evalDuration
+                            messages[index].finalIsStopped = messages[index].isStopped
                         }
                     }
                 }
@@ -622,6 +644,12 @@ struct MessageView: View {
                         message.content = revision.content
                         message.thinking = revision.thinking
                         message.isThinkingCompleted = revision.isThinkingCompleted
+                        // メタデータを復元
+                        message.createdAt = revision.createdAt
+                        message.totalDuration = revision.totalDuration
+                        message.evalCount = revision.evalCount
+                        message.evalDuration = revision.evalDuration
+                        message.isStopped = revision.isStopped
                     }) {
                         Image(systemName: "chevron.backward")
                             .contentShape(Rectangle()) // クリック可能領域を拡大
@@ -646,10 +674,22 @@ struct MessageView: View {
                             message.content = revision.content
                             message.thinking = revision.thinking
                             message.isThinkingCompleted = revision.isThinkingCompleted
+                            // メタデータを復元
+                            message.createdAt = revision.createdAt
+                            message.totalDuration = revision.totalDuration
+                            message.evalCount = revision.evalCount
+                            message.evalDuration = revision.evalDuration
+                            message.isStopped = revision.isStopped
                         } else { // 最新のメッセージに戻る場合
-                            message.content = message.latestContent ?? "" // latestContent を使用
-                        message.thinking = message.finalThinking // finalThinking を使用
-                        message.isThinkingCompleted = message.finalIsThinkingCompleted // finalIsThinkingCompleted を使用
+                            message.content = message.latestContent ?? ""
+                            message.thinking = message.finalThinking
+                            message.isThinkingCompleted = message.finalIsThinkingCompleted
+                            // finalからメタデータを復元
+                            message.createdAt = message.finalCreatedAt
+                            message.totalDuration = message.finalTotalDuration
+                            message.evalCount = message.finalEvalCount
+                            message.evalDuration = message.finalEvalDuration
+                            message.isStopped = message.finalIsStopped
                         }
                     }) {
                         Image(systemName: "chevron.forward")
