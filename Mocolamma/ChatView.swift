@@ -157,10 +157,8 @@ struct ChatView: View {
         guard !inputText.isEmpty else { return }
 
         isStreaming = true
-        let userMessageContent = inputText
+        let userMessage = ChatMessage(role: "user", content: inputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         inputText = ""
-
-        let userMessage = ChatMessage(role: "user", content: userMessageContent, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         messages.append(userMessage)
 
         var apiMessages = messages
@@ -206,8 +204,6 @@ struct ChatView: View {
                 return messageCreatedAt > userMessageCreatedAt && message.role == "assistant" // $0.role を message.role に変更
             })
 
-            // 新しいアシスタントの応答を生成
-            let userMessageContent = userMessage.content
             var apiMessages = messages
             if isSystemPromptEnabled && !systemPrompt.isEmpty {
                 let systemMessage = ChatMessage(role: "system", content: systemPrompt)

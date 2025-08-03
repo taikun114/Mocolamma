@@ -50,6 +50,7 @@ struct MessageView: View {
 
                 if message.role == "user" && (!message.isStreaming || message.isStopped) {
                     if isEditing {
+                        cancelButton
                         doneButton
                     } else {
                         editButton
@@ -225,6 +226,25 @@ struct MessageView: View {
     }
 
     @ViewBuilder
+    private var cancelButton: some View {
+        Button(action: {
+            isEditing = false
+            message.content = message.fixedContent // Revert changes
+        }) {
+            Text("Cancel")
+                .font(.caption2)
+                .bold()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Color.gray.opacity(0.2))) // Use a different color for cancel
+                .foregroundColor(.secondary)
+        }
+        .buttonStyle(.plain)
+        .help(String(localized: "Cancel editing."))
+        .disabled(message.isStreaming)
+    }
+
+    @ViewBuilder
     private var doneButton: some View {
         Button(action: {
             isEditing = false
@@ -242,6 +262,7 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
+        .disabled(message.isStreaming || message.content.isEmpty)
     }
 
     @ViewBuilder

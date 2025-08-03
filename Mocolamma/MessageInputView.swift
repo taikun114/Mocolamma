@@ -56,7 +56,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil)) // isStreaming の場合は常に有効
+                .disabled(isStreaming || inputText.isEmpty || selectedModel == nil)
             } else {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) { // isStreaming の状態に応じてアクションを切り替え
                     ZStack {
@@ -69,7 +69,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil)) // isStreaming の場合は常に有効
+                .disabled(isStreaming || inputText.isEmpty || selectedModel == nil)
             }
 
         }

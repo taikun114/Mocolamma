@@ -314,6 +314,22 @@
         }
       }
     },
+    "Cancel editing." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel editing."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集をキャンセルする"
+          }
+        }
+      }
+    },
     "Categories" : {
       "localizations" : {
         "en" : {
