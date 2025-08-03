@@ -32,7 +32,7 @@ Mocolamma
 ├── LicenseTextView.swift
 ├── MessageInputView.swift
 ├── MessageView.swift
-├── ModelDetailsView.swift
+├── ModelInspectorView.swift
 ├── ModelListView.swift
 ├── MocolammaApp.swift
 ├── OllamaChat.swift
@@ -96,7 +96,7 @@ Ollamaモデルとのチャット機能を提供するメインビューです�
 
 利用可能なモデルの一覧を表示・管理するビューです。モデルの削除や詳細情報の表示機能を提供します。
 
-#### `ModelDetailsView.swift`
+#### `ModelInspectorView.swift`
 
 `ModelListView`で選択されたモデルの詳細情報を表示します。
 

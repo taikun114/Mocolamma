@@ -18,7 +18,7 @@ struct MessageView: View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
                 .padding(10)
-                .background(message.role == "user" ? Color.blue : Color.gray.opacity(0.1))
+                .background(message.role == "user" ? Color.accentColor : Color.gray.opacity(0.1))
                 .cornerRadius(16)
                 .lineSpacing(4)
                 .textSelection(.enabled)
@@ -55,7 +55,7 @@ struct MessageView: View {
             .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-        .padding(.horizontal, 5)
+        .padding(message.role == "user" ? .leading : .trailing, 64) // 自分のメッセージは左に、相手のメッセージは右に64pxのパディング
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
     }
@@ -116,6 +116,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .buttonStyle(.link)
+        .foregroundColor(.accentColor)
         .help("Previous Revision")
         .disabled(message.currentRevisionIndex == 0)
 
@@ -158,6 +159,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .buttonStyle(.link)
+        .foregroundColor(.accentColor)
         .help("Next Revision")
         .disabled(message.currentRevisionIndex == message.revisions.count)
     }
@@ -173,6 +175,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .buttonStyle(.link)
+        .foregroundColor(.accentColor)
         .help("Retry")
     }
 
@@ -193,6 +196,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .buttonStyle(.link)
+        .foregroundColor(.accentColor)
         .help("Copy")
     }
 
