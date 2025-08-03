@@ -22,7 +22,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
     @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
 
-    // 新しいプロパティ
+    // 新しいプロパティ（やり直し履歴など）
     @Published var revisions: [ChatMessage] = [] // やり直し履歴
     @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
     @Published var originalContent: String? // メッセージの最初の内容を保持
@@ -34,6 +34,14 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
     @Published var finalEvalCount: Int? // 最終的なトークン数
     @Published var finalEvalDuration: Int? // 最終的な評価時間
     @Published var finalIsStopped: Bool = false // 最終的な停止状態
+
+    // ストリーミング表示最適化向けの分割バッファ
+    // fixed: 確定テキスト（Markdownで描画、ほとんど更新しない）
+    // pending: 差分テキスト（頻繁に更新、1行Textで軽量に表示）
+    @Published var fixedContent: String = ""
+    @Published var pendingContent: String = ""
+    @Published var fixedThinking: String = ""
+    @Published var pendingThinking: String = ""
 
     enum CodingKeys: String, CodingKey {
         case role
@@ -60,6 +68,12 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
         self.totalDuration = try container.decodeIfPresent(Int.self, forKey: .totalDuration)
         self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
+
+        // 復元時は固定領域に全体を入れておく
+        self.fixedContent = self.content
+        self.pendingContent = ""
+        self.fixedThinking = self.thinking ?? ""
+        self.pendingThinking = ""
     }
 
     func encode(to encoder: Encoder) throws {
@@ -91,6 +105,11 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
         self.isStreaming = isStreaming
         self.isStopped = isStopped
         self.isThinkingCompleted = isThinkingCompleted
+
+        self.fixedContent = content
+        self.pendingContent = ""
+        self.fixedThinking = thinking ?? ""
+        self.pendingThinking = ""
     }
 }
 
@@ -191,7 +210,7 @@ struct ChatRequestOptions: Codable {
     let typicalP: Double?
     let repeatLastN: Int?
     var temperature: Double?
-    var numCtx: Int? // ここを var に変更
+    var numCtx: Int?
     let repeatPenalty: Double?
     let presencePenalty: Double?
     let frequencyPenalty: Double?
@@ -203,7 +222,7 @@ struct ChatRequestOptions: Codable {
     let mainGpu: Int?
     let useMmap: Bool?
     let numThread: Int?
-    let keepAlive: String? // Duration string, e.g., "5m"
+    let keepAlive: String?
 
     enum CodingKeys: String, CodingKey {
         case numKeep = "num_keep"
@@ -230,7 +249,6 @@ struct ChatRequestOptions: Codable {
         case keepAlive = "keep_alive"
     }
 
-    // Custom initializer to allow partial initialization
     init(
         numKeep: Int? = nil,
         seed: Int? = nil,
@@ -247,7 +265,7 @@ struct ChatRequestOptions: Codable {
         penalizeNewline: Bool? = nil,
         stop: [String]? = nil,
         numa: Bool? = nil,
-        numCtx: Int? = nil, // ここを追加
+        numCtx: Int? = nil,
         numBatch: Int? = nil,
         numGpu: Int? = nil,
         mainGpu: Int? = nil,
@@ -270,7 +288,7 @@ struct ChatRequestOptions: Codable {
         self.penalizeNewline = penalizeNewline
         self.stop = stop
         self.numa = numa
-        self.numCtx = numCtx // ここを追加
+        self.numCtx = numCtx
         self.numBatch = numBatch
         self.numGpu = numGpu
         self.mainGpu = mainGpu
@@ -279,7 +297,6 @@ struct ChatRequestOptions: Codable {
         self.keepAlive = keepAlive
     }
 }
-
 
 /// Represents a streaming response chunk from the /api/chat endpoint.
 struct ChatResponseChunk: Codable {
@@ -374,33 +391,27 @@ enum JSONValue: Codable, Hashable {
         if case .string(let value) = self { return value }
         return nil
     }
-
     var intValue: Int? {
         if case .int(let value) = self { return value }
         return nil
     }
-
     var doubleValue: Double? {
         if case .double(let value) = self { return value }
         return nil
     }
-
     var boolValue: Bool? {
         if case .bool(let value) = self { return value }
         return nil
     }
-
     var arrayValue: [JSONValue]? {
         if case .array(let value) = self { return value }
         return nil
     }
-
     var objectValue: [String: JSONValue]? {
         if case .object(let value) = self { return value }
         return nil
     }
 
-    // MARK: - Equatable Conformance
     static func == (lhs: JSONValue, rhs: JSONValue) -> Bool {
         switch (lhs, rhs) {
         case (.string(let l), .string(let r)): return l == r
@@ -414,23 +425,15 @@ enum JSONValue: Codable, Hashable {
         }
     }
 
-    // MARK: - Hashable Conformance
     func hash(into hasher: inout Hasher) {
         switch self {
-        case .string(let value):
-            hasher.combine(value)
-        case .int(let value):
-            hasher.combine(value)
-        case .double(let value):
-            hasher.combine(value)
-        case .bool(let value):
-            hasher.combine(value)
-        case .array(let value):
-            hasher.combine(value)
-        case .object(let value):
-            hasher.combine(value)
-        case .null:
-            hasher.combine(0) // A unique hash for null
+        case .string(let value): hasher.combine(value)
+        case .int(let value): hasher.combine(value)
+        case .double(let value): hasher.combine(value)
+        case .bool(let value): hasher.combine(value)
+        case .array(let value): hasher.combine(value)
+        case .object(let value): hasher.combine(value)
+        case .null: hasher.combine(0)
         }
     }
 }
