@@ -450,7 +450,7 @@ private struct ModelInspectorDetailView: View {
     let licenseLink: String? // 新しく追加
 
     var body: some View {
-        ModelDetailsView(
+        ModelInspectorView(
             model: model,
             modelInfo: modelInfo,
             isLoading: isLoading,

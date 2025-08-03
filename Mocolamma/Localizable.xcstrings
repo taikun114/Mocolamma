@@ -849,6 +849,22 @@
         }
       }
     },
+    "Embedding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embedding"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "埋め込み"
+          }
+        }
+      }
+    },
     "Embedding Length:" : {
       "localizations" : {
         "en" : {
@@ -860,7 +876,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "エンベディング長:"
+            "value" : "埋め込み長:"
           }
         }
       }

@@ -4,7 +4,7 @@ import AppKit // NSPasteboard のため
 // MARK: - モデル詳細ビュー
 
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
-struct ModelDetailsView: View {
+struct ModelInspectorView: View {
     let model: OllamaModel
     let modelInfo: [String: JSONValue]? // 追加
     let isLoading: Bool // 追加
@@ -95,6 +95,9 @@ struct ModelDetailsView: View {
         case "thinking":
             displayText = String(localized: "Thinking")
             iconName = "brain.filled.head.profile"
+        case "embedding":
+            displayText = String(localized: "Embedding")
+            iconName = "square.stack.3d.up"
         default:
             displayText = capability
             iconName = "tag"
