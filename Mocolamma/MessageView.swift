@@ -248,13 +248,29 @@ struct MessageView: View {
     private var messageContentView: some View {
         if isEditing && message.role == "user" {
             VStack(alignment: .trailing) {
-                TextEditor(text: $message.content)
-                    .frame(minHeight: 50, maxHeight: 200)
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.accentColor, lineWidth: 1)
-                    )
+                TextField("Type your message...", text: $message.content, axis: .vertical)
+                    .textFieldStyle(.plain)
+                    .lineLimit(1...10)
+                    .padding(.horizontal, 10) // テキストと枠線の間にスペースを追加
+                    .padding(.vertical, 8) // 上下の余白を追加
+                    .background(.background.secondary.opacity(0.7)) // TextFieldの背景を透明にする
+                    .cornerRadius(8) // 角を丸くする
+                    .onKeyPress(KeyEquivalent.return) { // onKeyPressを追加
+                        if NSEvent.modifierFlags.contains(.command) { // Commandキーが押されている場合
+                            Task { @MainActor in
+                                isEditing = false
+                                message.fixedContent = message.content
+                                message.pendingContent = ""
+                                onRetry?(message.id, message)
+                            }
+                            return .handled
+                        } else { // Commandキーが押されていない場合（通常のReturnキー）
+                            Task { @MainActor in
+                                message.content += "\n" // 改行を挿入
+                            }
+                            return .handled
+                        }
+                    }
             }
         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
