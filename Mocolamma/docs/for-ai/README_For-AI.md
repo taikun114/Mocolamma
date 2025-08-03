@@ -31,6 +31,7 @@ Mocolamma
 ├── ContentView.swift
 ├── LicenseTextView.swift
 ├── MessageInputView.swift
+├── MessageView.swift
 ├── ModelDetailsView.swift
 ├── ModelListView.swift
 ├── MocolammaApp.swift
@@ -61,7 +62,7 @@ Mocolamma
 
 #### `ChatView.swift`
 
-Ollamaモデルとのチャット機能を提供するメインビューです。メッセージの送受信、履歴表示、リビジョン管理などのUIとビジネスロジックを管理します。
+Ollamaモデルとのチャット機能を提供するメインビューです。メッセージの送受信、履歴表示、リビジョン管理などのUIとビジネスロジックを管理します。メッセージの表示自体は`ChatMessagesView`と`MessageView`に委譲しています。
 
 #### `ChatMessagesView.swift`
 
