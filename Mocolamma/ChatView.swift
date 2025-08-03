@@ -192,104 +192,148 @@ struct ChatView: View {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
         }
-        guard indexToRetry == messages.count - 1 else {
-            print("Retry failed: Message is not the last one.")
-            return
+
+        // ユーザーメッセージのリトライの場合
+        if messages[indexToRetry].role == "user" {
+            // 編集されたユーザーメッセージを履歴の最後に移動
+            let userMessage = messages.remove(at: indexToRetry)
+            messages.append(userMessage)
+
+            // ユーザーメッセージ以降のアシスタントメッセージを削除
+                        messages.removeAll(where: { (message: ChatMessage) -> Bool in // ChatMessageを明示的に指定
+                guard let messageCreatedAt = message.createdAt,
+                      let userMessageCreatedAt = userMessage.createdAt else { return false }
+                return messageCreatedAt > userMessageCreatedAt && message.role == "assistant" // $0.role を message.role に変更
+            })
+
+            // 新しいアシスタントの応答を生成
+            let userMessageContent = userMessage.content
+            var apiMessages = messages
+            if isSystemPromptEnabled && !systemPrompt.isEmpty {
+                let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+                apiMessages.insert(systemMessage, at: 0)
+            }
+
+            let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
+            placeholderMessage.revisions = []
+            placeholderMessage.currentRevisionIndex = 0
+            placeholderMessage.originalContent = ""
+            placeholderMessage.latestContent = ""
+            placeholderMessage.fixedContent = ""
+            placeholderMessage.pendingContent = ""
+            placeholderMessage.fixedThinking = ""
+            placeholderMessage.pendingThinking = ""
+            messages.append(placeholderMessage)
+            let assistantMessageId = placeholderMessage.id
+
+            guard let model = currentSelectedModel else {
+                errorMessage = "Please select a model first."
+                return
+            }
+
+            isStreaming = true
+            Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
+
+        } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
+            guard indexToRetry == messages.count - 1 else {
+                print("Retry failed: Message is not the last one.")
+                return
+            }
+            guard !messages[indexToRetry].isStreaming else {
+                print("Retry failed: Message is still streaming.")
+                return
+            }
+            // 直前のユーザーメッセージまでをAPIに渡す
+            guard indexToRetry > 0, messages[indexToRetry - 1].role == "user" else {
+                print("Retry failed: User message not found immediately before assistant message at index \(indexToRetry).")
+                return
+            }
+            let userMessageIndex = indexToRetry - 1
+
+            // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
+            // 本文は latestContent > content > fixed+pending の順
+            let latestCandidate = messages[indexToRetry].latestContent ?? ""
+            let contentCandidate = messages[indexToRetry].content
+            let bufferedCandidate = messages[indexToRetry].fixedContent + messages[indexToRetry].pendingContent
+            let archiveContent: String = {
+                if !latestCandidate.isEmpty { return latestCandidate }
+                if !contentCandidate.isEmpty { return contentCandidate }
+                return bufferedCandidate
+            }()
+
+            // Thinking は finalThinking > thinking > fixed+pending > nil
+            let finalThinkingCandidate = messages[indexToRetry].finalThinking
+            let liveThinkingCandidate = messages[indexToRetry].thinking
+            let bufferedThinkingCandidate = messages[indexToRetry].fixedThinking + messages[indexToRetry].pendingThinking
+            let archiveThinking: String? = {
+                if let v = finalThinkingCandidate, !v.isEmpty { return v }
+                if let v = liveThinkingCandidate, !v.isEmpty { return v }
+                if !bufferedThinkingCandidate.isEmpty { return bufferedThinkingCandidate }
+                return nil
+            }()
+
+            // 2) 履歴アーカイブ（この関数内のみで1回）
+            let archived = ChatMessage(
+                role: messages[indexToRetry].role,
+                content: archiveContent,
+                thinking: archiveThinking,
+                images: messages[indexToRetry].images,
+                toolCalls: messages[indexToRetry].toolCalls,
+                toolName: messages[indexToRetry].toolName,
+                createdAt: messages[indexToRetry].createdAt,
+                totalDuration: messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration,
+                evalCount: messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount,
+                evalDuration: messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration,
+                isStreaming: false,
+                isStopped: messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped,
+                isThinkingCompleted: messages[indexToRetry].finalIsThinkingCompleted || messages[indexToRetry].isThinkingCompleted
+            )
+            archived.revisions = messages[indexToRetry].revisions
+            archived.currentRevisionIndex = messages[indexToRetry].currentRevisionIndex
+            archived.originalContent = messages[indexToRetry].originalContent
+            archived.latestContent = messages[indexToRetry].latestContent
+            archived.finalThinking = messages[indexToRetry].finalThinking
+            archived.finalIsThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
+            archived.finalCreatedAt = messages[indexToRetry].finalCreatedAt ?? messages[indexToRetry].createdAt
+            archived.finalTotalDuration = messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration
+            archived.finalEvalCount = messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount
+            archived.finalEvalDuration = messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration
+            archived.finalIsStopped = messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped
+
+            messages[indexToRetry].revisions.append(archived)
+            // 参照位置は常に最新（末尾の次 = 現在バージョン）
+            messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count
+
+            // 3) 再実行準備（表示バッファも初期化）
+            messages[indexToRetry].content = ""
+            messages[indexToRetry].thinking = nil
+            messages[indexToRetry].fixedContent = ""
+            messages[indexToRetry].pendingContent = ""
+            messages[indexToRetry].fixedThinking = ""
+            messages[indexToRetry].pendingThinking = ""
+            messages[indexToRetry].isStreaming = true
+            messages[indexToRetry].isStopped = false
+            messages[indexToRetry].isThinkingCompleted = false
+            messages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
+            messages[indexToRetry].totalDuration = nil
+            messages[indexToRetry].evalCount = nil
+            messages[indexToRetry].evalDuration = nil
+
+            // 4) APIに出すメッセージ（ユーザー発話まで）
+            var apiMessages = Array(messages.prefix(userMessageIndex + 1))
+            if isSystemPromptEnabled && !systemPrompt.isEmpty {
+                let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+                apiMessages.insert(systemMessage, at: 0)
+            }
+
+            guard let model = currentSelectedModel else {
+                errorMessage = "Please select a model first."
+                return
+            }
+
+            isStreaming = true
+            Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
         }
-        guard !messages[indexToRetry].isStreaming else {
-            print("Retry failed: Message is still streaming.")
-            return
-        }
-        // 直前のユーザーメッセージまでをAPIに渡す
-        guard indexToRetry > 0, messages[indexToRetry - 1].role == "user" else {
-            print("Retry failed: User message not found immediately before assistant message at index \(indexToRetry).")
-            return
-        }
-        let userMessageIndex = indexToRetry - 1
-
-        // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
-        // 本文は latestContent > content > fixed+pending の順
-        let latestCandidate = messages[indexToRetry].latestContent ?? ""
-        let contentCandidate = messages[indexToRetry].content
-        let bufferedCandidate = messages[indexToRetry].fixedContent + messages[indexToRetry].pendingContent
-        let archiveContent: String = {
-            if !latestCandidate.isEmpty { return latestCandidate }
-            if !contentCandidate.isEmpty { return contentCandidate }
-            return bufferedCandidate
-        }()
-
-        // Thinking は finalThinking > thinking > fixed+pending > nil
-        let finalThinkingCandidate = messages[indexToRetry].finalThinking
-        let liveThinkingCandidate = messages[indexToRetry].thinking
-        let bufferedThinkingCandidate = messages[indexToRetry].fixedThinking + messages[indexToRetry].pendingThinking
-        let archiveThinking: String? = {
-            if let v = finalThinkingCandidate, !v.isEmpty { return v }
-            if let v = liveThinkingCandidate, !v.isEmpty { return v }
-            if !bufferedThinkingCandidate.isEmpty { return bufferedThinkingCandidate }
-            return nil
-        }()
-
-        // 2) 履歴アーカイブ（この関数内のみで1回）
-        let archived = ChatMessage(
-            role: messages[indexToRetry].role,
-            content: archiveContent,
-            thinking: archiveThinking,
-            images: messages[indexToRetry].images,
-            toolCalls: messages[indexToRetry].toolCalls,
-            toolName: messages[indexToRetry].toolName,
-            createdAt: messages[indexToRetry].createdAt,
-            totalDuration: messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration,
-            evalCount: messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount,
-            evalDuration: messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration,
-            isStreaming: false,
-            isStopped: messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped,
-            isThinkingCompleted: messages[indexToRetry].finalIsThinkingCompleted || messages[indexToRetry].isThinkingCompleted
-        )
-        archived.revisions = messages[indexToRetry].revisions
-        archived.currentRevisionIndex = messages[indexToRetry].currentRevisionIndex
-        archived.originalContent = messages[indexToRetry].originalContent
-        archived.latestContent = messages[indexToRetry].latestContent
-        archived.finalThinking = messages[indexToRetry].finalThinking
-        archived.finalIsThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
-        archived.finalCreatedAt = messages[indexToRetry].finalCreatedAt ?? messages[indexToRetry].createdAt
-        archived.finalTotalDuration = messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration
-        archived.finalEvalCount = messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount
-        archived.finalEvalDuration = messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration
-        archived.finalIsStopped = messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped
-
-        messages[indexToRetry].revisions.append(archived)
-        // 参照位置は常に最新（末尾の次 = 現在バージョン）
-        messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count
-
-        // 3) 再実行準備（表示バッファも初期化）
-        messages[indexToRetry].content = ""
-        messages[indexToRetry].thinking = nil
-        messages[indexToRetry].fixedContent = ""
-        messages[indexToRetry].pendingContent = ""
-        messages[indexToRetry].fixedThinking = ""
-        messages[indexToRetry].pendingThinking = ""
-        messages[indexToRetry].isStreaming = true
-        messages[indexToRetry].isStopped = false
-        messages[indexToRetry].isThinkingCompleted = false
-        messages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
-        messages[indexToRetry].totalDuration = nil
-        messages[indexToRetry].evalCount = nil
-        messages[indexToRetry].evalDuration = nil
-
-        // 4) APIに出すメッセージ（ユーザー発話まで）
-        var apiMessages = Array(messages.prefix(userMessageIndex + 1))
-        if isSystemPromptEnabled && !systemPrompt.isEmpty {
-            let systemMessage = ChatMessage(role: "system", content: systemPrompt)
-            apiMessages.insert(systemMessage, at: 0)
-        }
-
-        guard let model = currentSelectedModel else {
-            errorMessage = "Please select a model first."
-            return
-        }
-
-        isStreaming = true
-        Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
     }
     
     /// ストリーミング応答を処理し、UIをバッファリングしながら更新（固定Markdown + 差分折り返しテキスト）

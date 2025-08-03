@@ -394,6 +394,22 @@
         }
       }
     },
+    "Complete editing and retry." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete editing and retry."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集を完了してやり直します。"
+          }
+        }
+      }
+    },
     "Completed" : {
       "comment" : "プルステータス: 完了。",
       "localizations" : {
@@ -752,6 +768,22 @@
         }
       }
     },
+    "Done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
+    },
     "Downloading model '%@' from %@..." : {
       "comment" : "モデルダウンロード中のステータスメッセージ。",
       "localizations" : {
@@ -813,6 +845,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "例: マイローカルサーバー"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
           }
         }
       }

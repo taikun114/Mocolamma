@@ -6,6 +6,7 @@ struct MessageView: View {
     let isLastAssistantMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @State private var isHovering: Bool = false
+    @State private var isEditing: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
     static let iso8601Formatter: ISO8601DateFormatter = {
@@ -43,8 +44,16 @@ struct MessageView: View {
                     retryButton // 修正: ここで履歴操作せず onRetry だけ呼ぶ
                 }
 
-                if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
+                if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
                     copyButton
+                }
+
+                if message.role == "user" && (!message.isStreaming || message.isStopped) {
+                    if isEditing {
+                        doneButton
+                    } else {
+                        editButton
+                    }
                 }
 
                 if message.role == "assistant" {
@@ -201,8 +210,53 @@ struct MessageView: View {
     }
 
     @ViewBuilder
+    private var editButton: some View {
+        Button(action: {
+            isEditing = true
+        }) {
+            Image(systemName: "pencil")
+                .contentShape(Rectangle())
+                .padding(5)
+        }
+        .font(.caption2)
+        .buttonStyle(.link)
+        .foregroundColor(.accentColor)
+        .help("Edit")
+    }
+
+    @ViewBuilder
+    private var doneButton: some View {
+        Button(action: {
+            isEditing = false
+            message.fixedContent = message.content // ここでfixedContentを更新
+            message.pendingContent = "" // pendingContentをクリア
+            onRetry?(message.id, message)
+        }) {
+            Text("Done")
+                .font(.caption2)
+                .bold()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Color.accentColor.opacity(0.2)))
+                .foregroundColor(.accentColor)
+        }
+        .buttonStyle(.plain)
+        .help(String(localized: "Complete editing and retry."))
+    }
+
+    @ViewBuilder
     private var messageContentView: some View {
-        if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+        if isEditing && message.role == "user" {
+            VStack(alignment: .trailing) {
+                TextEditor(text: $message.content)
+                    .frame(minHeight: 50, maxHeight: 200)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.accentColor, lineWidth: 1)
+                    )
+            }
+        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
