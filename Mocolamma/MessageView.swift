@@ -244,44 +244,6 @@ struct MessageView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .padding(.vertical, 8)
                     }
-                        .markdownTextStyle(\.text) {
-                            ForegroundColor(message.role == "user" ? .white : nil)
-                        }
-                        .markdownTextStyle(\.code) {
-                            FontFamilyVariant(.monospaced)
-                            BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                        }
-                        .markdownBlockStyle(\.paragraph) { configuration in
-                            configuration.label
-                                .relativeLineSpacing(.em(0.3))
-                                .markdownMargin(top: .zero, bottom: .em(0.8))
-                        }
-                        .markdownBlockStyle(\.listItem) { configuration in
-                            configuration.label
-                                .markdownMargin(top: .em(0.3))
-                        }
-                        .markdownBlockStyle(\.blockquote) { configuration in
-                            configuration.label
-                                .padding()
-                                .overlay(alignment: .leading) {
-                                    Rectangle()
-                                        .fill(message.role == "user" ? .white : .gray)
-                                        .frame(width: 4)
-                                }
-                        }
-                        .markdownBlockStyle(\.codeBlock) { configuration in
-                            ScrollView(.horizontal) {
-                                configuration.label
-                                    .markdownTextStyle {
-                                        FontFamilyVariant(.monospaced)
-                                    }
-                                    .markdownMargin(top: .em(0.3))
-                                    .padding()
-                            }
-                            .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .padding(.vertical, 8)
-                        }
                 }
             }
         } else {
@@ -296,44 +258,7 @@ struct MessageView: View {
                     .foregroundColor(.secondary)
             } else {
                 Markdown(message.content)
-                    .markdownTextStyle(\.text) {
-                        ForegroundColor(message.role == "user" ? .white : nil)
-                    }
-                    .markdownTextStyle(\.code) {
-                        FontFamilyVariant(.monospaced)
-                        BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                    }
-                    .markdownBlockStyle(\.paragraph) { configuration in
-                        configuration.label
-                            .relativeLineSpacing(.em(0.3))
-                            .markdownMargin(top: .zero, bottom: .em(0.8))
-                    }
-                    .markdownBlockStyle(\.listItem) { configuration in
-                        configuration.label
-                            .markdownMargin(top: .em(0.3))
-                    }
-                    .markdownBlockStyle(\.blockquote) { configuration in
-                        configuration.label
-                            .padding()
-                            .overlay(alignment: .leading) {
-                                Rectangle()
-                                    .fill(message.role == "user" ? .white : .gray)
-                                    .frame(width: 4)
-                            }
-                    }
-                    .markdownBlockStyle(\.codeBlock) { configuration in
-                        ScrollView(.horizontal) {
-                            configuration.label
-                                .markdownTextStyle {
-                                    FontFamilyVariant(.monospaced)
-                                }
-                                .markdownMargin(top: .em(0.3))
-                                .padding()
-                        }
-                        .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.vertical, 8)
-                    }
+                    .markdownTheme(Theme.simple(for: message))
             }
         }
     }
@@ -343,5 +268,67 @@ struct MessageView: View {
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
         return formatter
+    }
+}
+
+extension Theme {
+    static func simple(for message: ChatMessage) -> Theme {
+        Theme()
+            .text {
+                ForegroundColor(message.role == "user" ? .white : nil)
+            }
+            .strong {
+                FontWeight(.bold)
+            }
+            .emphasis {
+                FontStyle(.italic)
+            }
+            .link {
+                ForegroundColor(message.role == "user" ? .white : nil)
+                UnderlineStyle(.single)
+            }
+            .code {
+                FontFamilyVariant(.monospaced)
+                BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
+            }
+            .paragraph { configuration in
+                configuration.label
+                    .relativeLineSpacing(.em(0.3))
+                    .markdownMargin(top: .zero, bottom: .em(0.8))
+            }
+            .listItem { configuration in
+                configuration.label
+                    .markdownMargin(top: .em(0.3))
+            }
+            .blockquote { configuration in
+                configuration.label
+                    .padding()
+                    .overlay(alignment: .leading) {
+                        Rectangle()
+                            .fill(message.role == "user" ? .white : .gray)
+                            .frame(width: 4)
+                    }
+            }
+            .codeBlock { configuration in
+                ScrollView(.horizontal) {
+                    configuration.label
+                        .markdownTextStyle {
+                            FontFamilyVariant(.monospaced)
+                        }
+                        .markdownMargin(top: .em(0.3))
+                        .padding()
+                    }
+                    .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.vertical, 8)
+                }
+            .tableCell { configuration in
+                configuration.label
+                    .padding(8)
+            }
+            .table { configuration in
+                configuration.label
+                    .padding(.bottom, 8)
+            }
     }
 }
