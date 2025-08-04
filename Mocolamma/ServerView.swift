@@ -50,12 +50,18 @@ struct ServerView: View {
             }
         }
         .toolbar {
-            // MARK: - サーバー追加ボタン
             ToolbarItem(placement: .primaryAction) {
-                Button(action: {
-                    showingAddServerSheet = true
-                }) {
-                    Label("Add Server", systemImage: "plus")
+                HStack(spacing: 8) {
+                    Button(action: {
+                        checkAllServerConnectivity()
+                    }) {
+                        Label("Refresh", systemImage: "arrow.clockwise")
+                    }
+                    Button(action: {
+                        showingAddServerSheet = true
+                    }) {
+                        Label("Add Server", systemImage: "plus")
+                    }
                 }
             }
         }

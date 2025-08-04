@@ -1805,7 +1805,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新"
+            "value" : "再読み込み"
           }
         }
       }
@@ -1822,6 +1822,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "やり直す"
+          }
+        }
+      }
+    },
+    "Running Models:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running Models:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "実行中のモデル数:"
           }
         }
       }

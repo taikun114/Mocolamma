@@ -63,19 +63,27 @@ struct ServerInspectorView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollama Version information
-                VStack(alignment: .leading) {
-                    Text("Ollama Version:")
-                        .font(.subheadline)
-                    Text(ollamaVersion ?? "-")
-                        .font(.title3)
-                        .bold()
-                        .foregroundColor(.primary)
-                        .contextMenu {
-                            Button("Copy") {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
+                VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading) {
+                        Text("Ollama Version:")
+                            .font(.subheadline)
+                        Text(ollamaVersion ?? "-")
+                            .font(.title3)
+                            .bold()
+                            .foregroundColor(.primary)
+                            .contextMenu {
+                                Button("Copy") {
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
+                                }
                             }
-                        }
+                    }
+                    VStack(alignment: .leading) {
+                        Text("Running Models:")
+                            .font(.subheadline)
+                        RunningModelsCountView(host: server.host)
+                            .environmentObject(commandExecutor)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onAppear {

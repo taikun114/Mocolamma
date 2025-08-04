@@ -373,6 +373,21 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         print("モデル情報キャッシュをクリアしました。")
     }
 
+    /// 現在メモリにロードされているモデル数を取得します。
+    func fetchRunningModelsCount(host: String? = nil) async -> Int? {
+        let base = host ?? apiBaseURL
+        guard let url = URL(string: "http://\(base)/api/ps") else { return nil }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
+            let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
+            return ps.models.count
+        } catch {
+            print("/api/psの取得に失敗: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
@@ -645,4 +660,12 @@ struct OllamaPullResponse: Decodable {
 
 struct OllamaVersionResponse: Decodable {
     let version: String
+}
+
+struct OllamaPSResponse: Decodable {
+    let models: [OllamaRunningModel]
+}
+
+struct OllamaRunningModel: Decodable {
+    let name: String
 }
