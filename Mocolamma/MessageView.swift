@@ -4,7 +4,9 @@ import MarkdownUI
 struct MessageView: View {
     @ObservedObject var message: ChatMessage
     let isLastAssistantMessage: Bool
+    let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
+    let isStreamingAny: Bool
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @Environment(\.colorScheme) private var colorScheme
@@ -48,8 +50,7 @@ struct MessageView: View {
                     copyButton
                 }
 
-                if message.role == "user" && (!message.isStreaming || message.isStopped) {
-                    if isEditing {
+                 if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {                    if isEditing {
                         cancelButton
                         doneButton
                     } else {
@@ -262,7 +263,7 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(message.isStreaming || message.content.isEmpty)
+        .disabled(isStreamingAny || message.content.isEmpty)
     }
 
     @ViewBuilder

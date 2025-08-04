@@ -10,7 +10,8 @@ struct ChatMessagesView: View {
                     ForEach(messages) { message in // messages.indices から messages に変更
                         // 最後のメッセージかどうかを判定
                         let isLastAssistantMessage = message.role == "assistant" && messages.last?.id == message.id
-                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        let isLastOwnUserMessage = message.role == "user" && messages.last(where: { $0.role == "user" })?.id == message.id
+                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, isLastOwnUserMessage: isLastOwnUserMessage, onRetry: onRetry, isStreamingAny: messages.contains { $0.role == "assistant" && $0.isStreaming })
                             .id(message.id)
                     }
                 }
@@ -25,7 +26,8 @@ struct ChatMessagesView: View {
                     ForEach(messages) { message in // messages.indices から messages に変更
                         // 最後のメッセージかどうかを判定
                         let isLastAssistantMessage = message.role == "assistant" && messages.last?.id == message.id
-                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, onRetry: onRetry)
+                        let isLastOwnUserMessage = message.role == "user" && messages.last(where: { $0.role == "user" })?.id == message.id
+                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, isLastOwnUserMessage: isLastOwnUserMessage, onRetry: onRetry, isStreamingAny: messages.contains { $0.role == "assistant" && $0.isStreaming })
                             .id(message.id)
                     }
                 }
