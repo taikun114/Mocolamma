@@ -141,10 +141,18 @@ struct ModelListView: View {
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .onAppear {
-            print("ModelListView Appeared. Fetching Ollama models from API.") // デバッグ用
-            // ビューが表示されたときにOllama APIからモデルリストを取得します
-            Task {
-                await executor.fetchOllamaModelsFromAPI()
+            print("ModelListView Appeared. Fetching Ollama models from API.")
+            if !executor.isRunning && !executor.isPulling {
+                let previousSelection = selectedModel
+                Task {
+                    await executor.fetchOllamaModelsFromAPI()
+                    let models = executor.models
+                    if let prev = previousSelection, models.contains(where: { $0.id == prev }) {
+                        if selectedModel != prev { selectedModel = prev }
+                    } else {
+                        selectedModel = nil
+                    }
+                }
             }
         }
     }

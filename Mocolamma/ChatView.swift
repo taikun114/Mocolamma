@@ -66,12 +66,15 @@ struct ChatView: View {
         .toolbar { toolbarContent }
         .onAppear {
             print("ChatView appeared. Models: \(executor.models.count)")
+            if selectedModelID == nil {
+                selectedModelID = nil
+            } else if let current = selectedModelID, !executor.models.contains(where: { $0.id == current }) {
+                selectedModelID = nil
+            }
         }
         .onChange(of: executor.models) { _, newModels in
             if let currentSelectedModelID = selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
-                selectedModelID = newModels.first?.id
-            } else if selectedModelID == nil, let firstModel = newModels.first {
-                selectedModelID = firstModel.id
+                selectedModelID = nil
             }
         }
         .onChange(of: selectedModelID) { _, _ in
