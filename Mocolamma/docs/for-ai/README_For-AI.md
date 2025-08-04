@@ -179,4 +179,4 @@ Ollamaサーバーの接続情報（名前、URLなど）を保持するため�
 
 引き継ぎにあたって、上記以外で他に伝えるべき情報がある場合はこちらに記載してください。
 
-* ビルドコマンド: `xcodebuild -project /Users/taikun/Documents/Xcode/Mocolamma/Mocolamma/Mocolamma.xcodeproj -scheme Mocolamma build`
+* ビルドコマンド: `xcodebuild -project /Users/taikun/Documents/Xcode/Mocolamma/Mocolamma/Mocolamma.xcodeproj -scheme Mocolamma build -quiet`

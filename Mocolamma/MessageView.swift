@@ -7,8 +7,11 @@ struct MessageView: View {
     let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     let isStreamingAny: Bool
+    @Binding var allMessages: [ChatMessage]
+    @State private var pairedAssistantStreaming: Bool = false
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
+    @FocusState private var isEditingFocused: Bool
     @Environment(\.colorScheme) private var colorScheme
 
     static let iso8601Formatter: ISO8601DateFormatter = {
@@ -27,6 +30,11 @@ struct MessageView: View {
                 .textSelection(.enabled)
 
             HStack {
+                EmptyView()
+            }
+            .id(pairedAssistantStreaming)
+            
+            HStack {
                 if message.role == "user" {
                     Spacer()
                 }
@@ -43,14 +51,15 @@ struct MessageView: View {
                 }
 
                 if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
-                    retryButton // 修正: ここで履歴操作せず onRetry だけ呼ぶ
+                    retryButton
                 }
 
                 if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
                     copyButton
                 }
 
-                 if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {                    if isEditing {
+                if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                    if isEditing {
                         cancelButton
                         doneButton
                     } else {
@@ -64,11 +73,24 @@ struct MessageView: View {
             }
             .opacity(isHovering && (!message.isStreaming || message.isStopped) ? 1.0 : 0.0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
+            .onChange(of: pairedAssistantStreaming) { _, _ in withAnimation { } }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-        .padding(message.role == "user" ? .leading : .trailing, 64) // 自分のメッセージは左に、相手のメッセージは右に64pxのパディング
+        .padding(message.role == "user" ? .leading : .trailing, 64)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
+        .onAppear { recomputePairedAssistantStreaming() }
+        .onChange(of: allMessages.last?.isStreaming == true) { _, _ in recomputePairedAssistantStreaming() }
+        .onChange(of: message.isStreaming) { _, _ in recomputePairedAssistantStreaming() }
+        .onChange(of: isEditing) { _, _ in recomputePairedAssistantStreaming() }
+    }
+
+    private func recomputePairedAssistantStreaming() {
+        if let last = allMessages.last, last.role == "assistant" {
+            pairedAssistantStreaming = last.isStreaming
+        } else {
+            pairedAssistantStreaming = false
+        }
     }
 
     private var dateString: String {
@@ -215,6 +237,8 @@ struct MessageView: View {
     private var editButton: some View {
         Button(action: {
             isEditing = true
+            isEditingFocused = true
+            message.content = message.content
         }) {
             Image(systemName: "pencil")
                 .contentShape(Rectangle())
@@ -230,14 +254,14 @@ struct MessageView: View {
     private var cancelButton: some View {
         Button(action: {
             isEditing = false
-            message.content = message.fixedContent // Revert changes
+            message.content = message.fixedContent
         }) {
-            Text("Cancel")
+            Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
                 .font(.caption2)
                 .bold()
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(Capsule().fill(Color.gray.opacity(0.2))) // Use a different color for cancel
+                .background(Capsule().fill(Color.gray.opacity(0.2)))
                 .foregroundColor(.secondary)
         }
         .buttonStyle(.plain)
@@ -249,11 +273,11 @@ struct MessageView: View {
     private var doneButton: some View {
         Button(action: {
             isEditing = false
-            message.fixedContent = message.content // ここでfixedContentを更新
-            message.pendingContent = "" // pendingContentをクリア
+            message.fixedContent = message.content
+            message.pendingContent = ""
             onRetry?(message.id, message)
         }) {
-            Text("Done")
+            Label { Text("Done") } icon: { Image(systemName: "checkmark") }
                 .font(.caption2)
                 .bold()
                 .padding(.horizontal, 8)
@@ -263,7 +287,10 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(isStreamingAny || message.content.isEmpty)
+        .disabled(pairedAssistantStreaming || message.content.isEmpty)
+        .allowsHitTesting(!pairedAssistantStreaming)
+        .transaction { $0.disablesAnimations = true }
+        .id(pairedAssistantStreaming ? "on" : "off")
     }
 
     @ViewBuilder
@@ -271,14 +298,21 @@ struct MessageView: View {
         if isEditing && message.role == "user" {
             VStack(alignment: .trailing) {
                 TextField("Type your message...", text: $message.content, axis: .vertical)
+                    .focused($isEditingFocused)
+                    .onChange(of: isEditingFocused) { _, focused in
+                        if focused {
+                            message.content = message.content + ""
+                        }
+                    }
+                    .onAppear { if isEditingFocused { } }
                     .textFieldStyle(.plain)
                     .lineLimit(1...10)
-                    .padding(.horizontal, 10) // テキストと枠線の間にスペースを追加
-                    .padding(.vertical, 8) // 上下の余白を追加
-                    .background(.background.secondary.opacity(0.7)) // TextFieldの背景を透明にする
-                    .cornerRadius(8) // 角を丸くする
-                    .onKeyPress(KeyEquivalent.return) { // onKeyPressを追加
-                        if NSEvent.modifierFlags.contains(.command) { // Commandキーが押されている場合
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(.background.secondary.opacity(0.7))
+                    .cornerRadius(8)
+                    .onKeyPress(KeyEquivalent.return) {
+                        if NSEvent.modifierFlags.contains(.command) {
                             Task { @MainActor in
                                 isEditing = false
                                 message.fixedContent = message.content
@@ -286,9 +320,9 @@ struct MessageView: View {
                                 onRetry?(message.id, message)
                             }
                             return .handled
-                        } else { // Commandキーが押されていない場合（通常のReturnキー）
+                        } else {
                             Task { @MainActor in
-                                message.content += "\n" // 改行を挿入
+                                message.content += "\n"
                             }
                             return .handled
                         }

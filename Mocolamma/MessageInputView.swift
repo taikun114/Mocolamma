@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MessageInputView: View {
+    @FocusState private var isInputFocused: Bool
     @Binding var inputText: String
     @Binding var isStreaming: Bool
     var selectedModel: OllamaModel?
@@ -18,13 +19,18 @@ struct MessageInputView: View {
                         .cornerRadius(16)
                 }
                 TextField("Type your message...", text: $inputText, axis: .vertical)
+                    .focused($isInputFocused)
                     .textFieldStyle(.plain)
                     .disabled(selectedModel == nil)
+                    .onChange(of: selectedModel) { _, model in
+                        if model != nil { isInputFocused = true }
+                    }
                     .lineLimit(1...10)
                     .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる
                     .padding(.horizontal, 10) // テキストと枠線の間にスペースを追加
                     .padding(.vertical, 8) // 上下の余白を追加
                     .background(Color.clear) // TextFieldの背景を透明にする
+                    
                     .cornerRadius(16) // 角を丸くする
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
