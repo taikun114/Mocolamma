@@ -317,6 +317,10 @@ private struct InspectorContentView: View {
                             }
                             .pickerStyle(.menu)
                             .disabled(!(commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false))
+                            .onChange(of: commandExecutor.selectedModelCapabilities) { _, caps in
+                                let hasThinking = caps?.contains("thinking") ?? false
+                                if !hasThinking { thinkingOption = .none }
+                            }
                             Text("Specifies whether to perform inference when using a reasoning model.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
