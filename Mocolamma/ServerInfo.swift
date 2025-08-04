@@ -24,8 +24,8 @@ struct ServerInfo: Identifiable, Codable, Equatable {
         self.host = host
     }
 
-    // Equatableプロトコルの実装（IDとホストで比較）
+    // Equatableプロトコルの実装（ID・名前・ホストで比較）
     static func == (lhs: ServerInfo, rhs: ServerInfo) -> Bool {
-        lhs.id == rhs.id && lhs.host == rhs.host
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.host == rhs.host
     }
 }
