@@ -17,10 +17,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
     @Published var pullTotal: Int64 = 0 // 合計バイト数
     @Published var pullCompleted: Int64 = 0 // 完了したバイト数
+    @Published var pullSpeedBytesPerSec: Double = 0 // 現在のダウンロード速度(B/s)
+    @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
 
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
+    private var lastSpeedSampleTime: Date? // 速度算出用の前回サンプル時刻
+    private var lastSpeedSampleCompleted: Int64 = 0 // 速度算出用の前回完了バイト
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
@@ -177,6 +181,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.pullProgress = 0.0
         self.pullTotal = 0
         self.pullCompleted = 0
+        self.pullSpeedBytesPerSec = 0
+        self.pullETARemaining = 0
+        self.lastSpeedSampleTime = nil
+        self.lastSpeedSampleCompleted = 0
 
         guard let url = URL(string: "http://\(apiBaseURL)/api/pull") else {
             self.output = NSLocalizedString("Error: Invalid API URL for pull.", comment: "プル用API URLが無効な場合のエラーメッセージ。")
@@ -536,6 +544,28 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                             self.pullProgress = calculatedProgress
                         } else {
                             self.pullProgress = 0.0
+                        }
+                        let now = Date()
+                        if let lastTime = self.lastSpeedSampleTime {
+                            let dt = now.timeIntervalSince(lastTime)
+                            if dt > 0.5 { // 0.5秒以上の間隔でサンプリング
+                                let dBytes = Double(self.pullCompleted - self.lastSpeedSampleCompleted)
+                                if dBytes >= 0 {
+                                    let speed = dBytes / dt
+                                    self.pullSpeedBytesPerSec = speed
+                                    if self.pullTotal > 0 {
+                                        let remainingBytes = Double(self.pullTotal - self.pullCompleted)
+                                        if speed > 0 {
+                                            self.pullETARemaining = remainingBytes / speed
+                                        }
+                                    }
+                                }
+                                self.lastSpeedSampleTime = now
+                                self.lastSpeedSampleCompleted = self.pullCompleted
+                            }
+                        } else {
+                            self.lastSpeedSampleTime = now
+                            self.lastSpeedSampleCompleted = self.pullCompleted
                         }
                         
                         print("プルステータス: \(self.pullStatus), 完了: \(self.pullCompleted), 合計: \(self.pullTotal), 進捗: \(String(format: "%.2f", self.pullProgress))")

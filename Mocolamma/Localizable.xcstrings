@@ -6,7 +6,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : " %1$.1f%% completed (%2$@ / %3$@)"
           }
         },
@@ -30,6 +30,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*メッセージがありません*"
+          }
+        }
+      }
+    },
+    "%@/s, Time Remaining: %02d:%02d" : {
+      "comment" : "速度と残り時間表示。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s, Time Remaining: %2$02d:%3$02d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s、残り時間: %2$02d:%3$02d"
           }
         }
       }
