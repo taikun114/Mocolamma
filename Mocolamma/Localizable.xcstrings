@@ -18,6 +18,22 @@
         }
       }
     },
+    "*Could not connect*" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Could not connect*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*接続できませんでした*"
+          }
+        }
+      }
+    },
     "*No message*" : {
       "localizations" : {
         "en" : {

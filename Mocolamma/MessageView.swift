@@ -371,6 +371,10 @@ struct MessageView: View {
             Text("*No message*")
                 .font(.caption)
                 .foregroundColor(.secondary)
+        } else if !message.isStreaming && (message.fixedContent + message.pendingContent).isEmpty {
+            Text("*Could not connect*")
+                .font(.caption)
+                .foregroundColor(.secondary)
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 if !message.fixedContent.isEmpty {

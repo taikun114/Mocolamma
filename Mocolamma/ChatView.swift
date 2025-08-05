@@ -503,6 +503,10 @@ struct ChatView: View {
                         messages[index].isStopped = true
                     } else {
                         messages[index].isStopped = false
+                        if (messages[index].fixedContent + messages[index].pendingContent).isEmpty {
+                        messages[index].fixedContent = ""
+                        messages[index].content = ""
+                    }
                         generalErrorMessage = "Chat API Error: \(error.localizedDescription)"
                     }
                 }
