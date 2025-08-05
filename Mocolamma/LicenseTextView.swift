@@ -29,27 +29,15 @@ struct LicenseTextView: View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading) {
-                    HStack {
-                        Text("License")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .padding(12)
-                        Spacer()
-
-                        if let link = licenseLink, let url = URL(string: link) {
-                            Button("Open License Page") {
-                                openURL(url)
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                            .padding(.horizontal)
-                        }
-                    }
+                    Text("License")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .padding()
 
                     Text(licenseText)
                         .font(.body)
                         .monospaced()
-                        .padding(12)
+                        .padding()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 20) // スクロールビューのコンテンツが下部のオーバーレイに隠れないように
@@ -75,6 +63,17 @@ struct LicenseTextView: View {
 
 
                 HStack {
+                    if let link = licenseLink, let url = URL(string: link) {
+                        Button {
+                            openURL(url)
+                        } label: {
+                            Label("Open License Page", systemImage: "paperclip")
+                        }
+                        .controlSize(.large)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    }
+
                     Spacer()
 
                     Button("Close") {
