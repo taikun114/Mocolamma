@@ -30,12 +30,10 @@ struct LicenseTextView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     HStack {
-                        Text("License") // タイトル
+                        Text("License")
                             .font(.title)
                             .fontWeight(.bold)
-                            .padding(.vertical, 10) // 上下に10ポイントのパディングを追加
-                            .padding(.horizontal)
-
+                            .padding(12)
                         Spacer()
 
                         if let link = licenseLink, let url = URL(string: link) {
@@ -51,8 +49,7 @@ struct LicenseTextView: View {
                     Text(licenseText)
                         .font(.body)
                         .monospaced()
-                        .padding(.horizontal)
-                        .padding(.vertical, 1)
+                        .padding(12)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 20) // スクロールビューのコンテンツが下部のオーバーレイに隠れないように
