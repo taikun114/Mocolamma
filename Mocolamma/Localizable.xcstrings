@@ -115,6 +115,38 @@
       },
       "shouldTranslate" : false
     },
+    "About Mocolamma" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Mocolamma"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma"
+          }
+        }
+      }
+    },
+    "Acknowledgements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "謝辞"
+          }
+        }
+      }
+    },
     "Add" : {
       "localizations" : {
         "en" : {
@@ -331,6 +363,262 @@
         }
       }
     },
+    "Are you sure you want to open the Buy Me a Coffee page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Buy Me a Coffee page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the CompactSlider GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the CompactSlider GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CompactSliderのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the create-dmg GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the create-dmg GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmgのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the Discussion page on GitHub?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Discussion page on GitHub?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのDiscussionページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the Gemini CLI GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Gemini CLI GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the GitHub contributors page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the GitHub contributors page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubの貢献者ページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the GitHub repository page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the GitHub repository page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのリポジトリページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the Issue page on GitHub?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Issue page on GitHub?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのIssueページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the MarkdownUI GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the MarkdownUI GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MarkdownUIのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the Ollama GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Ollama GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OllamaのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the opencode GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the opencode GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opencodeのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the PayPal.Me page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the PayPal.Me page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPal.Meのページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the send feedback email window?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the send feedback email window?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Ask questions and share your opinions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask questions and share your opinions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "質問や意見交換などを行いましょう"
+          }
+        }
+      }
+    },
+    "Buy Green Tea" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Green Tea"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "緑茶を奢る"
+          }
+        }
+      }
+    },
+    "Buy Me Green Tea" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me Green Tea"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "緑茶を買ってあげる"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -442,6 +730,25 @@
           }
         }
       }
+    },
+    "Community" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミュニティ"
+          }
+        }
+      }
+    },
+    "CompactSlider by Alexey Bukhtin" : {
+      "shouldTranslate" : false
     },
     "Complete editing and retry." : {
       "localizations" : {
@@ -589,6 +896,38 @@
         }
       }
     },
+    "Contributors" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributors"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貢献者"
+          }
+        }
+      }
+    },
+    "Contributors involved in the development" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributors involved in the development"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発に携わった貢献者"
+          }
+        }
+      }
+    },
     "Copy" : {
       "localizations" : {
         "en" : {
@@ -621,6 +960,22 @@
         }
       }
     },
+    "Copyright ©︎ 2025 Taiga Imaura" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 今浦大雅"
+          }
+        }
+      }
+    },
     "Could not load model information." : {
       "localizations" : {
         "en" : {
@@ -636,6 +991,9 @@
           }
         }
       }
+    },
+    "create-dmg by Andrey Tarantsov and Andrew Janke" : {
+      "shouldTranslate" : false
     },
     "Custom Settings" : {
       "localizations" : {
@@ -801,6 +1159,22 @@
         }
       }
     },
+    "Developed with Generative AI" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developed with Generative AI"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成AIと開発"
+          }
+        }
+      }
+    },
     "Digest:" : {
       "localizations" : {
         "en" : {
@@ -813,6 +1187,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダイジェスト:"
+          }
+        }
+      }
+    },
+    "Donate at PayPal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donate at PayPal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPalで寄付"
           }
         }
       }
@@ -1210,18 +1600,69 @@
         }
       }
     },
-    "General settings will go here." : {
+    "Found a bug?" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "General settings will go here."
+            "value" : "Found a bug?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "General settings will go here."
+            "value" : "バグを見つけましたか？"
+          }
+        }
+      }
+    },
+    "Gemini CLI by Google" : {
+      "shouldTranslate" : false
+    },
+    "Give It a Star" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give It a Star"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スターをつける"
+          }
+        }
+      }
+    },
+    "Give It a Star to GitHub Repository" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give It a Star to GitHub Repository"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubリポジトリにスターをつける"
+          }
+        }
+      }
+    },
+    "Have an idea?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Have an idea?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイデアがありますか？"
           }
         }
       }
@@ -1274,6 +1715,22 @@
         }
       }
     },
+    "I would be so glad if you could give a star to the repository!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I would be so glad if you could give a star to the repository!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
+          }
+        }
+      }
+    },
     "License" : {
       "localizations" : {
         "en" : {
@@ -1286,6 +1743,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライセンス"
+          }
+        }
+      }
+    },
+    "License Information" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "License Information"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス情報"
           }
         }
       }
@@ -1318,6 +1791,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル情報を読み込み中…"
+          }
+        }
+      }
+    },
+    "MarkdownUI by Guillermo Gonzalez" : {
+      "shouldTranslate" : false
+    },
+    "Mocolamma" : {
+      "shouldTranslate" : false
+    },
+    "Mocolamma is an Open Source Application." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma is an Open Source Application."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolammaはオープンソースのアプリケーションです。"
           }
         }
       }
@@ -1663,6 +2158,9 @@
         }
       }
     },
+    "No settings available yet" : {
+      "shouldTranslate" : false
+    },
     "No." : {
       "localizations" : {
         "en" : {
@@ -1698,6 +2196,9 @@
     "OK" : {
       "shouldTranslate" : false
     },
+    "Ollama" : {
+      "shouldTranslate" : false
+    },
     "Ollama Version:" : {
       "localizations" : {
         "en" : {
@@ -1710,6 +2211,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama バージョン:"
+          }
+        }
+      }
+    },
+    "Open" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開く"
           }
         }
       }
@@ -1729,6 +2246,265 @@
           }
         }
       }
+    },
+    "Open link to discussion page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to discussion page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスカッションページへのリンクを開きます."
+          }
+        }
+      }
+    },
+    "Open link to list of known bugs and report page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to list of known bugs and report page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the Buy Me a Coffee page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the Buy Me a Coffee page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the CompactSlider GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the CompactSlider GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CompactSliderのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the create-dmg GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the create-dmg GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmgのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the Gemini CLI GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the Gemini CLI GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the GitHub contributors page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the GitHub contributors page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubの貢献者ページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the GitHub repository page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the GitHub repository page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubリポジトリページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the MarkdownUI GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the MarkdownUI GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MarkdownUIのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the Ollama GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the Ollama GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OllamaのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the opencode GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the opencode GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opencodeのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the PayPal.Me." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the PayPal.Me."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPal.Meのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open Link?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Link?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを開きますか？"
+          }
+        }
+      }
+    },
+    "Open Source License" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Source License"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オープンソースライセンス"
+          }
+        }
+      }
+    },
+    "Open the Send Email window?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the Send Email window?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メール送信画面を開きますか？"
+          }
+        }
+      }
+    },
+    "Open the send feedback email window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the send feedback email window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックのメール送信画面を開きます。"
+          }
+        }
+      }
+    },
+    "opencode by sst" : {
+      "shouldTranslate" : false
     },
     "Parameter Count:" : {
       "localizations" : {
@@ -1839,6 +2615,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再読み込み"
+          }
+        }
+      }
+    },
+    "Report a Bug" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report a Bug"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バグを報告"
           }
         }
       }
@@ -1971,6 +2763,22 @@
         }
       }
     },
+    "Send Feedback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Feedback"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックを送信"
+          }
+        }
+      }
+    },
     "Server" : {
       "localizations" : {
         "en" : {
@@ -1999,6 +2807,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
+    },
+    "Show license information for this application and the libraries used." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show license information for this application and the libraries used."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
           }
         }
       }
@@ -2113,6 +2953,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルの取得に成功しました。合計: %d"
+          }
+        }
+      }
+    },
+    "Support and Feedback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support and Feedback"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サポートとフィードバック"
+          }
+        }
+      }
+    },
+    "Support Developer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support Developer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発者をサポート"
           }
         }
       }
@@ -2361,6 +3233,38 @@
         }
       }
     },
+    "Version: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン: %@"
+          }
+        }
+      }
+    },
+    "Version: %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version: %1$@ (%2$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン: %1$@ (%2$@)"
+          }
+        }
+      }
+    },
     "Vision" : {
       "localizations" : {
         "en" : {
@@ -2373,6 +3277,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ビジョン"
+          }
+        }
+      }
+    },
+    "You can also donate directly at PayPal." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can also donate directly at PayPal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPalで直接寄付していただくこともできます。"
+          }
+        }
+      }
+    },
+    "You can support me at Buy Me a Coffee from the price of a cup of green tea." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can support me at Buy Me a Coffee from the price of a cup of green tea."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
           }
         }
       }

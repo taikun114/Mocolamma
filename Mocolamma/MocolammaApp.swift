@@ -7,6 +7,7 @@ import SwiftUI
 /// アプリケーションのメインコンテンツビューであるContentViewをホストします。
 @main
 struct MocolammaApp: App {
+    @Environment(\.openWindow) private var openWindow
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
@@ -16,12 +17,24 @@ struct MocolammaApp: App {
             // ContentViewにServerManagerのインスタンスを渡します
             ContentView(serverManager: serverManager)
         }
-        .windowStyle(.titleBar) // 標準的なタイトルバーを使用します
-        .windowResizability(.contentMinSize) // ウィンドウの最小サイズをコンテンツに基づいて設定します
-        
-        // 設定ウィンドウを定義します。macOSの標準的な「設定...」メニュー項目を自動で提供します。
+        .windowStyle(.titleBar)
+        .windowResizability(.contentMinSize)
+        .commandsReplaced(content: {
+            CommandGroup(replacing: .appInfo, addition: {
+                 Button("About Mocolamma") {
+                     openWindow(id: "about-window")
+                 }
+            })
+        })
+
         Settings {
             SettingsView()
         }
+
+        Window("About Mocolamma", id: "about-window") {
+            AboutView()
+        }
+        .defaultSize(width: 500, height: 600)
+        .windowResizability(.contentSize)
     }
 }
