@@ -142,22 +142,34 @@ struct ChatView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                Task {
+                    executor.clearModelInfoCache()
+                    await executor.fetchOllamaModelsFromAPI()
+                }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+        }
+        ToolbarItem(placement: .primaryAction) {
             Picker("Select Model", selection: $selectedModelID) {
-                Text("Select Model").tag(nil as OllamaModel.ID?)
-                Divider()
-                if executor.models.isEmpty {
-                    Text("No models available")
-                        .tag(OllamaModel.noModelsAvailable.id as OllamaModel.ID?)
-                        .selectionDisabled()
-                } else {
-                    ForEach(executor.models) { model in
-                        Text(model.name).tag(model.id as OllamaModel.ID?)
+                    Text("Select Model").tag(nil as OllamaModel.ID?)
+                    Divider()
+                    if executor.models.isEmpty {
+                        Text("No models available")
+                            .tag(OllamaModel.noModelsAvailable.id as OllamaModel.ID?)
+                            .selectionDisabled()
+                    } else {
+                        ForEach(executor.models) { model in
+                            Text(model.name).tag(model.id as OllamaModel.ID?)
+                        }
                     }
                 }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 150)
+                .pickerStyle(.menu)
+                .frame(width: 150)
         }
+        
         if #available(macOS 26, *) {
             ToolbarSpacer()
         }
