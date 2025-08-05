@@ -9,6 +9,8 @@ struct ChatView: View {
     @State private var inputText: String = ""
     @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
+    @State private var showEmbeddingAlert: Bool = false
+    @State private var generalErrorMessage: String? = nil
     @Binding var isStreamingEnabled: Bool
     @Binding var showingInspector: Bool
     @Binding var useCustomChatSettings: Bool
@@ -77,7 +79,7 @@ struct ChatView: View {
                 selectedModelID = nil
             }
         }
-        .onChange(of: selectedModelID) { _, _ in
+        .onChange(of: selectedModelID) { _, newID in
             contextWindowValue = 2048.0
             guard let model = currentSelectedModel else {
                 Task { @MainActor in
@@ -96,6 +98,20 @@ struct ChatView: View {
                     } else {
                         contextLength = nil
                     }
+                    let isEmbeddingOnly = {
+                        let caps = response.capabilities ?? []
+                        let detFamilies = response.details?.families ?? []
+                        if !caps.isEmpty { return caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" } }
+                        if !detFamilies.isEmpty { return detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding" }
+                        return false
+                    }()
+                    if isEmbeddingOnly {
+                        await MainActor.run {
+                            selectedModelID = nil
+                            showEmbeddingAlert = true
+                        }
+                        return
+                    }
                     await MainActor.run {
                         executor.selectedModelContextLength = contextLength
                         executor.selectedModelCapabilities = response.capabilities
@@ -108,13 +124,18 @@ struct ChatView: View {
                 }
             }
         }
-        .alert("Error", isPresented: Binding<Bool>(
-            get: { errorMessage != nil },
-            set: { if !$0 { errorMessage = nil } }
-        )) {
-            Button("OK") { errorMessage = nil }
+        .alert("This model cannot be used", isPresented: $showEmbeddingAlert) {
+            Button("OK") { showEmbeddingAlert = false }
         } message: {
-            Text(errorMessage ?? "An unknown error occurred.")
+            Text(String(localized: "This model does not support chat.", comment: "Embedding-only model selection warning body."))
+        }
+        .alert("Error", isPresented: Binding<Bool>(
+            get: { generalErrorMessage != nil },
+            set: { if !$0 { generalErrorMessage = nil } }
+        )) {
+            Button("OK") { generalErrorMessage = nil }
+        } message: {
+            Text(generalErrorMessage ?? "An unknown error occurred.")
         }
     }
 
@@ -154,7 +175,7 @@ struct ChatView: View {
 
     private func sendMessage() {
         guard let model = currentSelectedModel else {
-            errorMessage = "Please select a model first."
+            generalErrorMessage = "Please select a model first."
             return
         }
         guard !inputText.isEmpty else { return }
@@ -226,7 +247,7 @@ struct ChatView: View {
             let assistantMessageId = placeholderMessage.id
 
             guard let model = currentSelectedModel else {
-                errorMessage = "Please select a model first."
+                generalErrorMessage = "Please select a model first."
                 return
             }
 
@@ -326,7 +347,7 @@ struct ChatView: View {
             }
 
             guard let model = currentSelectedModel else {
-                errorMessage = "Please select a model first."
+                generalErrorMessage = "Please select a model first."
                 return
             }
 
@@ -482,7 +503,7 @@ struct ChatView: View {
                         messages[index].isStopped = true
                     } else {
                         messages[index].isStopped = false
-                        errorMessage = "Chat API Error: \(error.localizedDescription)"
+                        generalErrorMessage = "Chat API Error: \(error.localizedDescription)"
                     }
                 }
             }

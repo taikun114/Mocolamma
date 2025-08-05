@@ -2232,6 +2232,39 @@
         }
       }
     },
+    "This model cannot be used" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This model cannot be used"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルは使用できません"
+          }
+        }
+      }
+    },
+    "This model does not support chat." : {
+      "comment" : "Embedding-only model selection warning body.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This model does not support chat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルはチャットに対応していません。"
+          }
+        }
+      }
+    },
     "Toggle Inspector" : {
       "localizations" : {
         "en" : {
