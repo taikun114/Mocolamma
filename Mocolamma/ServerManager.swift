@@ -40,6 +40,9 @@ class ServerManager: ObservableObject {
     /// 各サーバーの接続状態を保持する辞書 (nil: チェック中, true: 接続済み, false: 未接続)
     @Published var serverConnectionStatuses: [ServerInfo.ID: Bool?] = [:]
 
+    /// インスペクターの再描画を誘発するためのトークン
+    @Published var inspectorRefreshToken: UUID = UUID()
+
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合は、デフォルトのローカルホストを返します。
     var currentServerHost: String {

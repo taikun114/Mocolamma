@@ -135,7 +135,18 @@ struct ModelListView: View {
                 Button(action: {
                     Task {
                         executor.clearModelInfoCache() // モデル情報キャッシュをクリアします
+                        let previousSelection = selectedModel
+                        let selectedServerID = serverManager.selectedServerID
+                        selectedModel = nil
                         await executor.fetchOllamaModelsFromAPI() // モデルリストを再読み込みします
+                        if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
+                        await MainActor.run {
+                            serverManager.inspectorRefreshToken = UUID()
+                            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                        }
+                        if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                            selectedModel = prev
+                        }
                     }
                 }) {
                     Label("Refresh", systemImage: "arrow.clockwise") // ツールバーボタン：モデルを更新します。

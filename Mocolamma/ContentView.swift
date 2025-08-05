@@ -133,11 +133,11 @@ struct ContentView: View {
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
             // selectedServerForInspector が変更されたら、接続状況を再チェック
             if let server = newServer {
-                // serverConnectionStatus = nil // チェック中にリセット
+                serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
                 Task {
-                    _ = await executor.checkAPIConnectivity(host: server.host)
+                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
                     await MainActor.run {
-                        // serverConnectionStatus = isConnected
+                        serverManager.updateServerConnectionStatus(serverID: server.id, status: isConnected)
                     }
                 }
             }
@@ -297,7 +297,7 @@ private struct InspectorContentView: View {
                         server: server,
                         connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
                     )
-                    .id(server.id) // Use server ID for view identity
+                    .id(UUID())
                 } else {
                     Text("Select a server to see the details.") // Fallback if no server is selected
                         .font(.title2)

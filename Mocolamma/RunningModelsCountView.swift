@@ -24,6 +24,9 @@ struct RunningModelsCountView: View {
                 Task { await refresh() }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("InspectorRefreshRequested"))) { _ in
+            Task { await refresh() }
+        }
     }
 
     private func refresh() async {

@@ -6,6 +6,7 @@ struct ServerInspectorView: View {
     let server: ServerInfo
     let connectionStatus: Bool? // Can be nil while checking
     @State private var ollamaVersion: String? // New state variable for Ollama version
+    private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
 
     var body: some View {
         ScrollView { // ScrollViewを追加
@@ -86,13 +87,21 @@ struct ServerInspectorView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onAppear {
+                .task(id: server.host) {
+                    do {
+                        ollamaVersion = try await commandExecutor.fetchOllamaVersion(host: server.host)
+                    } catch {
+                        ollamaVersion = "-"
+                        print("Error fetching Ollama version: \(error)")
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: inspectorRefreshNotification)) { _ in
                     Task {
                         do {
                             ollamaVersion = try await commandExecutor.fetchOllamaVersion(host: server.host)
                         } catch {
                             ollamaVersion = "-"
-                            print("Error fetching Ollama version: \(error)")
+                            print("Error fetching Ollama version (refresh): \(error)")
                         }
                     }
                 }
