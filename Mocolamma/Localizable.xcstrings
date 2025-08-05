@@ -126,7 +126,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mocolamma"
+            "value" : "Mocolammaについて"
           }
         }
       }
@@ -1272,18 +1272,18 @@
         }
       }
     },
-    "e.g., My Local Server" : {
+    "e.g., Ollama Server" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "e.g., My Local Server"
+            "value" : "e.g., Ollama Server"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "例: マイローカルサーバー"
+            "value" : "例: Ollamaサーバー"
           }
         }
       }

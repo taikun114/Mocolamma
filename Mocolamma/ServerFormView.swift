@@ -31,7 +31,7 @@ struct ServerFormView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
             Text(editingServer == nil ? "Add Server" : "Edit Server") // シートのタイトル
                 .font(.title)
                 .bold()
@@ -39,20 +39,22 @@ struct ServerFormView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Name") // 名前ラベル
                     .font(.headline)
-                TextField("e.g., My Local Server", text: $serverNameInput) // 名前入力フィールド
+                TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Text("Host") // ホストラベル
                     .font(.headline)
                 TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput) // ホスト入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                Spacer()
             }
-            .padding(.horizontal)
 
             HStack {
+                Spacer()
                 Button("Cancel") { // キャンセルボタン
                     dismiss() // シートを閉じる
                 }
+                .controlSize(.large)
                 .keyboardShortcut(.cancelAction) // Escキーでキャンセル
 
                 Button(editingServer == nil ? "Save" : "Update") { // 保存/更新ボタン
@@ -78,11 +80,12 @@ struct ServerFormView: View {
                     }
                 }
                 .keyboardShortcut(.defaultAction) // Enterキーで実行
+                .controlSize(.large)
                 .disabled(serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
-        .padding(30)
-        .frame(minWidth: 400, minHeight: 300) // シートの最小サイズ
+        .padding()
+        .frame(width: 350, height: 250) // シートの固定サイズ
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
             Button("OK") { }
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
