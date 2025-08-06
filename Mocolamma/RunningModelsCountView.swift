@@ -8,9 +8,7 @@ struct RunningModelsCountView: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            if isLoading {
-                ProgressView().scaleEffect(0.6)
-            }
+
             Text(countText)
                 .font(.title3)
                 .bold()

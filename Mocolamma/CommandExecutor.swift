@@ -275,6 +275,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // キャッシュに存在すればそれを返す
         if let cachedInfo = modelInfoCache[modelName] {
             print("モデル \(modelName) の詳細情報をキャッシュから取得しました。")
+            self.selectedModelCapabilities = cachedInfo.capabilities
             return cachedInfo
         }
 
