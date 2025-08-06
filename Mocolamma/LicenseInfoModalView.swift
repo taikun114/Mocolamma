@@ -227,7 +227,7 @@ struct LicenseInfoModalView: View {
                     // MARK: opencode
                     VStack(alignment: .leading) {
                         Button(action: { showingOpencodeLinkAlert = true }) {
-                            Text("opencode by sst")
+                            Text("opencode by SST")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.accentColor)

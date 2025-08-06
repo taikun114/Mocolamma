@@ -1619,6 +1619,22 @@
     "Gemini CLI by Google" : {
       "shouldTranslate" : false
     },
+    "General" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
+          }
+        }
+      }
+    },
     "Give It a Star" : {
       "localizations" : {
         "en" : {
@@ -1727,6 +1743,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
+          }
+        }
+      }
+    },
+    "Launch at Login" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch at Login"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に開く"
           }
         }
       }
@@ -2208,9 +2240,6 @@
         }
       }
     },
-    "No settings available yet" : {
-      "shouldTranslate" : false
-    },
     "No." : {
       "localizations" : {
         "en" : {
@@ -2553,7 +2582,7 @@
         }
       }
     },
-    "opencode by sst" : {
+    "opencode by SST" : {
       "shouldTranslate" : false
     },
     "Parameter Count:" : {
@@ -2857,22 +2886,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
-          }
-        }
-      }
-    },
-    "Settings" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定"
           }
         }
       }
