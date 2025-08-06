@@ -652,32 +652,44 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 self.pullTask = nil
                 self.pullLineBuffer = ""
 
-                 if let error = error {
-                     if self.pullHasError || self.pullStatus == NSLocalizedString("Error", comment: "プルステータス: エラー。") || self.pullStatus == NSLocalizedString("Failed", comment: "プルステータス: 失敗。") {
-                         print("保持: pullエラー状態のためオーバーレイ維持。error=\(error.localizedDescription)")
-                         self.isPullingErrorHold = true
-                         return
-                     }
-                      self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
-                      self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
-                      self.isPullingErrorHold = true
-                      print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
-                      self.isPulling = false
-                  } else {
-                      if self.pullHasError {
-                          print("完了: ただし途中でエラーを検出したためCompletedにしません")
-                          self.isPulling = false
-                          return
-                      }
-                      self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
-                      self.pullProgress = 1.0
-                      self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
-                      print("モデルプルが完了しました。")
-                      await self.fetchOllamaModelsFromAPI()
-                      self.isPulling = false
-                  }
-                self.chatContinuations.removeValue(forKey: task)
-                self.chatLineBuffers.removeValue(forKey: task)
+                if let error = error {
+                    if self.pullHasError || self.pullStatus == NSLocalizedString("Error", comment: "プルステータス: エラー。") || self.pullStatus == NSLocalizedString("Failed", comment: "プルステータス: 失敗。") {
+                        print("保持: pullエラー状態のためオーバーレイ維持。error=\(error.localizedDescription)")
+                        self.isPullingErrorHold = true
+                        return
+                    }
+                    self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
+                    self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
+                    self.isPullingErrorHold = true
+                    print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
+                    self.isPulling = false
+                } else {
+                    if self.pullHasError {
+                        print("完了: ただし途中でエラーを検出したためCompletedにしません")
+                        self.isPulling = false
+                        return
+                    }
+                    self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
+                    self.pullProgress = 1.0
+                    self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
+                    print("モデルプルが完了しました。")
+                    await self.fetchOllamaModelsFromAPI()
+                    self.isPulling = false
+                }
+            } else if let (continuation, _) = self.chatContinuations[task] {
+                // Handle chat task completion
+                if let error = error {
+                    continuation.finish(throwing: error)
+                } else {
+                    continuation.finish()
+                }
+            }
+            
+            // Clean up resources for the completed task
+            self.chatContinuations.removeValue(forKey: task)
+            self.chatLineBuffers.removeValue(forKey: task)
+            if task == self.currentChatTask {
+                self.currentChatTask = nil
             }
         }
     }
