@@ -35,8 +35,18 @@ struct ModelListView: View {
         }
     }
 
-    var body: some View {
-        VStack {
+    
+    private func parseError(from output: String) -> String? {
+        if let data = output.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let err = obj["error"] as? String {
+            return err.replacingOccurrences(of: "\n", with: " ")
+        }
+        if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
+        return nil
+    }
+    
+    var body: some View {        VStack {
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
@@ -97,34 +107,39 @@ struct ModelListView: View {
                 }
             }
             // プログレスバーとステータステキスト
-            if executor.isPulling {
-                VStack {
-                    ProgressView(value: executor.pullProgress) {
-                        Text(executor.pullStatus)
-                    } currentValueLabel: {
-                        HStack {
-                            Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
-                                        executor.pullProgress * 100 as CVarArg,
-                                        ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                        ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                            if executor.pullSpeedBytesPerSec > 0 {
-                                let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                let eta = Int(executor.pullETARemaining)
-                                let etaMin = eta / 60
-                                let etaSec = eta % 60
-                                Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
-                                    .foregroundStyle(.secondary)
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                            }
-                        }
-                    }
-                    .progressViewStyle(.linear)
-                }
-                .padding()
-            }
-            // コマンド実行の出力表示 (TextEditorは削除されました)
+             if executor.isPulling || executor.isPullingErrorHold { 
+                 VStack(alignment: .leading, spacing: 8) {
+                     ProgressView(value: executor.pullProgress) {
+                         Text(executor.pullStatus)
+                     } currentValueLabel: {
+                         HStack {
+                             Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                         executor.pullProgress * 100 as CVarArg,
+                                         ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                         ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                                 .frame(maxWidth: .infinity, alignment: .leading)
+                             Spacer()
+                             if executor.pullSpeedBytesPerSec > 0 {
+                                 let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+                                 let eta = Int(executor.pullETARemaining)
+                                 let etaMin = eta / 60
+                                 let etaSec = eta % 60
+                                 Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
+                                     .foregroundStyle(.secondary)
+                                     .frame(maxWidth: .infinity, alignment: .trailing)
+                             }
+                         }
+                     }
+                     .progressViewStyle(.linear)
+                     if let errorText = parseError(from: executor.output) {
+                         MarqueeText(text: errorText)
+                             .foregroundColor(.red)
+                             .padding(.top, 2)
+                             .frame(maxWidth: .infinity, minHeight: 14)
+                     }
+                 }
+                 .padding()
+             }            // コマンド実行の出力表示 (TextEditorは削除されました)
         }
         .navigationTitle("Models")
         .navigationSubtitle(subtitle)
@@ -132,24 +147,26 @@ struct ModelListView: View {
         .toolbar { // ここで全てのToolbarItemをまとめます
             // MARK: - Reload Button (Primary Action, before Add New)
             ToolbarItem(placement: .primaryAction) { // primaryActionに配置
-                Button(action: {
-                    Task {
-                        executor.clearModelInfoCache() // モデル情報キャッシュをクリアします
-                        let previousSelection = selectedModel
-                        let selectedServerID = serverManager.selectedServerID
-                        selectedModel = nil
-                        await executor.fetchOllamaModelsFromAPI() // モデルリストを再読み込みします
-                        if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
-                        await MainActor.run {
-                            serverManager.inspectorRefreshToken = UUID()
-                            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-                        }
-                        if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
-                            selectedModel = prev
-                        }
-                    }
-                }) {
-                    Label("Refresh", systemImage: "arrow.clockwise") // ツールバーボタン：モデルを更新します。
+                 Button(action: {
+                     Task {
+                          executor.isPullingErrorHold = false
+                          executor.pullHasError = false
+                          executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
+                           executor.clearModelInfoCache()
+                          let previousSelection = selectedModel
+                          let selectedServerID = serverManager.selectedServerID
+                         selectedModel = nil
+                         await executor.fetchOllamaModelsFromAPI()
+                         if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
+                         await MainActor.run {
+                             serverManager.inspectorRefreshToken = UUID()
+                             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                         }
+                         if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                             selectedModel = prev
+                         }
+                     }
+                 }) {                    Label("Refresh", systemImage: "arrow.clockwise") // ツールバーボタン：モデルを更新します。
                 }
                 .disabled(executor.isRunning || executor.isPulling)
             }

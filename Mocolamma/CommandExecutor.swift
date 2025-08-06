@@ -6,20 +6,23 @@ import Combine // CombineフレームワークをインポートしてPublisher�
 class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessionDataDelegate {
     @Published var output: String = "" // 公開用の生のコマンド出力（stdout + stderr + 終了メッセージ）
     @Published var isRunning: Bool = false
+    @Published var pullHttpErrorTriggered: Bool = false
+    @Published var pullHttpErrorMessage: String = ""
     @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
     @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
     @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
     @Published var selectedModelCapabilities: [String]? // 選択されたモデルのcapabilities
 
-    // モデルプル時の進捗状況
-    @Published var isPulling: Bool = false
-    @Published var pullStatus: String = "Preparing..." // プルステータス: 準備中。
-    @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
-    @Published var pullTotal: Int64 = 0 // 合計バイト数
-    @Published var pullCompleted: Int64 = 0 // 完了したバイト数
-    @Published var pullSpeedBytesPerSec: Double = 0 // 現在のダウンロード速度(B/s)
-    @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
-
+     // モデルプル時の進捗状況
+     @Published var isPulling: Bool = false
+     @Published var isPullingErrorHold: Bool = false
+     @Published var pullHasError: Bool = false
+     @Published var pullStatus: String = "Preparing..." // プルステータス: 準備中。
+     @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
+     @Published var pullTotal: Int64 = 0 // 合計バイト数
+     @Published var pullCompleted: Int64 = 0 // 完了したバイト数
+     @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度(B/s)
+     @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
@@ -177,11 +180,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "モデルダウンロード中のステータスメッセージ。"), modelName, apiBaseURL)
         self.isPulling = true
+        self.isPullingErrorHold = false
+        self.pullHasError = false
         self.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
         self.pullProgress = 0.0
         self.pullTotal = 0
         self.pullCompleted = 0
-        self.pullSpeedBytesPerSec = 0
+        self.pullSpeedBytesPerSec = 0.0
         self.pullETARemaining = 0
         self.lastSpeedSampleTime = nil
         self.lastSpeedSampleCompleted = 0
@@ -487,14 +492,24 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 completionHandler(.cancel)
                 return
             }
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                self.output = String(format: NSLocalizedString("Model pull error: HTTP Status Code %d", comment: "モデルプルエラー: HTTPステータスコード。"), (response as? HTTPURLResponse)?.statusCode ?? -1)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                if let url = dataTask.originalRequest?.url { print("/api/pull HTTP error: \(httpResponse.statusCode) on \(url)") }
+                let base = String(format: NSLocalizedString("Model pull error: HTTP Status Code %d", comment: "モデルプルエラー: HTTPステータスコード。"), httpResponse.statusCode)
+                self.output = base
+                if httpResponse.statusCode == 400 {
+                    self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nPlease make sure the model name is correct.", comment: "400 Bad Request: likely wrong model name")
+                } else {
+                    self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nUnknown error occurred.", comment: "Non-400 error fallback message")
+                }
+                self.pullHttpErrorTriggered = true
+                self.pullHasError = true
+                self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
+                self.isPullingErrorHold = true
                 self.isPulling = false
-                self.pullStatus = NSLocalizedString("Error", comment: "プルステータス: エラー。")
                 completionHandler(.cancel)
                 return
             }
-            self.pullLineBuffer = "" // 新しいレスポンスが来たのでバッファをクリアします
+            self.pullLineBuffer = ""
             completionHandler(.allow)
         }
     }
@@ -528,9 +543,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     }
 
                     do {
-                        let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
-                        self.pullStatus = response.status
-                        
+                         let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
+                         if !self.pullHasError { self.pullStatus = response.status }                        
                         if let total = response.total {
                             self.pullTotal = total
                         }
@@ -572,7 +586,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     } catch {
                         if let debugString = String(data: jsonData, encoding: .utf8) {
                             print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行: \(debugString)")
-                        } else {
+                             if debugString.contains("\"error\":") || debugString.lowercased().contains("error") {
+                                 self.output = debugString
+                                 self.pullHasError = true
+                                 self.pullStatus = NSLocalizedString("Error", comment: "プルステータス: エラー。")
+                                 self.isPullingErrorHold = true
+                             }                        } else {
                             print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行データが読み取り不能です。")
                         }
                     }
@@ -632,30 +651,30 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 self.pullTask = nil
                 self.pullLineBuffer = ""
 
-                if let error = error {
-                    self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
-                    self.isPulling = false
-                    self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
-                    print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
-                } else {
-                    self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
-                    self.isPulling = false
-                    self.pullProgress = 1.0
-                    self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
-                    print("モデルプルが完了しました。")
-                    // モデルリストを更新するために API から再取得します
-                    await self.fetchOllamaModelsFromAPI()
-                }
-            } else if let (continuation, _) = self.chatContinuations[task] {
-                if let error = error as? URLError, error.code == .cancelled {
-                    print("Chat streaming task cancelled by user.")
-                    // isStoppedはChatViewで設定されるため、ここではcontinuationをエラーなしで終了させる
-                    continuation.finish()
-                } else if let error = error {
-                    continuation.finish(throwing: error)
-                } else {
-                    continuation.finish()
-                }
+                 if let error = error {
+                     if self.pullHasError || self.pullStatus == NSLocalizedString("Error", comment: "プルステータス: エラー。") || self.pullStatus == NSLocalizedString("Failed", comment: "プルステータス: 失敗。") {
+                         print("保持: pullエラー状態のためオーバーレイ維持。error=\(error.localizedDescription)")
+                         self.isPullingErrorHold = true
+                         return
+                     }
+                      self.output = NSLocalizedString("Model pull failed: ", comment: "モデルプルの失敗プレフィックス。") + error.localizedDescription
+                      self.pullStatus = NSLocalizedString("Failed", comment: "プルステータス: 失敗。")
+                      self.isPullingErrorHold = true
+                      print("モデルプルがエラーで失敗しました: \(error.localizedDescription)")
+                      self.isPulling = false
+                  } else {
+                      if self.pullHasError {
+                          print("完了: ただし途中でエラーを検出したためCompletedにしません")
+                          self.isPulling = false
+                          return
+                      }
+                      self.output = NSLocalizedString("Model pull completed: ", comment: "モデルプルの完了プレフィックス。") + self.pullStatus
+                      self.pullProgress = 1.0
+                      self.pullStatus = NSLocalizedString("Completed", comment: "プルステータス: 完了。")
+                      print("モデルプルが完了しました。")
+                      await self.fetchOllamaModelsFromAPI()
+                      self.isPulling = false
+                  }
                 self.chatContinuations.removeValue(forKey: task)
                 self.chatLineBuffers.removeValue(forKey: task)
             }

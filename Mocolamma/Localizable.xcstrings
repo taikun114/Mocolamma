@@ -307,7 +307,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "モデル「%@」を削除してもよろしいですか？この操作は元に戻せません。"
+            "value" : "モデル「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -324,7 +324,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択されたモデルを削除してもよろしいですか？この操作は元に戻せません。"
+            "value" : "選択されたモデルを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -341,7 +341,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択されたサーバーを削除してもよろしいですか？この操作は元に戻せません。"
+            "value" : "選択されたサーバーを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -358,7 +358,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サーバー「%@」を削除してもよろしいですか？この操作は元に戻せません。"
+            "value" : "サーバー「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -836,14 +836,14 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not connect to the API. Please check if the host is correct and the Ollama server is running."
+            "state" : "translated",
+            "value" : "Could not connect to the API.\nPlease check if the host is correct and the Ollama server is running."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "APIに接続できませんでした。ホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
+            "value" : "APIに接続できませんでした。\nホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
           }
         }
       }
@@ -1883,6 +1883,22 @@
         }
       }
     },
+    "Model Pull Error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Pull Error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルエラー"
+          }
+        }
+      }
+    },
     "Model pull error: HTTP Status Code %d" : {
       "comment" : "モデルプルエラー: HTTPステータスコード。",
       "localizations" : {
@@ -1913,6 +1929,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルのプルに失敗しました:"
+          }
+        }
+      }
+    },
+    "Model pull failed.\nPlease make sure the model name is correct." : {
+      "comment" : "400 Bad Request: likely wrong model name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull failed.\nPlease make sure the model name is correct."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルに失敗しました。\nモデル名が正しいことをご確認ください。"
+          }
+        }
+      }
+    },
+    "Model pull failed.\nUnknown error occurred." : {
+      "comment" : "Non-400 error fallback message",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model pull failed.\nUnknown error occurred."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルに失敗しました。\n不明なエラーが発生しました。"
           }
         }
       }
