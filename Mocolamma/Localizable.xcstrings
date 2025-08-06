@@ -227,6 +227,22 @@
         }
       }
     },
+    "Allowed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
+          }
+        }
+      }
+    },
     "API Decode Error: " : {
       "comment" : "APIデコードエラーのプレフィックス。",
       "localizations" : {
@@ -1827,6 +1843,38 @@
         }
       }
     },
+    "Local Network Access" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Network Access"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセス"
+          }
+        }
+      }
+    },
+    "Local network permission is granted." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local network permission is granted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークの権限が許可されました。"
+          }
+        }
+      }
+    },
     "MarkdownUI by Guillermo Gonzalez" : {
       "shouldTranslate" : false
     },
@@ -2534,6 +2582,38 @@
         }
       }
     },
+    "Open Privacy & Security settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Privacy & Security settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーとセキュリティ設定を開きます。"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
+          }
+        }
+      }
+    },
     "Open Source License" : {
       "localizations" : {
         "en" : {
@@ -2633,6 +2713,38 @@
         }
       }
     },
+    "Permission is required to connect to Ollama servers on the same network." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permission is required to connect to Ollama servers on the same network."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一ネットワーク内のOllamaサーバーに接続するには権限が必要です。"
+          }
+        }
+      }
+    },
+    "Permissions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限"
+          }
+        }
+      }
+    },
     "Preparing..." : {
       "comment" : "プルステータス: 準備中。",
       "localizations" : {
@@ -2694,6 +2806,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再読み込み"
+          }
+        }
+      }
+    },
+    "Refresh status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh status"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "状態の更新"
           }
         }
       }

@@ -1,8 +1,11 @@
 import SwiftUI
 import ServiceManagement
+import AppKit
+import Network
 
 struct SettingsView: View {
     @State private var launchAtLogin: Bool = false
+    @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
 
     var body: some View {
         Form {
@@ -12,11 +15,49 @@ struct SettingsView: View {
                         LoginItemManager.shared.setEnabled(newValue)
                     }
             }
+
+            Section("Permissions") {
+                HStack {
+                    Circle()
+                        .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                        .frame(width: 10, height: 10)
+
+                    VStack(alignment: .leading) {
+                        Text("Local Network Access")
+                        Text("Permission is required to connect to Ollama servers on the same network.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+
+                    Button(action: {
+                        localNetworkChecker.refresh()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Refresh status")
+
+                    Button(action: {
+                        localNetworkChecker.openSystemPreferences()
+                    }) {
+                        HStack {
+                            Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                            Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(localNetworkChecker.isAllowed)
+                    .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 500, height: 300)
+        .frame(width: 400, height: 400)
         .onAppear {
             launchAtLogin = LoginItemManager.shared.isEnabled
+            localNetworkChecker.refresh()
         }
     }
 }
@@ -41,6 +82,82 @@ final class LoginItemManager {
         } catch {
             print("[LoginItemManager] Failed to set login item: \(error.localizedDescription)")
         }
+    }
+}
+
+final class LocalNetworkPermissionChecker: ObservableObject {
+    @Published var isAllowed: Bool = false
+
+    private let authorizer = LocalNetworkAuthorization()
+
+    func refresh() {
+        Task { @MainActor in
+            let granted = await authorizer.requestAuthorization()
+            self.isAllowed = granted
+        }
+    }
+
+    func openSystemPreferences() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+}
+
+private class LocalNetworkAuthorization: NSObject, NetServiceDelegate {
+    private var browser: NWBrowser?
+    private var netService: NetService?
+    private var completion: ((Bool) -> Void)?
+
+    func requestAuthorization() async -> Bool {
+        await withCheckedContinuation { continuation in
+            self.requestAuthorization { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
+
+    private func requestAuthorization(completion: @escaping (Bool) -> Void) {
+        self.completion = completion
+
+        let parameters = NWParameters()
+        parameters.includePeerToPeer = true
+
+        let browser = NWBrowser(for: .bonjour(type: "_bonjour._tcp", domain: nil), using: parameters)
+        self.browser = browser
+        browser.stateUpdateHandler = { [weak self] newState in
+            guard let self else { return }
+            switch newState {
+            case .failed:
+                break
+            case .ready:
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    if let completion = self.completion {
+                        self.reset()
+                        completion(true)
+                        self.completion = nil
+                    }
+                }
+            case .waiting(_):
+                self.reset()
+                self.completion?(false)
+                self.completion = nil
+            default:
+                break
+            }
+        }
+
+        self.netService = NetService(domain: "local.", type:"_lnp._tcp.", name: "LocalNetworkPrivacy", port: 11434)
+
+        self.browser?.start(queue: .main)
+        self.netService?.publish()
+    }
+
+    private func reset() {
+        self.browser?.cancel()
+        self.browser = nil
+        self.netService?.stop()
+        self.netService = nil
     }
 }
 
