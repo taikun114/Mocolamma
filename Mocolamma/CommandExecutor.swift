@@ -51,8 +51,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // デリゲートメソッド内で @MainActor への切り替えをTask { @MainActor in ... } で明示的に行います
         let configuration = URLSessionConfiguration.default
         let opt = APITimeoutManager.shared.currentOption
-        configuration.timeoutIntervalForRequest = opt.requestTimeout
-        configuration.timeoutIntervalForResource = opt.resourceTimeout
+        configuration.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
+        configuration.timeoutIntervalForResource = opt.overallResourceTimeout
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         
         // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
@@ -91,8 +91,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             guard let self = self else { return }
             let opt = APITimeoutManager.shared.currentOption
             let config = URLSessionConfiguration.default
-            config.timeoutIntervalForRequest = opt.requestTimeout
-            config.timeoutIntervalForResource = opt.resourceTimeout
+            config.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
+            config.timeoutIntervalForResource = opt.overallResourceTimeout
             self.urlSession.invalidateAndCancel()
             self.urlSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
         }

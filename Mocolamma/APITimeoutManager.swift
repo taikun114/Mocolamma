@@ -7,7 +7,7 @@ enum APITimeoutOption: String, CaseIterable, Codable, Equatable, Identifiable {
     case unlimited
     var id: String { rawValue }
     
-    var requestTimeout: TimeInterval {
+    var requestTimeoutUntilFirstByte: TimeInterval {
         switch self {
         case .seconds30: return 30
         case .minutes1: return 60
@@ -16,14 +16,7 @@ enum APITimeoutOption: String, CaseIterable, Codable, Equatable, Identifiable {
         }
     }
     
-    var resourceTimeout: TimeInterval {
-        switch self {
-        case .seconds30: return 35
-        case .minutes1: return 65
-        case .minutes5: return 305
-        case .unlimited: return 0
-        }
-    }
+    var overallResourceTimeout: TimeInterval { 0 }
 }
 
 final class APITimeoutManager {
