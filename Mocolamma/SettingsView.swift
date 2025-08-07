@@ -5,8 +5,9 @@ import Network
 
 struct SettingsView: View {
     @State private var launchAtLogin: Bool = false
+    @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
-
+    
     var body: some View {
         Form {
             Section("General") {
@@ -14,14 +15,33 @@ struct SettingsView: View {
                     .onChange(of: launchAtLogin) { _, newValue in
                         LoginItemManager.shared.setEnabled(newValue)
                     }
-            }
-
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("API Timeout")
+                        Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Picker("", selection: $apiTimeoutSelection) {
+                        Text("30 sec").tag(APITimeoutOption.seconds30)
+                        Text("1 min").tag(APITimeoutOption.minutes1)
+                        Text("5 min").tag(APITimeoutOption.minutes5)
+                        Text("Unlimited").tag(APITimeoutOption.unlimited)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .onChange(of: apiTimeoutSelection) { _, newValue in
+                        APITimeoutManager.shared.set(option: newValue)
+                    }
+                }             }
+            
             Section("Permissions") {
                 HStack {
                     Circle()
                         .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
                         .frame(width: 10, height: 10)
-
+                    
                     VStack(alignment: .leading) {
                         Text("Local Network Access")
                         Text("Permission is required to connect to Ollama servers on the same network.")
@@ -29,7 +49,7 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     Spacer()
-
+                    
                     Button(action: {
                         localNetworkChecker.refresh()
                     }) {
@@ -37,7 +57,7 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.borderless)
                     .help("Refresh status")
-
+                    
                     Button(action: {
                         localNetworkChecker.openSystemPreferences()
                     }) {
@@ -57,21 +77,21 @@ struct SettingsView: View {
         .frame(width: 400, height: 400)
         .onAppear {
             launchAtLogin = LoginItemManager.shared.isEnabled
+            apiTimeoutSelection = APITimeoutManager.shared.currentOption
             localNetworkChecker.refresh()
         }
     }
 }
-
 final class LoginItemManager {
     static let shared = LoginItemManager()
     private init() {}
-
+    
     private let helperIdentifier = Bundle.main.bundleIdentifier ?? ""
-
+    
     var isEnabled: Bool {
         SMAppService.mainApp.status == .enabled
     }
-
+    
     func setEnabled(_ enabled: Bool) {
         do {
             if enabled {
@@ -87,16 +107,16 @@ final class LoginItemManager {
 
 final class LocalNetworkPermissionChecker: ObservableObject {
     @Published var isAllowed: Bool = false
-
+    
     private let authorizer = LocalNetworkAuthorization()
-
+    
     func refresh() {
         Task { @MainActor in
             let granted = await authorizer.requestAuthorization()
             self.isAllowed = granted
         }
     }
-
+    
     func openSystemPreferences() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
             NSWorkspace.shared.open(url)
@@ -108,7 +128,7 @@ private class LocalNetworkAuthorization: NSObject, NetServiceDelegate {
     private var browser: NWBrowser?
     private var netService: NetService?
     private var completion: ((Bool) -> Void)?
-
+    
     func requestAuthorization() async -> Bool {
         await withCheckedContinuation { continuation in
             self.requestAuthorization { result in
@@ -116,13 +136,13 @@ private class LocalNetworkAuthorization: NSObject, NetServiceDelegate {
             }
         }
     }
-
+    
     private func requestAuthorization(completion: @escaping (Bool) -> Void) {
         self.completion = completion
-
+        
         let parameters = NWParameters()
         parameters.includePeerToPeer = true
-
+        
         let browser = NWBrowser(for: .bonjour(type: "_bonjour._tcp", domain: nil), using: parameters)
         self.browser = browser
         browser.stateUpdateHandler = { [weak self] newState in
@@ -146,13 +166,13 @@ private class LocalNetworkAuthorization: NSObject, NetServiceDelegate {
                 break
             }
         }
-
+        
         self.netService = NetService(domain: "local.", type:"_lnp._tcp.", name: "LocalNetworkPrivacy", port: 11434)
-
+        
         self.browser?.start(queue: .main)
         self.netService?.publish()
     }
-
+    
     private func reset() {
         self.browser?.cancel()
         self.browser = nil

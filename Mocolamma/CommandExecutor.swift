@@ -12,17 +12,17 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
     @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
     @Published var selectedModelCapabilities: [String]? // 選択されたモデルのcapabilities
-
-     // モデルプル時の進捗状況
-     @Published var isPulling: Bool = false
-     @Published var isPullingErrorHold: Bool = false
-     @Published var pullHasError: Bool = false
-     @Published var pullStatus: String = "Preparing..." // プルステータス: 準備中。
-     @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
-     @Published var pullTotal: Int64 = 0 // 合計バイト数
-     @Published var pullCompleted: Int64 = 0 // 完了したバイト数
-     @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度(B/s)
-     @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
+    
+    // モデルプル時の進捗状況
+    @Published var isPulling: Bool = false
+    @Published var isPullingErrorHold: Bool = false
+    @Published var pullHasError: Bool = false
+    @Published var pullStatus: String = "Preparing..." // プルステータス: 準備中。
+    @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
+    @Published var pullTotal: Int64 = 0 // 合計バイト数
+    @Published var pullCompleted: Int64 = 0 // 完了したバイト数
+    @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度(B/s)
+    @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
@@ -31,16 +31,16 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
-
+    
     // Ollama APIのベースURL
     // ServerManagerから現在のサーバーホストを受け取るように変更
     @Published var apiBaseURL: String
-
+    
     private var cancellables = Set<AnyCancellable>() // ServerManagerの変更を監視するためのSet
-
+    
     // MARK: - モデル情報キャッシュ
     private var modelInfoCache: [String: OllamaShowResponse] = [:]
-
+    
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
     init(serverManager: ServerManager) {
@@ -50,8 +50,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
         // デリゲートメソッド内で @MainActor への切り替えをTask { @MainActor in ... } で明示的に行います
         let configuration = URLSessionConfiguration.default
+        let opt = APITimeoutManager.shared.currentOption
+        configuration.timeoutIntervalForRequest = opt.requestTimeout
+        configuration.timeoutIntervalForResource = opt.resourceTimeout
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-
+        
         // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
         serverManager.$servers
             .map { servers in
@@ -66,7 +69,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
             .assign(to: \.apiBaseURL, on: self)
             .store(in: &cancellables)
-
+        
         serverManager.$selectedServerID
             .compactMap { selectedID in
                 // selectedIDが変更された場合、対応するサーバーのホストを返す
@@ -74,7 +77,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
             .assign(to: \.apiBaseURL, on: self)
             .store(in: &cancellables)
-
+        
         // apiBaseURLの変更を監視し、モデルリストを再取得
         $apiBaseURL
             .sink { [weak self] _ in
@@ -83,8 +86,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 }
             }
             .store(in: &cancellables)
+        
+        NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in
+            guard let self = self else { return }
+            let opt = APITimeoutManager.shared.currentOption
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = opt.requestTimeout
+            config.timeoutIntervalForResource = opt.resourceTimeout
+            self.urlSession.invalidateAndCancel()
+            self.urlSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+        }
     }
-
+    
     /// Ollama APIからモデルリストを取得します (async/await版)
     func fetchOllamaModelsFromAPI() async {
         print("Ollama APIから \(apiBaseURL) のモデルリストを取得中...")
@@ -94,22 +107,22 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
         // モデルリストを一旦クリア
         self.models = []
-
+        
         // defer を使って関数終了時に必ず isRunning を false に設定します
         defer {
             self.isRunning = false
         }
-
+        
         guard let url = URL(string: "http://\(apiBaseURL)/api/tags") else {
             self.output = NSLocalizedString("Error: Invalid API URL.", comment: "無効なAPI URLのエラーメッセージ。")
             self.models = [] // エラー時もモデルリストをクリア
             self.apiConnectionError = true // API接続エラーを設定
             return
         }
-
+        
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
-
+            
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("API Error: Unknown response type.", comment: "不明なAPIレスポンスタイプのエラーメッセージ。")
                 print("API エラー: 不明なレスポンスタイプです。")
@@ -117,7 +130,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 self.apiConnectionError = true // API接続エラーを設定
                 return
             }
-
+            
             guard httpResponse.statusCode == 200 else {
                 let statusMessage = String(format: NSLocalizedString("API Error: HTTP Status Code %d", comment: "HTTPステータスコードのエラーメッセージ。"), httpResponse.statusCode)
                 self.output = statusMessage
@@ -131,7 +144,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
             
             print("デコードを試行中。データサイズ: \(data.count) バイト。最初の10バイト: \(data.prefix(10).map { String(format: "%02x", $0) }.joined())...")
-
+            
             let apiResponse = try JSONDecoder().decode(OllamaAPIModelsResponse.self, from: data)
             self.models = apiResponse.models.enumerated().map { (index, model) in
                 var mutableModel = model
@@ -142,13 +155,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.output = successMessage
             print("モデル取得に成功しました。合計: \(self.models.count)")
             self.apiConnectionError = false // 成功時はエラーなし
-
+            
         } catch let decodingError as DecodingError {
             self.output = NSLocalizedString("API Decode Error: ", comment: "APIデコードエラーのプレフィックス。") + decodingError.localizedDescription
             print("APIデコードエラー: \(decodingError.localizedDescription)")
             self.models = [] // デコードエラー時もモデルリストをクリア
             self.apiConnectionError = true // API接続エラーを設定
-
+            
             switch decodingError {
             case .keyNotFound(let key, let context):
                 print("DecodingError.keyNotFound: キー '\(key.stringValue)' が見つかりません。\(context.debugDescription)")
@@ -165,7 +178,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             @unknown default:
                 print("不明なDecodingError: \(decodingError.localizedDescription)")
             }
-
+            
         } catch {
             self.output = NSLocalizedString("API Request Error: ", comment: "APIリクエストエラーのプレフィックス。") + error.localizedDescription
             print("APIリクエストエラー（その他）: \(error.localizedDescription)")
@@ -173,7 +186,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.apiConnectionError = true // API接続エラーを設定
         }
     }
-
+    
     /// モデルをダウンロードします (デリゲートを使用するため async化はしませんが、UI更新は @MainActor にディスパッチします)
     func pullModel(modelName: String) {
         print("モデル \(modelName) を \(apiBaseURL) からプルを試行中")
@@ -190,17 +203,17 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.pullETARemaining = 0
         self.lastSpeedSampleTime = nil
         self.lastSpeedSampleCompleted = 0
-
+        
         guard let url = URL(string: "http://\(apiBaseURL)/api/pull") else {
             self.output = NSLocalizedString("Error: Invalid API URL for pull.", comment: "プル用API URLが無効な場合のエラーメッセージ。")
             self.isPulling = false
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: Any] = ["model": modelName, "stream": true]
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
@@ -209,30 +222,30 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.isPulling = false
             return
         }
-
+        
         pullTask?.cancel()
         pullTask = urlSession.dataTask(with: request)
         pullTask?.resume()
     }
-
+    
     /// モデルを削除します
     func deleteModel(modelName: String) async {
         print("モデル \(modelName) を \(apiBaseURL) から削除を試行中")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "モデル削除中のステータスメッセージ。"), modelName, apiBaseURL)
         self.isRunning = true
-
+        
         defer { self.isRunning = false }
-
+        
         guard let url = URL(string: "http://\(apiBaseURL)/api/delete") else {
             self.output = NSLocalizedString("Error: Invalid API URL for delete.", comment: "削除用API URLが無効な場合のエラーメッセージ。")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let body: [String: String] = ["model": modelName]
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
@@ -243,18 +256,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
-
+            
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("Delete Error: Unknown response type.", comment: "削除エラー: 不明なレスポンスタイプのエラーメッセージ。")
                 print("削除エラー: 不明なレスポンスタイプです。")
                 return
             }
-
+            
             if httpResponse.statusCode == 200 {
                 self.output = String(format: NSLocalizedString("Successfully deleted model '%@' from %@.", comment: "モデル削除成功のメッセージ。"), modelName, apiBaseURL)
                 print("モデル '\(modelName)' を \(apiBaseURL) から正常に削除しました。")
                 await self.fetchOllamaModelsFromAPI() // メインアクターで実行されるasync関数なので直接呼び出し可能です
-
+                
             } else if httpResponse.statusCode == 404 {
                 self.output = String(format: NSLocalizedString("Delete Error: Model '%@' not found (404 Not Found) on %@.", comment: "削除エラー: モデルが見つからない場合のエラーメッセージ。"), modelName, apiBaseURL)
                 print("削除エラー: モデル '\(modelName)' が \(apiBaseURL) で見つかりません（404）。")
@@ -278,7 +291,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.selectedModelCapabilities = cachedInfo.capabilities
             return cachedInfo
         }
-
+        
         print("モデル \(modelName) の詳細情報を \(apiBaseURL) から取得中...")
         
         guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
@@ -320,27 +333,27 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         } catch {
             print("APIリクエストエラー: /api/show - \(error.localizedDescription)")
             if let decodingError = error as? DecodingError {
-                 switch decodingError {
-                 case .keyNotFound(let key, let context):
-                     print("DecodingError.keyNotFound: キー '\(key.stringValue)' が見つかりません。\(context.debugDescription)")
-                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
-                 case .typeMismatch(let type, let context):
-                     print("DecodingError.typeMismatch: タイプ '\(type)' が一致しません。\(context.debugDescription)")
-                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
-                 case .valueNotFound(let type, let context):
-                     print("DecodingError.valueNotFound: タイプ '\(type)' の値が見つかりません。\(context.debugDescription)")
-                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
-                 case .dataCorrupted(let context):
-                     print("DecodingError.dataCorrupted: データが破損しています。\(context.debugDescription)")
-                     print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
-                 @unknown default:
-                     print("不明なDecodingError: \(decodingError.localizedDescription)")
-                 }
+                switch decodingError {
+                case .keyNotFound(let key, let context):
+                    print("DecodingError.keyNotFound: キー '\(key.stringValue)' が見つかりません。\(context.debugDescription)")
+                    print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                case .typeMismatch(let type, let context):
+                    print("DecodingError.typeMismatch: タイプ '\(type)' が一致しません。\(context.debugDescription)")
+                    print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                case .valueNotFound(let type, let context):
+                    print("DecodingError.valueNotFound: タイプ '\(type)' の値が見つかりません。\(context.debugDescription)")
+                    print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                case .dataCorrupted(let context):
+                    print("DecodingError.dataCorrupted: データが破損しています。\(context.debugDescription)")
+                    print("コーディングパス: \(context.codingPath.map { $0.stringValue }.joined(separator: "."))")
+                @unknown default:
+                    print("不明なDecodingError: \(decodingError.localizedDescription)")
+                }
             }
             return nil
         }
     }
-
+    
     /// 指定されたホストにOllama APIが接続可能かを確認します。
     /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
     /// - Returns: 接続に成功した場合はtrue、それ以外はfalse。
@@ -349,10 +362,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("接続確認エラー: ホスト \(host) のURLが無効です")
             return false
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD" // HEADリクエストでヘッダーのみを取得し、高速化と帯域幅の節約を図る
-
+        
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
@@ -367,7 +380,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             return false
         }
     }
-
+    
     /// Ollamaのバージョンを取得します。
     /// - Parameter host: OllamaホストのURL。
     /// - Returns: Ollamaのバージョン文字列。
@@ -375,18 +388,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         guard let url = URL(string: "http://\(host)/api/version") else {
             throw URLError(.badURL)
         }
-
+        
         let (data, _) = try await URLSession.shared.data(from: url)
         let response = try JSONDecoder().decode(OllamaVersionResponse.self, from: data)
         return response.version
     }
-
+    
     /// モデル情報キャッシュをクリアします。
     func clearModelInfoCache() {
         modelInfoCache.removeAll()
         print("モデル情報キャッシュをクリアしました。")
     }
-
+    
     /// 現在メモリにロードされているモデル数を取得します。
     func fetchRunningModelsCount(host: String? = nil) async -> Int? {
         let base = host ?? apiBaseURL
@@ -401,7 +414,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             return nil
         }
     }
-
+    
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
@@ -412,11 +425,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     continuation.finish(throwing: URLError(.badURL))
                     return
                 }
-
+                
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+                
                 do {
                     print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt), thinkingOption: \(thinkingOption)")
                     var chatOptions: ChatRequestOptions?
@@ -431,7 +444,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         chatOptions = options
                         print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1), numCtx: \(chatOptions?.numCtx ?? -1)")
                     }
-
+                    
                     var finalMessages = messages
                     if useCustomChatSettings && isSystemPromptEnabled && !systemPrompt.isEmpty {
                         // Check if a system message already exists
@@ -442,7 +455,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                             finalMessages.insert(ChatMessage(role: "system", content: systemPrompt), at: 0)
                         }
                     }
-
+                    
                     let chatRequest: ChatRequest
                     switch thinkingOption {
                     case .none:
@@ -452,7 +465,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     case .off:
                         chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: false, options: chatOptions, tools: tools)
                     }
-
+                    
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .prettyPrinted // デバッグ用に整形
                     request.httpBody = try encoder.encode(chatRequest)
@@ -461,17 +474,17 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     continuation.finish(throwing: error)
                     return
                 }
-
+                
                 let task = urlSession.dataTask(with: request)
                 self.chatContinuations[task] = (continuation: continuation, isStreaming: stream)
                 self.chatLineBuffers[task] = "" // Initialize buffer for this task
                 self.currentChatTask = task // 現在のチャットタスクを保持
-
+                
                 task.resume()
             }
         }
     }
-
+    
     /// 現在進行中のチャットストリームをキャンセルします。
     func cancelChatStreaming() {
         currentChatTask?.cancel()
@@ -480,7 +493,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     }
     // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
     // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
-
+    
     /// URLSessionDataDelegateのdidReceiveResponseメソッドです。
     /// このメソッドは、URLSessionTaskDelegateのurlSession(_:task:didReceive:completionHandler:)と名前が似ているため、
     /// Swiftコンパイラが「nearly matches optional requirement」警告を出すことがあります。
@@ -514,11 +527,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             completionHandler(.allow)
         }
     }
-
+    
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
-
+            
             if dataTask == self.pullTask {
                 // プルタスクの処理
                 if let newString = String(data: data, encoding: .utf8) {
@@ -535,17 +548,17 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 } else {
                     self.pullLineBuffer = ""
                 }
-
+                
                 for line in lines {
                     guard !line.isEmpty else { continue } // 空行はスキップします
                     guard let jsonData = line.data(using: .utf8) else {
                         print("エラー: 行をDataに変換できませんでした: \(line)")
                         continue
                     }
-
+                    
                     do {
-                         let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
-                         if !self.pullHasError { self.pullStatus = response.status }                        
+                        let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
+                        if !self.pullHasError { self.pullStatus = response.status }
                         if let total = response.total {
                             self.pullTotal = total
                         }
@@ -587,14 +600,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     } catch {
                         if let debugString = String(data: jsonData, encoding: .utf8) {
                             print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行: \(debugString)")
-                             if debugString.contains("\"error\":") || debugString.lowercased().contains("error") {
-                                 self.output = debugString
-                                 self.pullHasError = true
-                                 self.pullStatus = NSLocalizedString("Error", comment: "プルステータス: エラー。")
-                                 self.isPullingErrorHold = true
-                             }                        } else {
-                            print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行データが読み取り不能です。")
-                        }
+                            if debugString.contains("\"error\":") || debugString.lowercased().contains("error") {
+                                self.output = debugString
+                                self.pullHasError = true
+                                self.pullStatus = NSLocalizedString("Error", comment: "プルステータス: エラー。")
+                                self.isPullingErrorHold = true
+                            }                        } else {
+                                print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行データが読み取り不能です。")
+                            }
                     }
                 }
             } else if let (continuation, isStreaming) = self.chatContinuations[dataTask] {
@@ -606,22 +619,22 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         print("エラー: 受信データをUTF-8文字列としてデコードできませんでした。")
                         return
                     }
-
+                    
                     var lines = self.chatLineBuffers[dataTask, default: ""].split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-
+                    
                     if !self.chatLineBuffers[dataTask, default: ""].hasSuffix("\n") && !lines.isEmpty {
                         self.chatLineBuffers[dataTask] = lines.removeLast()
                     } else {
                         self.chatLineBuffers[dataTask] = ""
                     }
-
+                    
                     for line in lines {
                         guard !line.isEmpty else { continue }
                         guard let jsonData = line.data(using: .utf8) else {
                             print("エラー: 行をDataに変換できませんでした: \(line)")
                             continue
                         }
-
+                        
                         do {
                             let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
                             continuation.yield(chunk)
@@ -643,15 +656,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
         }
     }
-
+    
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
-
+            
             if task == self.pullTask {
                 self.pullTask = nil
                 self.pullLineBuffer = ""
-
+                
                 if let error = error {
                     if self.pullHasError || self.pullStatus == NSLocalizedString("Error", comment: "プルステータス: エラー。") || self.pullStatus == NSLocalizedString("Failed", comment: "プルステータス: 失敗。") {
                         print("保持: pullエラー状態のためオーバーレイ維持。error=\(error.localizedDescription)")
@@ -710,7 +723,7 @@ struct OllamaShowResponse: Decodable {
     let details: OllamaModelDetails?
     let model_info: [String: JSONValue]?
     let capabilities: [String]?
-
+    
 }
 
 struct OllamaPullResponse: Decodable {
