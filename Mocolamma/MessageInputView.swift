@@ -11,6 +11,15 @@ struct MessageInputView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             ZStack(alignment: .leading) {
+                #if os(iOS)
+                if #available(iOS 26, *) {
+                    Color.clear
+                        .glassEffect(in: .rect(cornerRadius: 16.0))
+                } else {
+                    VisualEffectView(material: .systemThinMaterial)
+                        .cornerRadius(16)
+                }
+                #else
                 if #available(macOS 26, *) {
                     Color.clear
                         .glassEffect(in: .rect(cornerRadius: 16.0))
@@ -18,6 +27,7 @@ struct MessageInputView: View {
                     VisualEffectView(material: .headerView, blendingMode: .withinWindow)
                         .cornerRadius(16)
                 }
+                #endif
                 TextField("Type your message...", text: $inputText, axis: .vertical)
                     .focused($isInputFocused)
                     .textFieldStyle(.plain)
@@ -37,23 +47,33 @@ struct MessageInputView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1) // 枠線を追加
                     )
                     .onKeyPress(KeyEquivalent.return) {
+                        #if os(macOS)
                         if NSEvent.modifierFlags.contains(.shift) {
                             inputText += "\n"
                             return .handled
-                        } else if isStreaming { // isSending を isStreaming に変更
-                            return .handled // 送信中はEnterキーを無効化
+                        } else if isStreaming {
+                            return .handled
                         } else {
                             sendMessage()
                             return .handled
                         }
+                        #else
+                        if isStreaming {
+                            return .handled
+                        } else {
+                            sendMessage()
+                            return .handled
+                        }
+                        #endif
                     }
             }
             .fixedSize(horizontal: false, vertical: true)
 
-            if #available(macOS 26, *) {
-                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) { // isStreaming の状態に応じてアクションを切り替え
+            #if os(iOS)
+            if #available(iOS 26, *) {
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
-                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up") // アイコンを切り替え
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                             .font(.title2)
                             .foregroundColor(.white)
                             .padding(7)
@@ -64,9 +84,9 @@ struct MessageInputView: View {
                 .buttonStyle(.plain)
                 .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
             } else {
-                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) { // isStreaming の状態に応じてアクションを切り替え
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
-                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up") // アイコンを切り替え
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                             .font(.title2)
                             .foregroundColor(.white)
                             .padding(7)
@@ -77,6 +97,35 @@ struct MessageInputView: View {
                 .buttonStyle(.plain)
                 .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
             }
+            #else
+            if #available(macOS 26, *) {
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    ZStack {
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(7)
+                            .glassEffect(.regular.tint(.accentColor).interactive())
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+            } else {
+                Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    ZStack {
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(7)
+                            .background(Circle().fill(Color.accentColor))
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+            }
+            #endif
 
         }
         .padding()

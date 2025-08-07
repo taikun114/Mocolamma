@@ -51,6 +51,7 @@ struct ChatView: View {
 
             VStack {
                 Spacer()
+                
                 ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
                     sendMessage()
                 } stopMessage: {
@@ -64,7 +65,7 @@ struct ChatView: View {
             }
         }
         .navigationTitle("Chat")
-        .navigationSubtitle(subtitle)
+        .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
         .onAppear {
             print("ChatView appeared. Models: \(executor.models.count)")
@@ -152,27 +153,45 @@ struct ChatView: View {
             }
             .disabled(executor.isRunning)
         }
+        #if os(iOS)
         ToolbarItem(placement: .primaryAction) {
-            Picker("Select Model", selection: $selectedModelID) {
-                    Text("Select Model").tag(nil as OllamaModel.ID?)
-                    Divider()
-                    if executor.models.isEmpty {
-                        Text("No models available")
-                            .tag(OllamaModel.noModelsAvailable.id as OllamaModel.ID?)
-                            .selectionDisabled()
-                    } else {
-                        ForEach(executor.models) { model in
-                            Text(model.name).tag(model.id as OllamaModel.ID?)
-                        }
+            Menu {
+                Button("Select Model") { selectedModelID = nil }
+                Divider()
+                ForEach(executor.models) { model in
+                    Button(action: { selectedModelID = model.id }) {
+                        if selectedModelID == model.id { Image(systemName: "checkmark") }
+                        Text(model.name)
                     }
                 }
-                .pickerStyle(.menu)
-                .frame(width: 150)
+            } label: {
+                Image(systemName: "tray.full")
+                    .foregroundStyle(selectedModelID == nil ? Color.primary : Color.accentColor)
+            }
         }
+        #else
+        ToolbarItem(placement: .primaryAction) {
+            Picker("Select Model", selection: $selectedModelID) {
+                Text("Select Model").tag(nil as OllamaModel.ID?)
+                Divider()
+                ForEach(executor.models) { model in
+                    Text(model.name).tag(model.id as OllamaModel.ID?)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(width: 150)
+        }
+        #endif
         
+        #if os(iOS)
+        if #available(iOS 26, *) {
+            ToolbarSpacer()
+        }
+        #elseif os(macOS)
         if #available(macOS 26, *) {
             ToolbarSpacer()
         }
+        #endif
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 messages.removeAll()
@@ -183,6 +202,13 @@ struct ChatView: View {
                 Label("New Chat", systemImage: "square.and.pencil")
             }
         }
+        #if os(iOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { showingInspector.toggle() }) {
+                Label("Inspector", systemImage: "info.circle")
+            }
+        }
+        #endif
     }
 
     private func sendMessage() {

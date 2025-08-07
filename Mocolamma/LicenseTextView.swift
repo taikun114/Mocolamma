@@ -29,18 +29,29 @@ struct LicenseTextView: View {
                 Spacer().frame(height: 60)
             }
         }
-        .frame(width: 700, height: 500) // シートの固定サイズを設定
-        .background(Color(.controlBackgroundColor)) // モーダル全体の背景色
+        #if os(macOS)
+        .frame(width: 700, height: 500)
+        #endif
+        #if os(macOS)
+        .background(Color(nsColor: .controlBackgroundColor))
+        #else
+        .background(Color(uiColor: .systemBackground))
+        #endif // モーダル全体の背景色
         .overlay(alignment: .bottom) { // 下部にオーバーレイとしてVisualEffectViewとボタンを配置
             ZStack(alignment: .center) {
                 // macOS 26以降であればglassEffect、それ以外はVisualEffectView
-                if #available(macOS 26, *) {
+                if #available(iOS 26, macOS 26, *) {
                     Color.clear
                         .glassEffect() // HistoryWindowViewに合わせたcornerRadius
                         .edgesIgnoringSafeArea(.horizontal)
                 } else {
+                    #if os(macOS)
                     VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                        .edgesIgnoringSafeArea(.horizontal) // 水平方向いっぱいに広がるようにする
+                        .edgesIgnoringSafeArea(.horizontal)
+                    #else
+                    VisualEffectView(material: .systemThinMaterial)
+                        .edgesIgnoringSafeArea(.horizontal)
+                    #endif
                 }
 
 

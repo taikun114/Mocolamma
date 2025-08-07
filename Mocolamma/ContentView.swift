@@ -32,6 +32,7 @@ struct ContentView: View {
     @State private var isSystemPromptEnabled: Bool = false
     @State private var systemPrompt: String = ""
     @State private var thinkingOption: ThinkingOption = .none
+    @State private var showingSettingsSheet: Bool = false
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -81,12 +82,15 @@ struct ContentView: View {
             contextWindowValue: $contextWindowValue, // ここを追加
             isSystemPromptEnabled: $isSystemPromptEnabled,
             systemPrompt: $systemPrompt,
-            thinkingOption: $thinkingOption
+            thinkingOption: $thinkingOption,
+            showingSettingsSheet: $showingSettingsSheet
         )
         .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
-        .sheet(isPresented: $showingAddModelsSheet) { // モデル追加シートの表示は ContentView が管理
-            // ServerFormView (旧 AddModelsSheet) に executor を渡す
+        .sheet(isPresented: $showingAddModelsSheet) {
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
+        }
+        .sheet(isPresented: $showingSettingsSheet) {
+            SettingsView()
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
             Button("Delete", role: .destructive) { // アラートの削除ボタン。
@@ -163,41 +167,48 @@ private struct MainNavigationView: View {
     @ObservedObject var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
-    @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
+    @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
     @Binding var columnVisibility: NavigationSplitViewVisibility
     let sortedModels: [OllamaModel]
-    @Binding var isChatStreamingEnabled: Bool // 新しく追加
-    @Binding var useCustomChatSettings: Bool // 新しく追加
-    @Binding var chatTemperature: Double // 新しく追加
-    @Binding var isTemperatureEnabled: Bool // 新しく追加
-    @Binding var isContextWindowEnabled: Bool // ここを追加
-    @Binding var contextWindowValue: Double // ここを追加
+    @Binding var isChatStreamingEnabled: Bool
+    @Binding var useCustomChatSettings: Bool
+    @Binding var chatTemperature: Double
+    @Binding var isTemperatureEnabled: Bool
+    @Binding var isContextWindowEnabled: Bool
+    @Binding var contextWindowValue: Double
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
             // MARK: - サイドバー (左端のカラム)
             List(selection: $sidebarSelection) {
-                // "Server" という項目を配置し、選択可能にします
-                Label("Server", systemImage: "server.rack") // アイコンをserver.rackに
+                Label("Server", systemImage: "server.rack")
                     .tag("server")
-                
-                // "Models" という項目を配置し、選択可能にします
-                Label("Models", systemImage: "tray.full") // アイコンをtray.fullに
+                Label("Models", systemImage: "tray.full")
                     .tag("models")
-
-                Label("Chat", systemImage: "message") // 新しいチャットタブ
+                Label("Chat", systemImage: "message")
                     .tag("chat")
+#if os(iOS)
+                Button {
+                    showingSettingsSheet = true
+                } label: {
+                    Label("Settings", systemImage: "gear")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+#endif
             }
             .navigationTitle("Categories") // サイドバーのタイトル
             .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
-        } detail: { // content: { から detail: { に変更し、NavigationSplitViewを2カラム構成にします
+        } detail: {
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
                 selectedModel: $selectedModel,
@@ -213,13 +224,13 @@ private struct MainNavigationView: View {
                 useCustomChatSettings: $useCustomChatSettings,
                 chatTemperature: $chatTemperature,
                 isTemperatureEnabled: $isTemperatureEnabled,
-                isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-                contextWindowValue: $contextWindowValue, // ここを追加
+                isContextWindowEnabled: $isContextWindowEnabled,
+                contextWindowValue: $contextWindowValue,
                 isSystemPromptEnabled: $isSystemPromptEnabled,
                 systemPrompt: $systemPrompt,
-                thinkingOption: $thinkingOption
-            )
-        }
+            thinkingOption: $thinkingOption,
+            showingSettingsSheet: $showingSettingsSheet
+        )        }
         // MARK: - Inspector (右端のプレビューパネル)
         // Inspectorはメインコンテンツビューに追加され、独立して開閉します
         .inspector(isPresented: $showingInspector) {
@@ -239,9 +250,9 @@ private struct MainNavigationView: View {
                 contextWindowValue: $contextWindowValue, // ここを追加
                 isSystemPromptEnabled: $isSystemPromptEnabled,
                 systemPrompt: $systemPrompt,
-                thinkingOption: $thinkingOption
-            )
-            // Inspectorのデフォルト幅を設定（必要に応じて調整）
+            thinkingOption: $thinkingOption,
+            showingSettingsSheet: $showingSettingsSheet
+        )            // Inspectorのデフォルト幅を設定（必要に応じて調整）
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
         }
         
@@ -276,6 +287,7 @@ private struct InspectorContentView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
         Group {
@@ -501,6 +513,7 @@ private struct MainContentDetailView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
         Group {

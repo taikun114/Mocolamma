@@ -1,5 +1,7 @@
 import SwiftUI
+#if os(macOS)
 import AppKit // NSPasteboard のため
+#endif
 
 // MARK: - モデル詳細ビュー
 
@@ -148,11 +150,14 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.model) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                Button("Copy") {
+                                 Button("Copy") {
+                                    #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.model, forType: .string)
-                                }
-                            }
+                                    #else
+                                    UIPasteboard.general.string = model.model
+                                    #endif
+                                }                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Size:") // サイズ。
@@ -163,11 +168,14 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(sizeTooltipText) // 読みやすいサイズ + フルサイズ表記をツールチップに表示
                             .contextMenu {
-                                Button("Copy") {
+                                 Button("Copy") {
+                                    #if os(macOS)
                                     NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(fullSizeText, forType: .string) // フルサイズ表記のみをコピー
-                                }
-                            }
+                                    NSPasteboard.general.setString(fullSizeText, forType: .string)
+                                    #else
+                                    UIPasteboard.general.string = fullSizeText
+                                    #endif
+                                }                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Modified At:") // 変更日。
@@ -178,11 +186,14 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                Button("Copy") {
+                                 Button("Copy") {
+                                    #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
-                                }
-                            }
+                                    #else
+                                    UIPasteboard.general.string = model.formattedModifiedAt
+                                    #endif
+                                }                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Digest:") // ダイジェスト。
@@ -193,11 +204,14 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.digest) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                Button("Copy") {
+                                 Button("Copy") {
+                                    #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.digest, forType: .string)
-                                }
-                            }
+                                    #else
+                                    UIPasteboard.general.string = model.digest
+                                    #endif
+                                }                            }
                     }
                 }
                 .font(.body) // ラベルのフォントサイズは維持
@@ -221,11 +235,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parentModel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parentModel, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = parentModel
+                                            #endif
+                                        }                                    }
                             }
                         }
                         if let format = details.format {
@@ -238,11 +255,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(format) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(format, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = format
+                                            #endif
+                                        }                                    }
                             }
                         }
                         if let family = details.family {
@@ -255,11 +275,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(family) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(family, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = family
+                                            #endif
+                                        }                                    }
                             }
                         }
                         if let families = details.families, !families.isEmpty {
@@ -273,11 +296,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(familiesText) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(familiesText, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = familiesText
+                                            #endif
+                                        }                                    }
                             }
                         }
                         if let parameterSize = details.parameter_size {
@@ -290,11 +316,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parameterSize) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parameterSize, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = parameterSize
+                                            #endif
+                                        }                                    }
                             }
                         }
                         if let quantizationLevel = details.quantization_level {
@@ -307,11 +336,14 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(quantizationLevel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(quantizationLevel, forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = quantizationLevel
+                                            #endif
+                                        }                                    }
                             }
                         }
                     }
@@ -364,11 +396,14 @@ struct ModelInspectorView: View {
                                 Text(count.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(count.raw), forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = String(count.raw)
+                                            #endif
+                                        }                                    }
                             }
                         }
                         // コンテキストレングス
@@ -378,11 +413,14 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = String(length.raw)
+                                            #endif
+                                        }                                    }
                             }
                         }
                         // エンベディング長
@@ -392,11 +430,14 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                        Button("Copy") {
+                                         Button("Copy") {
+                                            #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)
-                                        }
-                                    }
+                                            #else
+                                            UIPasteboard.general.string = String(length.raw)
+                                            #endif
+                                        }                                    }
                             }
                         }
                         

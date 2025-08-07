@@ -1,5 +1,7 @@
 import SwiftUI
+#if os(macOS)
 import AppKit // NSPasteboard のため
+#endif
 
 // MARK: - モデルリストビュー
 
@@ -47,6 +49,26 @@ struct ModelListView: View {
     }
     
     var body: some View {        VStack {
+            #if os(iOS)
+            Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
+                TableColumn("No.", value: \.originalIndex) { model in
+                    Text("\(model.originalIndex + 1)")
+                }
+                .width(min: 30, ideal: 50, max: .infinity)
+                TableColumn("Name", value: \.name) { model in
+                    Text(model.name)
+                }
+                .width(min: 100, ideal: 200, max: .infinity)
+                TableColumn("Size", value: \.comparableSize) { model in
+                    Text(model.formattedSize)
+                }
+                .width(min: 50, ideal: 100, max: .infinity)
+                TableColumn("Modified At", value: \.comparableModifiedDate) { model in
+                    Text(model.formattedModifiedAt)
+                }
+                .width(min: 100, ideal: 150, max: .infinity)
+            }
+            #else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
@@ -74,31 +96,32 @@ struct ModelListView: View {
             }
             // Tableレベルでコンテキストメニューを設定
             .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
-                // 選択されたモデルIDから最初のモデルを取得
                 if let selectedID = selectedIDs.first,
                    let model = sortedModels.first(where: { $0.id == selectedID }) {
-                    Button("Copy Model Name") { // コンテキストメニューのアクション：モデル名をコピーします。
+                    Button("Copy Model Name") {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.name, forType: .string)
                     }
-                    Button("Delete...", role: .destructive) { // コンテキストメニューのアクション：モデルを削除します。
+                    Button("Delete...", role: .destructive) {
                         modelToDelete = model
                         showingDeleteConfirmation = true
                     }
                 }
             }
-            .overlay {
-                if executor.apiConnectionError { // API接続エラーの場合
+            #endif
+            Group {} // keep modifier chain valid
+            .overlay(alignment: .center) {
+                if executor.apiConnectionError {
                     ContentUnavailableView(
-                        "Connection Failed", // 接続失敗のタイトル。
+                        "Connection Failed",
                         systemImage: "network.slash",
-                        description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.") // 接続失敗の説明。
+                        description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
                     )
-                } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling { // pull中も表示されないように条件追加
+                } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
                     ContentUnavailableView(
-                        "No Models Available", // 利用可能なモデルなしのタイトル。
+                        "No Models Available",
                         systemImage: "internaldrive.fill",
-                        description: Text("No models are currently installed. Click '+' to add a new model.") // 利用可能なモデルなしの説明。
+                        description: Text("No models are currently installed. Click '+' to add a new model.")
                     )
                 } else if executor.isRunning {
                     ProgressView()
@@ -142,7 +165,7 @@ struct ModelListView: View {
              }            // コマンド実行の出力表示 (TextEditorは削除されました)
         }
         .navigationTitle("Models")
-        .navigationSubtitle(subtitle)
+        .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
 
         .toolbar { // ここで全てのToolbarItemをまとめます
             // MARK: - Reload Button (Primary Action, before Add New)
@@ -175,10 +198,17 @@ struct ModelListView: View {
                 Button(action: {
                     showingAddSheet = true
                 }) {
-                    Label("Add New", systemImage: "plus") // ツールバーボタン：新しいモデルを追加します。
+                    Label("Add New", systemImage: "plus")
                 }
                 .disabled(executor.isRunning || executor.isPulling)
             }
+#if os(iOS)
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { onTogglePreview() }) {
+                    Label("Inspector", systemImage: "info.circle")
+                }
+            }
+#endif
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .onAppear {

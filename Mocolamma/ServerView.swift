@@ -37,7 +37,7 @@ struct ServerView: View {
                 serverToDelete: $serverToDelete
             )
             .navigationTitle("Servers")
-            .navigationSubtitle(subtitle)
+            .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
  // ナビゲーションタイトル
             .overlay {
                 if serverManager.servers.isEmpty {
@@ -62,6 +62,11 @@ struct ServerView: View {
                     }) {
                         Label("Add Server", systemImage: "plus")
                     }
+                    #if os(iOS)
+                    Button(action: { onTogglePreview() }) {
+                        Label("Inspector", systemImage: "info.circle")
+                    }
+                    #endif
                 }
             }
         }
@@ -165,15 +170,25 @@ private struct ServerListViewContent: View {
                     serverToDelete: $serverToDelete,
                     isSelected: server.id == serverManager.selectedServerID
                 )
+#if os(iOS)
+                .onTapGesture(count: 1) {
+                    listSelection = server.id
+                }
+                .onTapGesture(count: 2) {
+                    serverManager.selectedServerID = server.id
+                    listSelection = server.id
+                }
+#endif
             }
             .onMove(perform: serverManager.moveServer)
         }
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
             if let selectedID = selectedIDs.first {
                 serverManager.selectedServerID = selectedID
-                listSelection = selectedID // リストのハイライトも連動させる
+                listSelection = selectedID
             }
         }
+
     }
 }
 
@@ -192,6 +207,15 @@ private struct ServerRowContent: View {
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
+#if os(iOS)
+        .simultaneousGesture(TapGesture(count: 2).onEnded { _ in
+            serverManager.selectedServerID = server.id
+            listSelection = server.id
+        })
+        .highPriorityGesture(TapGesture(count: 1).onEnded { _ in
+            listSelection = server.id
+        })
+#endif
         .contextMenu { // 右クリックコンテキストメニュー
             // コンテキストメニューの先頭に「Select」オプションを追加
             Button("Select") {

@@ -17,6 +17,7 @@ struct MocolammaApp: App {
             // ContentViewにServerManagerのインスタンスを渡します
             ContentView(serverManager: serverManager)
         }
+        #if os(macOS)
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
         .commandsReplaced(content: {
@@ -26,7 +27,9 @@ struct MocolammaApp: App {
                  }
             })
         })
+        #endif
 
+        #if os(macOS)
         Settings {
             SettingsView()
         }
@@ -36,5 +39,6 @@ struct MocolammaApp: App {
         }
         .defaultSize(width: 500, height: 600)
         .windowResizability(.contentSize)
+        #endif
     }
 }

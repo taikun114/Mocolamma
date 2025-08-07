@@ -1,6 +1,7 @@
 import SwiftUI
-import AppKit
 
+#if os(macOS)
+import AppKit
 struct VisualEffectView: NSViewRepresentable {
     var material: NSVisualEffectView.Material
     var blendingMode: NSVisualEffectView.BlendingMode
@@ -18,3 +19,19 @@ struct VisualEffectView: NSViewRepresentable {
         nsView.blendingMode = blendingMode
     }
 }
+#else
+import UIKit
+struct VisualEffectView: UIViewRepresentable {
+    var material: UIBlurEffect.Style
+
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        let effect = UIBlurEffect(style: material)
+        let view = UIVisualEffectView(effect: effect)
+        return view
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: material)
+    }
+}
+#endif

@@ -307,10 +307,28 @@ struct LicenseInfoModalView: View {
                 Spacer().frame(height: 60)
             }
         }
+        #if os(macOS)
         .frame(width: 650, height: 450)
-        .background(Color(.controlBackgroundColor))
+        #endif
+        .background({
+#if os(macOS)
+    Color(nsColor: .controlBackgroundColor)
+#else
+    Color(uiColor: .systemBackground)
+#endif
+}())
         .overlay(alignment: .bottom) {
             ZStack(alignment: .center) {
+                #if os(iOS)
+                if #available(iOS 26, *) {
+                    Color.clear
+                        .glassEffect()
+                        .edgesIgnoringSafeArea(.horizontal)
+                } else {
+                    VisualEffectView(material: .systemThinMaterial)
+                        .edgesIgnoringSafeArea(.horizontal)
+                }
+                #else
                 if #available(macOS 26, *) {
                     Color.clear
                         .glassEffect()
@@ -319,6 +337,7 @@ struct LicenseInfoModalView: View {
                     VisualEffectView(material: .headerView, blendingMode: .withinWindow)
                         .edgesIgnoringSafeArea(.horizontal)
                 }
+                #endif
                 HStack {
                     Spacer()
                     Button("Close") { dismiss() }

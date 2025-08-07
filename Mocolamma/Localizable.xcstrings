@@ -1846,6 +1846,9 @@
         }
       }
     },
+    "Inspector" : {
+
+    },
     "Launch at Login" : {
       "localizations" : {
         "en" : {
@@ -3100,6 +3103,9 @@
           }
         }
       }
+    },
+    "Settings" : {
+
     },
     "Show license information for this application and the libraries used." : {
       "localizations" : {

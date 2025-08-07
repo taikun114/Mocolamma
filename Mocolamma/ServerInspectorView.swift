@@ -1,5 +1,7 @@
 import SwiftUI
+#if os(macOS)
 import AppKit // For NSPasteboard
+#endif
 
 struct ServerInspectorView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
@@ -54,13 +56,16 @@ struct ServerInspectorView: View {
                         .truncationMode(.tail)
                         .help(server.host)
                         .foregroundColor(.primary)
-                        .contextMenu {
+                             .contextMenu {
                             Button("Copy") {
+                                #if os(macOS)
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(server.host, forType: .string)
+                                #else
+                                UIPasteboard.general.string = server.host
+                                #endif
                             }
-                        }
-                }
+                        }                }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollama Version information
@@ -72,13 +77,16 @@ struct ServerInspectorView: View {
                             .font(.title3)
                             .bold()
                             .foregroundColor(.primary)
-                            .contextMenu {
+                             .contextMenu {
                                 Button("Copy") {
+                                    #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
+                                    #else
+                                    UIPasteboard.general.string = ollamaVersion ?? "-"
+                                    #endif
                                 }
-                            }
-                    }
+                            }                    }
                     VStack(alignment: .leading) {
                         Text("Running Models:")
                             .font(.subheadline)

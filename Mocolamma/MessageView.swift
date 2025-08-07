@@ -34,52 +34,90 @@ struct MessageView: View {
             }
             .id(pairedAssistantStreaming)
             
-            HStack {
-                if message.role == "user" {
-                    Spacer()
-                }
-                Text(dateString)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-
-                if message.role == "assistant" {
-                    tokenAndSpeed
-                }
-
-                if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
-                    revisionNavigator
-                }
-
-                if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
-                    retryButton
-                }
-
-                if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
-                    copyButton
-                }
-
-                if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
-                    if isEditing {
-                        cancelButton
-                        doneButton
-                    } else {
-                        editButton
+            #if os(iOS)
+            Spacer().frame(height: 8)
+            #endif
+            Group {
+                #if os(iOS)
+                VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
+                    HStack {
+                        if message.role == "user" { Spacer() }
+                        Text(dateString)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        if message.role == "assistant" { tokenAndSpeed }
+                        if message.role == "assistant" { Spacer() }
+                    }
+                    HStack(spacing: 6) {
+                        if message.role == "user" { Spacer() }
+                        if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
+                        if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) { retryButton }
+                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                            if isEditing { cancelButton; doneButton } else { editButton }
+                        }
+                        if message.role == "assistant" { Spacer() }
                     }
                 }
+                #else
+                HStack {
+                    if message.role == "user" {
+                        Spacer()
+                    }
+                    Text(dateString)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
 
-                if message.role == "assistant" {
-                    Spacer()
+                    if message.role == "assistant" {
+                        tokenAndSpeed
+                    }
+
+                    if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
+                        revisionNavigator
+                    }
+
+                    if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
+                        retryButton
+                    }
+
+                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
+                        copyButton
+                    }
+
+                    if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                        if isEditing {
+                            cancelButton
+                            doneButton
+                        } else {
+                            editButton
+                        }
+                    }
+
+                    if message.role == "assistant" {
+                        Spacer()
+                    }
                 }
+                #endif
             }
-            .opacity(isHovering && (!message.isStreaming || message.isStopped) ? 1.0 : 0.0)
+            #if os(macOS)
+            .opacity((isHovering && (!message.isStreaming || message.isStopped)) ? 1.0 : 0.0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
+            #else
+            .opacity(1.0)
+            #endif
             .onChange(of: pairedAssistantStreaming) { _, _ in withAnimation { } }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
+        #if os(macOS)
         .padding(message.role == "user" ? .leading : .trailing, 64)
+        #else
+        .padding(message.role == "user" ? .leading : .trailing, 0)
+        #endif
         .contentShape(Rectangle())
-        .onHover { isHovering = $0 }
-        .onAppear { recomputePairedAssistantStreaming() }
+         #if os(macOS)
+         .onHover { isHovering = $0 }
+         #endif
+         .onAppear { recomputePairedAssistantStreaming() }
         .onChange(of: allMessages.last?.isStreaming == true) { _, _ in recomputePairedAssistantStreaming() }
         .onChange(of: message.isStreaming) { _, _ in recomputePairedAssistantStreaming() }
         .onChange(of: isEditing) { _, _ in recomputePairedAssistantStreaming() }
@@ -147,8 +185,12 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        #if os(iOS)
+        .font(.body)
+        #else
         .font(.caption2)
-        .buttonStyle(.link)
+        #endif
+        .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Previous Revision")
         .disabled(message.currentRevisionIndex == 0)
@@ -190,8 +232,12 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        #if os(iOS)
+        .font(.body)
+        #else
         .font(.caption2)
-        .buttonStyle(.link)
+        #endif
+        .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Next Revision")
         .disabled(message.currentRevisionIndex == message.revisions.count)
@@ -206,8 +252,12 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        #if os(iOS)
+        .font(.body)
+        #else
         .font(.caption2)
-        .buttonStyle(.link)
+        #endif
+        .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Retry")
     }
@@ -215,6 +265,7 @@ struct MessageView: View {
     @ViewBuilder
     private var copyButton: some View {
         Button(action: {
+            #if os(macOS)
             let pasteboard = NSPasteboard.general
             pasteboard.clearContents()
             var contentToCopy = message.content
@@ -222,13 +273,24 @@ struct MessageView: View {
                 contentToCopy = "<think>\(thinking)</think>\n" + message.content
             }
             pasteboard.setString(contentToCopy, forType: .string)
+            #else
+            var contentToCopy = message.content
+            if let thinking = message.thinking, !thinking.isEmpty {
+                contentToCopy = "<think>\(thinking)</think>\n" + message.content
+            }
+            UIPasteboard.general.string = contentToCopy
+            #endif
         }) {
             Image(systemName: "document.on.document")
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        #if os(iOS)
+        .font(.body)
+        #else
         .font(.caption2)
-        .buttonStyle(.link)
+        #endif
+        .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Copy")
     }
@@ -244,8 +306,12 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        #if os(iOS)
+        .font(.body)
+        #else
         .font(.caption2)
-        .buttonStyle(.link)
+        #endif
+        .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Edit")
     }
@@ -257,10 +323,14 @@ struct MessageView: View {
             message.content = message.fixedContent
         }) {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
+                #if os(iOS)
+                .font(.body)
+                #else
                 .font(.caption2)
+                #endif
                 .bold()
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
                 .background(Capsule().fill(Color.gray.opacity(0.2)))
                 .foregroundColor(.secondary)
         }
@@ -278,10 +348,14 @@ struct MessageView: View {
             onRetry?(message.id, message)
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
+                #if os(iOS)
+                .font(.body)
+                #else
                 .font(.caption2)
+                #endif
                 .bold()
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
                 .background(Capsule().fill(Color.accentColor.opacity(0.2)))
                 .foregroundColor(.accentColor)
         }
@@ -310,25 +384,32 @@ struct MessageView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(.background.secondary.opacity(0.7))
-                    .cornerRadius(8)
-                    .onKeyPress(KeyEquivalent.return) {
-                        if NSEvent.modifierFlags.contains(.command) {
-                            Task { @MainActor in
-                                isEditing = false
-                                message.fixedContent = message.content
-                                message.pendingContent = ""
-                                onRetry?(message.id, message)
-                            }
-                            return .handled
-                        } else {
-                            Task { @MainActor in
-                                message.content += "\n"
-                            }
-                            return .handled
-                        }
-                    }
-            }
-        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+                     .cornerRadius(8)
+                     .onKeyPress(KeyEquivalent.return) {
+                         #if os(macOS)
+                         if NSEvent.modifierFlags.contains(.command) {
+                             Task { @MainActor in
+                                 isEditing = false
+                                 message.fixedContent = message.content
+                                 message.pendingContent = ""
+                                 onRetry?(message.id, message)
+                             }
+                             return .handled
+                         } else {
+                             Task { @MainActor in
+                                 message.content += "\n"
+                             }
+                             return .handled
+                         }
+                         #else
+                         Task { @MainActor in
+                             message.content += "\n"
+                         }
+                         return .handled
+                         #endif
+                     }
+             }
+         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {

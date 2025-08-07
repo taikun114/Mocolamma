@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" initialViewController="LAUNCH-VC">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <scene sceneID="LAUNCH-SCENE">
+            <objects>
+                <viewController storyboardIdentifier="LaunchScreen" id="LAUNCH-VC" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="LAUNCH-VIEW">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="AppIcon512" translatesAutoresizingMaskIntoConstraints="NO" id="ICON">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="160" id="ICON-W"/>
+                                    <constraint firstAttribute="height" constant="160" id="ICON-H"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="ICON" firstAttribute="centerX" secondItem="LAUNCH-VIEW" secondAttribute="centerX" id="ICON-CX"/>
+                            <constraint firstItem="ICON" firstAttribute="centerY" secondItem="LAUNCH-VIEW" secondAttribute="centerY" id="ICON-CY"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="SAFE"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="FIRST" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="AppIcon512" width="512" height="512"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

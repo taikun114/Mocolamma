@@ -1,9 +1,12 @@
 import SwiftUI
+#if os(macOS)
 import AppKit
+#endif
 import Foundation
 
-struct AboutView: View {
-    @Environment(\.colorScheme) var colorScheme
+ struct AboutView: View {
+         @Environment(\.colorScheme) var colorScheme
+     @Environment(\.openURL) var openURL
 
     private var isMacOS26OrLater: Bool {
         let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
@@ -23,6 +26,7 @@ struct AboutView: View {
         Form {
             Section(header: Text("About Mocolamma").font(.headline)) {
                 HStack(alignment: .top, spacing: 20) {
+                    #if os(macOS)
                     if isMacOS26OrLater {
                         Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
                             .resizable()
@@ -40,6 +44,15 @@ struct AboutView: View {
                             .padding(.leading, 0)
                             .padding(.trailing, -10)
                     }
+                    #else
+                    Image("AppIcon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 96, height: 96)
+                        .padding(.vertical, 10)
+                        .padding(.leading, 10)
+                        .id(colorScheme)
+                    #endif
 
                     VStack(alignment: .leading) {
                         Spacer()
@@ -97,7 +110,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingContributorsAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/taikun114/Mocolamma/graphs/contributors") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -122,7 +135,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingBugReportAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/taikun114/Mocolamma/issues") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -158,7 +171,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingCommunityAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/taikun114/Mocolamma/discussions") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -189,7 +202,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingGitHubStarAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/taikun114/Mocolamma") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -218,7 +231,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingBuyMeACoffeeAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://www.buymeacoffee.com/i_am_taikun") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -247,7 +260,7 @@ struct AboutView: View {
                     .alert("Open Link?", isPresented: $showingPayPalAlert) {
                         Button("Open") {
                             if let url = URL(string: "https://paypal.me/taikun114") {
-                                _ = NSWorkspace.shared.open(url)
+                                openURL(url)
                             }
                         }
                         Button("Cancel", role: .cancel) {}
@@ -261,7 +274,7 @@ struct AboutView: View {
         .alert("Open the Send Email window?", isPresented: $showingFeedbackMailAlert) {
             Button("Open") {
                 if let url = URL(string: "mailto:contact.taikun@gmail.com?subject=\(formattedFeedbackSubject())&body=\(formattedFeedbackBody())") {
-                    _ = NSWorkspace.shared.open(url)
+                    openURL(url)
                 }
             }
             Button("Cancel", role: .cancel) {}

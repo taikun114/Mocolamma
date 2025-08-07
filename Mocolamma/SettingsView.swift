@@ -1,6 +1,10 @@
 import SwiftUI
+#if os(macOS)
 import ServiceManagement
+#endif
+#if os(macOS)
 import AppKit
+#endif
 import Network
 
 struct SettingsView: View {
@@ -11,10 +15,12 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section("General") {
+                #if os(macOS)
                 Toggle("Launch at Login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, newValue in
                         LoginItemManager.shared.setEnabled(newValue)
                     }
+                #endif
                 HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("API Timeout")
@@ -74,14 +80,19 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
+        #if os(macOS)
         .frame(width: 400, height: 400)
+        #endif
         .onAppear {
+            #if os(macOS)
             launchAtLogin = LoginItemManager.shared.isEnabled
+            #endif
             apiTimeoutSelection = APITimeoutManager.shared.currentOption
             localNetworkChecker.refresh()
         }
     }
 }
+#if os(macOS)
 final class LoginItemManager {
     static let shared = LoginItemManager()
     private init() {}
@@ -104,6 +115,7 @@ final class LoginItemManager {
         }
     }
 }
+#endif
 
 final class LocalNetworkPermissionChecker: ObservableObject {
     @Published var isAllowed: Bool = false
@@ -118,9 +130,11 @@ final class LocalNetworkPermissionChecker: ObservableObject {
     }
     
     func openSystemPreferences() {
+        #if os(macOS)
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
             NSWorkspace.shared.open(url)
         }
+        #endif
     }
 }
 
