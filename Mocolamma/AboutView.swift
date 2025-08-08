@@ -4,11 +4,16 @@ import AppKit
 #endif
 import Foundation
 
- struct AboutView: View {
-         @Environment(\.colorScheme) var colorScheme
-     @Environment(\.openURL) var openURL
+struct AboutView: View {
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.openURL) var openURL
 
     private var isMacOS26OrLater: Bool {
+        if #available(macOS 15.0, *) {
+            // macOS 15.0 and later
+            // We can use a more modern API if needed in the future.
+        }
         let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
         return majorVersion >= 26
     }
@@ -23,6 +28,26 @@ import Foundation
     @State private var showingLicenseInfoModal = false
 
     var body: some View {
+        #if os(macOS)
+        aboutViewContent
+            .frame(width: 550, height: 600)
+        #else
+        NavigationView {
+            aboutViewContent
+                .navigationTitle("About Mocolamma")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                        }
+                    }
+                }
+        }
+        #endif
+    }
+
+    private var aboutViewContent: some View {
         Form {
             Section(header: Text("About Mocolamma").font(.headline)) {
                 HStack(alignment: .top, spacing: 20) {
@@ -281,7 +306,6 @@ import Foundation
         } message: {
             Text("Are you sure you want to open the send feedback email window?")
         }
-        .frame(width: 550, height: 600)
     }
 
     private func formattedFeedbackSubject() -> String {

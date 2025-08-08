@@ -8,87 +8,146 @@ import AppKit
 import Network
 
 struct SettingsView: View {
+    @Environment(\.dismiss) private var dismissSheet
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @State private var showingAbout: Bool = false
     
     var body: some View {
+        #if os(iOS)
+        NavigationView {
+            Form {
+                content
+            }
+            .formStyle(.grouped)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { dismissSheet() }) {
+                        Image(systemName: "xmark")
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showingAbout = true }) {
+                        Image(systemName: "info.circle")
+                    }
+                    .sheet(isPresented: $showingAbout) {
+                        AboutView()
+                    }
+                }
+            }
+            .onAppear {
+                apiTimeoutSelection = APITimeoutManager.shared.currentOption
+                localNetworkChecker.refresh()
+            }
+        }
+        #else
         Form {
-            Section("General") {
-                #if os(macOS)
-                Toggle("Launch at Login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, newValue in
-                        LoginItemManager.shared.setEnabled(newValue)
-                    }
-                #endif
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("API Timeout")
-                        Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Picker("", selection: $apiTimeoutSelection) {
-                        Text("30 sec").tag(APITimeoutOption.seconds30)
-                        Text("1 min").tag(APITimeoutOption.minutes1)
-                        Text("5 min").tag(APITimeoutOption.minutes5)
-                        Text("Unlimited").tag(APITimeoutOption.unlimited)
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .onChange(of: apiTimeoutSelection) { _, newValue in
-                        APITimeoutManager.shared.set(option: newValue)
-                    }
-                }             }
-            
-            Section("Permissions") {
-                HStack {
+            content
+        }
+        .formStyle(.grouped)
+        .frame(width: 400, height: 400)
+        .onAppear {
+            launchAtLogin = LoginItemManager.shared.isEnabled
+            apiTimeoutSelection = APITimeoutManager.shared.currentOption
+            localNetworkChecker.refresh()
+        }
+        #endif
+    }
+    
+    @ViewBuilder
+    private var content: some View {
+        Section("General") {
+            #if os(macOS)
+            Toggle("Launch at Login", isOn: $launchAtLogin)
+                .onChange(of: launchAtLogin) { _, newValue in
+                    LoginItemManager.shared.setEnabled(newValue)
+                }
+            #endif
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Timeout")
+                    Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Picker("", selection: $apiTimeoutSelection) {
+                    Text("30 sec").tag(APITimeoutOption.seconds30)
+                    Text("1 min").tag(APITimeoutOption.minutes1)
+                    Text("5 min").tag(APITimeoutOption.minutes5)
+                    Text("Unlimited").tag(APITimeoutOption.unlimited)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .onChange(of: apiTimeoutSelection) { _, newValue in
+                    APITimeoutManager.shared.set(option: newValue)
+                }
+            }
+        }
+        
+        Section("Permissions") {
+            #if os(iOS)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
                     Circle()
                         .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
                         .frame(width: 10, height: 10)
-                    
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Local Network Access")
                         Text("Permission is required to connect to Ollama servers on the same network.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
-                    
-                    Button(action: {
-                        localNetworkChecker.refresh()
-                    }) {
+                    Button(action: { localNetworkChecker.refresh() }) {
                         Image(systemName: "arrow.clockwise")
                     }
                     .buttonStyle(.borderless)
                     .help("Refresh status")
-                    
-                    Button(action: {
-                        localNetworkChecker.openSystemPreferences()
-                    }) {
-                        HStack {
-                            Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
-                            Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(localNetworkChecker.isAllowed)
-                    .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                    HStack {
+                        Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                        Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .disabled(localNetworkChecker.isAllowed)
+                .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
             }
-        }
-        .formStyle(.grouped)
-        #if os(macOS)
-        .frame(width: 400, height: 400)
-        #endif
-        .onAppear {
-            #if os(macOS)
-            launchAtLogin = LoginItemManager.shared.isEnabled
+            .padding(.vertical, 6)
+            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+            #else
+            HStack {
+                Circle()
+                    .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                    .frame(width: 10, height: 10)
+                VStack(alignment: .leading) {
+                    Text("Local Network Access")
+                    Text("Permission is required to connect to Ollama servers on the same network.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
+                .buttonStyle(.borderless)
+                .help("Refresh status")
+                Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                    HStack {
+                        Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                        Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(localNetworkChecker.isAllowed)
+                .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             #endif
-            apiTimeoutSelection = APITimeoutManager.shared.currentOption
-            localNetworkChecker.refresh()
         }
     }
 }

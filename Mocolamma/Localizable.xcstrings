@@ -734,22 +734,6 @@
         }
       }
     },
-    "Categories" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Categories"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カテゴリ"
-          }
-        }
-      }
-    },
     "Chat" : {
       "localizations" : {
         "en" : {
@@ -1847,7 +1831,20 @@
       }
     },
     "Inspector" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspector"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インスペクタ"
+          }
+        }
+      }
     },
     "Launch at Login" : {
       "localizations" : {
@@ -1963,6 +1960,22 @@
     },
     "MarkdownUI by Guillermo Gonzalez" : {
       "shouldTranslate" : false
+    },
+    "Menu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニュー"
+          }
+        }
+      }
     },
     "Mocolamma" : {
       "shouldTranslate" : false
@@ -3105,7 +3118,20 @@
       }
     },
     "Settings" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
     },
     "Show license information for this application and the libraries used." : {
       "localizations" : {

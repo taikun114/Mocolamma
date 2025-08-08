@@ -206,7 +206,7 @@ private struct MainNavigationView: View {
                 .buttonStyle(.plain)
 #endif
             }
-            .navigationTitle("Categories") // サイドバーのタイトル
+            .navigationTitle("Menu") // サイドバーのタイトル
             .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
         } detail: {
             MainContentDetailView(
