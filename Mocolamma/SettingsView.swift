@@ -119,8 +119,6 @@ struct SettingsView: View {
                 .disabled(localNetworkChecker.isAllowed)
                 .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
             }
-            .padding(.vertical, 6)
-            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             #else
             HStack {
                 Circle()
