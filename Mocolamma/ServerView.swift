@@ -34,7 +34,8 @@ struct ServerView: View {
                 listSelection: $listSelection,
                 serverToEdit: $serverToEdit,
                 showingDeleteConfirmationServer: $showingDeleteConfirmationServer,
-                serverToDelete: $serverToDelete
+                serverToDelete: $serverToDelete,
+                onRefresh: checkAllServerConnectivity
             )
             .navigationTitle("Servers")
             .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
@@ -52,11 +53,13 @@ struct ServerView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 HStack(spacing: 8) {
+                    #if os(macOS)
                     Button(action: {
                         checkAllServerConnectivity()
                     }) {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     }
+#endif
                     Button(action: {
                         showingAddServerSheet = true
                     }) {
@@ -157,6 +160,7 @@ private struct ServerListViewContent: View {
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
+    let onRefresh: () -> Void
 
     var body: some View {
         List(selection: $listSelection) {
@@ -188,6 +192,11 @@ private struct ServerListViewContent: View {
                 listSelection = selectedID
             }
         }
+#if os(iOS)
+        .refreshable {
+            onRefresh()
+        }
+#endif
 
     }
 }

@@ -68,6 +68,24 @@ struct ModelListView: View {
                 }
                 .width(min: 100, ideal: 150, max: .infinity)
             }
+            .refreshable {
+                executor.isPullingErrorHold = false
+                executor.pullHasError = false
+                executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
+                executor.clearModelInfoCache()
+                let previousSelection = selectedModel
+                let selectedServerID = serverManager.selectedServerID
+                selectedModel = nil
+                await executor.fetchOllamaModelsFromAPI()
+                if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
+                await MainActor.run {
+                    serverManager.inspectorRefreshToken = UUID()
+                    NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                }
+                if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                    selectedModel = prev
+                }
+            }
             #else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 // 「番号」列: 最小30、理想50、最大無制限
@@ -168,6 +186,7 @@ struct ModelListView: View {
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
 
         .toolbar { // ここで全てのToolbarItemをまとめます
+            #if os(macOS)
             // MARK: - Reload Button (Primary Action, before Add New)
             ToolbarItem(placement: .primaryAction) { // primaryActionに配置
                  Button(action: {
@@ -193,6 +212,7 @@ struct ModelListView: View {
                 }
                 .disabled(executor.isRunning || executor.isPulling)
             }
+#endif
             // MARK: - Add Model Button (Primary Action)
             ToolbarItem(placement: .primaryAction) {
                 Button(action: {
