@@ -187,10 +187,12 @@ private struct ServerListViewContent: View {
             .onMove(perform: serverManager.moveServer)
         }
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
+#if os(macOS)
             if let selectedID = selectedIDs.first {
                 serverManager.selectedServerID = selectedID
                 listSelection = selectedID
             }
+#endif
         }
 #if os(iOS)
         .refreshable {
@@ -217,6 +219,7 @@ private struct ServerRowContent: View {
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
 #if os(iOS)
+        .contentShape(Rectangle())
         .simultaneousGesture(TapGesture(count: 2).onEnded { _ in
             serverManager.selectedServerID = server.id
             listSelection = server.id
