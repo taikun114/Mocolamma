@@ -224,9 +224,6 @@ private struct ServerRowContent: View {
             serverManager.selectedServerID = server.id
             listSelection = server.id
         })
-        .highPriorityGesture(TapGesture(count: 1).onEnded { _ in
-            listSelection = server.id
-        })
 #endif
         .contextMenu { // 右クリックコンテキストメニュー
             // コンテキストメニューの先頭に「Select」オプションを追加
