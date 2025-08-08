@@ -438,6 +438,7 @@ private struct InspectorContentView: View {
                 }
             }
         }
+        #if os(macOS)
         // InspectorContentViewにツールバーを追加
         .toolbar {
             Spacer()
@@ -451,6 +452,7 @@ private struct InspectorContentView: View {
             }
             .help("Toggle Inspector") // ツールチップ
         }
+        #endif
     }
         
 
