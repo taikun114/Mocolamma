@@ -227,18 +227,25 @@ private struct ServerRowContent: View {
 #endif
         .contextMenu { // 右クリックコンテキストメニュー
             // コンテキストメニューの先頭に「Select」オプションを追加
-            Button("Select") {
+            Button("Select", systemImage: "checkmark.circle") {
                 serverManager.selectedServerID = server.id
                 listSelection = server.id // リストのハイライトも連動させる
             }
+            .labelStyle(.titleAndIcon)
+            .buttonStyle(.plain)
 
-            Button("Edit...") { // 編集ボタン
+            Button("Edit...", systemImage: "pencil") { // 編集ボタン
                 serverToEdit = server // シート表示のためにアイテムを設定
             }
-            Button("Delete...", role: .destructive) { // 削除ボタン
+            .labelStyle(.titleAndIcon)
+            .buttonStyle(.plain)
+
+            Button("Delete...", systemImage: "trash", role: .destructive) { // 削除ボタン
                 serverToDelete = server
                 showingDeleteConfirmationServer = true
             }
+            .labelStyle(.titleAndIcon)
+            .buttonStyle(.plain)
         }
     }
 }

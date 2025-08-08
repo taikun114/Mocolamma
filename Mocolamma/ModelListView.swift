@@ -116,14 +116,19 @@ struct ModelListView: View {
             .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
                 if let selectedID = selectedIDs.first,
                    let model = sortedModels.first(where: { $0.id == selectedID }) {
-                    Button("Copy Model Name") {
+                    Button("Copy Model Name", systemImage: "document.on.document") {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.name, forType: .string)
                     }
-                    Button("Delete...", role: .destructive) {
+                    .labelStyle(.titleAndIcon)
+                    .buttonStyle(.plain)
+
+                    Button("Delete...", systemImage: "trash", role: .destructive) {
                         modelToDelete = model
                         showingDeleteConfirmation = true
                     }
+                    .labelStyle(.titleAndIcon)
+                    .buttonStyle(.plain)
                 }
             }
             #endif

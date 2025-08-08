@@ -57,7 +57,7 @@ struct ServerInspectorView: View {
                         .help(server.host)
                         .foregroundColor(.primary)
                              .contextMenu {
-                            Button("Copy") {
+                            Button("Copy", systemImage: "document.on.document") {
                                 #if os(macOS)
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(server.host, forType: .string)
@@ -78,7 +78,7 @@ struct ServerInspectorView: View {
                             .bold()
                             .foregroundColor(.primary)
                              .contextMenu {
-                                Button("Copy") {
+                                Button("Copy", systemImage: "document.on.document") {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
