@@ -65,6 +65,7 @@ class ServerManager: ObservableObject {
             self.servers = []
         }
 
+        #if os(macOS)
         // デフォルトの「ローカル」サーバーが存在するか、またはユーザーが削除したかを確認
         let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
         let didUserDeleteDefaultServer = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
@@ -72,6 +73,7 @@ class ServerManager: ObservableObject {
         if !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteDefaultServer {
             servers.insert(localServer, at: 0)
         }
+        #endif
         
         // 以前選択されていたサーバーIDを読み込む
         if let savedSelectedIDString = UserDefaults.standard.string(forKey: selectedServerIDKey),
