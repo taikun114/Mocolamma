@@ -45,6 +45,12 @@ struct ChatView: View {
                     systemImage: "server.rack",
                     description: Text("Please select a server in the Server tab.")
                 )
+            } else if executor.apiConnectionError {
+                ContentUnavailableView(
+                    "Connection Failed",
+                    systemImage: "network.slash",
+                    description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
+                )
             } else if messages.isEmpty {
                 ContentUnavailableView {
                     Label("Chat", systemImage: "message.fill")
