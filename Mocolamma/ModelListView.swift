@@ -120,15 +120,13 @@ struct ModelListView: View {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.name, forType: .string)
                     }
-                    .labelStyle(.titleAndIcon)
-                    .buttonStyle(.plain)
+
 
                     Button("Delete...", systemImage: "trash", role: .destructive) {
                         modelToDelete = model
                         showingDeleteConfirmation = true
                     }
-                    .labelStyle(.titleAndIcon)
-                    .buttonStyle(.plain)
+
                 }
             }
             #endif
@@ -220,7 +218,7 @@ struct ModelListView: View {
                      }
                  }) {                    Label("Refresh", systemImage: "arrow.clockwise") // ツールバーボタン：モデルを更新します。
                 }
-                .disabled(executor.isRunning || executor.isPulling)
+                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
             }
 #endif
             // MARK: - Add Model Button (Primary Action)
@@ -230,7 +228,7 @@ struct ModelListView: View {
                 }) {
                     Label("Add New", systemImage: "plus")
                 }
-                .disabled(executor.isRunning || executor.isPulling)
+                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
             }
 #if os(iOS)
             ToolbarItem(placement: .primaryAction) {

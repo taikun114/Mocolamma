@@ -215,21 +215,18 @@ private struct ServerRowContent: View {
                 serverManager.selectedServerID = server.id
                 listSelection = server.id
             }
-            .labelStyle(.titleAndIcon)
-            .buttonStyle(.plain)
+            
 
             Button("Edit...", systemImage: "pencil") { // 編集ボタン
                 serverToEdit = server
             }
-            .labelStyle(.titleAndIcon)
-            .buttonStyle(.plain)
+            
 
             Button("Delete...", systemImage: "trash", role: .destructive) { // 削除ボタン
                 serverToDelete = server
                 showingDeleteConfirmationServer = true
             }
-            .labelStyle(.titleAndIcon)
-            .buttonStyle(.plain)
+            
         }
     }
 }
