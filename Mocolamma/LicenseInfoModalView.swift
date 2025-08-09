@@ -35,7 +35,7 @@ struct LicenseInfoModalView: View {
     private let markdownUIVersionString: String = "2.4.1"
     private let geminiCLIVersionString: String = "0.1.18"
     private let createDmgVersionString: String = "1.2.2"
-    private let opencodeVersionString: String = "0.4.1"
+    private let opencodeVersionString: String = "0.4.2"
 
     var body: some View {
         #if os(macOS)

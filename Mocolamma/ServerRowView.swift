@@ -52,7 +52,6 @@ struct ServerRowView: View {
             }
         }
         .padding(.vertical, 4) // 行に垂直方向のパディングを追加
-        // listRowBackgroundとcontextMenuはServerViewで適用されます。
     }
 }
 

@@ -429,13 +429,13 @@
         }
       }
     },
-    "Are you sure you want to delete the server \"%@\"\nThis action cannot be undone." : {
+    "Are you sure you want to delete the server \"%@\"?\nThis action cannot be undone." : {
       "comment" : "サーバー削除の確認メッセージ。",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete the server \"%@\"\nThis action cannot be undone."
+            "value" : "Are you sure you want to delete the server “%@”?\nThis action cannot be undone."
           }
         },
         "ja" : {

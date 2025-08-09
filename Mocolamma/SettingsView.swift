@@ -8,53 +8,38 @@ import AppKit
 import Network
 
 struct SettingsView: View {
-    @Environment(\.dismiss) private var dismissSheet
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var showingAbout: Bool = false
     
     var body: some View {
-        #if os(iOS)
-        NavigationView {
-            Form {
-                content
-            }
-            .formStyle(.grouped)
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismissSheet() }) {
-                        Image(systemName: "xmark")
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAbout = true }) {
-                        Image(systemName: "info.circle")
-                    }
-                    .sheet(isPresented: $showingAbout) {
-                        AboutView()
-                    }
-                }
-            }
-            .onAppear {
-                apiTimeoutSelection = APITimeoutManager.shared.currentOption
-                localNetworkChecker.refresh()
-            }
-        }
-        #else
         Form {
             content
         }
         .formStyle(.grouped)
+        #if os(macOS)
         .frame(width: 400, height: 400)
+        #else
+        .navigationTitle("Settings")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { showingAbout = true }) {
+                    Image(systemName: "info.circle")
+                }
+                .sheet(isPresented: $showingAbout) {
+                    AboutView()
+                }
+            }
+        }
+        #endif
         .onAppear {
+            #if os(macOS)
             launchAtLogin = LoginItemManager.shared.isEnabled
+            #endif
             apiTimeoutSelection = APITimeoutManager.shared.currentOption
             localNetworkChecker.refresh()
         }
-        #endif
     }
     
     @ViewBuilder

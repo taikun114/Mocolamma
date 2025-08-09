@@ -5,8 +5,7 @@ import CompactSlider
 // MARK: - コンテンツビュー
 
 /// アプリのメインウィンドウを構成するSwiftUIビューです。
-/// NavigationSplitViewを使用して、サイドバー（「Categories」）、中央のコンテンツエリア、およびモデル詳細（`ModelDetailsView`）の3カラムレイアウトを構築します。
-/// サイドバーのビュー切り替えと、トップレベルの状態管理に特化しています。
+/// プラットフォームに応じて、NavigationSplitViewまたはTabViewを使用してUIを構築します。
 struct ContentView: View {
     // ServerManagerのインスタンスをAppStateに保持し、ライフサイクル全体で利用可能にする
     @ObservedObject var serverManager: ServerManager
@@ -14,11 +13,10 @@ struct ContentView: View {
     @StateObject var executor: CommandExecutor
 
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
-    // サイドバーの選択状態を保持します (デフォルトで"server"を選択)
-    @State private var sidebarSelection: String? = "server"
+    // サイドバー/タブの選択状態を保持します (デフォルトで"server"を選択)
+    @State private var selection: String? = "server"
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
-    // 全てのカラムを表示する初期設定とし、Inspectorの表示を別途制御します
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
 
     // Inspector（プレビューパネル）の表示/非表示を制御するState変数
@@ -32,7 +30,6 @@ struct ContentView: View {
     @State private var isSystemPromptEnabled: Bool = false
     @State private var systemPrompt: String = ""
     @State private var thinkingOption: ThinkingOption = .none
-    @State private var showingSettingsSheet: Bool = false
 
     // モデル追加シートの表示/非表示を制御します
     @State private var showingAddModelsSheet = false
@@ -53,58 +50,154 @@ struct ContentView: View {
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     
     // ContentViewの初期化。serverManagerを依存性として受け取り、executorを初期化します。
-    // このイニシャライザはMocolammaAppから呼び出される際にServerManagerを渡すために必要です。
     init(serverManager: ServerManager) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
     }
 
     var body: some View {
-        // メインナビゲーションビューを呼び出し、必要なバインディングとオブジェクトを渡します
-        MainNavigationView(
-            sidebarSelection: $sidebarSelection,
-            selectedModel: $selectedModel,
-            executor: executor,
-            serverManager: serverManager,
-            selectedServerForInspector: $selectedServerForInspector,
-            showingInspector: $showingInspector,
-            sortOrder: $sortOrder,
-            showingAddModelsSheet: $showingAddModelsSheet,
-            showingDeleteConfirmation: $showingDeleteConfirmation,
-            modelToDelete: $modelToDelete,
-            columnVisibility: $columnVisibility,
-            sortedModels: sortedModels,
-            isChatStreamingEnabled: $isChatStreamingEnabled,
-            useCustomChatSettings: $useCustomChatSettings,
-            chatTemperature: $chatTemperature,
-            isTemperatureEnabled: $isTemperatureEnabled,
-            isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-            contextWindowValue: $contextWindowValue, // ここを追加
-            isSystemPromptEnabled: $isSystemPromptEnabled,
-            systemPrompt: $systemPrompt,
-            thinkingOption: $thinkingOption,
-            showingSettingsSheet: $showingSettingsSheet
-        )
-        .environmentObject(executor) // CommandExecutorを環境オブジェクトとして追加
+        Group {
+            #if os(macOS)
+            if #available(macOS 15.0, *) {
+                MainTabView(
+                    selection: $selection,
+                    selectedModel: $selectedModel,
+                    executor: executor,
+                    serverManager: serverManager,
+                    selectedServerForInspector: $selectedServerForInspector,
+                    showingInspector: $showingInspector,
+                    sortOrder: $sortOrder,
+                    showingAddModelsSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    sortedModels: sortedModels,
+                    isChatStreamingEnabled: $isChatStreamingEnabled,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+            } else {
+                MainNavigationView(
+                    sidebarSelection: $selection,
+                    selectedModel: $selectedModel,
+                    executor: executor,
+                    serverManager: serverManager,
+                    selectedServerForInspector: $selectedServerForInspector,
+                    showingInspector: $showingInspector,
+                    sortOrder: $sortOrder,
+                    showingAddModelsSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    columnVisibility: $columnVisibility,
+                    sortedModels: sortedModels,
+                    isChatStreamingEnabled: $isChatStreamingEnabled,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+            }
+            #elseif os(iOS)
+            if #available(iOS 18.0, *) {
+                MainTabView(
+                    selection: $selection,
+                    selectedModel: $selectedModel,
+                    executor: executor,
+                    serverManager: serverManager,
+                    selectedServerForInspector: $selectedServerForInspector,
+                    showingInspector: $showingInspector,
+                    sortOrder: $sortOrder,
+                    showingAddModelsSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    sortedModels: sortedModels,
+                    isChatStreamingEnabled: $isChatStreamingEnabled,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+            } else {
+                MainNavigationView(
+                    sidebarSelection: $selection,
+                    selectedModel: $selectedModel,
+                    executor: executor,
+                    serverManager: serverManager,
+                    selectedServerForInspector: $selectedServerForInspector,
+                    showingInspector: $showingInspector,
+                    sortOrder: $sortOrder,
+                    showingAddModelsSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    columnVisibility: $columnVisibility,
+                    sortedModels: sortedModels,
+                    isChatStreamingEnabled: $isChatStreamingEnabled,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+            }
+            #else
+            MainNavigationView(
+                sidebarSelection: $selection,
+                selectedModel: $selectedModel,
+                executor: executor,
+                serverManager: serverManager,
+                selectedServerForInspector: $selectedServerForInspector,
+                showingInspector: $showingInspector,
+                sortOrder: $sortOrder,
+                showingAddModelsSheet: $showingAddModelsSheet,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                modelToDelete: $modelToDelete,
+                columnVisibility: $columnVisibility,
+                sortedModels: sortedModels,
+                isChatStreamingEnabled: $isChatStreamingEnabled,
+                useCustomChatSettings: $useCustomChatSettings,
+                chatTemperature: $chatTemperature,
+                isTemperatureEnabled: $isTemperatureEnabled,
+                isContextWindowEnabled: $isContextWindowEnabled,
+                contextWindowValue: $contextWindowValue,
+                isSystemPromptEnabled: $isSystemPromptEnabled,
+                systemPrompt: $systemPrompt,
+                thinkingOption: $thinkingOption
+            )
+            #endif
+        }
+        .environmentObject(executor)
         .sheet(isPresented: $showingAddModelsSheet) {
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
         }
-        .sheet(isPresented: $showingSettingsSheet) {
-            SettingsView()
-        }
-        .alert("Delete Model", isPresented: $showingDeleteConfirmation) { // presenting 引数を削除
-            Button("Delete", role: .destructive) { // アラートの削除ボタン。
-                if let model = modelToDelete { // 手動でアンラップ
+        .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let model = modelToDelete {
                     Task {
                         await executor.deleteModel(modelName: model.name)
                     }
                 }
-                showingDeleteConfirmation = false // アラートを閉じる
-                modelToDelete = nil // 削除対象モデルをクリア
+                showingDeleteConfirmation = false
+                modelToDelete = nil
             }
-            Button("Cancel", role: .cancel) { // アラートのキャンセルボタン。
-                showingDeleteConfirmation = false // アラートを閉じる
-                modelToDelete = nil // 削除対象モデルをクリア
+            Button("Cancel", role: .cancel) {
+                showingDeleteConfirmation = false
+                modelToDelete = nil
             }
         } message: {
             if let model = modelToDelete { // 手動でアンラップ
@@ -115,27 +208,17 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            // アプリ起動時に「Server」をデフォルトで選択状態にします
-            sidebarSelection = "server"
+            selection = "server"
         }
-        .onChange(of: columnVisibility) { oldVal, newVal in
-            print("ContentView: カラムの表示状態が \(oldVal) から \(newVal) に変更されました")
-        }
-        .onChange(of: sidebarSelection) { oldSelection, newSelection in
+        .onChange(of: selection) { oldSelection, newSelection in
             if newSelection == "server" {
                 updateSelectedServerForInspector()
             }
         }
-        .onChange(of: serverManager.selectedServerID) { oldID, newID in
+        .onChange(of: serverManager.selectedServerID) { _, _ in
             // API通信用の選択IDが変更されても、Inspectorの表示はServerViewのlistSelectionに任せる
-            // ここでは何もしない
-        }
-        .onChange(of: selectedModel) { oldModel, newModel in
-            // モデル選択が変更されたら、Inspectorの表示状態を更新
-            // ここでは何もしない
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
-            // selectedServerForInspector が変更されたら、接続状況を再チェック
             if let server = newServer {
                 serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
                 Task {
@@ -148,7 +231,6 @@ struct ContentView: View {
         }
     }
 
-    // Helper function to update selectedServerForInspector and check connectivity
     private func updateSelectedServerForInspector() {
         guard let selectedID = serverManager.selectedServerID,
               let server = serverManager.servers.first(where: { $0.id == selectedID }) else {
@@ -159,8 +241,113 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Main Navigation View Helper
-/// NavigationSplitViewとInspectorを含むメインナビゲーション構造をカプセル化するヘルパービュー
+// MARK: - Main Tab View (for modern OS versions)
+@available(macOS 15.0, iOS 18.0, *)
+private struct MainTabView: View {
+    @Binding var selection: String?
+    @Binding var selectedModel: OllamaModel.ID?
+    @ObservedObject var executor: CommandExecutor
+    @ObservedObject var serverManager: ServerManager
+    @Binding var selectedServerForInspector: ServerInfo?
+    @Binding var showingInspector: Bool
+    @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var showingAddModelsSheet: Bool
+    @Binding var showingDeleteConfirmation: Bool
+    @Binding var modelToDelete: OllamaModel?
+    let sortedModels: [OllamaModel]
+    @Binding var isChatStreamingEnabled: Bool
+    @Binding var useCustomChatSettings: Bool
+    @Binding var chatTemperature: Double
+    @Binding var isTemperatureEnabled: Bool
+    @Binding var isContextWindowEnabled: Bool
+    @Binding var contextWindowValue: Double
+    @Binding var isSystemPromptEnabled: Bool
+    @Binding var systemPrompt: String
+    @Binding var thinkingOption: ThinkingOption
+
+    var body: some View {
+        TabView(selection: $selection) {
+            NavigationStack {
+                ServerView(
+                    serverManager: serverManager,
+                    executor: executor,
+                    onTogglePreview: { showingInspector.toggle() },
+                    selectedServerForInspector: $selectedServerForInspector
+                )
+            }
+            .tabItem { Label("Server", systemImage: "server.rack") }
+            .tag("server")
+
+            NavigationStack {
+                ModelListView(
+                    executor: executor,
+                    selectedModel: $selectedModel,
+                    sortOrder: $sortOrder,
+                    showingAddSheet: $showingAddModelsSheet,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    modelToDelete: $modelToDelete,
+                    onTogglePreview: { showingInspector.toggle() }
+                )
+            }
+            .environmentObject(serverManager)
+            .environmentObject(executor)
+            .tabItem { Label("Models", systemImage: "tray.full") }
+            .tag("models")
+
+            NavigationStack {
+                ChatView(
+                    selectedModelID: $selectedModel,
+                    isStreamingEnabled: $isChatStreamingEnabled,
+                    showingInspector: $showingInspector,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+            }
+            .environmentObject(serverManager)
+            .environmentObject(executor)
+            .tabItem { Label("Chat", systemImage: "message") }
+            .tag("chat")
+
+            #if os(iOS)
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem { Label("Settings", systemImage: "gear") }
+            .tag("settings")
+            #endif
+        }
+        .tabViewStyle(.sidebarAdaptable)
+        .inspector(isPresented: $showingInspector) {
+            InspectorContentView(
+                selection: selection,
+                selectedModel: $selectedModel,
+                sortedModels: sortedModels,
+                selectedServerForInspector: selectedServerForInspector,
+                serverManager: serverManager,
+                showingInspector: $showingInspector,
+                isChatStreamingEnabled: $isChatStreamingEnabled,
+                useCustomChatSettings: $useCustomChatSettings,
+                chatTemperature: $chatTemperature,
+                isTemperatureEnabled: $isTemperatureEnabled,
+                isContextWindowEnabled: $isContextWindowEnabled,
+                contextWindowValue: $contextWindowValue,
+                isSystemPromptEnabled: $isSystemPromptEnabled,
+                systemPrompt: $systemPrompt,
+                thinkingOption: $thinkingOption
+            )
+            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+        }
+    }
+}
+
+
+// MARK: - Main Navigation View Helper (for older OS versions)
 private struct MainNavigationView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?
@@ -183,30 +370,18 @@ private struct MainNavigationView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
-    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) { // columnVisibilityをState変数にバインド
-            // MARK: - サイドバー (左端のカラム)
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             List(selection: $sidebarSelection) {
-                Label("Server", systemImage: "server.rack")
-                    .tag("server")
-                Label("Models", systemImage: "tray.full")
-                    .tag("models")
-                Label("Chat", systemImage: "message")
-                    .tag("chat")
-#if os(iOS)
-                Button {
-                    showingSettingsSheet = true
-                } label: {
-                    Label("Settings", systemImage: "gear")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-#endif
+                Label("Server", systemImage: "server.rack").tag("server")
+                Label("Models", systemImage: "tray.full").tag("models")
+                Label("Chat", systemImage: "message").tag("chat")
+                #if os(iOS)
+                Label("Settings", systemImage: "gear").tag("settings")
+                #endif
             }
-            .navigationTitle("Menu") // サイドバーのタイトル
+            .navigationTitle("Menu")
             .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
         } detail: {
             MainContentDetailView(
@@ -228,70 +403,59 @@ private struct MainNavigationView: View {
                 contextWindowValue: $contextWindowValue,
                 isSystemPromptEnabled: $isSystemPromptEnabled,
                 systemPrompt: $systemPrompt,
-            thinkingOption: $thinkingOption,
-            showingSettingsSheet: $showingSettingsSheet
-        )        }
-        // MARK: - Inspector (右端のプレビューパネル)
-        // Inspectorはメインコンテンツビューに追加され、独立して開閉します
+                thinkingOption: $thinkingOption
+            )
+        }
         .inspector(isPresented: $showingInspector) {
-            // Inspectorのコンテンツを分離したヘルパービューで管理
             InspectorContentView(
-                sidebarSelection: sidebarSelection,
+                selection: sidebarSelection,
                 selectedModel: $selectedModel,
                 sortedModels: sortedModels,
-                selectedServerForInspector: selectedServerForInspector, // Pass new state
-                serverManager: serverManager, // Pass ServerManager to InspectorContentView
-                showingInspector: $showingInspector, // InspectorContentViewにバインディングを渡す
+                selectedServerForInspector: selectedServerForInspector,
+                serverManager: serverManager,
+                showingInspector: $showingInspector,
                 isChatStreamingEnabled: $isChatStreamingEnabled,
                 useCustomChatSettings: $useCustomChatSettings,
                 chatTemperature: $chatTemperature,
                 isTemperatureEnabled: $isTemperatureEnabled,
-                isContextWindowEnabled: $isContextWindowEnabled, // ここを追加
-                contextWindowValue: $contextWindowValue, // ここを追加
+                isContextWindowEnabled: $isContextWindowEnabled,
+                contextWindowValue: $contextWindowValue,
                 isSystemPromptEnabled: $isSystemPromptEnabled,
                 systemPrompt: $systemPrompt,
-            thinkingOption: $thinkingOption,
-            showingSettingsSheet: $showingSettingsSheet
-        )            // Inspectorのデフォルト幅を設定（必要に応じて調整）
+                thinkingOption: $thinkingOption
+            )
             .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
         }
-        
-        // Inspectorの開閉アニメーションを明示的に指定すると競合することがあるため削除
-        // .animation(.default, value: showingInspector)
     }
 }
 
-
 // MARK: - Inspector Content Helper View
-/// Inspector内部のコンテンツを表示するためのヘルパービュー
 private struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
-    let sidebarSelection: String?
+    let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
-    let sortedModels: [OllamaModel] // ContentViewから渡されるモデルデータ
-    let selectedServerForInspector: ServerInfo? // New parameter
-    @ObservedObject var serverManager: ServerManager // ServerManagerを直接受け取る
-    @Binding var showingInspector: Bool // Inspectorの表示状態をバインディングとして受け取る
-    @Binding var isChatStreamingEnabled: Bool // ChatViewのストリーム設定をバインディングとして受け取る
+    let sortedModels: [OllamaModel]
+    let selectedServerForInspector: ServerInfo?
+    @ObservedObject var serverManager: ServerManager
+    @Binding var showingInspector: Bool
+    @Binding var isChatStreamingEnabled: Bool
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
     
-    // Model Infoを保持するState
     @State private var modelInfo: [String: JSONValue]?
-    @State private var licenseBody: String? // 新しく追加
-    @State private var licenseLink: String? // 新しく追加
-    @State private var isLoadingInfo: Bool = false // ローディング状態
-    @Binding var isTemperatureEnabled: Bool // 新しく追加
-    @Binding var isContextWindowEnabled: Bool // ここを追加
-    @Binding var contextWindowValue: Double // ここを追加
+    @State private var licenseBody: String?
+    @State private var licenseLink: String?
+    @State private var isLoadingInfo: Bool = false
+    @Binding var isTemperatureEnabled: Bool
+    @Binding var isContextWindowEnabled: Bool
+    @Binding var contextWindowValue: Double
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
-    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
         Group {
-            if sidebarSelection == "models",
+            if selection == "models",
                let selectedModelID = selectedModel,
                let model = sortedModels.first(where: { $0.id == selectedModelID }) {
                 ModelInspectorDetailView(
@@ -302,8 +466,8 @@ private struct InspectorContentView: View {
                     licenseBody: licenseBody,
                     licenseLink: licenseLink
                 )
-                .id(model.id) // モデルのIDに基づいてビューの同一性を管理
-            } else if sidebarSelection == "server" {
+                .id(model.id)
+            } else if selection == "server" {
                 if let server = selectedServerForInspector {
                     ServerInspectorDetailView(
                         server: server,
@@ -311,12 +475,12 @@ private struct InspectorContentView: View {
                     )
                     .id(UUID())
                 } else {
-                    Text("Select a server to see the details.") // Fallback if no server is selected
+                    Text("Select a server to see the details.")
                         .font(.title2)
                         .foregroundColor(.secondary)
                         .id("server_selection_placeholder")
                 }
-            } else if sidebarSelection == "chat" {
+            } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
                         Toggle("Stream Response", isOn: $isChatStreamingEnabled)
@@ -346,7 +510,7 @@ private struct InspectorContentView: View {
                                 .frame(height: 100)
                                 .disabled(!isSystemPromptEnabled)
                                 .foregroundColor(isSystemPromptEnabled ? .primary : .secondary)
-                                .scrollContentBackground(Visibility.hidden)
+                                .scrollContentBackground(.hidden)
                                 .background(isSystemPromptEnabled ? Color.primary.opacity(0.05) : Color.secondary.opacity(0.05))
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
@@ -357,7 +521,7 @@ private struct InspectorContentView: View {
                         Toggle("Enable Custom Settings", isOn: $useCustomChatSettings)
                         
                         VStack {
-                            Toggle(isOn: $isTemperatureEnabled) { // This is the new toggle for temperature
+                            Toggle(isOn: $isTemperatureEnabled) {
                                 Text("Temperature")
                             }
                             .padding(.bottom, 4)
@@ -367,11 +531,11 @@ private struct InspectorContentView: View {
                                 Text(String(format: "%.1f", chatTemperature))
                                     .font(.body.monospaced())
                             }
-                            .disabled(!isTemperatureEnabled) // Disable slider and value if temperature is not enabled
+                            .disabled(!isTemperatureEnabled)
                             .foregroundColor(isTemperatureEnabled ? .primary : .secondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .disabled(!useCustomChatSettings) // Existing disable for the whole custom settings section
+                        .disabled(!useCustomChatSettings)
                         .foregroundColor(useCustomChatSettings ? .primary : .secondary)
 
                         VStack {
@@ -380,7 +544,7 @@ private struct InspectorContentView: View {
                             }
                             .padding(.bottom, 4)
                             HStack {
-                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0) // ここを修正
+                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0)
                                     .frame(height: 16)
                                 Text("\(Int(contextWindowValue))")
                                     .font(.body.monospaced())
@@ -399,14 +563,13 @@ private struct InspectorContentView: View {
                 Text("Select a model to see the details.")
                     .font(.title2)
                     .foregroundColor(.secondary)
-                    .id("model_selection_placeholder") // ユニークなIDを付与
+                    .id("model_selection_placeholder")
             }
         }
         .onChange(of: selectedModel) { _, newID in
-            // 選択が変更されたらリセット
             modelInfo = nil
             isLoadingInfo = true
-            licenseBody = nil // Reset licenseBody as well
+            licenseBody = nil
             
             guard let newID = newID,
                   let model = sortedModels.first(where: { $0.id == newID }) else {
@@ -415,48 +578,34 @@ private struct InspectorContentView: View {
             }
             
             Task {
-                print("InspectorContentView: selectedModel changed to \(newID.uuidString)")
                 let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
-                // このタスクがキャンセルされていないか、または選択が再度変更されていないか確認
                 if selectedModel == newID {
                     await MainActor.run {
                         self.modelInfo = fetchedResponse?.model_info
                         self.licenseBody = fetchedResponse?.license
                         self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
                         self.isLoadingInfo = false
-
-                        print("InspectorContentView: Fetched capabilities for \(model.name): \(self.commandExecutor.selectedModelCapabilities ?? [])")
-
-                        // thinking capabilityがない場合、thinkingOptionを.noneに設定し、無効化
                         let hasThinkingCapability = self.commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false
-                        print("InspectorContentView: Model \(model.name) has thinking capability: \(hasThinkingCapability)")
                         if !hasThinkingCapability {
                             self.thinkingOption = .none
-                            print("InspectorContentView: thinkingOption set to .none for \(model.name)")
                         }
                     }
                 }
             }
         }
         #if os(macOS)
-        // InspectorContentViewにツールバーを追加
         .toolbar {
             Spacer()
             Button {
-                // Inspector の表示状態を切り替えます
-                print("InspectorContentView: インスペクター内のボタンが押されました。現在のインスペクターの表示状態: \(showingInspector)")
                 showingInspector.toggle()
-                print("InspectorContentView: 新しいインスペクターの表示状態: \(showingInspector)")
             } label: {
-                Label("Toggle Inspector", systemImage: "sidebar.trailing") // サイドバーの右側を示すアイコン
+                Label("Toggle Inspector", systemImage: "sidebar.trailing")
             }
-            .help("Toggle Inspector") // ツールチップ
+            .help("Toggle Inspector")
         }
         #endif
     }
-        
-
-} // InspectorContentViewの閉じブレース
+}
 
 // MARK: - Model Inspector Detail View Helper
 private struct ModelInspectorDetailView: View {
@@ -465,7 +614,7 @@ private struct ModelInspectorDetailView: View {
     let isLoading: Bool
     let fetchedCapabilities: [String]?
     let licenseBody: String?
-    let licenseLink: String? // 新しく追加
+    let licenseLink: String?
 
     var body: some View {
         ModelInspectorView(
@@ -492,8 +641,6 @@ private struct ServerInspectorDetailView: View {
     }
 }
 
-
-
 // MARK: - Main Content Detail Helper View
 private struct MainContentDetailView: View {
     @Binding var sidebarSelection: String?
@@ -509,18 +656,15 @@ private struct MainContentDetailView: View {
     @Binding var isChatStreamingEnabled: Bool
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
-    @Binding var isTemperatureEnabled: Bool // 新しく追加
-    @Binding var isContextWindowEnabled: Bool // ここを追加
-    @Binding var contextWindowValue: Double // ここを追加
+    @Binding var isTemperatureEnabled: Bool
+    @Binding var isContextWindowEnabled: Bool
+    @Binding var contextWindowValue: Double
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
-    @Binding var showingSettingsSheet: Bool
 
     var body: some View {
         Group {
-            // MARK: - メインコンテンツ (右側のカラム - 旧 content カラム)
-            // サイドバーの選択状態に基づいて表示するビューを切り替えます
             if sidebarSelection == "models" {
                 ModelListView(
                     executor: executor,
@@ -529,33 +673,36 @@ private struct MainContentDetailView: View {
                     showingAddSheet: $showingAddModelsSheet,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
-                    onTogglePreview: {
-                        // Inspector の表示状態を切り替えます
-                        print("ContentView: onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
-                        showingInspector.toggle()
-                        print("ContentView: 新しいインスペクターの表示状態: \(showingInspector)")
-                    }
+                    onTogglePreview: { showingInspector.toggle() }
                 )
                 .environmentObject(serverManager)
             } else if sidebarSelection == "server" {
                 ServerView(
                     serverManager: serverManager,
                     executor: executor,
-                    onTogglePreview: {
-                        // Inspector の表示状態を切り替えます
-                        print("ContentView: サーバー用の onTogglePreview を受信しました。現在のインスペクターの表示状態: \(showingInspector)")
-                        showingInspector.toggle()
-                        print("ContentView: 新しいインスペクターの表示状態: \(showingInspector)")
-                        
-                    },
+                    onTogglePreview: { showingInspector.toggle() },
                     selectedServerForInspector: $selectedServerForInspector
-                ) // ServerViewを表示
+                )
             } else if sidebarSelection == "chat" {
-                ChatView(selectedModelID: $selectedModel, isStreamingEnabled: $isChatStreamingEnabled, showingInspector: $showingInspector, useCustomChatSettings: $useCustomChatSettings, chatTemperature: $chatTemperature, isTemperatureEnabled: $isTemperatureEnabled, isContextWindowEnabled: $isContextWindowEnabled, contextWindowValue: $contextWindowValue, isSystemPromptEnabled: $isSystemPromptEnabled, systemPrompt: $systemPrompt, thinkingOption: $thinkingOption)
-                    .environmentObject(executor)
-                    .environmentObject(serverManager)
+                ChatView(
+                    selectedModelID: $selectedModel,
+                    isStreamingEnabled: $isChatStreamingEnabled,
+                    showingInspector: $showingInspector,
+                    useCustomChatSettings: $useCustomChatSettings,
+                    chatTemperature: $chatTemperature,
+                    isTemperatureEnabled: $isTemperatureEnabled,
+                    isContextWindowEnabled: $isContextWindowEnabled,
+                    contextWindowValue: $contextWindowValue,
+                    isSystemPromptEnabled: $isSystemPromptEnabled,
+                    systemPrompt: $systemPrompt,
+                    thinkingOption: $thinkingOption
+                )
+                .environmentObject(executor)
+                .environmentObject(serverManager)
+            } else if sidebarSelection == "settings" {
+                SettingsView()
             } else {
-                Text("Select a category.") // カテゴリを選択してください。
+                Text("Select a category.")
                     .font(.title2)
                     .foregroundColor(.secondary)
             }
@@ -564,9 +711,7 @@ private struct MainContentDetailView: View {
 }
 
 // MARK: - プレビュー用
-
 #Preview {
-    // プレビュー用にダミーのServerManagerインスタンスを作成
     let previewServerManager = ServerManager()
     return ContentView(serverManager: previewServerManager)
 }
