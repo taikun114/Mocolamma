@@ -1569,6 +1569,23 @@
         }
       }
     },
+    "Error: No Ollama server selected." : {
+      "comment" : "Ollamaサーバーが選択されていません。",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: No Ollama server selected."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: Ollamaサーバーが選択されていません。"
+          }
+        }
+      }
+    },
     "Failed" : {
       "comment" : "プルステータス: 失敗。",
       "localizations" : {

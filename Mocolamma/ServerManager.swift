@@ -44,14 +44,13 @@ class ServerManager: ObservableObject {
     @Published var inspectorRefreshToken: UUID = UUID()
 
     /// 現在選択されているサーバーのホストURL。
-    /// 選択されているサーバーがない場合は、デフォルトのローカルホストを返します。
-    var currentServerHost: String {
+    /// 選択されているサーバーがない場合はnilを返します。
+    var currentServerHost: String? {
         if let selectedID = selectedServerID,
            let selectedServer = servers.first(where: { $0.id == selectedID }) {
             return selectedServer.host
         }
-        // 選択されたサーバーがない場合のフォールバック（最初のサーバーがあればそれ、なければデフォルト）
-        return servers.first?.host ?? "localhost:11434"
+        return nil
     }
 
     /// ServerManagerのイニシャライザ。保存されたサーバーリストを読み込み、デフォルトサーバーを設定します。
@@ -79,15 +78,9 @@ class ServerManager: ObservableObject {
         if let savedSelectedIDString = UserDefaults.standard.string(forKey: selectedServerIDKey),
            let savedSelectedID = UUID(uuidString: savedSelectedIDString) {
             self.selectedServerID = savedSelectedID
-        } else {
-            // 以前の選択がない場合はデフォルトの「ローカル」サーバーをデフォルトで選択
-            self.selectedServerID = ServerInfo.defaultServerID
         }
 
-        // selectedServerIDがnilの場合、最初のサーバーを選択（ローカルサーバーがあればそれが選択される）
-        if self.selectedServerID == nil && !self.servers.isEmpty {
-            self.selectedServerID = self.servers.first?.id
-        }
+        
     }
 
     /// 新しいサーバーをリストに追加します。

@@ -34,7 +34,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     // Ollama APIのベースURL
     // ServerManagerから現在のサーバーホストを受け取るように変更
-    @Published var apiBaseURL: String
+    @Published var apiBaseURL: String?
     
     private var cancellables = Set<AnyCancellable>() // ServerManagerの変更を監視するためのSet
     
@@ -64,8 +64,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                    let selectedServer = servers.first(where: { $0.id == selectedID }) {
                     return selectedServer.host
                 }
-                // デフォルトのフォールバック
-                return servers.first?.host ?? "localhost:11434"
+                // フォールバックを削除し、nilを返す
+                return nil
             }
             .assign(to: \.apiBaseURL, on: self)
             .store(in: &cancellables)
@@ -100,6 +100,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// Ollama APIからモデルリストを取得します (async/await版)
     func fetchOllamaModelsFromAPI() async {
+        guard let apiBaseURL = self.apiBaseURL else {
+            // apiBaseURLがnilの場合、何もしない
+            print("Ollama APIベースURLが設定されていません。モデルリストの取得をスキップします。")
+            self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "Ollamaサーバーが選択されていません。")
+            self.apiConnectionError = true
+            return
+        }
         print("Ollama APIから \(apiBaseURL) のモデルリストを取得中...")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "APIからモデルを取得中のステータスメッセージ。"), apiBaseURL)
@@ -189,6 +196,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// モデルをダウンロードします (デリゲートを使用するため async化はしませんが、UI更新は @MainActor にディスパッチします)
     func pullModel(modelName: String) {
+        guard let apiBaseURL = self.apiBaseURL else {
+            print("Ollama APIベースURLが設定されていません。モデルのプルをスキップします。")
+            self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "Ollamaサーバーが選択されていません。")
+            self.isPulling = false
+            return
+        }
         print("モデル \(modelName) を \(apiBaseURL) からプルを試行中")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "モデルダウンロード中のステータスメッセージ。"), modelName, apiBaseURL)
@@ -230,6 +243,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// モデルを削除します
     func deleteModel(modelName: String) async {
+        guard let apiBaseURL = self.apiBaseURL else {
+            print("Ollama APIベースURLが設定されていません。モデルの削除をスキップします。")
+            self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "Ollamaサーバーが選択されていません。")
+            return
+        }
         print("モデル \(modelName) を \(apiBaseURL) から削除を試行中")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "モデル削除中のステータスメッセージ。"), modelName, apiBaseURL)
@@ -292,7 +310,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             return cachedInfo
         }
         
-        print("モデル \(modelName) の詳細情報を \(apiBaseURL) から取得中...")
+        print("モデル \(modelName) の詳細情報を \(String(describing: apiBaseURL)) から取得中...")
+        
+        guard let apiBaseURL = self.apiBaseURL else {
+            print("Ollama APIベースURLが設定されていません。モデルの詳細情報の取得をスキップします。")
+            return nil
+        }
+        print("モデル \(modelName) の詳細情報を \(String(describing: apiBaseURL)) から取得中...")
         
         guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
             print("エラー: /api/show のURLが無効です。")
@@ -402,7 +426,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// 現在メモリにロードされているモデル数を取得します。
     func fetchRunningModelsCount(host: String? = nil) async -> Int? {
-        let base = host ?? apiBaseURL
+        guard let base = host ?? apiBaseURL else { return nil }
         guard let url = URL(string: "http://\(base)/api/ps") else { return nil }
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
@@ -421,6 +445,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
+                guard let apiBaseURL = self.apiBaseURL else {
+                    continuation.finish(throwing: URLError(.badURL))
+                    return
+                }
                 guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
                     continuation.finish(throwing: URLError(.badURL))
                     return
