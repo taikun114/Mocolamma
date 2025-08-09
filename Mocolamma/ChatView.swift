@@ -39,7 +39,13 @@ struct ChatView: View {
 
     var body: some View {
         ZStack {
-            if messages.isEmpty {
+            if serverManager.selectedServer == nil {
+                ContentUnavailableView(
+                    "No Server Selected",
+                    systemImage: "server.rack",
+                    description: Text("Please select a server in the Server tab.")
+                )
+            } else if messages.isEmpty {
                 ContentUnavailableView {
                     Label("Chat", systemImage: "message.fill")
                 } description: {

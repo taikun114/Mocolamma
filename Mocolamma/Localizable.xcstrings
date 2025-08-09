@@ -2861,6 +2861,22 @@
         }
       }
     },
+    "Please select a server in the Server tab." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please select a server in the Server tab."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバータブでサーバーを選択してください。"
+          }
+        }
+      }
+    },
     "Preparing..." : {
       "comment" : "プルステータス: 準備中。",
       "localizations" : {

@@ -132,26 +132,6 @@ struct ModelListView: View {
                 }
             }
             #endif
-            Group {} // keep modifier chain valid
-            .overlay(alignment: .center) {
-                if executor.apiConnectionError {
-                    ContentUnavailableView(
-                        "Connection Failed",
-                        systemImage: "network.slash",
-                        description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
-                    )
-                } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
-                    ContentUnavailableView(
-                        "No Models Available",
-                        systemImage: "internaldrive.fill",
-                        description: Text("No models are currently installed. Click '+' to add a new model.")
-                    )
-                } else if executor.isRunning {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .scaleEffect(2)
-                }
-            }
             // プログレスバーとステータステキスト
              if executor.isPulling || executor.isPullingErrorHold { 
                  VStack(alignment: .leading, spacing: 8) {
@@ -186,6 +166,31 @@ struct ModelListView: View {
                  }
                  .padding()
              }            // コマンド実行の出力表示 (TextEditorは削除されました)
+        }
+        .overlay(alignment: .center) {
+            if serverManager.selectedServer == nil {
+                ContentUnavailableView(
+                    "No Server Selected",
+                    systemImage: "server.rack",
+                    description: Text("Please select a server in the Server tab.")
+                )
+            } else if executor.apiConnectionError {
+                ContentUnavailableView(
+                    "Connection Failed",
+                    systemImage: "network.slash",
+                    description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
+                )
+            } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
+                ContentUnavailableView(
+                    "No Models Available",
+                    systemImage: "internaldrive.fill",
+                    description: Text("No models are currently installed. Click '+' to add a new model.")
+                )
+            } else if executor.isRunning {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .scaleEffect(2)
+            }
         }
         .navigationTitle("Models")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
