@@ -26,6 +26,38 @@ struct ServerView: View {
         }
     }
 
+    @ToolbarContentBuilder
+    private var serverToolbarContent: some ToolbarContent {
+        #if os(macOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                checkAllServerConnectivity()
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+        }
+        #endif
+
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                showingAddServerSheet = true
+            }) {
+                Label("Add Server", systemImage: "plus")
+            }
+        }
+
+        #if os(iOS)
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { onTogglePreview() }) {
+                Label("Inspector", systemImage: "sidebar.trailing")
+            }
+        }
+        #endif
+    }
+
     var body: some View {
         ServerListViewContent(
             serverManager: serverManager,
@@ -48,27 +80,7 @@ struct ServerView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                HStack(spacing: 8) {
-                    #if os(macOS)
-                    Button(action: {
-                        checkAllServerConnectivity()
-                    }) {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    }
-                    #endif
-                    Button(action: {
-                        showingAddServerSheet = true
-                    }) {
-                        Label("Add Server", systemImage: "plus")
-                    }
-                    #if os(iOS)
-                    Button(action: { onTogglePreview() }) {
-                        Label("Inspector", systemImage: "info.circle")
-                    }
-                    #endif
-                }
-            }
+            serverToolbarContent
         }
         .sheet(isPresented: $showingAddServerSheet) {
             ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)

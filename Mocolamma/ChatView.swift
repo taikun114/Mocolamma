@@ -154,7 +154,8 @@ struct ChatView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
+        #if os(iOS)
+        ToolbarItemGroup(placement: .primaryAction) { // Group for Refresh and Model Selection (iOS)
             Button(action: {
                 Task {
                     executor.clearModelInfoCache()
@@ -164,9 +165,7 @@ struct ChatView: View {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning)
-        }
-        #if os(iOS)
-        ToolbarItem(placement: .primaryAction) {
+
             Menu {
                 Button("Select Model") { selectedModelID = nil }
                 Divider()
@@ -181,8 +180,19 @@ struct ChatView: View {
                     .foregroundStyle(selectedModelID == nil ? Color.primary : Color.accentColor)
             }
         }
-        #else
-        ToolbarItem(placement: .primaryAction) {
+        #else // macOS
+        ToolbarItem(placement: .primaryAction) { // Refresh Button (macOS)
+            Button(action: {
+                Task {
+                    executor.clearModelInfoCache()
+                    await executor.fetchOllamaModelsFromAPI()
+                }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+        }
+        ToolbarItem(placement: .primaryAction) { // Model Picker (macOS)
             Picker("Select Model", selection: $selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
@@ -194,16 +204,13 @@ struct ChatView: View {
             .frame(width: 150)
         }
         #endif
-        
+
         #if os(iOS)
         if #available(iOS 26, *) {
-            ToolbarSpacer()
-        }
-        #elseif os(macOS)
-        if #available(macOS 26, *) {
-            ToolbarSpacer()
+            ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between Model Group and New Chat
         }
         #endif
+
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 messages.removeAll()
@@ -214,10 +221,14 @@ struct ChatView: View {
                 Label("New Chat", systemImage: "square.and.pencil")
             }
         }
+
         #if os(iOS)
+        if #available(iOS 26, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between New Chat and Inspector
+        }
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showingInspector.toggle() }) {
-                Label("Inspector", systemImage: "info.circle")
+                Label("Inspector", systemImage: "sidebar.trailing")
             }
         }
         #endif

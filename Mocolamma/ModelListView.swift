@@ -48,6 +48,57 @@ struct ModelListView: View {
         return nil
     }
     
+    @ToolbarContentBuilder
+    private var modelToolbarContent: some ToolbarContent {
+        #if os(macOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                Task {
+                    executor.isPullingErrorHold = false
+                    executor.pullHasError = false
+                    executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
+                    executor.clearModelInfoCache()
+                    let previousSelection = selectedModel
+                    let selectedServerID = serverManager.selectedServerID
+                    selectedModel = nil
+                    await executor.fetchOllamaModelsFromAPI()
+                    if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
+                    await MainActor.run {
+                        serverManager.inspectorRefreshToken = UUID()
+                        NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                    }
+                    if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                        selectedModel = prev
+                    }
+                }
+            }) { Label("Refresh", systemImage: "arrow.clockwise") }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
+        }
+        #endif
+
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                showingAddSheet = true
+            }) {
+                Label("Add New", systemImage: "plus")
+            }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+        }
+
+        #if os(iOS)
+        Group { // Wrap the conditional content in a Group
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .primaryAction)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { onTogglePreview() }) {
+                    Label("Inspector", systemImage: "sidebar.trailing")
+                }
+            }
+        }
+        #endif
+    }
+
     var body: some View {        VStack {
             #if os(iOS)
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
@@ -193,50 +244,8 @@ struct ModelListView: View {
         .navigationTitle("Models")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
 
-        .toolbar { // ここで全てのToolbarItemをまとめます
-            #if os(macOS)
-            // MARK: - Reload Button (Primary Action, before Add New)
-            ToolbarItem(placement: .primaryAction) { // primaryActionに配置
-                 Button(action: {
-                     Task {
-                          executor.isPullingErrorHold = false
-                          executor.pullHasError = false
-                          executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
-                           executor.clearModelInfoCache()
-                          let previousSelection = selectedModel
-                          let selectedServerID = serverManager.selectedServerID
-                         selectedModel = nil
-                         await executor.fetchOllamaModelsFromAPI()
-                         if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
-                         await MainActor.run {
-                             serverManager.inspectorRefreshToken = UUID()
-                             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-                         }
-                         if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
-                             selectedModel = prev
-                         }
-                     }
-                 }) {                    Label("Refresh", systemImage: "arrow.clockwise") // ツールバーボタン：モデルを更新します。
-                }
-                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
-            }
-#endif
-            // MARK: - Add Model Button (Primary Action)
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: {
-                    showingAddSheet = true
-                }) {
-                    Label("Add New", systemImage: "plus")
-                }
-                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
-            }
-#if os(iOS)
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: { onTogglePreview() }) {
-                    Label("Inspector", systemImage: "info.circle")
-                }
-            }
-#endif
+        .toolbar {
+            modelToolbarContent
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .onAppear {
