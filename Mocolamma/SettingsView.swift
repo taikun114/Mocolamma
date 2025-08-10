@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var showingAbout: Bool = false
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     var body: some View {
         Form {
@@ -75,34 +76,63 @@ struct SettingsView: View {
         
         Section("Permissions") {
             #if os(iOS)
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Circle()
-                        .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
-                        .frame(width: 10, height: 10)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Local Network Access")
-                        Text("Permission is required to connect to Ollama servers on the same network.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+            Group {
+                if horizontalSizeClass == .compact { // iPhone portrait, or iPad narrow split view
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 10) {
+                            Circle()
+                                .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                                .frame(width: 10, height: 10)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Local Network Access")
+                                Text("Permission is required to connect to Ollama servers on the same network.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button(action: { localNetworkChecker.refresh() }) {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                            .buttonStyle(.borderless)
+                            .help("Refresh status")
+                        }
+                        Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                            HStack {
+                                Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                                Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(localNetworkChecker.isAllowed)
+                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
                     }
-                    Spacer()
-                    Button(action: { localNetworkChecker.refresh() }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .buttonStyle(.borderless)
-                    .help("Refresh status")
-                }
-                Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                } else { // .regular - iPhone landscape, iPad full screen or wider split view
                     HStack {
-                        Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
-                        Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                        Circle()
+                            .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                            .frame(width: 10, height: 10)
+                        VStack(alignment: .leading) {
+                            Text("Local Network Access")
+                            Text("Permission is required to connect to Ollama servers on the same network.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
+                        .buttonStyle(.borderless)
+                        .help("Refresh status")
+                        Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                            HStack {
+                                Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                                Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(localNetworkChecker.isAllowed)
+                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .disabled(localNetworkChecker.isAllowed)
-                .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
             }
             #else
             HStack {
