@@ -151,46 +151,9 @@ struct MessageView: View {
 
     @ViewBuilder
     private var revisionNavigator: some View {
-        Button(action: {
-            message.currentRevisionIndex -= 1
-            let revision = message.revisions[message.currentRevisionIndex]
-            message.content = revision.content
-            message.thinking = revision.thinking
-            message.isThinkingCompleted = revision.isThinkingCompleted
-            message.createdAt = revision.createdAt
-            message.totalDuration = revision.totalDuration
-            message.evalCount = revision.evalCount
-            message.evalDuration = revision.evalDuration
-            message.isStopped = revision.isStopped
-
-            message.fixedContent = message.content
-            message.pendingContent = ""
-            message.fixedThinking = message.thinking ?? ""
-            message.pendingThinking = ""
-        }) {
-            Image(systemName: "chevron.backward")
-                .contentShape(Rectangle())
-                .padding(5)
-        }
-        #if os(iOS)
-        .font(.body)
-        #else
-        .font(.caption2)
-        #endif
-        .buttonStyle(.plain)
-        .foregroundColor(.accentColor)
-        .help("Previous Revision")
-        .disabled(message.currentRevisionIndex == 0)
-
-        if message.revisions.count > 0 {
-            Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-        }
-
-        Button(action: {
-            message.currentRevisionIndex += 1
-            if message.currentRevisionIndex < message.revisions.count {
+        Group { // Wrap in Group to apply disabled modifier to the whole view builder
+            Button(action: {
+                message.currentRevisionIndex -= 1
                 let revision = message.revisions[message.currentRevisionIndex]
                 message.content = revision.content
                 message.thinking = revision.thinking
@@ -200,34 +163,74 @@ struct MessageView: View {
                 message.evalCount = revision.evalCount
                 message.evalDuration = revision.evalDuration
                 message.isStopped = revision.isStopped
-            } else {
-                message.content = message.latestContent ?? ""
-                message.thinking = message.finalThinking
-                message.isThinkingCompleted = message.finalIsThinkingCompleted
-                message.createdAt = message.finalCreatedAt
-                message.totalDuration = message.finalTotalDuration
-                message.evalCount = message.finalEvalCount
-                message.evalDuration = message.finalEvalDuration
-                message.isStopped = message.finalIsStopped
+
+                message.fixedContent = message.content
+                message.pendingContent = ""
+                message.fixedThinking = message.thinking ?? ""
+                message.pendingThinking = ""
+            }) {
+                Image(systemName: "chevron.backward")
+                    .contentShape(Rectangle())
+                    .padding(5)
             }
-            message.fixedContent = message.content
-            message.pendingContent = ""
-            message.fixedThinking = message.thinking ?? ""
-            message.pendingThinking = ""
-        }) {
-            Image(systemName: "chevron.forward")
-                .contentShape(Rectangle())
-                .padding(5)
+            #if os(iOS)
+            .font(.body)
+            #else
+            .font(.caption2)
+            #endif
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
+            .help("Previous Revision")
+            .disabled(message.currentRevisionIndex == 0)
+
+            if message.revisions.count > 0 {
+                Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            Button(action: {
+                message.currentRevisionIndex += 1
+                if message.currentRevisionIndex < message.revisions.count {
+                    let revision = message.revisions[message.currentRevisionIndex]
+                    message.content = revision.content
+                    message.thinking = revision.thinking
+                    message.isThinkingCompleted = revision.isThinkingCompleted
+                    message.createdAt = revision.createdAt
+                    message.totalDuration = revision.totalDuration
+                    message.evalCount = revision.evalCount
+                    message.evalDuration = revision.evalDuration
+                    message.isStopped = revision.isStopped
+                } else {
+                    message.content = message.latestContent ?? ""
+                    message.thinking = message.finalThinking
+                    message.isThinkingCompleted = message.finalIsThinkingCompleted
+                    message.createdAt = message.finalCreatedAt
+                    message.totalDuration = message.finalTotalDuration
+                    message.evalCount = message.finalEvalCount
+                    message.evalDuration = message.finalEvalDuration
+                    message.isStopped = message.finalIsStopped
+                }
+                message.fixedContent = message.content
+                message.pendingContent = ""
+                message.fixedThinking = message.thinking ?? ""
+                message.pendingThinking = ""
+            }) {
+                Image(systemName: "chevron.forward")
+                    .contentShape(Rectangle())
+                    .padding(5)
+            }
+            #if os(iOS)
+            .font(.body)
+            #else
+            .font(.caption2)
+            #endif
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
+            .help("Next Revision")
+            .disabled(message.currentRevisionIndex == message.revisions.count)
         }
-        #if os(iOS)
-        .font(.body)
-        #else
-        .font(.caption2)
-        #endif
-        .buttonStyle(.plain)
-        .foregroundColor(.accentColor)
-        .help("Next Revision")
-        .disabled(message.currentRevisionIndex == message.revisions.count)
+        .disabled(isStreamingAny) // Disable the entire revisionNavigator when streaming
     }
 
     @ViewBuilder
