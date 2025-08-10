@@ -13,6 +13,7 @@ struct ContentView: View {
     @StateObject var executor: CommandExecutor
 
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
+    @State private var selectedChatModelID: OllamaModel.ID? // チャットで選択されたモデルのID
     // サイドバー/タブの選択状態を保持します (デフォルトで"server"を選択)
     @State private var selection: String? = "server"
     
@@ -62,6 +63,7 @@ struct ContentView: View {
                 MainTabView(
                     selection: $selection,
                     selectedModel: $selectedModel,
+                    selectedChatModelID: $selectedChatModelID,
                     executor: executor,
                     serverManager: serverManager,
                     selectedServerForInspector: $selectedServerForInspector,
@@ -85,6 +87,7 @@ struct ContentView: View {
                 MainNavigationView(
                     sidebarSelection: $selection,
                     selectedModel: $selectedModel,
+                    selectedChatModelID: $selectedChatModelID,
                     executor: executor,
                     serverManager: serverManager,
                     selectedServerForInspector: $selectedServerForInspector,
@@ -111,6 +114,7 @@ struct ContentView: View {
                 MainTabView(
                     selection: $selection,
                     selectedModel: $selectedModel,
+                    selectedChatModelID: $selectedChatModelID,
                     executor: executor,
                     serverManager: serverManager,
                     selectedServerForInspector: $selectedServerForInspector,
@@ -134,6 +138,7 @@ struct ContentView: View {
                 MainNavigationView(
                     sidebarSelection: $selection,
                     selectedModel: $selectedModel,
+                    selectedChatModelID: $selectedChatModelID,
                     executor: executor,
                     serverManager: serverManager,
                     selectedServerForInspector: $selectedServerForInspector,
@@ -246,6 +251,7 @@ struct ContentView: View {
 private struct MainTabView: View {
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
+    @Binding var selectedChatModelID: OllamaModel.ID? // 新しく追加
     @ObservedObject var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
@@ -296,7 +302,7 @@ private struct MainTabView: View {
 
             NavigationStack {
                 ChatView(
-                    selectedModelID: $selectedModel,
+                    selectedModelID: $selectedChatModelID, // ここを変更
                     isStreamingEnabled: $isChatStreamingEnabled,
                     showingInspector: $showingInspector,
                     useCustomChatSettings: $useCustomChatSettings,
@@ -327,6 +333,7 @@ private struct MainTabView: View {
             InspectorContentView(
                 selection: selection,
                 selectedModel: $selectedModel,
+                selectedChatModelID: $selectedChatModelID, // 新しく追加
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector,
                 serverManager: serverManager,
@@ -351,6 +358,7 @@ private struct MainTabView: View {
 private struct MainNavigationView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?
+    @Binding var selectedChatModelID: OllamaModel.ID? // 新しく追加
     @ObservedObject var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
@@ -387,6 +395,7 @@ private struct MainNavigationView: View {
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
                 selectedModel: $selectedModel,
+                selectedChatModelID: $selectedChatModelID, // 新しく追加
                 executor: executor,
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
@@ -410,6 +419,7 @@ private struct MainNavigationView: View {
             InspectorContentView(
                 selection: sidebarSelection,
                 selectedModel: $selectedModel,
+                selectedChatModelID: $selectedChatModelID, // 新しく追加
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector,
                 serverManager: serverManager,
@@ -434,6 +444,7 @@ private struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
+    @Binding var selectedChatModelID: OllamaModel.ID? // 新しく追加
     let sortedModels: [OllamaModel]
     let selectedServerForInspector: ServerInfo?
     @ObservedObject var serverManager: ServerManager
@@ -601,6 +612,33 @@ private struct InspectorContentView: View {
                 }
             }
         }
+        .onChange(of: selectedChatModelID) { _, newID in // 新しく追加
+            modelInfo = nil
+            isLoadingInfo = true
+            licenseBody = nil
+            
+            guard let newID = newID,
+                  let model = sortedModels.first(where: { $0.id == newID }) else {
+                isLoadingInfo = false
+                return
+            }
+            
+            Task {
+                let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
+                if selectedChatModelID == newID { // ここを変更
+                    await MainActor.run {
+                        self.modelInfo = fetchedResponse?.model_info
+                        self.licenseBody = fetchedResponse?.license
+                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+                        self.isLoadingInfo = false
+                        let hasThinkingCapability = self.commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false
+                        if !hasThinkingCapability {
+                            self.thinkingOption = .none
+                        }
+                    }
+                }
+            }
+        }
         #if os(macOS)
         .toolbar {
             Spacer()
@@ -653,6 +691,7 @@ private struct ServerInspectorDetailView: View {
 private struct MainContentDetailView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?
+    @Binding var selectedChatModelID: OllamaModel.ID? // 新しく追加
     @ObservedObject var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
@@ -693,7 +732,7 @@ private struct MainContentDetailView: View {
                 )
             } else if sidebarSelection == "chat" {
                 ChatView(
-                    selectedModelID: $selectedModel,
+                    selectedModelID: $selectedChatModelID, // ここを変更
                     isStreamingEnabled: $isChatStreamingEnabled,
                     showingInspector: $showingInspector,
                     useCustomChatSettings: $useCustomChatSettings,
