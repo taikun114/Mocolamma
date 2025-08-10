@@ -219,6 +219,9 @@ struct ContentView: View {
             if newSelection == "server" {
                 updateSelectedServerForInspector()
             }
+            if newSelection == "settings" && showingInspector {
+                showingInspector = false
+            }
         }
         .onChange(of: serverManager.selectedServerID) { _, _ in
             // API通信用の選択IDが変更されても、Inspectorの表示はServerViewのlistSelectionに任せる
