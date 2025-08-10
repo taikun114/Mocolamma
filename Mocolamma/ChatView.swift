@@ -58,7 +58,7 @@ struct ChatView: View {
                     Text("Here you can perform a simple chat to check the model.")
                 }
             } else {
-                ChatMessagesView(messages: $messages, onRetry: retryMessage)
+                ChatMessagesView(messages: $messages, onRetry: retryMessage, isOverallStreaming: $isStreaming)
             }
 
             VStack {

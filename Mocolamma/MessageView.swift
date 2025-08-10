@@ -6,9 +6,8 @@ struct MessageView: View {
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
-    let isStreamingAny: Bool
+    @Binding var isStreamingAny: Bool // Changed to Binding
     @Binding var allMessages: [ChatMessage]
-    @State private var pairedAssistantStreaming: Bool = false
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
@@ -32,7 +31,7 @@ struct MessageView: View {
             HStack {
                 EmptyView()
             }
-            .id(pairedAssistantStreaming)
+            .id(isStreamingAny)
             
             #if os(iOS)
             Spacer().frame(height: 8)
@@ -105,7 +104,7 @@ struct MessageView: View {
             #else
             .opacity(1.0)
             #endif
-            .onChange(of: pairedAssistantStreaming) { _, _ in withAnimation { } }
+            .onChange(of: isEditing) { _, _ in withAnimation { } } // Keep this onChange for isEditing
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         #if os(macOS)
@@ -117,18 +116,6 @@ struct MessageView: View {
          #if os(macOS)
          .onHover { isHovering = $0 }
          #endif
-         .onAppear { recomputePairedAssistantStreaming() }
-        .onChange(of: allMessages.last?.isStreaming == true) { _, _ in recomputePairedAssistantStreaming() }
-        .onChange(of: message.isStreaming) { _, _ in recomputePairedAssistantStreaming() }
-        .onChange(of: isEditing) { _, _ in recomputePairedAssistantStreaming() }
-    }
-
-    private func recomputePairedAssistantStreaming() {
-        if let last = allMessages.last, last.role == "assistant" {
-            pairedAssistantStreaming = last.isStreaming
-        } else {
-            pairedAssistantStreaming = false
-        }
     }
 
     private var dateString: String {
@@ -295,25 +282,29 @@ struct MessageView: View {
         .help("Copy")
     }
 
-    @ViewBuilder
+        @ViewBuilder
     private var editButton: some View {
-        Button(action: {
-            isEditing = true
-            isEditingFocused = true
-            message.content = message.content
-        }) {
-            Image(systemName: "pencil")
-                .contentShape(Rectangle())
-                .padding(5)
-        }
-        #if os(iOS)
-        .font(.body)
-        #else
-        .font(.caption2)
-        #endif
-        .buttonStyle(.plain)
-        .foregroundColor(.accentColor)
-        .help("Edit")
+        Group { // Added Group
+            Button(action: {
+                isEditing = true
+                isEditingFocused = true
+                message.content = message.content
+            }) {
+                Image(systemName: "pencil")
+                    .contentShape(Rectangle())
+                    .padding(5)
+            }
+            #if os(iOS)
+            .font(.body)
+            #else
+            .font(.caption2)
+            #endif
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
+            .help("Edit")
+            .disabled(isStreamingAny)
+        } // End Group
+        .id(isStreamingAny) // Added id modifier
     }
 
     @ViewBuilder
@@ -361,10 +352,10 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(pairedAssistantStreaming || message.content.isEmpty)
-        .allowsHitTesting(!pairedAssistantStreaming)
+        .disabled(isStreamingAny || message.content.isEmpty)
+        .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
-        .id(pairedAssistantStreaming ? "on" : "off")
+        .id(isStreamingAny ? "on" : "off")
     }
 
     @ViewBuilder
