@@ -232,7 +232,7 @@ struct ModelListView: View {
             } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
                 ContentUnavailableView(
                     "No Models Available",
-                    systemImage: "internaldrive.fill",
+                    systemImage: "tray.full",
                     description: Text("No models are currently installed. Click '+' to add a new model.")
                 )
             } else if executor.isRunning {
