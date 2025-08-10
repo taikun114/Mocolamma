@@ -400,7 +400,7 @@ struct MessageView: View {
                          #endif
                      }
              }
-         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
