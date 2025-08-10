@@ -10,6 +10,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var pullHttpErrorMessage: String = ""
     @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
     @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
+    @Published var specificConnectionErrorMessage: String? // 特定の接続エラーメッセージを追加
     @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
     @Published var selectedModelCapabilities: [String]? // 選択されたモデルのcapabilities
     
@@ -409,8 +410,23 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
                 return false
             }
+        } catch let error as URLError {
+            print("\(host) への接続確認エラー: \(error.localizedDescription)")
+            // TLSエラーのチェック
+            if scheme == "https" && (
+                error.code == .secureConnectionFailed ||
+                error.code == .serverCertificateUntrusted ||
+                error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
+                error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
+            ) {
+                self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS connection error message.")
+            } else {
+                self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
+            }
+            return false
         } catch {
             print("\(host) への接続確認エラー: \(error.localizedDescription)")
+            self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
             return false
         }
     }

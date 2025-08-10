@@ -1075,6 +1075,23 @@
         }
       }
     },
+    "Could not connect to API.\nTLS error occurred, could not establish a secure connection." : {
+      "comment" : "TLS connection error message.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not connect to API.\nTLS error occurred, could not establish a secure connection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIに接続できませんでした。\nTLSエラーが起きたため、セキュリティ保護された接続を確立できませんでした。"
+          }
+        }
+      }
+    },
     "Could not load model information." : {
       "localizations" : {
         "en" : {

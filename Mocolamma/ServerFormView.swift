@@ -103,16 +103,25 @@ struct ServerFormView: View {
                 dismiss() // シートを閉じる
             }
         } message: {
-            Text(LocalizedStringKey("ConnectionError.message"))
+            Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "ConnectionError.message"))
         }
     }
 private func processHostInput(_ host: String) -> String {
-        if host.contains(":") {
-            return host
-        } else {
-            return host + ":11434"
+    let lowercasedHost = host.lowercased()
+
+    // Find the last colon
+    if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {
+        let afterColon = lowercasedHost[lowercasedHost.index(after: lastColonIndex)...]
+        // Check if characters after the last colon are all digits
+        if !afterColon.isEmpty && afterColon.allSatisfy({ $0.isNumber }) {
+            // A port number exists, return as is
+            return lowercasedHost
         }
     }
+
+    // No colon, or colon not followed by a port number, append default port
+    return lowercasedHost + ":11434"
+}
 }
 
 // MARK: - プレビュー

@@ -49,7 +49,7 @@ struct ChatView: View {
                 ContentUnavailableView(
                     "Connection Failed",
                     systemImage: "network.slash",
-                    description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
+                    description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
             } else if messages.isEmpty {
                 ContentUnavailableView {
