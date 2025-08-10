@@ -23,27 +23,35 @@
 
 ```
 Mocolamma
+├── AboutView.swift
 ├── AddModelsSheet.swift
+├── APITimeoutManager.swift
 ├── ChatInputView.swift
 ├── ChatMessagesView.swift
 ├── ChatView.swift
 ├── CommandExecutor.swift
 ├── ContentView.swift
+├── LicenseInfoModalView.swift
 ├── LicenseTextView.swift
+├── MarqueeText.swift
 ├── MessageInputView.swift
 ├── MessageView.swift
+├── MocolammaApp.swift
 ├── ModelInspectorView.swift
 ├── ModelListView.swift
-├── MocolammaApp.swift
+├── NavSubtitleIfAvailable.swift
 ├── OllamaChat.swift
 ├── OllamaModel.swift
+├── RunningModelsCountView.swift
 ├── ServerFormView.swift
 ├── ServerInfo.swift
 ├── ServerInspectorView.swift
 ├── ServerManager.swift
 ├── ServerRowView.swift
 ├── ServerView.swift
-└── SettingsView.swift
+├── SettingsView.swift
+├── SoftEdgeIfAvailable.swift
+└── VisualEffectView.swift
 ```
 
 新たなファイルを作成した場合はこの構造に新たなファイルを追加してください。
@@ -52,73 +60,73 @@ Mocolamma
 
 新たなファイルが作成された場合や機能に変更があった場合は以下の文章を変更・追加してください。コードの変更履歴を記載するものではありません。コードの役割のみを説明する必要があります。
 
-#### `MocolammaApp.swift`
+#### `AboutView.swift`
 
-アプリケーションのエントリーポイントです。メインウィンドウと`ContentView`を初期化し、アプリケーション全体で利用する`ServerManager`と`CommandExecutor`を環境オブジェクトとして設定します。
-
-#### `ContentView.swift`
-
-アプリケーションのメインUIを構成するビューです。`NavigationSplitView`を使用し、サイドバーで`ServerView`、`ModelListView`、`ChatView`、`SettingsView`を切り替えて表示します。
-
-#### `ChatView.swift`
-
-Ollamaモデルとのチャット機能を提供するメインビューです。メッセージの送受信、履歴表示、リビジョン管理などのUIとビジネスロジックを管理します。メッセージの表示自体は`ChatMessagesView`と`MessageView`に委譲しています。
-
-#### `ChatMessagesView.swift`
-
-`ChatView`内で使用され、チャットメッセージのリストを表示する責務を負います。各メッセージは`MessageView`としてレンダリングされます。
-
-#### `MessageView.swift`
-
-個々のメッセージバブル、思考プロセス、リビジョン機能、メタデータ（トークン数、生成速度など）の表示を担当します。ホバーエフェクトで統計情報や操作ボタンを表示します。
-
-#### `ChatInputView.swift`
-
-`ChatView`の下部に配置される入力コンポーネントです。テキスト入力フィールド、送信ボタン、ストリーミング停止ボタンを提供します。
-
-#### `ServerView.swift`
-
-登録されているOllamaサーバーのリストを表示・管理するビューです。サーバーの追加、削除、選択などの操作を提供します。
-
-#### `ServerRowView.swift`
-
-`ServerView`のリスト内の各サーバー情報を表示するためのビューコンポーネントです。
-
-#### `ServerFormView.swift`
-
-新規サーバーの追加や既存サーバーの編集を行うためのフォームを提供するシートビューです。
-
-#### `ServerInspectorView.swift`
-
-`ServerView`で選択されたサーバーの詳細情報をインスペクター領域に表示します。
-
-#### `ModelListView.swift`
-
-利用可能なモデルの一覧を表示・管理するビューです。モデルの削除や詳細情報の表示機能を提供します。
-
-#### `ModelInspectorView.swift`
-
-`ModelListView`で選択されたモデルの詳細情報を表示します。
+アプリケーションの「About」セクションを表示するビューです。アプリケーションのバージョン情報、ライセンス情報、開発者へのフィードバックやサポートに関するオプションを提供します。
 
 #### `AddModelsSheet.swift`
 
 Ollamaライブラリからモデルを検索し、ダウンロードして追加するためのシートビューです。
 
-#### `SettingsView.swift`
+#### `APITimeoutManager.swift`
 
-アプリケーション全体の設定（チャット設定、システムプロンプトなど）を行うビューです。
+Ollama APIとの通信におけるタイムアウト設定を管理するクラスです。30秒、1分、5分、無制限のオプションを提供し、選択されたタイムアウト設定をUserDefaultsに保存します。
 
-#### `LicenseTextView.swift`
+#### `ChatInputView.swift`
 
-アプリケーションのライセンス情報を表示するためのビューです。
+`ChatView`の下部に配置される入力コンポーネントです。テキスト入力フィールド、送信ボタン、ストリーミング停止ボタンを提供します。
+
+#### `ChatMessagesView.swift`
+
+`ChatView`内で使用され、チャットメッセージのリストを表示する責務を負います。各メッセージは`MessageView`としてレンダリングされます。
+
+#### `ChatView.swift`
+
+Ollamaモデルとのチャット機能を提供するメインビューです。メッセージの送受信、履歴表示、リビジョン管理などのUIとビジネスロジックを管理します。メッセージの表示自体は`ChatMessagesView`と`MessageView`に委譲しています。
 
 #### `CommandExecutor.swift`
 
 Ollama APIとの通信を非同期で実行し、結果をビューモデルに反映させる中心的なクラスです。チャットの実行、モデル情報の取得、モデルのプルと削除など、アプリケーションの主要なロジックを担います。
 
-#### `ServerManager.swift`
+#### `ContentView.swift`
 
-Ollamaサーバーの追加、削除、選択状態などを管理するクラスです。サーバー情報はUserDefaultsに永続化されます。
+アプリケーションのメインUIを構成するビューです。`NavigationSplitView`を使用し、サイドバーで`ServerView`、`ModelListView`、`ChatView`、`SettingsView`を切り替えて表示します。
+
+#### `LicenseInfoModalView.swift`
+
+アプリケーションと依存関係のライセンス情報を表示するモーダルビューです。Mocolamma自身のライセンスと、Ollama、CompactSlider、MarkdownUI、Gemini CLI、opencode、create-dmgなどのオープンソースプロジェクトのライセンスおよびバージョン情報が含まれます。
+
+#### `LicenseTextView.swift`
+
+アプリケーションのライセンス情報を表示するためのビューです。
+
+#### `MarqueeText.swift`
+
+テキストがコンテナに収まらない場合に、マーキー（スクロール）効果で表示するSwiftUIビューです。
+
+#### `MessageInputView.swift`
+
+`ChatView`の下部に配置される入力コンポーネントです。テキスト入力フィールド、送信ボタン、ストリーミング停止ボタンを提供します。
+
+#### `MessageView.swift`
+
+個々のメッセージバブル、思考プロセス、リビジョン機能、メタデータ（トークン数、生成速度など）の表示を担当します。ホバーエフェクトで統計情報や操作ボタンを表示します。
+
+#### `MocolammaApp.swift`
+
+アプリケーションのエントリーポイントです。メインウィンドウと`ContentView`を初期化し、アプリケーション全体で利用する`ServerManager`と`CommandExecutor`を環境オブジェクトとして設定します。
+
+#### `ModelInspectorView.swift`
+
+`ModelListView`で選択されたモデルの詳細情報を表示します。
+
+#### `ModelListView.swift`
+
+利用可能なモデルの一覧を表示・管理するビューです。モデルの削除や詳細情報の表示機能を提供します。
+
+#### `NavSubtitleIfAvailable.swift`
+
+オペレーティングシステムのバージョンがサポートしている場合（iOS 26.0以降またはmacOS）、ビューにナビゲーションサブタイトルを適用するViewModifierです。
 
 #### `OllamaChat.swift`
 
@@ -128,9 +136,45 @@ Ollamaの`/api/chat`エンドポイントとやり取りするためのリクエ
 
 Ollamaの`/api/tags`や`/api/show`から取得したモデル情報を保持するためのデータ構造を定義します。
 
+#### `RunningModelsCountView.swift`
+
+指定されたOllamaホストで現在実行中のモデル数を表示するSwiftUIビューです。
+
+#### `ServerFormView.swift`
+
+新規サーバーの追加や既存サーバーの編集を行うためのフォームを提供するシートビューです。
+
 #### `ServerInfo.swift`
 
 Ollamaサーバーの接続情報（名前、URLなど）を保持するためのデータ構造を定義します。
+
+#### `ServerInspectorView.swift`
+
+`ServerView`で選択されたサーバーの詳細情報をインスペクター領域に表示します。
+
+#### `ServerManager.swift`
+
+Ollamaサーバーの追加、削除、選択状態などを管理するクラスです。サーバー情報はUserDefaultsに永続化されます。
+
+#### `ServerRowView.swift`
+
+`ServerView`のリスト内の各サーバー情報を表示するためのビューコンポーネントです。
+
+#### `ServerView.swift`
+
+登録されているOllamaサーバーのリストを表示・管理するビューです。サーバーの追加、削除、選択などの操作を提供します。
+
+#### `SettingsView.swift`
+
+アプリケーション全体の設定（チャット設定、システムプロンプトなど）を行うビューです。
+
+#### `SoftEdgeIfAvailable.swift`
+
+オペレーティングシステムのバージョンがサポートしている場合（iOS 26.0以降またはmacOS 26.0以降）、ビューのスクロールエッジにソフトエッジ効果を適用するViewModifierです。
+
+#### `VisualEffectView.swift`
+
+SwiftUIビューに、プラットフォーム固有のぼかしや鮮やかさなどの視覚効果を組み込むためのViewRepresentableを定義します。
 
 ### 開発方針について
 
