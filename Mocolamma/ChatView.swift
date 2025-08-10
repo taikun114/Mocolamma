@@ -176,8 +176,7 @@ struct ChatView: View {
                     }
                 }
             } label: {
-                Image(systemName: "tray.full")
-                    .foregroundStyle(selectedModelID == nil ? Color.primary : Color.accentColor)
+                Image(systemName: selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
         #else // macOS

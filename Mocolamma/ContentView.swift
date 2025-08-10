@@ -527,7 +527,11 @@ private struct InspectorContentView: View {
                             .padding(.bottom, 4)
                             HStack {
                                 CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
+#if os(iOS)
+                                    .frame(height: 32)
+#else
                                     .frame(height: 16)
+#endif
                                 Text(String(format: "%.1f", chatTemperature))
                                     .font(.body.monospaced())
                             }
@@ -545,7 +549,11 @@ private struct InspectorContentView: View {
                             .padding(.bottom, 4)
                             HStack {
                                 CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0)
+#if os(iOS)
+                                    .frame(height: 32)
+#else
                                     .frame(height: 16)
+#endif
                                 Text("\(Int(contextWindowValue))")
                                     .font(.body.monospaced())
                             }
