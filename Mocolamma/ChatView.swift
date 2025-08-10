@@ -168,7 +168,11 @@ struct ChatView: View {
 
             Menu {
                 Button("Select Model") { selectedModelID = nil }
-                Divider()
+                if executor.models.isEmpty {
+                    Divider()
+                    Button(LocalizedStringKey("No models available")) {}
+                        .disabled(true)
+                }
                 ForEach(executor.models) { model in
                     Button(action: { selectedModelID = model.id }) {
                         if selectedModelID == model.id { Image(systemName: "checkmark") }
@@ -197,6 +201,12 @@ struct ChatView: View {
                 Divider()
                 ForEach(executor.models) { model in
                     Text(model.name).tag(model.id as OllamaModel.ID?)
+                }
+                if executor.models.isEmpty {
+                    Divider()
+                    Text(LocalizedStringKey("No models available"))
+                        .tag(UUID() as OllamaModel.ID?) // Assign a unique, non-nil UUID
+                        .selectionDisabled(true)
                 }
             }
             .pickerStyle(.menu)
