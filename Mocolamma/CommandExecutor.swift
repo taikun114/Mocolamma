@@ -120,7 +120,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.isRunning = false
         }
         
-        guard let url = URL(string: "http://\(apiBaseURL)/api/tags") else {
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
             self.output = NSLocalizedString("Error: Invalid API URL.", comment: "無効なAPI URLのエラーメッセージ。")
             self.models = [] // エラー時もモデルリストをクリア
             self.apiConnectionError = true // API接続エラーを設定
@@ -217,7 +219,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.lastSpeedSampleTime = nil
         self.lastSpeedSampleCompleted = 0
         
-        guard let url = URL(string: "http://\(apiBaseURL)/api/pull") else {
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/pull") else {
             self.output = NSLocalizedString("Error: Invalid API URL for pull.", comment: "プル用API URLが無効な場合のエラーメッセージ。")
             self.isPulling = false
             return
@@ -255,7 +259,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         
         defer { self.isRunning = false }
         
-        guard let url = URL(string: "http://\(apiBaseURL)/api/delete") else {
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/delete") else {
             self.output = NSLocalizedString("Error: Invalid API URL for delete.", comment: "削除用API URLが無効な場合のエラーメッセージ。")
             return
         }
@@ -318,7 +324,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
         print("モデル \(modelName) の詳細情報を \(String(describing: apiBaseURL)) から取得中...")
         
-        guard let url = URL(string: "http://\(apiBaseURL)/api/show") else {
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/show") else {
             print("エラー: /api/show のURLが無効です。")
             return nil
         }
@@ -382,7 +390,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
     /// - Returns: 接続に成功した場合はtrue、それ以外はfalse。
     func checkAPIConnectivity(host: String) async -> Bool {
-        guard let url = URL(string: "http://\(host)/api/tags") else {
+        let scheme = host.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
             print("接続確認エラー: ホスト \(host) のURLが無効です")
             return false
         }
@@ -409,7 +419,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Parameter host: OllamaホストのURL。
     /// - Returns: Ollamaのバージョン文字列。
     func fetchOllamaVersion(host: String) async throws -> String {
-        guard let url = URL(string: "http://\(host)/api/version") else {
+        let scheme = host.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/version") else {
             throw URLError(.badURL)
         }
         
@@ -427,7 +439,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// 現在メモリにロードされているモデル数を取得します。
     func fetchRunningModelsCount(host: String? = nil) async -> Int? {
         guard let base = host ?? apiBaseURL else { return nil }
-        guard let url = URL(string: "http://\(base)/api/ps") else { return nil }
+        let scheme = base.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
@@ -449,11 +463,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     continuation.finish(throwing: URLError(.badURL))
                     return
                 }
-                guard let url = URL(string: "http://\(apiBaseURL)/api/chat") else {
+                let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+                let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+                guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/chat") else {
                     continuation.finish(throwing: URLError(.badURL))
                     return
                 }
-                
+
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")

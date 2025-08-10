@@ -59,18 +59,19 @@ struct ServerFormView: View {
 
                 Button(editingServer == nil ? "Save" : "Update") { // 保存/更新ボタン
                     Task {
+                        let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
                         // ホストに接続できることを確認
-                        let isConnected = await executor.checkAPIConnectivity(host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                        let isConnected = await executor.checkAPIConnectivity(host: processedHost)
 
                         if isConnected {
                             if let server = editingServer {
                                 // 編集モード: サーバーを更新
                                 serverManager.updateServer(
-                                    serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                                    serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                                 )
                             } else {
                                 // 追加モード: 新しいサーバーを追加
-                                serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                                serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                             }
                             dismiss() // シートを閉じる
                         } else {
@@ -89,19 +90,27 @@ struct ServerFormView: View {
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
             Button("OK") { }
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
+                let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
                 if let server = editingServer {
                     // 編集モード: サーバーを更新
                     serverManager.updateServer(
-                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                     )
                 } else {
                     // 追加モード: 新しいサーバーを追加
-                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                 }
                 dismiss() // シートを閉じる
             }
         } message: {
             Text(LocalizedStringKey("ConnectionError.message"))
+        }
+    }
+private func processHostInput(_ host: String) -> String {
+        if host.contains(":") {
+            return host
+        } else {
+            return host + ":11434"
         }
     }
 }
