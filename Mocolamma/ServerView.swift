@@ -182,6 +182,12 @@ private struct ServerListViewContent: View {
                 }
                 #endif
             }
+            .onDelete { offsets in
+                if let index = offsets.first {
+                    serverToDelete = serverManager.servers[index]
+                    showingDeleteConfirmationServer = true
+                }
+            } // Add this line
             .onMove(perform: serverManager.moveServer)
         }
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in

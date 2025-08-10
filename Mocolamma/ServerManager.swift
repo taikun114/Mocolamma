@@ -119,6 +119,21 @@ class ServerManager: ObservableObject {
         }
     }
 
+    /// 指定されたインデックスセットのサーバーをリストから削除します。
+    /// - Parameter offsets: 削除するサーバーのインデックスセット。
+    func deleteServers(at offsets: IndexSet) {
+        let deletedServerIDs = offsets.map { servers[$0].id }
+        servers.remove(atOffsets: offsets)
+        // 削除後に選択状態を調整
+        if let selectedID = selectedServerID, !servers.contains(where: { $0.id == selectedID }) {
+            selectedServerID = servers.first?.id
+        }
+        // 削除されたサーバーの接続状態をクリア
+        for id in deletedServerIDs {
+            serverConnectionStatuses[id] = nil
+        }
+    }
+
     /// 指定されたサーバーの接続状態を更新します。
     func updateServerConnectionStatus(serverID: ServerInfo.ID, status: Bool?) {
         serverConnectionStatuses[serverID] = status
