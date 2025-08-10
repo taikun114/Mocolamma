@@ -3,6 +3,25 @@ import SwiftUI
 import AppKit // NSPasteboard のため
 #endif
 
+// MARK: - ソート順序の定義
+
+enum SortCriterion: String, CaseIterable, Identifiable {
+    case number = "Number"
+    case name = "Name"
+    case size = "Size"
+    case date = "Date"
+    
+    var id: String { self.rawValue }
+}
+
+enum SortOrder: String, CaseIterable, Identifiable {
+    case ascending = "Ascending"
+    case descending = "Descending"
+
+    var id: String { self.rawValue }
+}
+
+
 // MARK: - モデルリストビュー
 
 /// モデルのテーブル表示、ダウンロード進捗ゲージ、APIログ表示、
@@ -21,11 +40,34 @@ struct ModelListView: View {
 
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
 
+    // MARK: - Sorting State
+    @State private var sortCriterion: SortCriterion = .number
+    @State private var sortOrderOption: SortOrder = .ascending
     
 
     // 現在のソート順に基づいてモデルリストを返すComputed Property
     var sortedModels: [OllamaModel] {
-        executor.models.sorted(using: sortOrder)
+        let models = executor.models
+        let ascending = sortOrderOption == .ascending
+        
+        switch sortCriterion {
+        case .number:
+            return models.sorted {
+                ascending ? $0.originalIndex < $1.originalIndex : $0.originalIndex > $1.originalIndex
+            }
+        case .name:
+            return models.sorted {
+                ascending ? $0.name < $1.name : $0.name > $1.name
+            }
+        case .size:
+            return models.sorted {
+                ascending ? $0.comparableSize < $1.comparableSize : $0.comparableSize > $1.comparableSize
+            }
+        case .date:
+            return models.sorted {
+                ascending ? $0.comparableModifiedDate < $1.comparableModifiedDate : $0.comparableModifiedDate > $1.comparableModifiedDate
+            }
+        }
     }
 
     // ナビゲーションのサブタイトルを生成するComputed Property
@@ -46,6 +88,14 @@ struct ModelListView: View {
         }
         if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
         return nil
+    }
+    
+    private func deleteModel(at offsets: IndexSet) {
+        let modelsToDelete = offsets.map { sortedModels[$0] }
+        if let model = modelsToDelete.first {
+            modelToDelete = model
+            showingDeleteConfirmation = true
+        }
     }
     
     @ToolbarContentBuilder
@@ -71,8 +121,36 @@ struct ModelListView: View {
                         selectedModel = prev
                     }
                 }
-            }) { Label("Refresh", systemImage: "arrow.clockwise") }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
+        }
+        #endif
+
+        #if os(iOS)
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                Picker("Sort by", selection: $sortCriterion) {
+                    ForEach(SortCriterion.allCases) {
+                        criterion in
+                        Text(LocalizedStringKey(criterion.rawValue)).tag(criterion)
+                    }
+                }
+                Divider()
+                Picker("Order", selection: $sortOrderOption) {
+                    ForEach(SortOrder.allCases) {
+                        order in
+                        Text(LocalizedStringKey(order.rawValue)).tag(order)
+                    }
+                }
+            } label: {
+                Label("Sort", systemImage: "line.3.horizontal.decrease")
+            }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
         }
         #endif
 
@@ -100,44 +178,65 @@ struct ModelListView: View {
     }
 
     var body: some View {        VStack {
-            #if os(iOS)
-            Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
-                TableColumn("No.", value: \.originalIndex) { model in
+#if os(iOS)
+        List(selection: $selectedModel) {
+            ForEach(sortedModels) { model in
+                HStack(alignment: .center, spacing: 16) {
                     Text("\(model.originalIndex + 1)")
+                        .foregroundColor(.secondary)
+                        .frame(minWidth: 20, alignment: .center)
+                    
+                    VStack(alignment: .leading) {
+                        Text(model.name)
+                            .fontWeight(.bold)
+                            .lineLimit(1)
+                        Text("\(model.formattedSize), \(model.formattedModifiedAt)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
-                .width(min: 30, ideal: 50, max: .infinity)
-                TableColumn("Name", value: \.name) { model in
-                    Text(model.name)
+                .tag(model.id)
+                .contextMenu {
+                    Button {
+                        #if os(iOS)
+                        UIPasteboard.general.string = model.name
+                        #else
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(model.name, forType: .string)
+                        #endif
+                    } label: {
+                        Label("Copy Model Name", systemImage: "document.on.document")
+                    }
+                    
+                    Button(role: .destructive) {
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    } label: {
+                        Label("Delete...", systemImage: "trash")
+                    }
                 }
-                .width(min: 100, ideal: 200, max: .infinity)
-                TableColumn("Size", value: \.comparableSize) { model in
-                    Text(model.formattedSize)
-                }
-                .width(min: 50, ideal: 100, max: .infinity)
-                TableColumn("Modified At", value: \.comparableModifiedDate) { model in
-                    Text(model.formattedModifiedAt)
-                }
-                .width(min: 100, ideal: 150, max: .infinity)
             }
-            .refreshable {
-                executor.isPullingErrorHold = false
-                executor.pullHasError = false
-                executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
-                executor.clearModelInfoCache()
-                let previousSelection = selectedModel
-                let selectedServerID = serverManager.selectedServerID
-                selectedModel = nil
-                await executor.fetchOllamaModelsFromAPI()
-                if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
-                await MainActor.run {
-                    serverManager.inspectorRefreshToken = UUID()
-                    NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-                }
-                if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
-                    selectedModel = prev
-                }
+            .onDelete(perform: deleteModel)
+        }
+        .refreshable {
+            executor.isPullingErrorHold = false
+            executor.pullHasError = false
+            executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
+            executor.clearModelInfoCache()
+            let previousSelection = selectedModel
+            let selectedServerID = serverManager.selectedServerID
+            selectedModel = nil
+            await executor.fetchOllamaModelsFromAPI()
+            if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
+            await MainActor.run {
+                serverManager.inspectorRefreshToken = UUID()
+                NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
             }
-            #else
+            if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                selectedModel = prev
+            }
+        }
+#else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
@@ -180,11 +279,11 @@ struct ModelListView: View {
 
                 }
             }
-            #endif
+#endif
             // プログレスバーとステータステキスト
-             if executor.isPulling || executor.isPullingErrorHold { 
+             if executor.isPulling || executor.isPullingErrorHold {
                  VStack(alignment: .leading, spacing: 8) {
-                     ProgressView(value: executor.pullProgress) {
+                     ProgressView(value: executor.pullProgress) { 
                          Text(executor.pullStatus)
                      } currentValueLabel: {
                          HStack {

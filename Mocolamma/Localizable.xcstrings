@@ -53,6 +53,22 @@
         }
       }
     },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、%2$@"
+          }
+        }
+      }
+    },
     "%@/s, Time Remaining: %02d:%02d" : {
       "comment" : "速度と残り時間表示。",
       "localizations" : {
@@ -654,6 +670,22 @@
         }
       }
     },
+    "Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascending"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昇順"
+          }
+        }
+      }
+    },
     "Ask questions and share your opinions" : {
       "localizations" : {
         "en" : {
@@ -1078,6 +1110,22 @@
         }
       }
     },
+    "Date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付順"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "en" : {
@@ -1206,6 +1254,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%1$@」を「%2$@」から削除しています…"
+          }
+        }
+      }
+    },
+    "Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descending"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "降順"
           }
         }
       }
@@ -2222,7 +2286,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "名前"
+            "value" : "名前順"
           }
         }
       }
@@ -2432,6 +2496,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未接続"
+          }
+        }
+      }
+    },
+    "Number" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号順"
           }
         }
       }
@@ -2780,6 +2860,22 @@
     },
     "opencode by SST" : {
       "shouldTranslate" : false
+    },
+    "Order" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Order"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "順序"
+          }
+        }
+      }
     },
     "Parameter Count:" : {
       "localizations" : {
@@ -3193,7 +3289,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サイズ"
+            "value" : "サイズ順"
           }
         }
       }
@@ -3210,6 +3306,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サイズ:"
+          }
+        }
+      }
+    },
+    "Sort" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び替え"
+          }
+        }
+      }
+    },
+    "Sort by" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort by"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び順"
           }
         }
       }
