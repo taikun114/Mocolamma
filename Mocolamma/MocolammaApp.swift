@@ -38,6 +38,9 @@ struct MocolammaApp: App {
     // これにより、メニューコマンドから状態を操作できます。
     @State private var showingInspector: Bool = false
 
+    // モデル追加シートの表示/非表示を制御するStateをAppレベルに移動
+    @State private var showingAddModelsSheet = false
+
 #if os(macOS)
     init() {
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
@@ -47,7 +50,7 @@ struct MocolammaApp: App {
     var body: some Scene {
         WindowGroup() {
             // ContentViewにshowingInspectorのBindingを渡します。
-            ContentView(serverManager: serverManager, selection: $selection, showingInspector: $showingInspector)
+            ContentView(serverManager: serverManager, selection: $selection, showingInspector: $showingInspector, showingAddModelsSheet: $showingAddModelsSheet)
                 .sheet(isPresented: $showingAboutSheet) {
                     AboutView()
                 }
@@ -62,7 +65,14 @@ struct MocolammaApp: App {
             // 標準のサイドバーコマンド（「サイドバーを切り替える」ボタン）を追加します。
             SidebarCommands()
 
-            CommandGroup(replacing: .newItem) {}  // 新規ウィンドウのメニュー/ショートカットを無効化
+            CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
+                if selection == "server" { // サーバー画面が選択されている場合のみ表示
+                    Button("Add Server") { // 「サーバーを追加」メニュー項目を追加
+                        showingAddModelsSheet = true
+                    }
+                    .keyboardShortcut("s", modifiers: [.control, .command])
+                }
+            }
 
             #else
             // iPadOSの場合、設定メニュー項目を置き換えてアプリ内設定を開く
@@ -81,6 +91,16 @@ struct MocolammaApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
             SidebarCommands()
+
+            // iPadOSでも「サーバーを追加」メニュー項目を追加
+            CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
+                if selection == "server" { // サーバー画面が選択されている場合のみ表示
+                    Button("Add Server") { // 「サーバーを追加」メニュー項目を追加
+                        showingAddModelsSheet = true
+                    }
+                    .keyboardShortcut("s", modifiers: [.control, .command])
+                }
+            }
             #endif
             
             // カスタマイズされた表示メニューコマンドを追加します。

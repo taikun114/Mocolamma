@@ -33,7 +33,7 @@ struct ContentView: View {
     @State private var thinkingOption: ThinkingOption = .none
 
     // モデル追加シートの表示/非表示を制御します
-    @State private var showingAddModelsSheet = false
+    @Binding var showingAddModelsSheet: Bool
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
     
@@ -50,12 +50,13 @@ struct ContentView: View {
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     
-    // ContentViewの初期化子を更新し、showingInspectorのBindingを受け取るように変更
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>) {
+    // ContentViewの初期化子を更新し、showingInspectorとshowingAddModelsSheetのBindingを受け取るように変更
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
         self._showingInspector = showingInspector
+        self._showingAddModelsSheet = showingAddModelsSheet
     }
 
     var body: some View {
@@ -765,5 +766,5 @@ private struct MainContentDetailView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    return ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false))
 }
