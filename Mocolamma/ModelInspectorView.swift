@@ -68,7 +68,7 @@ struct ModelInspectorView: View {
 
     // 新しく追加: general.license を取得するヘルパー
     private var licenseName: String {
-        let rawLicense = modelInfo?["general.license"]?.stringValue ?? "Other"
+        let rawLicense = modelInfo?["general.license"]?.stringValue ?? String(localized: "Other License")
         switch rawLicense.lowercased() {
         case "mit":
             return "MIT License"
@@ -461,7 +461,7 @@ struct ModelInspectorView: View {
         }
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {
-                LicenseTextView(licenseText: licenseBody, licenseLink: licenseLink)
+                LicenseTextView(licenseText: licenseBody, licenseLink: licenseLink, licenseTitle: licenseName)
             }
         }
     }

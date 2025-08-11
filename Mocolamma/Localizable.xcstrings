@@ -2894,6 +2894,22 @@
         }
       }
     },
+    "Other License" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other License"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他のライセンス"
+          }
+        }
+      }
+    },
     "Parameter Count:" : {
       "localizations" : {
         "en" : {

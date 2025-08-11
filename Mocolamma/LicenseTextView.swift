@@ -2,7 +2,8 @@ import SwiftUI
 
 struct LicenseTextView: View {
     let licenseText: String
-    let licenseLink: String? // 新しく追加
+    let licenseLink: String?
+    let licenseTitle: String // 追加
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
     @State private var isTextWrapped: Bool = true
@@ -72,6 +73,7 @@ struct LicenseTextView: View {
                         }
                     }
                 }
+                .modifier(NavSubtitleIfAvailable(subtitle: Text(licenseTitle))) // ここに追加
         }
         .onAppear { // ここに onAppear を追加
             isTextWrapped = true
