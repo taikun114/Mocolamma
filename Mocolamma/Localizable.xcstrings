@@ -310,6 +310,23 @@
         }
       }
     },
+    "Add Server…" : {
+      "comment" : "サーバー追加メニューアイテム",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Server…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを追加…"
+          }
+        }
+      }
+    },
     "Allowed" : {
       "localizations" : {
         "en" : {

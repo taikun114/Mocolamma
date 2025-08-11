@@ -1,25 +1,5 @@
 import SwiftUI
 
-// MARK: - View Commands
-
-/// 表示メニューのカスタマイズを管理します。
-struct ViewCommands: Commands {
-    /// Inspectorの表示/非表示を制御するためのBinding。
-    @Binding var showingInspector: Bool
-
-    var body: some Commands {
-        CommandGroup(after: .sidebar) {
-            Button(action: {
-                showingInspector.toggle()
-            }) {
-                Label(showingInspector ? "Hide Inspector" : "Show Inspector", systemImage: "sidebar.trailing")
-            }
-            .keyboardShortcut("i", modifiers: [.command, .option])
-        }
-    }
-}
-
-
 // MARK: - メインアプリケーション構造
 
 /// アプリケーションの起動ポイントとなる基本ファイルです。
@@ -64,13 +44,16 @@ struct MocolammaApp: App {
             }
             // 標準のサイドバーコマンド（「サイドバーを切り替える」ボタン）を追加します。
             SidebarCommands()
+            InspectorCommands()
 
             CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 if selection == "server" { // サーバー画面が選択されている場合のみ表示
-                    Button("Add Server") { // 「サーバーを追加」メニュー項目を追加
+                    Button(action: {
                         showingAddModelsSheet = true
+                    }) {
+                        Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
                     }
-                    .keyboardShortcut("s", modifiers: [.control, .command])
+                    .keyboardShortcut("s", modifiers: [.option, .command])
                 }
             }
 
@@ -91,20 +74,20 @@ struct MocolammaApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
             SidebarCommands()
+            InspectorCommands()
 
             // iPadOSでも「サーバーを追加」メニュー項目を追加
-            CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
+            CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 if selection == "server" { // サーバー画面が選択されている場合のみ表示
-                    Button("Add Server") { // 「サーバーを追加」メニュー項目を追加
+                    Button(action: {
                         showingAddModelsSheet = true
+                    }) {
+                        Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
                     }
-                    .keyboardShortcut("s", modifiers: [.control, .command])
+                    .keyboardShortcut("s", modifiers: [.option, .command])
                 }
             }
             #endif
-            
-            // カスタマイズされた表示メニューコマンドを追加します。
-            ViewCommands(showingInspector: $showingInspector)
         }
         #if os(macOS)
         .windowStyle(.titleBar)
