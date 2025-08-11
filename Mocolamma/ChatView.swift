@@ -215,7 +215,7 @@ struct ChatView: View {
                 }
             }
             .pickerStyle(.menu)
-            .frame(width: 150)
+            .frame(maxWidth: 150)
         }
         #endif
 

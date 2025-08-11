@@ -12,10 +12,17 @@ struct LicenseTextView: View {
         #if os(macOS)
         licenseTextViewContent
             .frame(width: 700, height: 500)
+            .frame(maxWidth: .infinity, maxHeight: .infinity) // ここに追加
             .overlay(alignment: .bottom) { // 下部にオーバーレイとしてVisualEffectViewとボタンを配置
                 ZStack(alignment: .center) {
-                    VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                        .edgesIgnoringSafeArea(.horizontal)
+                    if #available(macOS 26, *) {
+                        Color.clear
+                            .glassEffect()
+                            .edgesIgnoringSafeArea(.horizontal)
+                    } else {
+                        VisualEffectView(material: .headerView, blendingMode: .withinWindow)
+                            .edgesIgnoringSafeArea(.horizontal)
+                    }
                     HStack {
                         if let link = licenseLink, let url = URL(string: link) {
                             Button {
@@ -83,12 +90,18 @@ struct LicenseTextView: View {
 
     private var licenseTextViewContent: some View {
         ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) {
-            Text(licenseText)
-                .font(.body)
-                .monospaced()
-                .padding()
-                .fixedSize(horizontal: !isTextWrapped, vertical: false)
+            VStack(alignment: .leading) { // VStack を追加
+                Text(licenseText)
+                    .font(.body)
+                    .monospaced()
+                    .padding()
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading) // VStack に frame を追加
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity) // ScrollView に frame を追加
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Spacer().frame(height: 60)
+        }
     }
 }

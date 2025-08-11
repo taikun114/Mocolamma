@@ -44,8 +44,14 @@ struct LicenseInfoModalView: View {
             .frame(width: 650, height: 450)
             .overlay(alignment: .bottom) {
                 ZStack(alignment: .center) {
-                    VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                        .edgesIgnoringSafeArea(.horizontal)
+                    if #available(macOS 26, *) {
+                        Color.clear
+                            .glassEffect()
+                            .edgesIgnoringSafeArea(.horizontal)
+                    } else {
+                        VisualEffectView(material: .headerView, blendingMode: .withinWindow)
+                            .edgesIgnoringSafeArea(.horizontal)
+                    }
                     HStack {
                         Spacer()
                         Button("Close") { dismiss() }
