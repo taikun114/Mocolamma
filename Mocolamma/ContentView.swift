@@ -20,8 +20,8 @@ struct ContentView: View {
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
 
-    // Inspector（プレビューパネル）の表示/非表示を制御するState変数
-    @State private var showingInspector: Bool = false
+    // Inspector（プレビューパネル）の表示/非表示を制御するState変数を@Bindingに変更
+    @Binding var showingInspector: Bool
     @State private var isChatStreamingEnabled: Bool = true // ChatViewのストリーム設定
     @State private var useCustomChatSettings: Bool = false // カスタムチャット設定の有効化
     @State private var chatTemperature: Double = 0.8 // Temperatureの初期値
@@ -50,11 +50,12 @@ struct ContentView: View {
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     
-    // ContentViewの初期化。serverManagerとselectionのBindingを依存性として受け取り、executorを初期化します。
-    init(serverManager: ServerManager, selection: Binding<String?>) {
+    // ContentViewの初期化子を更新し、showingInspectorのBindingを受け取るように変更
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
+        self._showingInspector = showingInspector
     }
 
     var body: some View {
@@ -649,7 +650,7 @@ private struct InspectorContentView: View {
             Button {
                 showingInspector.toggle()
             } label: {
-                Label("Toggle Inspector", systemImage: "sidebar.trailing")
+                Label(showingInspector ? "Hide Inspector" : "Show Inspector", systemImage: "sidebar.trailing")
             }
             .help("Toggle Inspector")
         }
@@ -764,5 +765,5 @@ private struct MainContentDetailView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    return ContentView(serverManager: previewServerManager, selection: .constant("server"))
+    return ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false))
 }
