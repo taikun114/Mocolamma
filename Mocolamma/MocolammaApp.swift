@@ -11,22 +11,45 @@ struct MocolammaApp: App {
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
+    @State private var selection: String? = "server" // 状態変数をAppレベルに移動
+    @State private var showingAboutSheet = false // Aboutシートの表示状態
 
     var body: some Scene {
         WindowGroup() {
-            // ContentViewにServerManagerのインスタンスを渡します
-            ContentView(serverManager: serverManager)
+            // ContentViewにServerManagerとselectionのBindingを渡します
+            ContentView(serverManager: serverManager, selection: $selection)
+                .sheet(isPresented: $showingAboutSheet) {
+                    AboutView()
+                }
+        }
+        .commands {
+            #if os(macOS)
+            CommandGroup(replacing: .appInfo) {
+                 Button("About Mocolamma") {
+                     openWindow(id: "about-window")
+                 }
+            }
+            #else
+            // iPadOSの場合、設定メニュー項目を置き換えてアプリ内設定を開く
+            CommandGroup(replacing: .appSettings) {
+                Button(action: {
+                    showingAboutSheet = true
+                }) {
+                    Label("About Mocolamma…", systemImage: "info.circle")
+                }
+                Divider()
+                Button(action: {
+                    selection = "settings"
+                }) {
+                    Label(String(localized: "Settings…", comment: "設定メニューアイテム"), systemImage: "gear")
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+            #endif
         }
         #if os(macOS)
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
-        .commandsReplaced(content: {
-            CommandGroup(replacing: .appInfo, addition: {
-                 Button("About Mocolamma") {
-                     openWindow(id: "about-window")
-                 }
-            })
-        })
         #endif
 
         #if os(macOS)

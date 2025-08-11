@@ -14,8 +14,8 @@ struct ContentView: View {
 
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     @State private var selectedChatModelID: OllamaModel.ID? // チャットで選択されたモデルのID
-    // サイドバー/タブの選択状態を保持します (デフォルトで"server"を選択)
-    @State private var selection: String? = "server"
+    // サイドバー/タブの選択状態をAppレベルから受け取ります
+    @Binding var selection: String?
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
@@ -50,10 +50,11 @@ struct ContentView: View {
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     
-    // ContentViewの初期化。serverManagerを依存性として受け取り、executorを初期化します。
-    init(serverManager: ServerManager) {
+    // ContentViewの初期化。serverManagerとselectionのBindingを依存性として受け取り、executorを初期化します。
+    init(serverManager: ServerManager, selection: Binding<String?>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
+        self._selection = selection
     }
 
     var body: some View {
@@ -763,5 +764,5 @@ private struct MainContentDetailView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    return ContentView(serverManager: previewServerManager)
+    return ContentView(serverManager: previewServerManager, selection: .constant("server"))
 }

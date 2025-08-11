@@ -198,6 +198,22 @@
         }
       }
     },
+    "About Mocolamma…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About Mocolamma…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolammaについて…"
+          }
+        }
+      }
+    },
     "Acknowledgements" : {
       "localizations" : {
         "en" : {
@@ -3291,6 +3307,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定"
+          }
+        }
+      }
+    },
+    "Settings…" : {
+      "comment" : "設定メニューアイテム",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
           }
         }
       }
