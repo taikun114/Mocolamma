@@ -21,6 +21,7 @@ struct ChatView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
         if let id = selectedModelID {
@@ -74,6 +75,10 @@ struct ChatView: View {
                     isStreaming = false
                     executor.cancelChatStreaming()
                 }
+            }
+            .padding()
+            .if(horizontalSizeClass != .compact) { view in
+                view.ignoresSafeArea(.container, edges: [.bottom])
             }
         }
         .navigationTitle("Chat")

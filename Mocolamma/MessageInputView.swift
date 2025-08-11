@@ -128,7 +128,6 @@ struct MessageInputView: View {
             #endif
 
         }
-        .padding()
         .background(Color.clear)
     }
 }
