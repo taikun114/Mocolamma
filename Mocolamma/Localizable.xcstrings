@@ -3653,6 +3653,22 @@
         }
       }
     },
+    "Toggle Text Wrapping" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Text Wrapping"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストの折り返しを切り替える"
+          }
+        }
+      }
+    },
     "Tools" : {
       "localizations" : {
         "en" : {

@@ -68,7 +68,7 @@ struct LicenseTextView: View {
                             isTextWrapped.toggle()
                             print("isTextWrapped: \(isTextWrapped)")
                         }) {
-                            Image(systemName: "arrow.up.and.down.text.horizontal")
+                            Label("Toggle Text Wrapping", systemImage: "arrow.up.and.down.text.horizontal")
                         }
                     }
                 }

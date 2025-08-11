@@ -4,6 +4,7 @@ struct LicenseInfoModalView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
 
+    @State private var isTextWrapped: Bool = true // 追加
 
     @State private var showingCreateDmgLinkAlert = false
     @State private var isCreateDmgLinkHovered: Bool = false
@@ -68,13 +69,25 @@ struct LicenseInfoModalView: View {
                             Image(systemName: "xmark")
                         }
                     }
+                    // ここに新しい ToolbarItem を追加
+                    ToolbarItem(placement: .primaryAction) {
+                        Button(action: {
+                            isTextWrapped.toggle()
+                            print("LicenseInfoModalView isTextWrapped: \(isTextWrapped)")
+                        }) {
+                            Label("Toggle Text Wrapping", systemImage: "arrow.up.and.down.text.horizontal")
+                        }
+                    }
                 }
+        }
+        .onAppear { // onAppear を追加
+            isTextWrapped = true
         }
         #endif
     }
 
     private var licenseInfoModalViewContent: some View {
-        ScrollView {
+        ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) { // axes を切り替える
             VStack(alignment: .leading) {
                 VStack(alignment: .leading) {
                     Text("Open Source License")
@@ -103,6 +116,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 Divider()
                     .padding(.horizontal)
@@ -147,6 +161,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 // MARK: CompactSlider
                 VStack(alignment: .leading) {
@@ -184,6 +199,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 // MARK: MarkdownUI
                 VStack(alignment: .leading) {
@@ -221,6 +237,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 // MARK: Gemini CLI
                 VStack(alignment: .leading) {
@@ -258,6 +275,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 // MARK: opencode
                 VStack(alignment: .leading) {
@@ -295,6 +313,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
                 // MARK: create-dmg
                 VStack(alignment: .leading) {
@@ -332,6 +351,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
+                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
