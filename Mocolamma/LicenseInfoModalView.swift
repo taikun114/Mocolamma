@@ -63,7 +63,7 @@ struct LicenseInfoModalView: View {
                 .navigationTitle("License Information")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .cancellationAction) {
                         Button(action: { dismiss() }) {
                             Image(systemName: "xmark")
                         }

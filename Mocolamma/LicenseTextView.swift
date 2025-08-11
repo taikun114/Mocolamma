@@ -5,6 +5,7 @@ struct LicenseTextView: View {
     let licenseLink: String? // 新しく追加
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
+    @State private var isTextWrapped: Bool = true
 
     var body: some View {
         #if os(macOS)
@@ -46,32 +47,45 @@ struct LicenseTextView: View {
                 .navigationTitle("License")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .cancellationAction) {
                         Button(action: { dismiss() }) {
                             Image(systemName: "xmark")
                         }
                     }
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItem(placement: .primaryAction) {
                         if let link = licenseLink, let url = URL(string: link) {
                             Button(action: { openURL(url) }) {
                                 Image(systemName: "paperclip")
                             }
                         }
                     }
+                    // iOS 26.0 以降の場合のみ ToolbarSpacer を追加
+                    if #available(iOS 26.0, *) {
+                        ToolbarSpacer(.fixed, placement: .primaryAction) // ToolbarItem の外に配置
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button(action: {
+                            isTextWrapped.toggle()
+                            print("isTextWrapped: \(isTextWrapped)")
+                        }) {
+                            Image(systemName: "arrow.up.and.down.text.horizontal")
+                        }
+                    }
                 }
+        }
+        .onAppear { // ここに onAppear を追加
+            isTextWrapped = true
         }
         #endif
     }
 
     private var licenseTextViewContent: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                Text(licenseText)
-                    .font(.body)
-                    .monospaced()
-                    .padding()
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) {
+            Text(licenseText)
+                .font(.body)
+                .monospaced()
+                .padding()
+                .fixedSize(horizontal: !isTextWrapped, vertical: false)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

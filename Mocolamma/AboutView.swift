@@ -36,7 +36,7 @@ struct AboutView: View {
                 .navigationTitle("About Mocolamma")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .cancellationAction) {
                         Button(action: { dismiss() }) {
                             Image(systemName: "xmark")
                         }
