@@ -100,8 +100,10 @@ struct LicenseTextView: View {
             .frame(maxWidth: .infinity, alignment: .leading) // VStack に frame を追加
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity) // ScrollView に frame を追加
+        #if os(macOS) // ここを追加
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Spacer().frame(height: 60)
         }
+        #endif // ここを追加
     }
 }

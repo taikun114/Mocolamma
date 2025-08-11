@@ -364,9 +364,11 @@ struct LicenseInfoModalView: View {
             .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        #if os(macOS) // ここを追加
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Spacer().frame(height: 60)
         }
+        #endif // ここを追加
     }
 }
 
