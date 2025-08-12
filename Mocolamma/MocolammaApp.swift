@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 // MARK: - メインアプリケーション構造
 
@@ -21,6 +22,9 @@ struct MocolammaApp: App {
     // モデル追加シートの表示/非表示を制御するStateをAppレベルに移動
     @State private var showingAddModelsSheet = false
 
+    // リフレッシュコマンドを発行するためのトリガー
+    @State private var refreshTrigger = PassthroughSubject<Void, Never>()
+
 #if os(macOS)
     init() {
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
@@ -29,8 +33,14 @@ struct MocolammaApp: App {
 
     var body: some Scene {
         WindowGroup() {
-            // ContentViewにshowingInspectorのBindingを渡します。
-            ContentView(serverManager: serverManager, selection: $selection, showingInspector: $showingInspector, showingAddModelsSheet: $showingAddModelsSheet)
+            // ContentViewにrefreshTriggerのPublisherを渡します。
+            ContentView(
+                serverManager: serverManager,
+                selection: $selection,
+                showingInspector: $showingInspector,
+                showingAddModelsSheet: $showingAddModelsSheet,
+                refreshTrigger: refreshTrigger.eraseToAnyPublisher()
+            )
                 .sheet(isPresented: $showingAboutSheet) {
                     AboutView()
                 }
@@ -45,6 +55,17 @@ struct MocolammaApp: App {
             // 標準のサイドバーコマンド（「サイドバーを切り替える」ボタン）を追加します。
             SidebarCommands()
             InspectorCommands()
+
+            // リフレッシュコマンドを表示メニューの先頭に追加
+            CommandGroup(before: .sidebar) {
+                Button(action: {
+                    refreshTrigger.send()
+                }) {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }
+                .keyboardShortcut("r", modifiers: .command)
+                Divider()
+            }
 
             CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 if selection == "server" { // サーバー画面が選択されている場合のみ表示
@@ -75,6 +96,17 @@ struct MocolammaApp: App {
             }
             SidebarCommands()
             InspectorCommands()
+
+            // リフレッシュコマンドを表示メニューの先頭に追加（iPadOS）
+            CommandGroup(before: .sidebar) {
+                Button(action: {
+                    refreshTrigger.send()
+                }) {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }
+                .keyboardShortcut("r", modifiers: .command)
+                Divider()
+            }
 
             // iPadOSでも「サーバーを追加」メニュー項目を追加
             CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化

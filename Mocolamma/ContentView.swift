@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation // Task { @MainActor in } を使用するため
 import CompactSlider
+import Combine
 
 // MARK: - コンテンツビュー
 
@@ -50,13 +51,17 @@ struct ContentView: View {
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     
-    // ContentViewの初期化子を更新し、showingInspectorとshowingAddModelsSheetのBindingを受け取るように変更
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>) {
+    // リフレッシュトリガーを受け取る
+    let refreshTrigger: AnyPublisher<Void, Never>
+    
+    // ContentViewの初期化子を更新
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, refreshTrigger: AnyPublisher<Void, Never>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
+        self.refreshTrigger = refreshTrigger
     }
 
     var body: some View {
@@ -240,6 +245,9 @@ struct ContentView: View {
                 }
             }
         }
+        .onReceive(refreshTrigger) {
+            performRefreshForCurrentSelection()
+        }
     }
 
     private func updateSelectedServerForInspector() {
@@ -249,6 +257,57 @@ struct ContentView: View {
             return
         }
         selectedServerForInspector = server
+    }
+    
+    private func performRefreshForCurrentSelection() {
+        guard let currentSelection = selection else { return }
+        
+        switch currentSelection {
+        case "server":
+            // サーバー接続状態を再チェック
+            for server in serverManager.servers {
+                serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
+                Task {
+                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
+                    await MainActor.run {
+                        serverManager.updateServerConnectionStatus(serverID: server.id, status: isConnected)
+                    }
+                }
+            }
+            
+        case "models":
+            // モデルリストを再取得
+            Task {
+                executor.isPullingErrorHold = false
+                executor.pullHasError = false
+                executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
+                executor.clearModelInfoCache()
+                let previousSelection = selectedModel
+                let selectedServerID = serverManager.selectedServerID
+                selectedModel = nil
+                await executor.fetchOllamaModelsFromAPI()
+                if let sid = selectedServerID {
+                    serverManager.updateServerConnectionStatus(serverID: sid, status: nil)
+                }
+                await MainActor.run {
+                    serverManager.inspectorRefreshToken = UUID()
+                    NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                }
+                if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
+                    selectedModel = prev
+                }
+            }
+            
+        case "chat":
+            // チャットではモデルリストを再取得
+            Task {
+                executor.clearModelInfoCache()
+                await executor.fetchOllamaModelsFromAPI()
+            }
+            
+        default:
+            break
+        }
     }
 }
 
@@ -766,5 +825,5 @@ private struct MainContentDetailView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), refreshTrigger: Just(()).eraseToAnyPublisher())
 }
