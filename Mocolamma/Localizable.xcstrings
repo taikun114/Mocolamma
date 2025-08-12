@@ -3232,18 +3232,18 @@
         }
       }
     },
-    "Select a category." : {
+    "Select a menu." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a category."
+            "value" : "Select a menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カテゴリを選択してください。"
+            "value" : "メニューを選択してください"
           }
         }
       }
@@ -3275,7 +3275,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "詳細を見るにはサーバーを選択してください。"
+            "value" : "詳細を表示するにはサーバーを選択してください。"
           }
         }
       }

@@ -50,6 +50,9 @@ struct MocolammaApp: App {
                 showingInspector: $showingInspector,
                 showingAddModelsSheet: $showingAddModelsSheet
             )
+            #if os(macOS)
+                .frame(minWidth: 500, minHeight: 300)
+            #endif
                 .environmentObject(appRefreshTrigger)
                 .sheet(isPresented: $showingAboutSheet) {
                     AboutView()
@@ -134,6 +137,7 @@ struct MocolammaApp: App {
             #endif
         }
         #if os(macOS)
+        .defaultSize(width: 800, height: 500)
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
         #endif
