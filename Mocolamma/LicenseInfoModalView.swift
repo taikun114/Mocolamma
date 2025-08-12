@@ -154,6 +154,7 @@ struct LicenseInfoModalView: View {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/ollama/ollama") { openURL(url) }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: { Text("Are you sure you want to open the Ollama GitHub page?") }
 
@@ -186,6 +187,7 @@ struct LicenseInfoModalView: View {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/buh/CompactSlider") { openURL(url) }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: { Text("Are you sure you want to open the CompactSlider GitHub page?") }
 
@@ -224,6 +226,7 @@ struct LicenseInfoModalView: View {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/gonzalezreal/swift-markdown-ui/tree/main") { openURL(url) }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: { Text("Are you sure you want to open the MarkdownUI GitHub page?") }
 
@@ -262,6 +265,7 @@ struct LicenseInfoModalView: View {
                         Button("Open") {
                             if let url = URL(string: "https://github.com/google-gemini/gemini-cli") { openURL(url) }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: { Text("Are you sure you want to open the Gemini CLI GitHub page?") }
 
@@ -350,6 +354,7 @@ struct LicenseInfoModalView: View {
                     Button("Open") {
                         if let url = URL(string: "https://github.com/create-dmg/create-dmg") { openURL(url) }
                     }
+                    .keyboardShortcut(.defaultAction)
                     Button("Cancel", role: .cancel) {}
                 } message: { Text("Are you sure you want to open the create-dmg GitHub page?") }
 

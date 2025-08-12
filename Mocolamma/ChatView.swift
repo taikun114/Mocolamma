@@ -145,6 +145,7 @@ struct ChatView: View {
         }
         .alert("This model cannot be used", isPresented: $showEmbeddingAlert) {
             Button("OK") { showEmbeddingAlert = false }
+            .keyboardShortcut(.defaultAction)
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "Embedding-only model selection warning body."))
         }
@@ -153,6 +154,7 @@ struct ChatView: View {
             set: { if !$0 { generalErrorMessage = nil } }
         )) {
             Button("OK") { generalErrorMessage = nil }
+            .keyboardShortcut(.defaultAction)
         } message: {
             Text(generalErrorMessage ?? "An unknown error occurred.")
         }

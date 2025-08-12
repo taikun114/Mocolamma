@@ -107,6 +107,7 @@ struct ServerView: View {
                 showingDeleteConfirmationServer = false
                 serverToDelete = nil
             }
+            .keyboardShortcut(.defaultAction)
         } message: {
             if let server = serverToDelete {
                 Text(String(localized: "Are you sure you want to delete the server \"\(server.name)\"?\nThis action cannot be undone.", comment: "サーバー削除の確認メッセージ。"))

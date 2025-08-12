@@ -162,6 +162,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the GitHub contributors page?")
@@ -186,6 +187,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the GitHub contributors page?")
@@ -213,6 +215,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Issue page on GitHub?")
@@ -237,6 +240,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Issue page on GitHub?")
@@ -291,6 +295,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Discussion page on GitHub?")
@@ -315,6 +320,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Discussion page on GitHub?")
@@ -348,6 +354,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the GitHub repository page?")
@@ -378,6 +385,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the GitHub repository page?")
@@ -409,6 +417,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Buy Me a Coffee page?")
@@ -439,6 +448,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the Buy Me a Coffee page?")
@@ -470,6 +480,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the PayPal.Me page?")
@@ -500,6 +511,7 @@ struct AboutView: View {
                                 openURL(url)
                             }
                         }
+                        .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the PayPal.Me page?")
@@ -515,6 +527,7 @@ struct AboutView: View {
                     openURL(url)
                 }
             }
+            .keyboardShortcut(.defaultAction)
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Are you sure you want to open the send feedback email window?")

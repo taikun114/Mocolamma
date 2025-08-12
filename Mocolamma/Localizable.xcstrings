@@ -655,6 +655,23 @@
         }
       }
     },
+    "Are you sure you want to open the Ollama models page?" : {
+      "comment" : "Alert message asking for confirmation to open Ollama models page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Ollama models page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollamaのモデルページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
     "Are you sure you want to open the opencode GitHub page?" : {
       "localizations" : {
         "en" : {
@@ -768,6 +785,7 @@
       }
     },
     "Cancel" : {
+      "comment" : "Button to cancel an action.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1782,6 +1800,22 @@
         }
       }
     },
+    "Find Models" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find Models"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを探す"
+          }
+        }
+      }
+    },
     "Format:" : {
       "localizations" : {
         "en" : {
@@ -1973,6 +2007,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大きなモデルを読み込む場合など、応答に時間がかかる場合はタイムアウトを長くすることで改善する可能性があります。"
+          }
+        }
+      }
+    },
+    "If you're not sure what to enter, you can find models on the Ollama website." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you're not sure what to enter, you can find models on the Ollama website."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "何を入力したら良いかわからない場合、Ollamaのウェブサイトでモデルを探すことができます。"
           }
         }
       }
@@ -2621,6 +2671,7 @@
       }
     },
     "Open" : {
+      "comment" : "Button to confirm opening a link.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2845,6 +2896,7 @@
       }
     },
     "Open Link?" : {
+      "comment" : "Alert title for opening an external link.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2936,6 +2988,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開きます。"
+          }
+        }
+      }
+    },
+    "Open Website" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Website"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトを開く"
           }
         }
       }

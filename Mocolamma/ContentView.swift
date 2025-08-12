@@ -216,6 +216,7 @@ struct ContentView: View {
                 showingDeleteConfirmation = false
                 modelToDelete = nil
             }
+            .keyboardShortcut(.defaultAction) // Added here
         } message: {
             if let model = modelToDelete { // 手動でアンラップ
                 Text(String(localized: "Are you sure you want to delete the model \"\(model.name)\"?\nThis action cannot be undone.", comment: "モデル削除の確認メッセージ。"))
@@ -561,7 +562,7 @@ private struct MainNavigationView: View {
                 #endif
             }
             .navigationTitle("Menu")
-            .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
+            .navigationSplitViewColumnWidth(min: 150, ideal: 300, max: 500)
         } detail: {
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,

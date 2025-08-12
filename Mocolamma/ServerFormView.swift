@@ -81,6 +81,7 @@ struct ServerFormView: View {
         #endif
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
             Button("OK") { }
+            .keyboardShortcut(.defaultAction) // Added here
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
                 let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
                 if let server = editingServer {
@@ -111,6 +112,7 @@ struct ServerFormView: View {
                 Button(action: save) {
                     Image(systemName: "checkmark")
                 }
+                .keyboardShortcut(.defaultAction)
                 .disabled(isSaveButtonDisabled)
             }
         }
