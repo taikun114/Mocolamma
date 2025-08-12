@@ -552,6 +552,16 @@ struct AboutView: View {
         #else
         let cpuArchitecture = "N/A"
         #endif
+
+        let osType: String
+        #if os(iOS)
+        osType = "iOS / iPadOS"
+        #elseif os(macOS)
+        osType = "macOS"
+        #else
+        osType = "Unknown"
+        #endif
+
         let languageCode = Locale.current.language.languageCode?.identifier
         let body: String
         if languageCode == "ja" {
@@ -561,7 +571,10 @@ struct AboutView: View {
 
             システム情報:
 
-            ・macOS
+            ・OSの種類
+            　\(osType)
+
+            ・OSバージョン
             　\(osVersion)
 
             ・アプリ
@@ -574,7 +587,10 @@ struct AboutView: View {
 
             System Information:
 
-            ・macOS
+            ・OS Type
+            　\(osType)
+
+            ・OS Version
             　\(osVersion)
 
             ・App
