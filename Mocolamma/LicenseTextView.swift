@@ -7,6 +7,7 @@ struct LicenseTextView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
     @State private var isTextWrapped: Bool = true
+    @State private var showingLicenseLinkAlert = false // Added for license link alert
 
     var body: some View {
         #if os(macOS)
@@ -26,7 +27,7 @@ struct LicenseTextView: View {
                     HStack {
                         if let link = licenseLink, let url = URL(string: link) {
                             Button {
-                                openURL(url)
+                                showingLicenseLinkAlert = true // Modified
                             } label: {
                                 Label("Open License Page", systemImage: "paperclip")
                             }
@@ -49,6 +50,17 @@ struct LicenseTextView: View {
                 }
                 .frame(height: 60) // オーバーレイの固定高さ
             }
+            .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) { // Added here
+                Button("Open") {
+                    if let link = licenseLink, let url = URL(string: link) {
+                        openURL(url)
+                    }
+                }
+                .keyboardShortcut(.defaultAction)
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Are you sure you want to open the page with license information?")
+            }
         #else
         NavigationView {
             licenseTextViewContent
@@ -62,7 +74,7 @@ struct LicenseTextView: View {
                     }
                     ToolbarItem(placement: .primaryAction) {
                         if let link = licenseLink, let url = URL(string: link) {
-                            Button(action: { openURL(url) }) {
+                            Button(action: { showingLicenseLinkAlert = true }) { // Modified
                                 Image(systemName: "paperclip")
                             }
                         }
@@ -81,6 +93,17 @@ struct LicenseTextView: View {
                     }
                 }
                 .modifier(NavSubtitleIfAvailable(subtitle: Text(licenseTitle))) // ここに追加
+                .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) { // Added here
+                    Button("Open") {
+                        if let link = licenseLink, let url = URL(string: link) {
+                            openURL(url)
+                        }
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Are you sure you want to open the page with license information?")
+                }
         }
         .onAppear { // ここに onAppear を追加
             isTextWrapped = true

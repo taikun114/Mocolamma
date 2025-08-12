@@ -688,6 +688,22 @@
         }
       }
     },
+    "Are you sure you want to open the page with license information?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the page with license information?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス情報が記載されたページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
     "Are you sure you want to open the PayPal.Me page?" : {
       "localizations" : {
         "en" : {
@@ -2699,6 +2715,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライセンスページを開く"
+          }
+        }
+      }
+    },
+    "Open License Page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open License Page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンスページを開きますか？"
           }
         }
       }
