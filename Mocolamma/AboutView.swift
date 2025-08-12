@@ -555,7 +555,17 @@ struct AboutView: View {
 
         let osType: String
         #if os(iOS)
-        osType = "iOS / iPadOS"
+        if ProcessInfo.processInfo.isiOSAppOnMac {
+            osType = "macOS (iPad App)"
+        } else if UIDevice.current.userInterfaceIdiom == .pad {
+            osType = "iPadOS"
+        } else if UIDevice.current.userInterfaceIdiom == .phone {
+            osType = "iOS"
+        } else if UIDevice.current.userInterfaceIdiom == .vision {
+            osType = "visionOS (iPad App)"
+        } else {
+            osType = "iOS / iPadOS (Unknown)"
+        }
         #elseif os(macOS)
         osType = "macOS"
         #else
