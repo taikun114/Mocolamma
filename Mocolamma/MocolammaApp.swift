@@ -25,6 +25,16 @@ struct MocolammaApp: App {
     // リフレッシュコマンドを発行するためのトリガー
     @State private var refreshTrigger = PassthroughSubject<Void, Never>()
 
+    // メニュー項目の有効/無効を判断する計算プロパティ
+    private var isMenuActionDisabled: Bool {
+        switch selection {
+        case "server", "models", "chat": // サーバー、モデル、チャットのいずれかの画面が開いている場合は有効
+            return false
+        default: // "settings" または nil (初期状態など) の場合は無効
+            return true
+        }
+    }
+
 #if os(macOS)
     init() {
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
@@ -64,6 +74,7 @@ struct MocolammaApp: App {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(isMenuActionDisabled) // ここで無効化を適用
                 Divider()
             }
 
@@ -105,6 +116,7 @@ struct MocolammaApp: App {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(isMenuActionDisabled) // ここで無効化を適用
                 Divider()
             }
 

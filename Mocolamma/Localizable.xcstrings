@@ -2566,6 +2566,22 @@
         }
       }
     },
+    "Nothing to display." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to display."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示するものがありません。"
+          }
+        }
+      }
+    },
     "Number" : {
       "localizations" : {
         "en" : {

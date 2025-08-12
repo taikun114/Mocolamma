@@ -531,18 +531,25 @@ private struct InspectorContentView: View {
 
     var body: some View {
         Group {
-            if selection == "models",
-               let selectedModelID = selectedModel,
-               let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                ModelInspectorDetailView(
-                    model: model,
-                    modelInfo: modelInfo,
-                    isLoading: isLoadingInfo,
-                    fetchedCapabilities: commandExecutor.selectedModelCapabilities,
-                    licenseBody: licenseBody,
-                    licenseLink: licenseLink
-                )
-                .id(model.id)
+            if selection == "models" {
+                if let selectedModelID = selectedModel,
+                   let model = sortedModels.first(where: { $0.id == selectedModelID }) {
+                    ModelInspectorDetailView(
+                        model: model,
+                        modelInfo: modelInfo,
+                        isLoading: isLoadingInfo,
+                        fetchedCapabilities: commandExecutor.selectedModelCapabilities,
+                        licenseBody: licenseBody,
+                        licenseLink: licenseLink
+                    )
+                    .id(model.id)
+                } else {
+                    Text("Select a model to see the details.") // モデルが選択されていない場合
+                        .font(.title2)
+                        .foregroundColor(.secondary)
+                        .id("model_selection_placeholder")
+                        .padding()
+                }
             } else if selection == "server" {
                 if let server = selectedServerForInspector {
                     ServerInspectorDetailView(
@@ -555,6 +562,7 @@ private struct InspectorContentView: View {
                         .font(.title2)
                         .foregroundColor(.secondary)
                         .id("server_selection_placeholder")
+                        .padding()
                 }
             } else if selection == "chat" {
                 Form {
@@ -644,10 +652,11 @@ private struct InspectorContentView: View {
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
             } else {
-                Text("Select a model to see the details.")
+                Text("Nothing to display.")
                     .font(.title2)
                     .foregroundColor(.secondary)
-                    .id("model_selection_placeholder")
+                    .id("nothing_to_display_placeholder")
+                    .padding()
             }
         }
         .onChange(of: selectedModel) { _, newID in
