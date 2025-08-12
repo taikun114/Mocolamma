@@ -12,6 +12,9 @@ struct AddModelsSheet: View {
     @State private var httpErrorMessage: String = ""
     @State private var pullErrorTriggeredSeen: Bool = false
     
+    @State private var showingOpenLinkAlert = false
+    @Environment(\.openURL) var openURL
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             #if os(macOS)
@@ -26,11 +29,39 @@ struct AddModelsSheet: View {
                 
                 TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                Spacer()
                 
+                Spacer() // This spacer is present in both old and new strings, so it should be preserved.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Find Models")
+                        .font(.headline)
+                    Text("If you're not sure what to enter, you can find models on the Ollama website.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .lineLimit(nil)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    #if os(iOS) // Button appears below message on iOS
+                    Button {
+                        showingOpenLinkAlert = true
+                    } label: {
+                        Label("Open Website", systemImage: "paperclip")
+                    }
+                    .buttonStyle(.bordered)
+                    #endif
+                }
+
                 #if os(macOS)
                 HStack {
-                    Spacer()
+                    Button {
+                        showingOpenLinkAlert = true
+                    } label: {
+                        Label("Open Website", systemImage: "paperclip")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large) // Apply controlSize for macOS
+
+                    Spacer() // This spacer is present in both old and new strings, so it should be preserved.
                     Button("Cancel") { // キャンセルボタンのテキスト。
                         showingAddSheet = false
                     }
@@ -49,7 +80,7 @@ struct AddModelsSheet: View {
         }
         .padding()
         #if os(macOS)
-        .frame(width: 350, height: 180) // シートの固定サイズ
+        .frame(width: 400, height: 250) // シートの固定サイズ
         #endif
         .onReceive(executor.$pullHttpErrorTriggered) { triggered in
             if triggered && !pullErrorTriggeredSeen {
@@ -67,8 +98,20 @@ struct AddModelsSheet: View {
         }
         .alert("Model Pull Error", isPresented: $showHttpErrorAlert) {
             Button("OK") { showHttpErrorAlert = false }
+            .keyboardShortcut(.defaultAction)
         } message: {
             Text(httpErrorMessage)
+        }
+        .alert(String(localized: "Open Link?", comment: "Alert title for opening an external link."), isPresented: $showingOpenLinkAlert) {
+            Button(String(localized: "Open", comment: "Button to confirm opening a link.")) {
+                if let url = URL(string: "https://ollama.com/library") {
+                    openURL(url)
+                }
+            }
+            .keyboardShortcut(.defaultAction)
+            Button(String(localized: "Cancel", comment: "Button to cancel an action."), role: .cancel) {}
+        } message: {
+            Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "Alert message asking for confirmation to open Ollama models page."))
         }
         #if os(iOS)
         .navigationTitle("Add Model")
@@ -83,6 +126,7 @@ struct AddModelsSheet: View {
                 Button(action: add) {
                     Image(systemName: "plus")
                 }
+                .keyboardShortcut(.defaultAction)
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
             }
         }
