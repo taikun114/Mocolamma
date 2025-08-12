@@ -6,8 +6,21 @@ import Combine
 /// アプリケーションの起動ポイントとなる基本ファイルです。
 /// ウィンドウのタイトルやスタイルなどの初期設定を行い、
 /// アプリケーションのメインコンテンツビューであるContentViewをホストします。
+#if os(macOS)
+import AppKit
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return true
+    }
+}
+#endif
+
 @main
 struct MocolammaApp: App {
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    #endif
     @Environment(\.openWindow) private var openWindow
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
