@@ -1565,18 +1565,18 @@
         }
       }
     },
-    "Enter the name of the model you want to add." : {
+    "Enter the name of the model you want to add" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter the name of the model you want to add."
+            "value" : "Enter the name of the model you want to add"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "追加したモデル名を入力してください。"
+            "value" : "追加したいモデル名を入力"
           }
         }
       }
@@ -3324,6 +3324,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
+          }
+        }
+      }
+    },
+    "server_name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前"
           }
         }
       }

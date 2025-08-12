@@ -84,12 +84,16 @@ struct ServerView: View {
             serverToolbarContent
         }
         .sheet(isPresented: $showingAddServerSheet) {
-            ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
-                .environmentObject(appRefreshTrigger)
+            NavigationStack {
+                ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
+                    .environmentObject(appRefreshTrigger)
+            }
         }
         .sheet(item: $serverToEdit) { server in
-            ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
-                .environmentObject(appRefreshTrigger)
+            NavigationStack {
+                ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
+                    .environmentObject(appRefreshTrigger)
+            }
         }
         .alert("Delete Server", isPresented: $showingDeleteConfirmationServer) {
             Button("Delete", role: .destructive) {

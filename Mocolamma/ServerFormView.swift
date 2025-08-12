@@ -31,14 +31,21 @@ struct ServerFormView: View {
         _serverHostInput = State(initialValue: editingServer?.host ?? "")
     }
 
+    // 保存/更新ボタンを無効化するための計算プロパティ
+    private var isSaveButtonDisabled: Bool {
+        serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
+            #if os(macOS)
             Text(editingServer == nil ? "Add Server" : "Edit Server") // シートのタイトル
                 .font(.title)
                 .bold()
+            #endif
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Name") // 名前ラベル
+                Text("server_name") // 名前ラベル
                     .font(.headline)
                 TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -50,6 +57,7 @@ struct ServerFormView: View {
                 Spacer()
             }
 
+            #if os(macOS)
             HStack {
                 Spacer()
                 Button("Cancel") { // キャンセルボタン
@@ -59,36 +67,18 @@ struct ServerFormView: View {
                 .keyboardShortcut(.cancelAction) // Escキーでキャンセル
 
                 Button(editingServer == nil ? "Save" : "Update") { // 保存/更新ボタン
-                    Task {
-                        let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
-                        // ホストに接続できることを確認
-                        let isConnected = await executor.checkAPIConnectivity(host: processedHost)
-
-                        if isConnected {
-                            if let server = editingServer {
-                                // 編集モード: サーバーを更新
-                                serverManager.updateServer(
-                                    serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
-                                )
-                            } else {
-                                // 追加モード: 新しいサーバーを追加
-                                serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
-                            }
-                            appRefreshTrigger.send() // リフレッシュをトリガー
-                            dismiss() // シートを閉じる
-                        } else {
-                            // 接続失敗: アラートを表示
-                            showingConnectionErrorAlert = true
-                        }
-                    }
+                    save()
                 }
                 .keyboardShortcut(.defaultAction) // Enterキーで実行
                 .controlSize(.large)
-                .disabled(serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(isSaveButtonDisabled)
             }
+            #endif
         }
         .padding()
+        #if os(macOS)
         .frame(width: 350, height: 250) // シートの固定サイズ
+        #endif
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
             Button("OK") { }
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
@@ -108,23 +98,67 @@ struct ServerFormView: View {
         } message: {
             Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "ConnectionError.message"))
         }
+        #if os(iOS)
+        .navigationTitle(editingServer == nil ? "Add Server" : "Edit Server")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: save) {
+                    Image(systemName: "checkmark")
+                }
+                .disabled(isSaveButtonDisabled)
+            }
+        }
+        #endif
     }
-private func processHostInput(_ host: String) -> String {
-    let lowercasedHost = host.lowercased()
 
-    // Find the last colon
-    if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {
-        let afterColon = lowercasedHost[lowercasedHost.index(after: lastColonIndex)...]
-        // Check if characters after the last colon are all digits
-        if !afterColon.isEmpty && afterColon.allSatisfy({ $0.isNumber }) {
-            // A port number exists, return as is
-            return lowercasedHost
+    /// 保存/更新処理
+    private func save() {
+        Task {
+            let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
+            // ホストに接続できることを確認
+            let isConnected = await executor.checkAPIConnectivity(host: processedHost)
+
+            if isConnected {
+                if let server = editingServer {
+                    // 編集モード: サーバーを更新
+                    serverManager.updateServer(
+                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                    )
+                } else {
+                    // 追加モード: 新しいサーバーを追加
+                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                }
+                appRefreshTrigger.send() // リフレッシュをトリガー
+                dismiss() // シートを閉じる
+            } else {
+                // 接続失敗: アラートを表示
+                showingConnectionErrorAlert = true
+            }
         }
     }
 
-    // No colon, or colon not followed by a port number, append default port
-    return lowercasedHost + ":11434"
-}
+    private func processHostInput(_ host: String) -> String {
+        let lowercasedHost = host.lowercased()
+
+        // Find the last colon
+        if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {
+            let afterColon = lowercasedHost[lowercasedHost.index(after: lastColonIndex)...]
+            // Check if characters after the last colon are all digits
+            if !afterColon.isEmpty && afterColon.allSatisfy({ $0.isNumber }) {
+                // A port number exists, return as is
+                return lowercasedHost
+            }
+        }
+
+        // No colon, or colon not followed by a port number, append default port
+        return lowercasedHost + ":11434"
+    }
 }
 
 // MARK: - プレビュー

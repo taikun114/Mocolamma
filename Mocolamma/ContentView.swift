@@ -197,8 +197,10 @@ struct ContentView: View {
         }
         .environmentObject(executor)
         .sheet(isPresented: $showingAddModelsSheet) {
-            AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
-                .environmentObject(appRefreshTrigger)
+            NavigationStack {
+                AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
+                    .environmentObject(appRefreshTrigger)
+            }
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {
