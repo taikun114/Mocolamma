@@ -23,7 +23,7 @@ struct MocolammaApp: App {
     @State private var showingAddModelsSheet = false
 
     // リフレッシュコマンドを発行するためのトリガー
-    @State private var refreshTrigger = PassthroughSubject<Void, Never>()
+    @StateObject private var appRefreshTrigger = RefreshTrigger()
 
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
@@ -48,9 +48,9 @@ struct MocolammaApp: App {
                 serverManager: serverManager,
                 selection: $selection,
                 showingInspector: $showingInspector,
-                showingAddModelsSheet: $showingAddModelsSheet,
-                refreshTrigger: refreshTrigger.eraseToAnyPublisher()
+                showingAddModelsSheet: $showingAddModelsSheet
             )
+                .environmentObject(appRefreshTrigger)
                 .sheet(isPresented: $showingAboutSheet) {
                     AboutView()
                 }
@@ -69,7 +69,7 @@ struct MocolammaApp: App {
             // リフレッシュコマンドを表示メニューの先頭に追加
             CommandGroup(before: .sidebar) {
                 Button(action: {
-                    refreshTrigger.send()
+                    appRefreshTrigger.send()
                 }) {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
@@ -111,7 +111,7 @@ struct MocolammaApp: App {
             // リフレッシュコマンドを表示メニューの先頭に追加（iPadOS）
             CommandGroup(before: .sidebar) {
                 Button(action: {
-                    refreshTrigger.send()
+                    appRefreshTrigger.send()
                 }) {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }

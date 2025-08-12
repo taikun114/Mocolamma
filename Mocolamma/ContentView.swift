@@ -50,18 +50,18 @@ struct ContentView: View {
 
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     // リフレッシュトリガーを受け取る
-    let refreshTrigger: AnyPublisher<Void, Never>
+    
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, refreshTrigger: AnyPublisher<Void, Never>) {
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
-        self.refreshTrigger = refreshTrigger
     }
 
     var body: some View {
@@ -197,6 +197,7 @@ struct ContentView: View {
         .environmentObject(executor)
         .sheet(isPresented: $showingAddModelsSheet) {
             AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
+                .environmentObject(appRefreshTrigger)
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {
@@ -235,18 +236,14 @@ struct ContentView: View {
             // API通信用の選択IDが変更されても、Inspectorの表示はServerViewのlistSelectionに任せる
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
-            if let server = newServer {
-                serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
-                Task {
-                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
-                    await MainActor.run {
-                        serverManager.updateServerConnectionStatus(serverID: server.id, status: isConnected)
-                    }
+            if newServer != nil {
+                if selection == "server" {
+                    appRefreshTrigger.send()
                 }
             }
         }
-        .onReceive(refreshTrigger) {
-            performRefreshForCurrentSelection()
+        .onReceive(appRefreshTrigger.publisher) {
+            Task { await performRefreshForCurrentSelection() }
         }
     }
 
@@ -259,11 +256,12 @@ struct ContentView: View {
         selectedServerForInspector = server
     }
     
-    private func performRefreshForCurrentSelection() {
+    private func performRefreshForCurrentSelection() async {
         guard let currentSelection = selection else { return }
         
         switch currentSelection {
         case "server":
+            try? await Task.sleep(nanoseconds: 100_000_000)
             // サーバー接続状態を再チェック
             for server in serverManager.servers {
                 serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
@@ -276,6 +274,7 @@ struct ContentView: View {
             }
             
         case "models":
+            try? await Task.sleep(nanoseconds: 100_000_000)
             // モデルリストを再取得
             Task {
                 executor.isPullingErrorHold = false
@@ -834,5 +833,6 @@ private struct MainContentDetailView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), refreshTrigger: Just(()).eraseToAnyPublisher())
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false))
+        .environmentObject(RefreshTrigger())
 }

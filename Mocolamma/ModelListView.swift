@@ -31,6 +31,7 @@ enum SortOrder: String, CaseIterable, Identifiable {
 struct ModelListView: View {
     @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
     @EnvironmentObject var serverManager: ServerManager
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
     
@@ -103,24 +104,7 @@ struct ModelListView: View {
         #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                Task {
-                    executor.isPullingErrorHold = false
-                    executor.pullHasError = false
-                    executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
-                    executor.clearModelInfoCache()
-                    let previousSelection = selectedModel
-                    let selectedServerID = serverManager.selectedServerID
-                    selectedModel = nil
-                    await executor.fetchOllamaModelsFromAPI()
-                    if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
-                    await MainActor.run {
-                        serverManager.inspectorRefreshToken = UUID()
-                        NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-                    }
-                    if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
-                        selectedModel = prev
-                    }
-                }
+                appRefreshTrigger.send()
             }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
@@ -219,22 +203,7 @@ struct ModelListView: View {
             .onDelete(perform: deleteModel)
         }
         .refreshable {
-            executor.isPullingErrorHold = false
-            executor.pullHasError = false
-            executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
-            executor.clearModelInfoCache()
-            let previousSelection = selectedModel
-            let selectedServerID = serverManager.selectedServerID
-            selectedModel = nil
-            await executor.fetchOllamaModelsFromAPI()
-            if let sid = selectedServerID { serverManager.updateServerConnectionStatus(serverID: sid, status: nil) }
-            await MainActor.run {
-                serverManager.inspectorRefreshToken = UUID()
-                NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-            }
-            if let prev = previousSelection, executor.models.contains(where: { $0.id == prev }) {
-                selectedModel = prev
-            }
+            appRefreshTrigger.send()
         }
 #else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
@@ -340,6 +309,7 @@ struct ModelListView: View {
                     .scaleEffect(2)
             }
         }
+        
         .navigationTitle("Models")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
 
@@ -350,16 +320,7 @@ struct ModelListView: View {
         .onAppear {
             print("ModelListView Appeared. Fetching Ollama models from API.")
             if !executor.isRunning && !executor.isPulling {
-                let previousSelection = selectedModel
-                Task {
-                    await executor.fetchOllamaModelsFromAPI()
-                    let models = executor.models
-                    if let prev = previousSelection, models.contains(where: { $0.id == prev }) {
-                        if selectedModel != prev { selectedModel = prev }
-                    } else {
-                        selectedModel = nil
-                    }
-                }
+                appRefreshTrigger.send()
             }
         }
     }

@@ -111,10 +111,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         print("Ollama APIから \(apiBaseURL) のモデルリストを取得中...")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "APIからモデルを取得中のステータスメッセージ。"), apiBaseURL)
+        try? await Task.sleep(nanoseconds: 100_000_000)
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
-        // モデルリストを一旦クリア
-        self.models = []
         
         // defer を使って関数終了時に必ず isRunning を false に設定します
         defer {

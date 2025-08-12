@@ -7,6 +7,7 @@ import SwiftUI
 struct ServerView: View {
     @ObservedObject var serverManager: ServerManager
     @ObservedObject var executor: CommandExecutor
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
 
     @State private var showingAddServerSheet = false
     @State private var serverToEdit: ServerInfo?
@@ -31,7 +32,7 @@ struct ServerView: View {
         #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                checkAllServerConnectivity()
+                appRefreshTrigger.send()
             }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
@@ -66,7 +67,7 @@ struct ServerView: View {
             serverToEdit: $serverToEdit,
             showingDeleteConfirmationServer: $showingDeleteConfirmationServer,
             serverToDelete: $serverToDelete,
-            onRefresh: checkAllServerConnectivity
+            appRefreshTrigger: appRefreshTrigger
         )
         .navigationTitle("Servers")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
@@ -84,9 +85,11 @@ struct ServerView: View {
         }
         .sheet(isPresented: $showingAddServerSheet) {
             ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
+                .environmentObject(appRefreshTrigger)
         }
         .sheet(item: $serverToEdit) { server in
             ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
+                .environmentObject(appRefreshTrigger)
         }
         .alert("Delete Server", isPresented: $showingDeleteConfirmationServer) {
             Button("Delete", role: .destructive) {
@@ -112,7 +115,7 @@ struct ServerView: View {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
             listSelection = serverManager.selectedServerID
-            checkAllServerConnectivity()
+            appRefreshTrigger.send()
         }
         .onChange(of: serverManager.servers) { oldServers, newServers in
             handleServerListChange(oldServers: oldServers, newServers: newServers)
@@ -139,7 +142,7 @@ struct ServerView: View {
             serverManager.selectedServerID = newServers.first?.id
         }
         listSelection = serverManager.selectedServerID
-        checkAllServerConnectivity()
+        appRefreshTrigger.send()
     }
 
     private func handleListSelectionChange(oldID: ServerInfo.ID?, newID: ServerInfo.ID?) {
@@ -158,7 +161,7 @@ private struct ServerListViewContent: View {
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
-    let onRefresh: () -> Void
+    @ObservedObject var appRefreshTrigger: RefreshTrigger
 
     var body: some View {
         List(selection: $listSelection) {
@@ -200,7 +203,7 @@ private struct ServerListViewContent: View {
         }
         #if os(iOS)
         .refreshable {
-            onRefresh()
+            appRefreshTrigger.send()
         }
         #endif
     }

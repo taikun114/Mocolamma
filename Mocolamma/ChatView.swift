@@ -4,6 +4,7 @@ import MarkdownUI
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
     @EnvironmentObject var serverManager: ServerManager
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @Binding var selectedModelID: OllamaModel.ID?
     @State private var messages: [ChatMessage] = []
     @State private var inputText: String = ""
@@ -162,10 +163,7 @@ struct ChatView: View {
         #if os(iOS)
         ToolbarItemGroup(placement: .primaryAction) { // Group for Refresh and Model Selection (iOS)
             Button(action: {
-                Task {
-                    executor.clearModelInfoCache()
-                    await executor.fetchOllamaModelsFromAPI()
-                }
+                appRefreshTrigger.send()
             }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
@@ -191,10 +189,7 @@ struct ChatView: View {
         #else // macOS
         ToolbarItem(placement: .primaryAction) { // Refresh Button (macOS)
             Button(action: {
-                Task {
-                    executor.clearModelInfoCache()
-                    await executor.fetchOllamaModelsFromAPI()
-                }
+                appRefreshTrigger.send()
             }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }

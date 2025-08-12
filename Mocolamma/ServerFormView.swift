@@ -6,6 +6,7 @@ import SwiftUI
 /// サーバー名とホストURLの入力欄を提供し、保存時に接続確認を行います。
 struct ServerFormView: View {
     @Environment(\.dismiss) var dismiss // シートを閉じるための環境変数
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @ObservedObject var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
     @ObservedObject var executor: CommandExecutor // 接続確認のためにCommandExecutorのインスタンスを受け取ります
 
@@ -73,6 +74,7 @@ struct ServerFormView: View {
                                 // 追加モード: 新しいサーバーを追加
                                 serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                             }
+                            appRefreshTrigger.send() // リフレッシュをトリガー
                             dismiss() // シートを閉じる
                         } else {
                             // 接続失敗: アラートを表示
@@ -100,6 +102,7 @@ struct ServerFormView: View {
                     // 追加モード: 新しいサーバーを追加
                     serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
                 }
+                appRefreshTrigger.send() // リフレッシュをトリガー
                 dismiss() // シートを閉じる
             }
         } message: {
