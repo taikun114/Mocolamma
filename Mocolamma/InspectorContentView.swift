@@ -16,10 +16,12 @@ struct InspectorContentView: View {
     @Binding var useCustomChatSettings: Bool
     @Binding var chatTemperature: Double
     
+    // States for chat model info, which are still needed.
     @State private var modelInfo: [String: JSONValue]?
     @State private var licenseBody: String?
     @State private var licenseLink: String?
     @State private var isLoadingInfo: Bool = false
+
     @Binding var isTemperatureEnabled: Bool
     @Binding var isContextWindowEnabled: Bool
     @Binding var contextWindowValue: Double
@@ -32,15 +34,8 @@ struct InspectorContentView: View {
             if selection == "models" {
                 if let selectedModelID = selectedModel,
                    let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                    ModelInspectorDetailView(
-                        model: model,
-                        modelInfo: modelInfo,
-                        isLoading: isLoadingInfo,
-                        fetchedCapabilities: commandExecutor.selectedModelCapabilities,
-                        licenseBody: licenseBody,
-                        licenseLink: licenseLink
-                    )
-                    .id(model.id)
+                    ModelInspectorDetailView(model: model)
+                        .id(model.id)
                 } else {
                     Text("Select a model to see the details.")
                         .font(.title2)
@@ -157,33 +152,6 @@ struct InspectorContentView: View {
                     .padding()
             }
         }
-        .onChange(of: selectedModel) { _, newID in
-            modelInfo = nil
-            isLoadingInfo = true
-            licenseBody = nil
-            
-            guard let newID = newID,
-                  let model = sortedModels.first(where: { $0.id == newID }) else {
-                isLoadingInfo = false
-                return
-            }
-            
-            Task {
-                let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
-                if selectedModel == newID {
-                    await MainActor.run {
-                        self.modelInfo = fetchedResponse?.model_info
-                        self.licenseBody = fetchedResponse?.license
-                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
-                        self.isLoadingInfo = false
-                        let hasThinkingCapability = self.commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false
-                        if !hasThinkingCapability {
-                            self.thinkingOption = .none
-                        }
-                    }
-                }
-            }
-        }
         .onChange(of: selectedChatModelID) { _, newID in
             modelInfo = nil
             isLoadingInfo = true
@@ -224,5 +192,3 @@ struct InspectorContentView: View {
         #endif
     }
 }
-
-
