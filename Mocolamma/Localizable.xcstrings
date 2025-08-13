@@ -1205,7 +1205,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "日付順"
+            "value" : "日付"
           }
         }
       }
@@ -2418,7 +2418,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "名前順"
+            "value" : "名前"
           }
         }
       }
@@ -2659,7 +2659,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "番号順"
+            "value" : "番号"
           }
         }
       }
@@ -3428,22 +3428,6 @@
         }
       }
     },
-    "server_name" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名前"
-          }
-        }
-      }
-    },
     "Servers" : {
       "localizations" : {
         "en" : {
@@ -3536,7 +3520,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サイズ順"
+            "value" : "サイズ"
           }
         }
       }

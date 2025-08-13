@@ -45,7 +45,7 @@ struct ServerFormView: View {
             #endif
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("server_name") // 名前ラベル
+                Text("Name") // 名前ラベル
                     .font(.headline)
                 TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())

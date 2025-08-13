@@ -74,9 +74,11 @@ struct MocolammaApp: App {
         .commands {
             #if os(macOS)
             CommandGroup(replacing: .appInfo) {
-                 Button("About Mocolamma") {
-                     openWindow(id: "about-window")
-                 }
+                Button(action: {
+                    openWindow(id: "about-window")
+                }) {
+                    Label("About Mocolamma", systemImage: "info.circle")
+                }
             }
             // 標準のサイドバーコマンド（「サイドバーを切り替える」ボタン）を追加します。
             SidebarCommands()
@@ -150,7 +152,7 @@ struct MocolammaApp: App {
             #endif
         }
         #if os(macOS)
-        .defaultSize(width: 800, height: 500)
+        .defaultSize(width: 1000, height: 600)
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
         #endif

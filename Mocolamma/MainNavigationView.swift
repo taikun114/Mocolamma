@@ -37,7 +37,7 @@ struct MainNavigationView: View {
                 #endif
             }
             .navigationTitle("Menu")
-            .navigationSplitViewColumnWidth(min: 150, ideal: 300, max: 500)
+            .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
         } detail: {
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
