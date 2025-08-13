@@ -4078,6 +4078,22 @@
         }
       }
     },
+    "VRAM Size: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VRAM Size: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VRAMサイズ: %@"
+          }
+        }
+      }
+    },
     "You can also donate directly at PayPal." : {
       "localizations" : {
         "en" : {

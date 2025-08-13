@@ -35,6 +35,7 @@ struct RunningModelsCountView: View {
                 Text("running")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                    .padding(.bottom, 2)
             }
 
             if runningModels.count > 0 {
@@ -45,6 +46,12 @@ struct RunningModelsCountView: View {
                                 .font(.subheadline)
                                 .bold()
                                 .foregroundColor(.primary) // Changed to primary for bold text
+
+                            if let formattedVRAMSize = model.formattedVRAMSize { // Add VRAM size
+                                Text("VRAM Size: \(formattedVRAMSize)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
 
                             if let expiresAt = model.expires_at {
                                 Text("Expires: \(expiresAt, formatter: Self.dateFormatter)") // Expires date, not bold

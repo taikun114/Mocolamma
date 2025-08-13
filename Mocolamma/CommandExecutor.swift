@@ -819,12 +819,21 @@ struct OllamaPSResponse: Decodable {
 
 struct OllamaRunningModel: Decodable {
     let name: String
-    let expires_at: Date? // Add expires_at
+    let expires_at: Date?
+    let size_vram: Int64?
+
+    var formattedVRAMSize: String? { // Add formattedVRAMSize
+        guard let size = size_vram else { return nil }
+        let byteCountFormatter = ByteCountFormatter()
+        byteCountFormatter.countStyle = .file
+        return byteCountFormatter.string(fromByteCount: size)
+    }
 
     // Custom decoding to handle ISO 8601 date string
     enum CodingKeys: String, CodingKey {
         case name
         case expires_at
+        case size_vram
     }
 
     init(from decoder: Decoder) throws {
@@ -838,5 +847,6 @@ struct OllamaRunningModel: Decodable {
         } else {
             expires_at = nil
         }
+        size_vram = try? container.decode(Int64.self, forKey: .size_vram)
     }
 }
