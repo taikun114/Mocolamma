@@ -69,7 +69,7 @@ struct ServerInspectorView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollama Version information
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 10) { // Changed spacing from 6 to 10
                     VStack(alignment: .leading) {
                         Text("Ollama Version:")
                             .font(.subheadline)
