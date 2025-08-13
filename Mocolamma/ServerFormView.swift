@@ -114,6 +114,7 @@ struct ServerFormView: View {
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(isSaveButtonDisabled)
+                .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
             }
         }
         #endif

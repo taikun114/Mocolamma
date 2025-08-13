@@ -128,6 +128,7 @@ struct AddModelsSheet: View {
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
+                .applyGlassProminentButtonStyle(isDisabled: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
             }
         }
         #endif
