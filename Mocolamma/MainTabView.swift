@@ -25,6 +25,8 @@ struct MainTabView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    
+    @State private var isInspectorSheetPresented = false
 
     var body: some View {
         TabView(selection: $selection) {
@@ -32,7 +34,7 @@ struct MainTabView: View {
                 ServerView(
                     serverManager: serverManager,
                     executor: executor,
-                    onTogglePreview: { showingInspector.toggle() },
+                    onTogglePreview: { toggleInspector() },
                     selectedServerForInspector: $selectedServerForInspector
                 )
             }
@@ -47,7 +49,7 @@ struct MainTabView: View {
                     showingAddSheet: $showingAddModelsSheet,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
-                    onTogglePreview: { showingInspector.toggle() }
+                    onTogglePreview: { toggleInspector() }
                 )
             }
             .environmentObject(serverManager)
@@ -67,7 +69,8 @@ struct MainTabView: View {
                     contextWindowValue: $contextWindowValue,
                     isSystemPromptEnabled: $isSystemPromptEnabled,
                     systemPrompt: $systemPrompt,
-                    thinkingOption: $thinkingOption
+                    thinkingOption: $thinkingOption,
+                    onToggleInspector: toggleInspector
                 )
             }
             .environmentObject(serverManager)
@@ -84,26 +87,71 @@ struct MainTabView: View {
             #endif
         }
         .tabViewStyle(.sidebarAdaptable)
-        .inspector(isPresented: $showingInspector) {
-            InspectorContentView(
-                selection: selection,
-                selectedModel: $selectedModel,
-                selectedChatModelID: $selectedChatModelID,
-                sortedModels: sortedModels,
-                selectedServerForInspector: selectedServerForInspector,
-                serverManager: serverManager,
-                showingInspector: $showingInspector,
-                isChatStreamingEnabled: $isChatStreamingEnabled,
-                useCustomChatSettings: $useCustomChatSettings,
-                chatTemperature: $chatTemperature,
-                isTemperatureEnabled: $isTemperatureEnabled,
-                isContextWindowEnabled: $isContextWindowEnabled,
-                contextWindowValue: $contextWindowValue,
-                isSystemPromptEnabled: $isSystemPromptEnabled,
-                systemPrompt: $systemPrompt,
-                thinkingOption: $thinkingOption
-            )
-            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+        .inspector(isPresented: isiOSAppOnVision ? .constant(false) : $showingInspector) {
+            inspectorContent
+        }
+        .sheet(isPresented: $isInspectorSheetPresented) {
+            NavigationStack {
+                inspectorContent
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(action: { isInspectorSheetPresented = false }) {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                    }
+                    .navigationTitle(inspectorTitle)
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+            }
+        }
+    }
+
+    private func toggleInspector() {
+        if isiOSAppOnVision {
+            isInspectorSheetPresented.toggle()
+        } else {
+            showingInspector.toggle()
+        }
+    }
+
+    private var inspectorContent: some View {
+        InspectorContentView(
+            selection: selection,
+            selectedModel: $selectedModel,
+            selectedChatModelID: $selectedChatModelID,
+            sortedModels: sortedModels,
+            selectedServerForInspector: selectedServerForInspector,
+            serverManager: serverManager,
+            showingInspector: $showingInspector,
+            isChatStreamingEnabled: $isChatStreamingEnabled,
+            useCustomChatSettings: $useCustomChatSettings,
+            chatTemperature: $chatTemperature,
+            isTemperatureEnabled: $isTemperatureEnabled,
+            isContextWindowEnabled: $isContextWindowEnabled,
+            contextWindowValue: $contextWindowValue,
+            isSystemPromptEnabled: $isSystemPromptEnabled,
+            systemPrompt: $systemPrompt,
+            thinkingOption: $thinkingOption
+        )
+        .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+    }
+
+    private var inspectorTitle: String {
+        switch selection {
+        case "server":
+            return selectedServerForInspector?.name ?? String(localized: "Server Details")
+        case "models":
+            if let modelName = sortedModels.first(where: { $0.id == selectedModel })?.name {
+                return modelName
+            } else {
+                return String(localized: "Model Details")
+            }
+        case "chat":
+            return ""
+        default:
+            return ""
         }
     }
 }

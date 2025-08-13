@@ -22,6 +22,7 @@ struct ChatView: View {
     @Binding var isSystemPromptEnabled: Bool
     @Binding var systemPrompt: String
     @Binding var thinkingOption: ThinkingOption
+    var onToggleInspector: () -> Void
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
@@ -238,7 +239,7 @@ struct ChatView: View {
             ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between New Chat and Inspector
         }
         ToolbarItem(placement: .primaryAction) {
-            Button(action: { showingInspector.toggle() }) {
+            Button(action: { onToggleInspector() }) {
                 Label("Inspector", systemImage: "sidebar.trailing")
             }
         }

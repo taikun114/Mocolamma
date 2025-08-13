@@ -2226,6 +2226,22 @@
         }
       }
     },
+    "Model Details" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Details"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの詳細"
+          }
+        }
+      }
+    },
     "Model Information:" : {
       "localizations" : {
         "en" : {
@@ -3424,6 +3440,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
+          }
+        }
+      }
+    },
+    "Server Details" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server Details"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーの詳細"
           }
         }
       }

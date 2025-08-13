@@ -55,7 +55,8 @@ struct MainContentDetailView: View {
                     contextWindowValue: $contextWindowValue,
                     isSystemPromptEnabled: $isSystemPromptEnabled,
                     systemPrompt: $systemPrompt,
-                    thinkingOption: $thinkingOption
+                    thinkingOption: $thinkingOption,
+                    onToggleInspector: { showingInspector.toggle() }
                 )
                 .environmentObject(executor)
                 .environmentObject(serverManager)
