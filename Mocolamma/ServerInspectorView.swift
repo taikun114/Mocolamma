@@ -90,7 +90,7 @@ struct ServerInspectorView: View {
                     VStack(alignment: .leading) {
                         Text("Running Models:")
                             .font(.subheadline)
-                        RunningModelsCountView(host: server.host)
+                                                RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
                             .environmentObject(commandExecutor)
                     }
                 }

@@ -467,6 +467,23 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             return nil
         }
     }
+
+    /// 現在メモリにロードされているモデルのリストを取得します。
+    func fetchRunningModels(host: String? = nil) async -> [OllamaRunningModel]? {
+        guard let base = host ?? apiBaseURL else { return nil }
+        let scheme = base.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
+            let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
+            return ps.models
+        } catch {
+            print("/api/psの取得に失敗: \(error.localizedDescription)")
+            return nil
+        }
+    }
     
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
@@ -802,4 +819,24 @@ struct OllamaPSResponse: Decodable {
 
 struct OllamaRunningModel: Decodable {
     let name: String
+    let expires_at: Date? // Add expires_at
+
+    // Custom decoding to handle ISO 8601 date string
+    enum CodingKeys: String, CodingKey {
+        case name
+        case expires_at
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+
+        if let expiresAtString = try? container.decode(String.self, forKey: .expires_at) {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            expires_at = formatter.date(from: expiresAtString)
+        } else {
+            expires_at = nil
+        }
+    }
 }

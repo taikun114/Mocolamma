@@ -21,6 +21,9 @@
         }
       }
     },
+    "-" : {
+      "shouldTranslate" : false
+    },
     "*Could not connect*" : {
       "localizations" : {
         "en" : {
@@ -1734,6 +1737,22 @@
         }
       }
     },
+    "Expires: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expires: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "期限切れ: %@"
+          }
+        }
+      }
+    },
     "Failed" : {
       "comment" : "プルステータス: 失敗。",
       "localizations" : {
@@ -3296,6 +3315,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "やり直す"
+          }
+        }
+      }
+    },
+    "running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "running"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "実行中"
           }
         }
       }
