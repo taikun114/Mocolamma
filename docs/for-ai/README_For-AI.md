@@ -31,12 +31,18 @@ Mocolamma
 ├── ChatView.swift
 ├── CommandExecutor.swift
 ├── ContentView.swift
+├── InspectorContentView.swift
+├── LegacyIPhoneTabView.swift
 ├── LicenseInfoModalView.swift
 ├── LicenseTextView.swift
+├── MainContentDetailView.swift
+├── MainNavigationView.swift
+├── MainTabView.swift
 ├── MarqueeText.swift
 ├── MessageInputView.swift
 ├── MessageView.swift
 ├── MocolammaApp.swift
+├── ModelInspectorDetailView.swift
 ├── ModelInspectorView.swift
 ├── ModelListView.swift
 ├── NavSubtitleIfAvailable.swift
@@ -45,6 +51,7 @@ Mocolamma
 ├── RunningModelsCountView.swift
 ├── ServerFormView.swift
 ├── ServerInfo.swift
+├── ServerInspectorDetailView.swift
 ├── ServerInspectorView.swift
 ├── ServerManager.swift
 ├── ServerRowView.swift
@@ -90,7 +97,35 @@ Ollama APIとの通信を非同期で実行し、結果をビューモデルに�
 
 #### `ContentView.swift`
 
-アプリケーションのメインUIを構成するビューです。`NavigationSplitView`を使用し、サイドバーで`ServerView`、`ModelListView`、`ChatView`、`SettingsView`を切り替えて表示します。
+アプリケーションのメインUIを構成するビューです。プラットフォームに応じて、`MainNavigationView`または`MainTabView`（iOS 18.0以降）/`LegacyIPhoneTabView`（iOS 18.0未満のiPhone）を使用してUIを構築します。
+
+#### `InspectorContentView.swift`
+
+インスペクター（サイドバーの右側に表示される詳細パネル）のコンテンツを管理するビューです。選択された項目（モデル、サーバー、チャット設定など）に応じて、`ModelInspectorView`、`ServerInspectorView`、またはチャット設定フォームを表示します。
+
+#### `LegacyIPhoneTabView.swift`
+
+iOS 18.0未満のiPhoneデバイスでアプリケーションのメインタブベースUIを構成するビューです。
+
+#### `MainContentDetailView.swift`
+
+メインナビゲーションビュー（`MainNavigationView`）の詳細ペインに表示されるコンテンツを管理するビューです。選択されたサイドバーの項目（モデル、サーバー、チャット、設定）に応じて、対応するビュー（`ModelListView`, `ServerView`, `ChatView`, `SettingsView`）を表示します。
+
+#### `MainNavigationView.swift`
+
+macOSおよびiOS 18.0未満のiPadデバイスでアプリケーションのメインナビゲーションベースUIを構成するビューです。
+
+#### `MainTabView.swift`
+
+iOS 18.0以降のデバイスでアプリケーションのメインタブベースUIを構成するビューです。
+
+#### `ModelInspectorDetailView.swift`
+
+モデルインスペクターの詳細ビューです。`ModelInspectorView`をラップし、`OllamaModel`の情報を表示します。
+
+#### `ServerInspectorDetailView.swift`
+
+サーバーインスペクターの詳細ビューです。`ServerInspectorView`をラップし、`ServerInfo`と接続ステータスを表示します。
 
 #### `LicenseInfoModalView.swift`
 
