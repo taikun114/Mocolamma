@@ -6,8 +6,6 @@ struct ChatView: View {
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @Binding var selectedModelID: OllamaModel.ID?
-    @State private var messages: [ChatMessage] = []
-    @State private var inputText: String = ""
     @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
     @State private var showEmbeddingAlert: Bool = false
@@ -54,25 +52,25 @@ struct ChatView: View {
                     systemImage: "network.slash",
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
-            } else if messages.isEmpty {
+            } else if executor.chatMessages.isEmpty {
                 ContentUnavailableView {
                     Label("Chat", systemImage: "message.fill")
                 } description: {
                     Text("Here you can perform a simple chat to check the model.")
                 }
             } else {
-                ChatMessagesView(messages: $messages, onRetry: retryMessage, isOverallStreaming: $isStreaming)
+                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $isStreaming)
             }
 
             VStack {
                 Spacer()
                 
-                ChatInputView(inputText: $inputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
+                ChatInputView(inputText: $executor.chatInputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
                     sendMessage()
                 } stopMessage: {
-                    if let lastAssistantMessageIndex = messages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                        messages[lastAssistantMessageIndex].isStreaming = false
-                        messages[lastAssistantMessageIndex].isStopped = true
+                    if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                        executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                        executor.chatMessages[lastAssistantMessageIndex].isStopped = true
                     }
                     isStreaming = false
                     executor.cancelChatStreaming()
@@ -225,8 +223,7 @@ struct ChatView: View {
 
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                messages.removeAll()
-                inputText = ""
+                executor.clearChat()
                 isStreaming = false
                 errorMessage = nil
             }) {
@@ -251,14 +248,14 @@ struct ChatView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !inputText.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty else { return }
 
         isStreaming = true
-        let userMessage = ChatMessage(role: "user", content: inputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
-        inputText = ""
-        messages.append(userMessage)
+        let userMessage = ChatMessage(role: "user", content: executor.chatInputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        executor.chatInputText = ""
+        executor.chatMessages.append(userMessage)
 
-        var apiMessages = messages
+        var apiMessages = executor.chatMessages
         if isSystemPromptEnabled && !systemPrompt.isEmpty {
             let systemMessage = ChatMessage(role: "system", content: systemPrompt)
             apiMessages.insert(systemMessage, at: 0)
@@ -273,7 +270,7 @@ struct ChatView: View {
         placeholderMessage.pendingContent = ""
         placeholderMessage.fixedThinking = ""
         placeholderMessage.pendingThinking = ""
-        messages.append(placeholderMessage)
+        executor.chatMessages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
 
         Task {
@@ -283,25 +280,25 @@ struct ChatView: View {
 
     // 過去リビジョン参照中でも、最新の完成版だけをアーカイブしてリトライ開始する
     private func retryMessage(for messageId: UUID, with messageToRetry: ChatMessage) {
-        guard let indexToRetry = messages.firstIndex(where: { $0.id == messageId }) else {
+        guard let indexToRetry = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
         }
 
         // ユーザーメッセージのリトライの場合
-        if messages[indexToRetry].role == "user" {
+        if executor.chatMessages[indexToRetry].role == "user" {
             // 編集されたユーザーメッセージを履歴の最後に移動
-            let userMessage = messages.remove(at: indexToRetry)
-            messages.append(userMessage)
+            let userMessage = executor.chatMessages.remove(at: indexToRetry)
+            executor.chatMessages.append(userMessage)
 
             // ユーザーメッセージ以降のアシスタントメッセージを削除
-                        messages.removeAll(where: { (message: ChatMessage) -> Bool in // ChatMessageを明示的に指定
+            executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in // ChatMessageを明示的に指定
                 guard let messageCreatedAt = message.createdAt,
                       let userMessageCreatedAt = userMessage.createdAt else { return false }
                 return messageCreatedAt > userMessageCreatedAt && message.role == "assistant" // $0.role を message.role に変更
             })
 
-            var apiMessages = messages
+            var apiMessages = executor.chatMessages
             if isSystemPromptEnabled && !systemPrompt.isEmpty {
                 let systemMessage = ChatMessage(role: "system", content: systemPrompt)
                 apiMessages.insert(systemMessage, at: 0)
@@ -316,7 +313,7 @@ struct ChatView: View {
             placeholderMessage.pendingContent = ""
             placeholderMessage.fixedThinking = ""
             placeholderMessage.pendingThinking = ""
-            messages.append(placeholderMessage)
+            executor.chatMessages.append(placeholderMessage)
             let assistantMessageId = placeholderMessage.id
 
             guard let model = currentSelectedModel else {
@@ -328,16 +325,16 @@ struct ChatView: View {
             Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
 
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
-            guard indexToRetry == messages.count - 1 else {
+            guard indexToRetry == executor.chatMessages.count - 1 else {
                 print("Retry failed: Message is not the last one.")
                 return
             }
-            guard !messages[indexToRetry].isStreaming else {
+            guard !executor.chatMessages[indexToRetry].isStreaming else {
                 print("Retry failed: Message is still streaming.")
                 return
             }
             // 直前のユーザーメッセージまでをAPIに渡す
-            guard indexToRetry > 0, messages[indexToRetry - 1].role == "user" else {
+            guard indexToRetry > 0, executor.chatMessages[indexToRetry - 1].role == "user" else {
                 print("Retry failed: User message not found immediately before assistant message at index \(indexToRetry).")
                 return
             }
@@ -345,9 +342,9 @@ struct ChatView: View {
 
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content > fixed+pending の順
-            let latestCandidate = messages[indexToRetry].latestContent ?? ""
-            let contentCandidate = messages[indexToRetry].content
-            let bufferedCandidate = messages[indexToRetry].fixedContent + messages[indexToRetry].pendingContent
+            let latestCandidate = executor.chatMessages[indexToRetry].latestContent ?? ""
+            let contentCandidate = executor.chatMessages[indexToRetry].content
+            let bufferedCandidate = executor.chatMessages[indexToRetry].fixedContent + executor.chatMessages[indexToRetry].pendingContent
             let archiveContent: String = {
                 if !latestCandidate.isEmpty { return latestCandidate }
                 if !contentCandidate.isEmpty { return contentCandidate }
@@ -355,9 +352,9 @@ struct ChatView: View {
             }()
 
             // Thinking は finalThinking > thinking > fixed+pending > nil
-            let finalThinkingCandidate = messages[indexToRetry].finalThinking
-            let liveThinkingCandidate = messages[indexToRetry].thinking
-            let bufferedThinkingCandidate = messages[indexToRetry].fixedThinking + messages[indexToRetry].pendingThinking
+            let finalThinkingCandidate = executor.chatMessages[indexToRetry].finalThinking
+            let liveThinkingCandidate = executor.chatMessages[indexToRetry].thinking
+            let bufferedThinkingCandidate = executor.chatMessages[indexToRetry].fixedThinking + executor.chatMessages[indexToRetry].pendingThinking
             let archiveThinking: String? = {
                 if let v = finalThinkingCandidate, !v.isEmpty { return v }
                 if let v = liveThinkingCandidate, !v.isEmpty { return v }
@@ -367,53 +364,53 @@ struct ChatView: View {
 
             // 2) 履歴アーカイブ（この関数内のみで1回）
             let archived = ChatMessage(
-                role: messages[indexToRetry].role,
+                role: executor.chatMessages[indexToRetry].role,
                 content: archiveContent,
                 thinking: archiveThinking,
-                images: messages[indexToRetry].images,
-                toolCalls: messages[indexToRetry].toolCalls,
-                toolName: messages[indexToRetry].toolName,
-                createdAt: messages[indexToRetry].createdAt,
-                totalDuration: messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration,
-                evalCount: messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount,
-                evalDuration: messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration,
+                images: executor.chatMessages[indexToRetry].images,
+                toolCalls: executor.chatMessages[indexToRetry].toolCalls,
+                toolName: executor.chatMessages[indexToRetry].toolName,
+                createdAt: executor.chatMessages[indexToRetry].createdAt,
+                totalDuration: executor.chatMessages[indexToRetry].finalTotalDuration ?? executor.chatMessages[indexToRetry].totalDuration,
+                evalCount: executor.chatMessages[indexToRetry].finalEvalCount ?? executor.chatMessages[indexToRetry].evalCount,
+                evalDuration: executor.chatMessages[indexToRetry].finalEvalDuration ?? executor.chatMessages[indexToRetry].evalDuration,
                 isStreaming: false,
-                isStopped: messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped,
-                isThinkingCompleted: messages[indexToRetry].finalIsThinkingCompleted || messages[indexToRetry].isThinkingCompleted
+                isStopped: executor.chatMessages[indexToRetry].finalIsStopped || executor.chatMessages[indexToRetry].isStopped,
+                isThinkingCompleted: executor.chatMessages[indexToRetry].finalIsThinkingCompleted || executor.chatMessages[indexToRetry].isThinkingCompleted
             )
-            archived.revisions = messages[indexToRetry].revisions
-            archived.currentRevisionIndex = messages[indexToRetry].currentRevisionIndex
-            archived.originalContent = messages[indexToRetry].originalContent
-            archived.latestContent = messages[indexToRetry].latestContent
-            archived.finalThinking = messages[indexToRetry].finalThinking
-            archived.finalIsThinkingCompleted = messages[indexToRetry].finalIsThinkingCompleted
-            archived.finalCreatedAt = messages[indexToRetry].finalCreatedAt ?? messages[indexToRetry].createdAt
-            archived.finalTotalDuration = messages[indexToRetry].finalTotalDuration ?? messages[indexToRetry].totalDuration
-            archived.finalEvalCount = messages[indexToRetry].finalEvalCount ?? messages[indexToRetry].evalCount
-            archived.finalEvalDuration = messages[indexToRetry].finalEvalDuration ?? messages[indexToRetry].evalDuration
-            archived.finalIsStopped = messages[indexToRetry].finalIsStopped || messages[indexToRetry].isStopped
+            archived.revisions = executor.chatMessages[indexToRetry].revisions
+            archived.currentRevisionIndex = executor.chatMessages[indexToRetry].currentRevisionIndex
+            archived.originalContent = executor.chatMessages[indexToRetry].originalContent
+            archived.latestContent = executor.chatMessages[indexToRetry].latestContent
+            archived.finalThinking = executor.chatMessages[indexToRetry].finalThinking
+            archived.finalIsThinkingCompleted = executor.chatMessages[indexToRetry].finalIsThinkingCompleted
+            archived.finalCreatedAt = executor.chatMessages[indexToRetry].finalCreatedAt ?? executor.chatMessages[indexToRetry].createdAt
+            archived.finalTotalDuration = executor.chatMessages[indexToRetry].finalTotalDuration ?? executor.chatMessages[indexToRetry].totalDuration
+            archived.finalEvalCount = executor.chatMessages[indexToRetry].finalEvalCount ?? executor.chatMessages[indexToRetry].evalCount
+            archived.finalEvalDuration = executor.chatMessages[indexToRetry].finalEvalDuration ?? executor.chatMessages[indexToRetry].evalDuration
+            archived.finalIsStopped = executor.chatMessages[indexToRetry].finalIsStopped || executor.chatMessages[indexToRetry].isStopped
 
-            messages[indexToRetry].revisions.append(archived)
+            executor.chatMessages[indexToRetry].revisions.append(archived)
             // 参照位置は常に最新（末尾の次 = 現在バージョン）
-            messages[indexToRetry].currentRevisionIndex = messages[indexToRetry].revisions.count
+            executor.chatMessages[indexToRetry].currentRevisionIndex = executor.chatMessages[indexToRetry].revisions.count
 
             // 3) 再実行準備（表示バッファも初期化）
-            messages[indexToRetry].content = ""
-            messages[indexToRetry].thinking = nil
-            messages[indexToRetry].fixedContent = ""
-            messages[indexToRetry].pendingContent = ""
-            messages[indexToRetry].fixedThinking = ""
-            messages[indexToRetry].pendingThinking = ""
-            messages[indexToRetry].isStreaming = true
-            messages[indexToRetry].isStopped = false
-            messages[indexToRetry].isThinkingCompleted = false
-            messages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
-            messages[indexToRetry].totalDuration = nil
-            messages[indexToRetry].evalCount = nil
-            messages[indexToRetry].evalDuration = nil
+            executor.chatMessages[indexToRetry].content = ""
+            executor.chatMessages[indexToRetry].thinking = nil
+            executor.chatMessages[indexToRetry].fixedContent = ""
+            executor.chatMessages[indexToRetry].pendingContent = ""
+            executor.chatMessages[indexToRetry].fixedThinking = ""
+            executor.chatMessages[indexToRetry].pendingThinking = ""
+            executor.chatMessages[indexToRetry].isStreaming = true
+            executor.chatMessages[indexToRetry].isStopped = false
+            executor.chatMessages[indexToRetry].isThinkingCompleted = false
+            executor.chatMessages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
+            executor.chatMessages[indexToRetry].totalDuration = nil
+            executor.chatMessages[indexToRetry].evalCount = nil
+            executor.chatMessages[indexToRetry].evalDuration = nil
 
             // 4) APIに出すメッセージ（ユーザー発話まで）
-            var apiMessages = Array(messages.prefix(userMessageIndex + 1))
+            var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
             if isSystemPromptEnabled && !systemPrompt.isEmpty {
                 let systemMessage = ChatMessage(role: "system", content: systemPrompt)
                 apiMessages.insert(systemMessage, at: 0)
@@ -443,23 +440,23 @@ struct ChatView: View {
         let flushNewlinePreferred = true
 
         func flushPendingToFixed(index: Int, force: Bool = false) async {
-            guard messages.indices.contains(index) else { return }
+            guard executor.chatMessages.indices.contains(index) else { return }
             if force || pendingMain.count >= flushCharThreshold || (flushNewlinePreferred && pendingMain.contains("\n")) {
                 let toAppend = pendingMain
                 pendingMain.removeAll(keepingCapacity: true)
-                let base = messages[index].fixedContent
+                let base = executor.chatMessages[index].fixedContent
                 let newFixed = base + toAppend
                 await MainActor.run {
-                    if messages.indices.contains(index) { messages[index].fixedContent = newFixed }
+                    if executor.chatMessages.indices.contains(index) { executor.chatMessages[index].fixedContent = newFixed }
                 }
             }
             if force || pendingThinking.count >= flushCharThreshold || (flushNewlinePreferred && pendingThinking.contains("\n")) {
                 let toAppend = pendingThinking
                 pendingThinking.removeAll(keepingCapacity: true)
-                let base = messages[index].fixedThinking
+                let base = executor.chatMessages[index].fixedThinking
                 let newFixed = base + toAppend
                 await MainActor.run {
-                    if messages.indices.contains(index) { messages[index].fixedThinking = newFixed }
+                    if executor.chatMessages.indices.contains(index) { executor.chatMessages[index].fixedThinking = newFixed }
                 }
             }
         }
@@ -479,7 +476,7 @@ struct ChatView: View {
                 thinkingOption: thinkingOption,
                 tools: nil
             ) {
-                guard let assistantMessageIndex = messages.firstIndex(where: { $0.id == messageId }) else { continue }
+                guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
 
                 if let messageChunk = chunk.message {
                     if thinkingOption == .on {
@@ -497,8 +494,8 @@ struct ChatView: View {
                             pendingThinking += String(current[..<end.lowerBound])
                             pendingMain += String(current[end.upperBound...])
                             await MainActor.run {
-                                if messages.indices.contains(assistantMessageIndex) {
-                                    messages[assistantMessageIndex].isThinkingCompleted = true
+                                if executor.chatMessages.indices.contains(assistantMessageIndex) {
+                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
                                 }
                             }
                         } else if isInsideThinkingBlock {
@@ -510,8 +507,8 @@ struct ChatView: View {
 
                     if isFirstChunk {
                         await MainActor.run {
-                            if messages.indices.contains(assistantMessageIndex) {
-                                messages[assistantMessageIndex].createdAt = chunk.createdAt
+                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
+                                executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
                             }
                         }
                         isFirstChunk = false
@@ -522,16 +519,16 @@ struct ChatView: View {
                     let now = Date()
                     if now.timeIntervalSince(lastUIUpdateTime) > throttleInterval || chunk.done {
                         await MainActor.run {
-                            if messages.indices.contains(assistantMessageIndex) {
-                                messages[assistantMessageIndex].pendingContent = pendingMain
-                                messages[assistantMessageIndex].pendingThinking = pendingThinking
-                                messages[assistantMessageIndex].latestContent = messages[assistantMessageIndex].fixedContent + messages[assistantMessageIndex].pendingContent
+                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
+                                executor.chatMessages[assistantMessageIndex].pendingContent = pendingMain
+                                executor.chatMessages[assistantMessageIndex].pendingThinking = pendingThinking
+                                executor.chatMessages[assistantMessageIndex].latestContent = executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent
 
                                 if thinkingOption == .on &&
-                                    !(messages[assistantMessageIndex].fixedThinking + messages[assistantMessageIndex].pendingThinking).isEmpty &&
-                                    !(messages[assistantMessageIndex].fixedContent + messages[assistantMessageIndex].pendingContent).isEmpty &&
-                                    !messages[assistantMessageIndex].isThinkingCompleted {
-                                    messages[assistantMessageIndex].isThinkingCompleted = true
+                                    !(executor.chatMessages[assistantMessageIndex].fixedThinking + executor.chatMessages[assistantMessageIndex].pendingThinking).isEmpty &&
+                                    !(executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent).isEmpty &&
+                                    !executor.chatMessages[assistantMessageIndex].isThinkingCompleted {
+                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
                                 }
                             }
                         }
@@ -540,28 +537,28 @@ struct ChatView: View {
                 }
 
                 if chunk.done {
-                    if let index = messages.firstIndex(where: { $0.id == messageId }), messages.indices.contains(index) {
+                    if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
                         await flushPendingToFixed(index: index, force: true)
                         await MainActor.run {
-                            if messages.indices.contains(index) {
-                                messages[index].content = messages[index].fixedContent
-                                messages[index].thinking = messages[index].fixedThinking.isEmpty ? nil : messages[index].fixedThinking
-                                messages[index].pendingContent = ""
-                                messages[index].pendingThinking = ""
-                                messages[index].totalDuration = chunk.totalDuration
-                                messages[index].evalCount = chunk.evalCount
-                                messages[index].evalDuration = chunk.evalDuration
-                                messages[index].isStreaming = false
-                                if thinkingOption == .on && messages[index].thinking != nil && !messages[index].isThinkingCompleted {
-                                    messages[index].isThinkingCompleted = true
+                            if executor.chatMessages.indices.contains(index) {
+                                executor.chatMessages[index].content = executor.chatMessages[index].fixedContent
+                                executor.chatMessages[index].thinking = executor.chatMessages[index].fixedThinking.isEmpty ? nil : executor.chatMessages[index].fixedThinking
+                                executor.chatMessages[index].pendingContent = ""
+                                executor.chatMessages[index].pendingThinking = ""
+                                executor.chatMessages[index].totalDuration = chunk.totalDuration
+                                executor.chatMessages[index].evalCount = chunk.evalCount
+                                executor.chatMessages[index].evalDuration = chunk.evalDuration
+                                executor.chatMessages[index].isStreaming = false
+                                if thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
+                                    executor.chatMessages[index].isThinkingCompleted = true
                                 }
-                                messages[index].finalThinking = messages[index].thinking
-                                messages[index].finalIsThinkingCompleted = messages[index].isThinkingCompleted
-                                messages[index].finalCreatedAt = messages[index].createdAt
-                                messages[index].finalTotalDuration = messages[index].totalDuration
-                                messages[index].finalEvalCount = messages[index].evalCount
-                                messages[index].finalEvalDuration = messages[index].evalDuration
-                                messages[index].finalIsStopped = messages[index].isStopped
+                                executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
+                                executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
+                                executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
+                                executor.chatMessages[index].finalTotalDuration = executor.chatMessages[index].totalDuration
+                                executor.chatMessages[index].finalEvalCount = executor.chatMessages[index].evalCount
+                                executor.chatMessages[index].finalEvalDuration = executor.chatMessages[index].evalDuration
+                                executor.chatMessages[index].finalIsStopped = executor.chatMessages[index].isStopped
                             }
                         }
                     }
@@ -569,16 +566,16 @@ struct ChatView: View {
             }
         } catch {
             print("Chat streaming error or cancelled: \(error)")
-            if let index = messages.firstIndex(where: { $0.id == messageId }), messages.indices.contains(index) {
+            if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
                 await MainActor.run {
-                    messages[index].isStreaming = false
+                    executor.chatMessages[index].isStreaming = false
                     if let urlError = error as? URLError, urlError.code == .cancelled {
-                        messages[index].isStopped = true
+                        executor.chatMessages[index].isStopped = true
                     } else {
-                        messages[index].isStopped = false
-                        if (messages[index].fixedContent + messages[index].pendingContent).isEmpty {
-                        messages[index].fixedContent = ""
-                        messages[index].content = ""
+                        executor.chatMessages[index].isStopped = false
+                        if (executor.chatMessages[index].fixedContent + executor.chatMessages[index].pendingContent).isEmpty {
+                        executor.chatMessages[index].fixedContent = ""
+                        executor.chatMessages[index].content = ""
                     }
                         generalErrorMessage = "Chat API Error: \(error.localizedDescription)"
                     }

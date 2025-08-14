@@ -13,6 +13,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var specificConnectionErrorMessage: String? // 特定の接続エラーメッセージを追加
     @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
     @Published var selectedModelCapabilities: [String]? // 選択されたモデルのcapabilities
+    @Published var chatMessages: [ChatMessage] = [] // チャットメッセージ
+    @Published var chatInputText: String = "" // チャット入力テキスト
     
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -566,6 +568,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         currentChatTask?.cancel()
         currentChatTask = nil
         print("Chat streaming cancelled.")
+    }
+
+    /// チャット履歴と入力テキストをクリアします。
+    func clearChat() {
+        chatMessages.removeAll()
+        chatInputText = ""
+        // 関連するストリーミング状態などもリセットする必要があればここに追加
+        cancelChatStreaming()
     }
     // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
     // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
