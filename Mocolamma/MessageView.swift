@@ -8,6 +8,7 @@ struct MessageView: View {
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isStreamingAny: Bool // Changed to Binding
     @Binding var allMessages: [ChatMessage]
+    let isModelSelected: Bool
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
@@ -250,6 +251,7 @@ struct MessageView: View {
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Retry")
+        .disabled(!isModelSelected)
     }
 
     @ViewBuilder
@@ -355,7 +357,7 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(isStreamingAny || message.content.isEmpty)
+        .disabled(!isModelSelected || isStreamingAny || message.content.isEmpty)
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .id(isStreamingAny ? "on" : "off")
