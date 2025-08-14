@@ -182,10 +182,6 @@ private struct ServerListViewContent: View {
                     serverToDelete: $serverToDelete,
                     isSelected: server.id == serverManager.selectedServerID
                 )
-                #if os(iOS)
-                .onTapGesture {
-                    listSelection = server.id
-                }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
                         serverManager.selectedServerID = server.id
@@ -194,14 +190,26 @@ private struct ServerListViewContent: View {
                     }
                     .tint(.accentColor)
                 }
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        serverToDelete = server
+                        showingDeleteConfirmationServer = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    Button {
+                        serverToEdit = server
+                    } label: {
+                        Label("Edit", systemImage: "pencil")
+                    }
+                    .tint(.blue)
+                }
+                #if os(iOS)
+                .onTapGesture {
+                    listSelection = server.id
+                }
                 #endif
             }
-            .onDelete { offsets in
-                if let index = offsets.first {
-                    serverToDelete = serverManager.servers[index]
-                    showingDeleteConfirmationServer = true
-                }
-            } // Add this line
             .onMove(perform: serverManager.moveServer)
         }
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
