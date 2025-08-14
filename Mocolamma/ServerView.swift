@@ -115,11 +115,10 @@ struct ServerView: View {
                 Text(String(localized: "Are you sure you want to delete the selected server?\nThis action cannot be undone.", comment: "選択したサーバー削除の確認メッセージ（フォールバック）。"))
             }
         }
-        .onAppear {
+                .onAppear {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
-            listSelection = serverManager.selectedServerID
             appRefreshTrigger.send()
         }
         .onChange(of: serverManager.servers) { oldServers, newServers in
@@ -127,6 +126,9 @@ struct ServerView: View {
         }
         .onChange(of: listSelection) { oldID, newID in
             handleListSelectionChange(oldID: oldID, newID: newID)
+        }
+        .onChange(of: serverManager.selectedServerID) { _, newID in
+            listSelection = newID
         }
     }
 
@@ -181,12 +183,16 @@ private struct ServerListViewContent: View {
                     isSelected: server.id == serverManager.selectedServerID
                 )
                 #if os(iOS)
-                .onTapGesture(count: 1) {
+                .onTapGesture {
                     listSelection = server.id
                 }
-                .onTapGesture(count: 2) {
-                    serverManager.selectedServerID = server.id
-                    listSelection = server.id
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        serverManager.selectedServerID = server.id
+                    } label: {
+                        Label("Select", systemImage: "checkmark.circle.fill")
+                    }
+                    .tint(.accentColor)
                 }
                 #endif
             }
@@ -202,7 +208,6 @@ private struct ServerListViewContent: View {
             #if os(macOS)
             if let selectedID = selectedIDs.first {
                 serverManager.selectedServerID = selectedID
-                listSelection = selectedID
             }
             #endif
         }
@@ -231,15 +236,11 @@ private struct ServerRowContent: View {
         )
         #if os(iOS)
         .contentShape(Rectangle())
-        .simultaneousGesture(TapGesture(count: 2).onEnded { _ in
-            serverManager.selectedServerID = server.id
-            listSelection = server.id
-        })
+        
         #endif
         .contextMenu { // 右クリックコンテキストメニュー
             Button("Select", systemImage: "checkmark.circle") {
                 serverManager.selectedServerID = server.id
-                listSelection = server.id
             }
             
 
@@ -276,4 +277,5 @@ private struct ServerRowContent: View {
         onTogglePreview: { print("ServerView_Preview: Dummy onTogglePreview called.") },
         selectedServerForInspector: .constant(previewServerManager.servers.first)
     )
+    .environmentObject(RefreshTrigger())
 }
