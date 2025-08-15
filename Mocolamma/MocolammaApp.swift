@@ -34,6 +34,7 @@ struct MocolammaApp: App {
 
     // モデル追加シートの表示/非表示を制御するStateをAppレベルに移動
     @State private var showingAddModelsSheet = false
+    @State private var showingAddServerSheet = false
 
     // リフレッシュコマンドを発行するためのトリガー
     @StateObject private var appRefreshTrigger = RefreshTrigger()
@@ -61,7 +62,8 @@ struct MocolammaApp: App {
                 serverManager: serverManager,
                 selection: $selection,
                 showingInspector: $showingInspector,
-                showingAddModelsSheet: $showingAddModelsSheet
+                showingAddModelsSheet: $showingAddModelsSheet,
+                showingAddServerSheet: $showingAddServerSheet
             )
             #if os(macOS)
                 .frame(minWidth: 500, minHeight: 300)
@@ -97,14 +99,21 @@ struct MocolammaApp: App {
             }
 
             CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
-                if selection == "server" { // サーバー画面が選択されている場合のみ表示
-                    Button(action: {
-                        showingAddModelsSheet = true
-                    }) {
-                        Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
-                    }
-                    .keyboardShortcut("s", modifiers: [.option, .command])
+                Button(action: {
+                    showingAddServerSheet = true
+                }) {
+                    Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
                 }
+                .keyboardShortcut("s", modifiers: [.option, .command])
+                .disabled(selection != "server")
+
+                Button(action: {
+                    showingAddModelsSheet = true
+                }) {
+                    Label(String(localized: "Add Model…", comment: "モデル追加メニューアイテム"), systemImage: "plus")
+                }
+                .keyboardShortcut("m", modifiers: [.option, .command])
+                .disabled(selection != "models")
             }
 
             #else
@@ -140,14 +149,21 @@ struct MocolammaApp: App {
 
             // iPadOSでも「サーバーを追加」メニュー項目を追加
             CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
-                if selection == "server" { // サーバー画面が選択されている場合のみ表示
-                    Button(action: {
-                        showingAddModelsSheet = true
-                    }) {
-                        Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
-                    }
-                    .keyboardShortcut("s", modifiers: [.option, .command])
+                Button(action: {
+                    showingAddServerSheet = true
+                }) {
+                    Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
                 }
+                .keyboardShortcut("s", modifiers: [.option, .command])
+                .disabled(selection != "server")
+
+                Button(action: {
+                    showingAddModelsSheet = true
+                }) {
+                    Label(String(localized: "Add Model…", comment: "モデル追加メニューアイテム"), systemImage: "plus")
+                }
+                .keyboardShortcut("m", modifiers: [.option, .command])
+                .disabled(selection != "models")
             }
             #endif
         }

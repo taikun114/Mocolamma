@@ -281,6 +281,23 @@
         }
       }
     },
+    "Add Model…" : {
+      "comment" : "モデル追加メニューアイテム",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Model…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを追加…"
+          }
+        }
+      }
+    },
     "Add New" : {
       "localizations" : {
         "en" : {

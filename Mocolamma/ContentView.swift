@@ -35,6 +35,7 @@ struct ContentView: View {
 
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
+    @Binding var showingAddServerSheet: Bool
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
     
@@ -56,12 +57,13 @@ struct ContentView: View {
     
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>) {
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
+        self._showingAddServerSheet = showingAddServerSheet
     }
 
     var body: some View {
@@ -202,6 +204,12 @@ struct ContentView: View {
                     .environmentObject(appRefreshTrigger)
             }
         }
+        .sheet(isPresented: $showingAddServerSheet) {
+            NavigationStack {
+                ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
+                    .environmentObject(appRefreshTrigger)
+            }
+        }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {
                 if let model = modelToDelete {
@@ -317,6 +325,6 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false))
         .environmentObject(RefreshTrigger())
 }
