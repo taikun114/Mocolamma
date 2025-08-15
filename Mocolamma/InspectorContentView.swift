@@ -49,7 +49,7 @@ struct InspectorContentView: View {
                         server: server,
                         connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
                     )
-                    .id(UUID())
+                    .id(server.id)
                 } else {
                     Text("Select a server to see the details.")
                         .font(.title2)
