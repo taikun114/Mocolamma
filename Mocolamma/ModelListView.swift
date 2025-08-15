@@ -38,6 +38,7 @@ struct ModelListView: View {
     @Binding var showingAddSheet: Bool // モデル追加シートの表示/非表示を制御するバインディング
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
 
@@ -255,21 +256,42 @@ struct ModelListView: View {
                      ProgressView(value: executor.pullProgress) { 
                          Text(executor.pullStatus)
                      } currentValueLabel: {
-                         HStack {
-                             Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
-                                         executor.pullProgress * 100 as CVarArg,
-                                         ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                         ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                 .frame(maxWidth: .infinity, alignment: .leading)
-                             Spacer()
-                             if executor.pullSpeedBytesPerSec > 0 {
-                                 let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                 let eta = Int(executor.pullETARemaining)
-                                 let etaMin = eta / 60
-                                 let etaSec = eta % 60
-                                 Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
-                                     .foregroundStyle(.secondary)
-                                     .frame(maxWidth: .infinity, alignment: .trailing)
+                         Group {
+                             if horizontalSizeClass == .compact {
+                                 VStack(alignment: .leading) {
+                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                                  executor.pullProgress * 100 as CVarArg,
+                                                  ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                                  ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                     if executor.pullSpeedBytesPerSec > 0 {
+                                         let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+                                         let eta = Int(executor.pullETARemaining)
+                                         let etaMin = eta / 60
+                                         let etaSec = eta % 60
+                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
+                                             .foregroundStyle(.secondary)
+                                             .frame(maxWidth: .infinity, alignment: .leading)
+                                     }
+                                 }
+                             } else {
+                                 HStack {
+                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                                  executor.pullProgress * 100 as CVarArg,
+                                                  ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                                  ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                     Spacer()
+                                     if executor.pullSpeedBytesPerSec > 0 {
+                                         let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+                                         let eta = Int(executor.pullETARemaining)
+                                         let etaMin = eta / 60
+                                         let etaSec = eta % 60
+                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
+                                             .foregroundStyle(.secondary)
+                                             .frame(maxWidth: .infinity, alignment: .trailing)
+                                     }
+                                 }
                              }
                          }
                      }
