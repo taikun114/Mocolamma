@@ -258,9 +258,25 @@ struct ModelListView: View {
 #endif
             // プログレスバーとステータステキスト
              if executor.isPulling || executor.isPullingErrorHold {
-                 VStack(alignment: .leading, spacing: 8) {
-                     ProgressView(value: executor.pullProgress) { 
-                         Text(executor.pullStatus)
+                 VStack(alignment: .center, spacing: 8) {
+                     ProgressView(value: executor.pullProgress) {
+                         HStack(alignment: .bottom) {
+                             Text(executor.pullStatus)
+                             Spacer()
+                             if executor.isPullingErrorHold && executor.pullHasError {
+                                 Button(action: {
+                                     if !executor.lastPulledModelName.isEmpty {
+                                         executor.pullModel(modelName: executor.lastPulledModelName)
+                                     }
+                                 }) {
+                                     Image(systemName: "arrow.clockwise")
+                                         .help("Retry") // ヘルプテキストを追加
+                                 }
+                                 .buttonStyle(.plain)
+                                 .padding(.vertical, 4)
+                                 .contentShape(Rectangle())
+                             }
+                         }
                      } currentValueLabel: {
                          Group {
                              if horizontalSizeClass == .compact {
@@ -309,8 +325,10 @@ struct ModelListView: View {
                              .frame(maxWidth: .infinity, minHeight: 14)
                      }
                  }
-                 .padding()
-             }            // コマンド実行の出力表示 (TextEditorは削除されました)
+                 .padding(.horizontal, 12)
+                 .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 8 : 0)
+                 .padding(.bottom, 12)
+             }
         }
         .overlay(alignment: .center) {
             if serverManager.selectedServer == nil {

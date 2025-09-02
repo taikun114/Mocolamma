@@ -26,6 +26,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var pullCompleted: Int64 = 0 // 完了したバイト数
     @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度(B/s)
     @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
+    @Published var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
@@ -220,6 +221,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.pullETARemaining = 0
         self.lastSpeedSampleTime = nil
         self.lastSpeedSampleCompleted = 0
+        self.lastPulledModelName = modelName // 最後にプルリクエストを送ったモデル名を更新
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
