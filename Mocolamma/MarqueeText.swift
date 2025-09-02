@@ -6,52 +6,60 @@ struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var containerWidth: CGFloat = 0
     @State private var needsScroll: Bool = false
+    @State private var isFirstLoop: Bool = true // Track if it's the first loop
 
     var body: some View {
         GeometryReader { geo in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 200) {
-                    Text(text)
-                        .font(.caption)
-                        .lineLimit(1)
-                        .background(WidthReader(width: $textWidth))
-                        .fixedSize()
-                    Text(text)
-                        .font(.caption)
-                        .lineLimit(1)
-                        .fixedSize()
-                }
-                .offset(x: needsScroll ? offset : 0)
+                Text(text)
+                    .font(.caption)
+                    .lineLimit(1)
+                    .background(WidthReader(width: $textWidth))
+                    .fixedSize()
+                    .offset(x: needsScroll ? offset : 0)
             }
             .disabled(true)
             .onAppear {
                 containerWidth = geo.size.width
-                needsScroll = textWidth > containerWidth
-                if needsScroll {
-                    offset = 0
-                    let distance = (textWidth + 200)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(.linear(duration: Double(max(distance, 1)) / 60.0).repeatForever(autoreverses: false)) {
-                            offset = -distance
-                        }
-                    }
-                }
+                startScrolling()
             }
             .onChange(of: text) { _, _ in
-                needsScroll = textWidth > containerWidth
-                offset = 0
-                if needsScroll {
-                    let distance = (textWidth + 200)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(.linear(duration: Double(max(distance, 1)) / 60.0).repeatForever(autoreverses: false)) {
-                            offset = -distance
-                        }
-                    }
-                }
+                isFirstLoop = true // Reset to first loop on text change
+                startScrolling()
             }
         }
         .frame(height: 14)
         .clipped()
+    }
+
+    private func startScrolling() {
+        needsScroll = textWidth > containerWidth
+        if needsScroll {
+            offset = isFirstLoop ? 0 : containerWidth // Start from left for first loop, right for subsequent
+            let distance = textWidth + containerWidth + 200 // Distance to scroll
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { // 3 seconds delay
+                withAnimation(.linear(duration: Double(distance) / 60.0)) {
+                    offset = -textWidth - 200 // End position
+                }
+                // Schedule the next loop after the animation completes
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(distance) / 60.0) {
+                    resetAndScroll()
+                }
+            }
+        }
+    }
+
+    private func resetAndScroll() {
+        isFirstLoop = false // Set to false for subsequent loops
+        offset = containerWidth // Reset to start position (right edge)
+        let distance = textWidth + containerWidth + 200 // Distance to scroll
+        withAnimation(.linear(duration: Double(distance) / 60.0)) {
+            offset = -textWidth - 200 // End position
+        }
+        // Schedule the next loop after the animation completes
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(distance) / 60.0) {
+            resetAndScroll()
+        }
     }
 }
 
