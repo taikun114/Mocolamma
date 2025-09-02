@@ -17,6 +17,9 @@ struct ServerInspectorView: View {
                 Text(server.name)
                     .font(.title2)
                     .bold()
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .help(server.name)
 
                 // Connection status below the name in a secondary color
                 if let status = connectionStatus {

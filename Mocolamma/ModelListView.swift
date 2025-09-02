@@ -170,11 +170,13 @@ struct ModelListView: View {
                     Text("\(model.originalIndex + 1)")
                         .foregroundColor(.secondary)
                         .frame(minWidth: 20, alignment: .center)
+                        .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
                     
                     VStack(alignment: .leading) {
                         Text(model.name)
                             .fontWeight(.bold)
                             .lineLimit(1)
+                            .help(model.name)
                         Text("\(model.formattedSize), \(model.formattedModifiedAt)")
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -211,24 +213,28 @@ struct ModelListView: View {
                 // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
                     Text("\(model.originalIndex + 1)")
+                        .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
                 }
                 .width(min: 30, ideal: 50, max: .infinity) // 番号列の幅設定を更新します
 
                 // 「名前」列: 最小50、理想150、最大無制限
                 TableColumn("Name", value: \.name) { model in // テーブル列ヘッダー：名前。
                     Text(model.name)
+                        .help(model.name)
                 }
                 .width(min: 100, ideal: 200, max: .infinity) // 名前列の幅設定を更新します
 
                 // 「サイズ」列: 最小30、理想50、最大無制限
                 TableColumn("Size", value: \.comparableSize) { model in // テーブル列ヘッダー：サイズ。
                     Text(model.formattedSize) // formattedSizeを使用します
+                        .help("\(model.formattedSize), \(model.size) B") // サイズのヘルプテキスト
                 }
                 .width(min: 50, ideal: 100, max: .infinity) // サイズ列の幅設定を更新します
 
                 // 「変更日」列: 最小50、理想80、最大無制限
                 TableColumn("Modified At", value: \.comparableModifiedDate) { model in // テーブル列ヘッダー：変更日。
                     Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
+                        .help(model.formattedModifiedAt) // 変更日のヘルプテキスト
                 }
                 .width(min: 100, ideal: 150, max: .infinity) // 変更日列の幅設定を更新します
             }

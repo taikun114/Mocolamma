@@ -35,10 +35,16 @@ struct ServerRowView: View {
             VStack(alignment: .leading) { // テキストコンテンツをVStackでグループ化
                 Text(server.name)
                     .font(.headline)
+                    .lineLimit(1) // サーバー名を1行に収める
+                    .truncationMode(.tail) // 末尾を省略
+                    .help(server.name) // サーバー名のヘルプテキスト
                 HStack {
                     Text(server.host)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                        .lineLimit(1) // ホスト名を1行に収める
+                        .truncationMode(.tail) // 末尾を省略
+                        .help(server.host) // ホスト名のヘルプテキスト
                 }
             }
 

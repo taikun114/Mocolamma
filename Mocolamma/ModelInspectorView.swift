@@ -125,6 +125,7 @@ struct ModelInspectorView: View {
                     .bold()
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .help(model.name) // モデル名のフルテキストをツールチップに表示
 
                 // Capabilities Section
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {

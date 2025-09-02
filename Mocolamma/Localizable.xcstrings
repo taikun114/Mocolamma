@@ -70,7 +70,25 @@
             "value" : "%1$@、%2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
+    },
+    "%@, %lld B" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        }
+      },
+      "shouldTranslate" : false
     },
     "%@/s, Time Remaining: %02d:%02d" : {
       "comment" : "速度と残り時間表示。",
@@ -2680,6 +2698,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号"
+          }
+        }
+      }
+    },
+    "No. %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No. %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号: %lld"
           }
         }
       }
