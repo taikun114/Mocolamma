@@ -740,6 +740,22 @@
         }
       }
     },
+    "Are you sure you want to open the Qwen Code GitHub page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Qwen Code GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
     "Are you sure you want to open the send feedback email window?" : {
       "localizations" : {
         "en" : {
@@ -2979,6 +2995,22 @@
         }
       }
     },
+    "Open link to the Qwen Code GitHub page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the Qwen Code GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
     "Open Link?" : {
       "comment" : "Alert title for opening an external link.",
       "localizations" : {
@@ -3271,6 +3303,17 @@
           }
         }
       }
+    },
+    "Qwen Code by Qwen" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        }
+      },
+      "shouldTranslate" : false
     },
     "Refresh" : {
       "localizations" : {
