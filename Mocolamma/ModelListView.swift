@@ -273,7 +273,8 @@ struct ModelListView: View {
                                          .help("Retry") // ヘルプテキストを追加
                                  }
                                  .buttonStyle(.plain)
-                                 .padding(.vertical, 4)
+                                 .padding(.top, 4)
+                                 .padding(.bottom, 2)
                                  .contentShape(Rectangle())
                              }
                          }
@@ -326,7 +327,7 @@ struct ModelListView: View {
                      }
                  }
                  .padding(.horizontal, 12)
-                 .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 8 : 0)
+                 .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
                  .padding(.bottom, 12)
              }
         }
