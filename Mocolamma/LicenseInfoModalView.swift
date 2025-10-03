@@ -37,8 +37,8 @@ struct LicenseInfoModalView: View {
 
     private let compactSliderVersionString: String = "2.0.9"
     private let markdownUIVersionString: String = "2.4.1"
-    private let geminiCLIVersionString: String = "0.1.21"
-    private let qwenCodeVersionString: String = "0.0.9"
+    private let geminiCLIVersionString: String = "0.7.0"
+    private let qwenCodeVersionString: String = "0.0.14"
     private let createDmgVersionString: String = "1.2.2"
     private let opencodeVersionString: String = "0.4.2"
 

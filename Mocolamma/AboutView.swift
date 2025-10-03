@@ -74,11 +74,11 @@ struct AboutView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
                         #else
-                        Image("InAppIcon")
+                        Image("AppIconLiquidGlass")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 96, height: 96)
-                            .padding(.vertical, 10)
+                            .frame(width: 128, height: 128)
+                            .padding(-8)
                             .id(colorScheme)
                         #endif
                     }
