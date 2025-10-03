@@ -6,11 +6,6 @@
 
 このドキュメントを受け取ったあなたは、このドキュメント内の情報を確認し、チャットを送るようにしてください。また、ユーザから新たな依頼や「必ずこうして欲しい」など、今後も守るべき情報を受け取った場合はこのドキュメントの中に追記してください。
 
-### このドキュメントを編集する際は
-
-あなたがこのドキュメントを編集する際、ユーザには生のマークダウンデータとして提供する必要があります。
-つまり、このドキュメントの最も上と最も下に、8つ以上の「`」で囲み、大きなコードブロックとして提供してください。
-
 ## プロジェクトについて
 
 プロジェクト名: `Mocolamma`\
@@ -23,42 +18,55 @@
 
 ```
 Mocolamma
-├── AboutView.swift
-├── AddModelsSheet.swift
-├── APITimeoutManager.swift
-├── ChatInputView.swift
-├── ChatMessagesView.swift
-├── ChatView.swift
-├── CommandExecutor.swift
-├── ContentView.swift
-├── InspectorContentView.swift
-├── LegacyIPhoneTabView.swift
-├── LicenseInfoModalView.swift
-├── LicenseTextView.swift
-├── MainContentDetailView.swift
-├── MainNavigationView.swift
-├── MainTabView.swift
-├── MarqueeText.swift
-├── MessageInputView.swift
-├── MessageView.swift
-├── MocolammaApp.swift
-├── ModelInspectorDetailView.swift
-├── ModelInspectorView.swift
-├── ModelListView.swift
-├── NavSubtitleIfAvailable.swift
-├── OllamaChat.swift
-├── OllamaModel.swift
-├── RunningModelsCountView.swift
-├── ServerFormView.swift
-├── ServerInfo.swift
-├── ServerInspectorDetailView.swift
-├── ServerInspectorView.swift
-├── ServerManager.swift
-├── ServerRowView.swift
-├── ServerView.swift
-├── SettingsView.swift
-├── SoftEdgeIfAvailable.swift
-└── VisualEffectView.swift
+├── Components
+│   ├── GlassProminentButtonStyle.swift
+│   ├── MarqueeText.swift
+│   ├── NavSubtitleIfAvailable.swift
+│   ├── SoftEdgeIfAvailable.swift
+│   └── VisualEffectView.swift
+├── Managers
+│   ├── APITimeoutManager.swift
+│   ├── CommandExecutor.swift
+│   └── ServerManager.swift
+├── Models
+│   ├── OllamaChat.swift
+│   ├── OllamaModel.swift
+│   └── ServerInfo.swift
+├── Resources
+│   ├── AppIcon.icon
+│   ├── Assets.xcassets
+│   └── Localizable.xcstrings
+├── Supporting Files
+│   └── MocolammaApp.swift
+├── Utilities
+│   ├── RefreshTrigger.swift
+│   └── VisionOSDetection.swift
+└── Views
+    ├── AboutView.swift
+    ├── AddModelsSheet.swift
+    ├── ChatInputView.swift
+    ├── ChatMessagesView.swift
+    ├── ChatView.swift
+    ├── ContentView.swift
+    ├── InspectorContentView.swift
+    ├── LegacyIPhoneTabView.swift
+    ├── LicenseInfoModalView.swift
+    ├── LicenseTextView.swift
+    ├── MainContentDetailView.swift
+    ├── MainNavigationView.swift
+    ├── MainTabView.swift
+    ├── MessageInputView.swift
+    ├── MessageView.swift
+    ├── ModelInspectorDetailView.swift
+    ├── ModelInspectorView.swift
+    ├── ModelListView.swift
+    ├── RunningModelsCountView.swift
+    ├── ServerFormView.swift
+    ├── ServerInspectorDetailView.swift
+    ├── ServerInspectorView.swift
+    ├── ServerRowView.swift
+    ├── ServerView.swift
+    └── SettingsView.swift
 ```
 
 新たなファイルを作成した場合はこの構造に新たなファイルを追加してください。
@@ -240,19 +248,3 @@ SwiftUIビューに、プラットフォーム固有のぼかしや鮮やかさ�
 * **Ollama APIのモデル情報からコンテキスト長を取得する際**:
     * Ollama APIの`/api/show`エンドポイントから返されるモデル情報（`model_info`）には、モデルの種類によって異なるキー（例: `llama.context_length`, `mistral.context_length`など）でコンテキスト長が提供される。
     * そのため、`context_length`の値を抽出する際は、キーのプレフィックスに依存せず、`.context_length`で終わるキーを検索して値を取得すること。
-
-### TODOリスト
-
-ここには、今後開発をする上で一時的に保留にしている作業を記載します。
-
-例えば、ユーザが「実際の機能は後で実装するので、とりあえず設定にオプションだけ追加してください」のように言った場合、このリストに「〇〇のオプションを追加したため、この後、実際の機能を実装する」のような項目を追加します。どのような機能を実装するのか、このドキュメントを見た誰もが理解できるように詳細に記載する必要があります。
-
-作業が完了して実装が終わったら、実装が完了した項目をこのリストから削除してください。
-
-* なし
-
-## その他の情報
-
-引き継ぎにあたって、上記以外で他に伝えるべき情報がある場合はこちらに記載してください。
-
-* ビルドコマンド: `xcodebuild -project /Users/taikun/Documents/Xcode/Mocolamma/Mocolamma/Mocolamma.xcodeproj -scheme Mocolamma build -quiet`
