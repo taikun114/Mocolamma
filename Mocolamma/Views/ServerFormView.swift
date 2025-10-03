@@ -13,6 +13,7 @@ struct ServerFormView: View {
     @State private var serverNameInput: String
     @State private var serverHostInput: String
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
+    @FocusState private var isNameFieldFocused: Bool
     // 編集中のサーバー情報 (追加の場合はnil)
     var editingServer: ServerInfo?
 
@@ -49,6 +50,7 @@ struct ServerFormView: View {
                     .font(.headline)
                 TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .focused($isNameFieldFocused)
 
                 Text("Host") // ホストラベル
                     .font(.headline)
@@ -116,6 +118,9 @@ struct ServerFormView: View {
                 .disabled(isSaveButtonDisabled)
                 .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
             }
+        }
+        .onAppear {
+            isNameFieldFocused = true
         }
         #endif
     }

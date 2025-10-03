@@ -11,6 +11,7 @@ struct AddModelsSheet: View {
     @State private var showHttpErrorAlert: Bool = false
     @State private var httpErrorMessage: String = ""
     @State private var pullErrorTriggeredSeen: Bool = false
+    @FocusState private var isTextFieldFocused: Bool
     
     @State private var showingOpenLinkAlert = false
     @Environment(\.openURL) var openURL
@@ -29,6 +30,7 @@ struct AddModelsSheet: View {
                 
                 TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .focused($isTextFieldFocused)
                 
                 Spacer() // This spacer is present in both old and new strings, so it should be preserved.
                 VStack(alignment: .leading, spacing: 8) {
@@ -130,6 +132,9 @@ struct AddModelsSheet: View {
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
                 .applyGlassProminentButtonStyle(isDisabled: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
             }
+        }
+        .onAppear {
+            isTextFieldFocused = true
         }
         #endif
     }
