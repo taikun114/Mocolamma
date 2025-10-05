@@ -13,6 +13,8 @@ struct InspectorContentView: View {
     @ObservedObject var serverManager: ServerManager
     @Binding var showingInspector: Bool
 
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    
     var body: some View {
         Group {
             if selection == "models" {
@@ -74,6 +76,15 @@ struct InspectorContentView: View {
                                 .scrollContentBackground(.hidden)
                                 .background(chatSettings.isSystemPromptEnabled ? Color.primary.opacity(0.05) : Color.secondary.opacity(0.05))
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(
+                                            colorSchemeContrast == .increased 
+                                                ? (chatSettings.isSystemPromptEnabled ? Color.primary : Color.secondary) 
+                                                : Color.clear,
+                                            lineWidth: 1
+                                        )
+                                )
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
