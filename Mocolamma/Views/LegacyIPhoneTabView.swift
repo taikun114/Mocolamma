@@ -5,7 +5,6 @@ import CompactSlider
 struct LegacyIPhoneTabView: View {
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
-    @Binding var selectedChatModelID: OllamaModel.ID?
     @ObservedObject var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
@@ -15,15 +14,6 @@ struct LegacyIPhoneTabView: View {
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
     let sortedModels: [OllamaModel]
-    @Binding var isChatStreamingEnabled: Bool
-    @Binding var useCustomChatSettings: Bool
-    @Binding var chatTemperature: Double
-    @Binding var isTemperatureEnabled: Bool
-    @Binding var isContextWindowEnabled: Bool
-    @Binding var contextWindowValue: Double
-    @Binding var isSystemPromptEnabled: Bool
-    @Binding var systemPrompt: String
-    @Binding var thinkingOption: ThinkingOption
     
     @State private var isInspectorSheetPresented = false
 
@@ -59,17 +49,7 @@ struct LegacyIPhoneTabView: View {
 
             NavigationStack {
                 ChatView(
-                    selectedModelID: $selectedChatModelID,
-                    isStreamingEnabled: $isChatStreamingEnabled,
                     showingInspector: $showingInspector,
-                    useCustomChatSettings: $useCustomChatSettings,
-                    chatTemperature: $chatTemperature,
-                    isTemperatureEnabled: $isTemperatureEnabled,
-                    isContextWindowEnabled: $isContextWindowEnabled,
-                    contextWindowValue: $contextWindowValue,
-                    isSystemPromptEnabled: $isSystemPromptEnabled,
-                    systemPrompt: $systemPrompt,
-                    thinkingOption: $thinkingOption,
                     onToggleInspector: toggleInspector
                 )
             }
@@ -117,20 +97,10 @@ struct LegacyIPhoneTabView: View {
         InspectorContentView(
             selection: selection,
             selectedModel: $selectedModel,
-            selectedChatModelID: $selectedChatModelID,
             sortedModels: sortedModels,
             selectedServerForInspector: selectedServerForInspector,
             serverManager: serverManager,
-            showingInspector: $showingInspector,
-            isChatStreamingEnabled: $isChatStreamingEnabled,
-            useCustomChatSettings: $useCustomChatSettings,
-            chatTemperature: $chatTemperature,
-            isTemperatureEnabled: $isTemperatureEnabled,
-            isContextWindowEnabled: $isContextWindowEnabled,
-            contextWindowValue: $contextWindowValue,
-            isSystemPromptEnabled: $isSystemPromptEnabled,
-            systemPrompt: $systemPrompt,
-            thinkingOption: $thinkingOption
+            showingInspector: $showingInspector
         )
         .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
     }

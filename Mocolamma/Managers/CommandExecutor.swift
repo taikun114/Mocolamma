@@ -11,8 +11,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
     @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
     @Published var specificConnectionErrorMessage: String? // 特定の接続エラーメッセージを追加
-    @Published var selectedModelContextLength: Int? // 選択されたモデルのコンテキスト長
-    @Published var selectedModelCapabilities: [String]? // 選択されたモデルのcapabilities
     @Published var chatMessages: [ChatMessage] = [] // チャットメッセージ
     @Published var chatInputText: String = "" // チャット入力テキスト
     
@@ -316,7 +314,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         // キャッシュに存在すればそれを返す
         if let cachedInfo = modelInfoCache[modelName] {
             print("モデル \(modelName) の詳細情報をキャッシュから取得しました。")
-            self.selectedModelCapabilities = cachedInfo.capabilities
             return cachedInfo
         }
         
@@ -360,7 +357,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("モデル \(modelName) の詳細情報を正常に取得しました。")
             // 取得した情報をキャッシュに保存
             modelInfoCache[modelName] = apiResponse
-            self.selectedModelCapabilities = apiResponse.capabilities // ここを追加
             
             // 変更点: selectedModelContextLength の更新ロジックを削除
             

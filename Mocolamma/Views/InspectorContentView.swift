@@ -5,29 +5,13 @@ import CompactSlider
 // MARK: - Inspector Content Helper View
 struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
+    @EnvironmentObject var chatSettings: ChatSettings
     let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
-    @Binding var selectedChatModelID: OllamaModel.ID?
     let sortedModels: [OllamaModel]
     let selectedServerForInspector: ServerInfo?
     @ObservedObject var serverManager: ServerManager
     @Binding var showingInspector: Bool
-    @Binding var isChatStreamingEnabled: Bool
-    @Binding var useCustomChatSettings: Bool
-    @Binding var chatTemperature: Double
-    
-    // States for chat model info, which are still needed.
-    @State private var modelInfo: [String: JSONValue]?
-    @State private var licenseBody: String?
-    @State private var licenseLink: String?
-    @State private var isLoadingInfo: Bool = false
-
-    @Binding var isTemperatureEnabled: Bool
-    @Binding var isContextWindowEnabled: Bool
-    @Binding var contextWindowValue: Double
-    @Binding var isSystemPromptEnabled: Bool
-    @Binding var systemPrompt: String
-    @Binding var thinkingOption: ThinkingOption
 
     var body: some View {
         Group {
@@ -60,19 +44,19 @@ struct InspectorContentView: View {
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
-                        Toggle("Stream Response", isOn: $isChatStreamingEnabled)
+                        Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Picker("Thinking", selection: $thinkingOption) {
+                            Picker("Thinking", selection: $chatSettings.thinkingOption) {
                                 ForEach(ThinkingOption.allCases) { option in
                                     Text(option.localizedName).tag(option)
                                 }
                             }
                             .pickerStyle(.menu)
-                            .disabled(!(commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false))
-                            .onChange(of: commandExecutor.selectedModelCapabilities) { _, caps in
+                            .disabled(!(chatSettings.selectedModelCapabilities?.contains("thinking") ?? false))
+                            .onChange(of: chatSettings.selectedModelCapabilities) { _, caps in
                                 let hasThinking = caps?.contains("thinking") ?? false
-                                if !hasThinking { thinkingOption = .none }
+                                if !hasThinking { chatSettings.thinkingOption = .none }
                             }
                             Text("Specifies whether to perform inference when using a reasoning model.")
                                 .font(.caption)
@@ -80,66 +64,66 @@ struct InspectorContentView: View {
                         }
                         
                         VStack {
-                            Toggle(isOn: $isSystemPromptEnabled) {
+                            Toggle(isOn: $chatSettings.isSystemPromptEnabled) {
                                 Text("System Prompt")
                             }
-                            TextEditor(text: $systemPrompt)
+                            TextEditor(text: $chatSettings.systemPrompt)
                                 .frame(height: 100)
-                                .disabled(!isSystemPromptEnabled)
-                                .foregroundColor(isSystemPromptEnabled ? .primary : .secondary)
+                                .disabled(!chatSettings.isSystemPromptEnabled)
+                                .foregroundColor(chatSettings.isSystemPromptEnabled ? .primary : .secondary)
                                 .scrollContentBackground(.hidden)
-                                .background(isSystemPromptEnabled ? Color.primary.opacity(0.05) : Color.secondary.opacity(0.05))
+                                .background(chatSettings.isSystemPromptEnabled ? Color.primary.opacity(0.05) : Color.secondary.opacity(0.05))
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     
                     Section("Custom Settings") {
-                        Toggle("Enable Custom Settings", isOn: $useCustomChatSettings)
+                        Toggle("Enable Custom Settings", isOn: $chatSettings.useCustomChatSettings)
                         
                         VStack {
-                            Toggle(isOn: $isTemperatureEnabled) {
+                            Toggle(isOn: $chatSettings.isTemperatureEnabled) {
                                 Text("Temperature")
                             }
                             .padding(.bottom, 4)
                             HStack {
-                                CompactSlider(value: $chatTemperature, in: 0.0...2.0, step: 0.1)
+                                CompactSlider(value: $chatSettings.chatTemperature, in: 0.0...2.0, step: 0.1)
 #if os(iOS)
                                     .frame(height: 32)
 #else
                                     .frame(height: 16)
 #endif
-                                Text(String(format: "%.1f", chatTemperature))
+                                Text(String(format: "%.1f", chatSettings.chatTemperature))
                                     .font(.body.monospaced())
                             }
-                            .disabled(!isTemperatureEnabled)
-                            .foregroundColor(isTemperatureEnabled ? .primary : .secondary)
+                            .disabled(!chatSettings.isTemperatureEnabled)
+                            .foregroundColor(chatSettings.isTemperatureEnabled ? .primary : .secondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .disabled(!useCustomChatSettings)
-                        .foregroundColor(useCustomChatSettings ? .primary : .secondary)
+                        .disabled(!chatSettings.useCustomChatSettings)
+                        .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
 
                         VStack {
-                            Toggle(isOn: $isContextWindowEnabled) {
+                            Toggle(isOn: $chatSettings.isContextWindowEnabled) {
                                 Text("Context Window")
                             }
                             .padding(.bottom, 4)
                             HStack {
-                                CompactSlider(value: $contextWindowValue, in: 512...Double(commandExecutor.selectedModelContextLength ?? 4096), step: 128.0)
+                                CompactSlider(value: $chatSettings.contextWindowValue, in: 512...Double(chatSettings.selectedModelContextLength ?? 4096), step: 128.0)
 #if os(iOS)
                                     .frame(height: 32)
 #else
                                     .frame(height: 16)
 #endif
-                                Text("\(Int(contextWindowValue))")
+                                Text("\(Int(chatSettings.contextWindowValue))")
                                     .font(.body.monospaced())
                             }
-                            .disabled(!isContextWindowEnabled)
-                            .foregroundColor(isContextWindowEnabled ? .primary : .secondary)
+                            .disabled(!chatSettings.isContextWindowEnabled)
+                            .foregroundColor(chatSettings.isContextWindowEnabled ? .primary : .secondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .disabled(!useCustomChatSettings)
-                        .foregroundColor(useCustomChatSettings ? .primary : .secondary)
+                        .disabled(!chatSettings.useCustomChatSettings)
+                        .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
                     }
                 }
                 .formStyle(.grouped)
@@ -150,33 +134,6 @@ struct InspectorContentView: View {
                     .foregroundColor(.secondary)
                     .id("nothing_to_display_placeholder")
                     .padding()
-            }
-        }
-        .onChange(of: selectedChatModelID) { _, newID in
-            modelInfo = nil
-            isLoadingInfo = true
-            licenseBody = nil
-            
-            guard let newID = newID,
-                  let model = sortedModels.first(where: { $0.id == newID }) else {
-                isLoadingInfo = false
-                return
-            }
-            
-            Task {
-                let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
-                if selectedChatModelID == newID {
-                    await MainActor.run {
-                        self.modelInfo = fetchedResponse?.model_info
-                        self.licenseBody = fetchedResponse?.license
-                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
-                        self.isLoadingInfo = false
-                        let hasThinkingCapability = self.commandExecutor.selectedModelCapabilities?.contains("thinking") ?? false
-                        if !hasThinkingCapability {
-                            self.thinkingOption = .none
-                        }
-                    }
-                }
             }
         }
         #if os(macOS)

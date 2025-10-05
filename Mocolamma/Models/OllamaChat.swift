@@ -437,3 +437,19 @@ enum JSONValue: Codable, Hashable {
         }
     }
 }
+
+@MainActor
+class ChatSettings: ObservableObject {
+    @Published var selectedModelID: OllamaModel.ID?
+    @Published var selectedModelContextLength: Int?
+    @Published var selectedModelCapabilities: [String]?
+    @Published var isStreamingEnabled: Bool = true
+    @Published var useCustomChatSettings: Bool = false
+    @Published var chatTemperature: Double = 0.8
+    @Published var isTemperatureEnabled: Bool = false
+    @Published var isContextWindowEnabled: Bool = false
+    @Published var contextWindowValue: Double = 2048.0
+    @Published var isSystemPromptEnabled: Bool = false
+    @Published var systemPrompt: String = ""
+    @Published var thinkingOption: ThinkingOption = .none
+}

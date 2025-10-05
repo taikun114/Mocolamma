@@ -5,31 +5,24 @@ struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @Binding var selectedModelID: OllamaModel.ID?
+    @EnvironmentObject var chatSettings: ChatSettings
+    
     @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
     @State private var showEmbeddingAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
-    @Binding var isStreamingEnabled: Bool
+    
     @Binding var showingInspector: Bool
-    @Binding var useCustomChatSettings: Bool
-    @Binding var chatTemperature: Double
-    @Binding var isTemperatureEnabled: Bool
-    @Binding var isContextWindowEnabled: Bool
-    @Binding var contextWindowValue: Double
-    @Binding var isSystemPromptEnabled: Bool
-    @Binding var systemPrompt: String
-    @Binding var thinkingOption: ThinkingOption
     var onToggleInspector: () -> Void
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
-        if let id = selectedModelID {
+        if let id = chatSettings.selectedModelID {
             return executor.models.first(where: { $0.id == id })
         }
         return nil
     }
-
+    
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
             return Text(LocalizedStringKey(serverName))
@@ -37,7 +30,7 @@ struct ChatView: View {
             return Text("No Server Selected")
         }
     }
-
+    
     var body: some View {
         ZStack {
             if serverManager.selectedServer == nil {
@@ -59,9 +52,9 @@ struct ChatView: View {
                     Text("Here you can perform a simple chat to check the model.")
                 }
             } else {
-                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $isStreaming, isModelSelected: selectedModelID != nil)
+                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $isStreaming, isModelSelected: chatSettings.selectedModelID != nil)
             }
-
+            
             VStack {
                 Spacer()
                 
@@ -85,25 +78,20 @@ struct ChatView: View {
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
         .onAppear {
-            print("ChatView appeared. Models: \(executor.models.count)")
-            if selectedModelID == nil {
-                selectedModelID = nil
-            } else if let current = selectedModelID, !executor.models.contains(where: { $0.id == current }) {
-                selectedModelID = nil
+            if let current = chatSettings.selectedModelID, !executor.models.contains(where: { $0.id == current }) {
+                chatSettings.selectedModelID = nil
             }
         }
         .onChange(of: executor.models) { _, newModels in
-            if let currentSelectedModelID = selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
-                selectedModelID = nil
+            if let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+                chatSettings.selectedModelID = nil
             }
         }
-        .onChange(of: selectedModelID) { _, newID in
-            contextWindowValue = 2048.0
+        .onChange(of: chatSettings.selectedModelID) { _, newID in
+            chatSettings.contextWindowValue = 2048.0
             guard let model = currentSelectedModel else {
-                Task { @MainActor in
-                    executor.selectedModelContextLength = nil
-                    executor.selectedModelCapabilities = nil
-                }
+                chatSettings.selectedModelContextLength = nil
+                chatSettings.selectedModelCapabilities = nil
                 return
             }
             Task {
@@ -124,21 +112,15 @@ struct ChatView: View {
                         return false
                     }()
                     if isEmbeddingOnly {
-                        await MainActor.run {
-                            selectedModelID = nil
-                            showEmbeddingAlert = true
-                        }
+                        chatSettings.selectedModelID = nil
+                        showEmbeddingAlert = true
                         return
                     }
-                    await MainActor.run {
-                        executor.selectedModelContextLength = contextLength
-                        executor.selectedModelCapabilities = response.capabilities
-                    }
+                    chatSettings.selectedModelContextLength = contextLength
+                    chatSettings.selectedModelCapabilities = response.capabilities
                 } else {
-                    await MainActor.run {
-                        executor.selectedModelContextLength = nil
-                        executor.selectedModelCapabilities = nil
-                    }
+                    chatSettings.selectedModelContextLength = nil
+                    chatSettings.selectedModelCapabilities = nil
                 }
             }
         }
@@ -158,7 +140,7 @@ struct ChatView: View {
             Text(generalErrorMessage ?? "An unknown error occurred.")
         }
     }
-
+    
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if os(iOS)
@@ -169,22 +151,22 @@ struct ChatView: View {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning)
-
+            
             Menu {
-                Button("Select Model") { selectedModelID = nil }
+                Button("Select Model") { chatSettings.selectedModelID = nil }
                 if executor.models.isEmpty {
                     Divider()
                     Button(LocalizedStringKey("No models available")) {}
                         .disabled(true)
                 }
                 ForEach(executor.models) { model in
-                    Button(action: { selectedModelID = model.id }) {
-                        if selectedModelID == model.id { Image(systemName: "checkmark") }
+                    Button(action: { chatSettings.selectedModelID = model.id }) {
+                        if chatSettings.selectedModelID == model.id { Image(systemName: "checkmark") }
                         Text(model.name)
                     }
                 }
             } label: {
-                Image(systemName: selectedModelID != nil ? "tray.full.fill" : "tray.full")
+                Image(systemName: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
         #else // macOS
@@ -197,7 +179,7 @@ struct ChatView: View {
             .disabled(executor.isRunning)
         }
         ToolbarItem(placement: .primaryAction) { // Model Picker (macOS)
-            Picker("Select Model", selection: $selectedModelID) {
+            Picker("Select Model", selection: $chatSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
                 ForEach(executor.models) { model in
@@ -214,13 +196,13 @@ struct ChatView: View {
             .frame(maxWidth: 150)
         }
         #endif
-
+        
         #if os(iOS)
         if #available(iOS 26, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between Model Group and New Chat
         }
         #endif
-
+        
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 executor.clearChat()
@@ -230,7 +212,7 @@ struct ChatView: View {
                 Label("New Chat", systemImage: "square.and.pencil")
             }
         }
-
+        
         #if os(iOS)
         if #available(iOS 26, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between New Chat and Inspector
@@ -242,25 +224,25 @@ struct ChatView: View {
         }
         #endif
     }
-
+    
     private func sendMessage() {
         guard let model = currentSelectedModel else {
             generalErrorMessage = "Please select a model first."
             return
         }
         guard !executor.chatInputText.isEmpty else { return }
-
+        
         isStreaming = true
         let userMessage = ChatMessage(role: "user", content: executor.chatInputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         executor.chatInputText = ""
         executor.chatMessages.append(userMessage)
-
+        
         var apiMessages = executor.chatMessages
-        if isSystemPromptEnabled && !systemPrompt.isEmpty {
-            let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+        if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+            let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
             apiMessages.insert(systemMessage, at: 0)
         }
-
+        
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
         placeholderMessage.revisions = []
         placeholderMessage.currentRevisionIndex = 0
@@ -272,38 +254,38 @@ struct ChatView: View {
         placeholderMessage.pendingThinking = ""
         executor.chatMessages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
-
+        
         Task {
             await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
         }
     }
-
+    
     // 過去リビジョン参照中でも、最新の完成版だけをアーカイブしてリトライ開始する
     private func retryMessage(for messageId: UUID, with messageToRetry: ChatMessage) {
         guard let indexToRetry = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
         }
-
+        
         // ユーザーメッセージのリトライの場合
         if executor.chatMessages[indexToRetry].role == "user" {
             // 編集されたユーザーメッセージを履歴の最後に移動
             let userMessage = executor.chatMessages.remove(at: indexToRetry)
             executor.chatMessages.append(userMessage)
-
+            
             // ユーザーメッセージ以降のアシスタントメッセージを削除
             executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in // ChatMessageを明示的に指定
                 guard let messageCreatedAt = message.createdAt,
                       let userMessageCreatedAt = userMessage.createdAt else { return false }
                 return messageCreatedAt > userMessageCreatedAt && message.role == "assistant" // $0.role を message.role に変更
             })
-
+            
             var apiMessages = executor.chatMessages
-            if isSystemPromptEnabled && !systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
                 apiMessages.insert(systemMessage, at: 0)
             }
-
+            
             let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
             placeholderMessage.revisions = []
             placeholderMessage.currentRevisionIndex = 0
@@ -315,15 +297,15 @@ struct ChatView: View {
             placeholderMessage.pendingThinking = ""
             executor.chatMessages.append(placeholderMessage)
             let assistantMessageId = placeholderMessage.id
-
+            
             guard let model = currentSelectedModel else {
                 generalErrorMessage = "Please select a model first."
                 return
             }
-
+            
             isStreaming = true
             Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
-
+            
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
             guard indexToRetry == executor.chatMessages.count - 1 else {
                 print("Retry failed: Message is not the last one.")
@@ -339,7 +321,7 @@ struct ChatView: View {
                 return
             }
             let userMessageIndex = indexToRetry - 1
-
+            
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content > fixed+pending の順
             let latestCandidate = executor.chatMessages[indexToRetry].latestContent ?? ""
@@ -350,7 +332,7 @@ struct ChatView: View {
                 if !contentCandidate.isEmpty { return contentCandidate }
                 return bufferedCandidate
             }()
-
+            
             // Thinking は finalThinking > thinking > fixed+pending > nil
             let finalThinkingCandidate = executor.chatMessages[indexToRetry].finalThinking
             let liveThinkingCandidate = executor.chatMessages[indexToRetry].thinking
@@ -361,7 +343,7 @@ struct ChatView: View {
                 if !bufferedThinkingCandidate.isEmpty { return bufferedThinkingCandidate }
                 return nil
             }()
-
+            
             // 2) 履歴アーカイブ（この関数内のみで1回）
             let archived = ChatMessage(
                 role: executor.chatMessages[indexToRetry].role,
@@ -389,11 +371,11 @@ struct ChatView: View {
             archived.finalEvalCount = executor.chatMessages[indexToRetry].finalEvalCount ?? executor.chatMessages[indexToRetry].evalCount
             archived.finalEvalDuration = executor.chatMessages[indexToRetry].finalEvalDuration ?? executor.chatMessages[indexToRetry].evalDuration
             archived.finalIsStopped = executor.chatMessages[indexToRetry].finalIsStopped || executor.chatMessages[indexToRetry].isStopped
-
+            
             executor.chatMessages[indexToRetry].revisions.append(archived)
             // 参照位置は常に最新（末尾の次 = 現在バージョン）
             executor.chatMessages[indexToRetry].currentRevisionIndex = executor.chatMessages[indexToRetry].revisions.count
-
+            
             // 3) 再実行準備（表示バッファも初期化）
             executor.chatMessages[indexToRetry].content = ""
             executor.chatMessages[indexToRetry].thinking = nil
@@ -408,19 +390,19 @@ struct ChatView: View {
             executor.chatMessages[indexToRetry].totalDuration = nil
             executor.chatMessages[indexToRetry].evalCount = nil
             executor.chatMessages[indexToRetry].evalDuration = nil
-
+            
             // 4) APIに出すメッセージ（ユーザー発話まで）
             var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
-            if isSystemPromptEnabled && !systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: systemPrompt)
+            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
                 apiMessages.insert(systemMessage, at: 0)
             }
-
+            
             guard let model = currentSelectedModel else {
                 generalErrorMessage = "Please select a model first."
                 return
             }
-
+            
             isStreaming = true
             Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
         }
@@ -432,13 +414,13 @@ struct ChatView: View {
         let throttleInterval = 0.08
         var isFirstChunk = true
         var isInsideThinkingBlock = false
-
+        
         var pendingMain = ""
         var pendingThinking = ""
-
+        
         let flushCharThreshold = 300
         let flushNewlinePreferred = true
-
+        
         func flushPendingToFixed(index: Int, force: Bool = false) async {
             guard executor.chatMessages.indices.contains(index) else { return }
             if force || pendingMain.count >= flushCharThreshold || (flushNewlinePreferred && pendingMain.contains("\n")) {
@@ -460,26 +442,26 @@ struct ChatView: View {
                 }
             }
         }
-
+        
         do {
             for try await chunk in executor.chat(
                 model: model.name,
                 messages: apiMessages,
-                stream: isStreamingEnabled,
-                useCustomChatSettings: useCustomChatSettings,
-                isTemperatureEnabled: isTemperatureEnabled,
-                chatTemperature: chatTemperature,
-                isContextWindowEnabled: isContextWindowEnabled,
-                contextWindowValue: contextWindowValue,
-                isSystemPromptEnabled: isSystemPromptEnabled,
-                systemPrompt: systemPrompt,
-                thinkingOption: thinkingOption,
+                stream: chatSettings.isStreamingEnabled,
+                useCustomChatSettings: chatSettings.useCustomChatSettings,
+                isTemperatureEnabled: chatSettings.isTemperatureEnabled,
+                chatTemperature: chatSettings.chatTemperature,
+                isContextWindowEnabled: chatSettings.isContextWindowEnabled,
+                contextWindowValue: chatSettings.contextWindowValue,
+                isSystemPromptEnabled: chatSettings.isSystemPromptEnabled,
+                systemPrompt: chatSettings.systemPrompt,
+                thinkingOption: chatSettings.thinkingOption,
                 tools: nil
             ) {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
-
+                
                 if let messageChunk = chunk.message {
-                    if thinkingOption == .on {
+                    if chatSettings.thinkingOption == .on {
                         if let apiThinking = messageChunk.thinking { pendingThinking += apiThinking }
                         pendingMain += messageChunk.content
                     } else {
@@ -504,7 +486,7 @@ struct ChatView: View {
                             pendingMain += current
                         }
                     }
-
+                    
                     if isFirstChunk {
                         await MainActor.run {
                             if executor.chatMessages.indices.contains(assistantMessageIndex) {
@@ -513,9 +495,9 @@ struct ChatView: View {
                         }
                         isFirstChunk = false
                     }
-
+                    
                     await flushPendingToFixed(index: assistantMessageIndex, force: false)
-
+                    
                     let now = Date()
                     if now.timeIntervalSince(lastUIUpdateTime) > throttleInterval || chunk.done {
                         await MainActor.run {
@@ -523,8 +505,8 @@ struct ChatView: View {
                                 executor.chatMessages[assistantMessageIndex].pendingContent = pendingMain
                                 executor.chatMessages[assistantMessageIndex].pendingThinking = pendingThinking
                                 executor.chatMessages[assistantMessageIndex].latestContent = executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent
-
-                                if thinkingOption == .on &&
+                                
+                                if chatSettings.thinkingOption == .on &&
                                     !(executor.chatMessages[assistantMessageIndex].fixedThinking + executor.chatMessages[assistantMessageIndex].pendingThinking).isEmpty &&
                                     !(executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent).isEmpty &&
                                     !executor.chatMessages[assistantMessageIndex].isThinkingCompleted {
@@ -535,7 +517,7 @@ struct ChatView: View {
                         lastUIUpdateTime = now
                     }
                 }
-
+                
                 if chunk.done {
                     if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
                         await flushPendingToFixed(index: index, force: true)
@@ -549,7 +531,7 @@ struct ChatView: View {
                                 executor.chatMessages[index].evalCount = chunk.evalCount
                                 executor.chatMessages[index].evalDuration = chunk.evalDuration
                                 executor.chatMessages[index].isStreaming = false
-                                if thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
+                                if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
                                     executor.chatMessages[index].isThinkingCompleted = true
                                 }
                                 executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
@@ -574,9 +556,9 @@ struct ChatView: View {
                     } else {
                         executor.chatMessages[index].isStopped = false
                         if (executor.chatMessages[index].fixedContent + executor.chatMessages[index].pendingContent).isEmpty {
-                        executor.chatMessages[index].fixedContent = ""
-                        executor.chatMessages[index].content = ""
-                    }
+                            executor.chatMessages[index].fixedContent = ""
+                            executor.chatMessages[index].content = ""
+                        }
                         generalErrorMessage = "Chat API Error: \(error.localizedDescription)"
                     }
                 }

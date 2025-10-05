@@ -14,7 +14,6 @@ struct ContentView: View {
     @StateObject var executor: CommandExecutor
 
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
-    @State private var selectedChatModelID: OllamaModel.ID? // チャットで選択されたモデルのID
     // サイドバー/タブの選択状態をAppレベルから受け取ります
     @Binding var selection: String?
     
@@ -23,15 +22,7 @@ struct ContentView: View {
 
     // Inspector（プレビューパネル）の表示/非表示を制御するState変数を@Bindingに変更
     @Binding var showingInspector: Bool
-    @State private var isChatStreamingEnabled: Bool = true // ChatViewのストリーム設定
-    @State private var useCustomChatSettings: Bool = false // カスタムチャット設定の有効化
-    @State private var chatTemperature: Double = 0.8 // Temperatureの初期値
-    @State private var isTemperatureEnabled: Bool = false // 新しく追加
-    @State private var isContextWindowEnabled: Bool = false // ここを追加
-    @State private var contextWindowValue: Double = 2048.0 // ここを2048.0に変更
-    @State private var isSystemPromptEnabled: Bool = false
-    @State private var systemPrompt: String = ""
-    @State private var thinkingOption: ThinkingOption = .none
+    @StateObject private var chatSettings = ChatSettings()
 
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -77,7 +68,6 @@ struct ContentView: View {
             MainNavigationView(
                 sidebarSelection: $selection,
                 selectedModel: $selectedModel,
-                selectedChatModelID: $selectedChatModelID,
                 executor: executor,
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
@@ -87,23 +77,13 @@ struct ContentView: View {
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
                 columnVisibility: $columnVisibility,
-                sortedModels: sortedModels,
-                isChatStreamingEnabled: $isChatStreamingEnabled,
-                useCustomChatSettings: $useCustomChatSettings,
-                chatTemperature: $chatTemperature,
-                isTemperatureEnabled: $isTemperatureEnabled,
-                isContextWindowEnabled: $isContextWindowEnabled,
-                contextWindowValue: $contextWindowValue,
-                isSystemPromptEnabled: $isSystemPromptEnabled,
-                systemPrompt: $systemPrompt,
-                thinkingOption: $thinkingOption
+                sortedModels: sortedModels
             )
             #elseif os(iOS)
             if #available(iOS 18.0, *) {
                 MainTabView(
                     selection: $selection,
                     selectedModel: $selectedModel,
-                    selectedChatModelID: $selectedChatModelID,
                     executor: executor,
                     serverManager: serverManager,
                     selectedServerForInspector: $selectedServerForInspector,
@@ -112,23 +92,13 @@ struct ContentView: View {
                     showingAddModelsSheet: $showingAddModelsSheet,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
-                    sortedModels: sortedModels,
-                    isChatStreamingEnabled: $isChatStreamingEnabled,
-                    useCustomChatSettings: $useCustomChatSettings,
-                    chatTemperature: $chatTemperature,
-                    isTemperatureEnabled: $isTemperatureEnabled,
-                    isContextWindowEnabled: $isContextWindowEnabled,
-                    contextWindowValue: $contextWindowValue,
-                    isSystemPromptEnabled: $isSystemPromptEnabled,
-                    systemPrompt: $systemPrompt,
-                    thinkingOption: $thinkingOption
+                    sortedModels: sortedModels
                 )
             } else {
                 if UIDevice.current.userInterfaceIdiom == .phone {
                     LegacyIPhoneTabView(
                         selection: $selection,
                         selectedModel: $selectedModel,
-                        selectedChatModelID: $selectedChatModelID,
                         executor: executor,
                         serverManager: serverManager,
                         selectedServerForInspector: $selectedServerForInspector,
@@ -137,22 +107,12 @@ struct ContentView: View {
                         showingAddModelsSheet: $showingAddModelsSheet,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         modelToDelete: $modelToDelete,
-                        sortedModels: sortedModels,
-                        isChatStreamingEnabled: $isChatStreamingEnabled,
-                        useCustomChatSettings: $useCustomChatSettings,
-                        chatTemperature: $chatTemperature,
-                        isTemperatureEnabled: $isTemperatureEnabled,
-                        isContextWindowEnabled: $isContextWindowEnabled,
-                        contextWindowValue: $contextWindowValue,
-                        isSystemPromptEnabled: $isSystemPromptEnabled,
-                        systemPrompt: $systemPrompt,
-                        thinkingOption: $thinkingOption
+                        sortedModels: sortedModels
                     )
                 } else {
                     MainNavigationView(
                         sidebarSelection: $selection,
                         selectedModel: $selectedModel,
-                        selectedChatModelID: $selectedChatModelID,
                         executor: executor,
                         serverManager: serverManager,
                         selectedServerForInspector: $selectedServerForInspector,
@@ -162,16 +122,7 @@ struct ContentView: View {
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         modelToDelete: $modelToDelete,
                         columnVisibility: $columnVisibility,
-                        sortedModels: sortedModels,
-                        isChatStreamingEnabled: $isChatStreamingEnabled,
-                        useCustomChatSettings: $useCustomChatSettings,
-                        chatTemperature: $chatTemperature,
-                        isTemperatureEnabled: $isTemperatureEnabled,
-                        isContextWindowEnabled: $isContextWindowEnabled,
-                        contextWindowValue: $contextWindowValue,
-                        isSystemPromptEnabled: $isSystemPromptEnabled,
-                        systemPrompt: $systemPrompt,
-                        thinkingOption: $thinkingOption
+                        sortedModels: sortedModels
                     )
                 }
             }
@@ -179,7 +130,6 @@ struct ContentView: View {
             MainNavigationView(
                 sidebarSelection: $selection,
                 selectedModel: $selectedModel,
-                selectedChatModelID: $selectedChatModelID,
                 executor: executor,
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
@@ -189,20 +139,12 @@ struct ContentView: View {
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
                 columnVisibility: $columnVisibility,
-                sortedModels: sortedModels,
-                isChatStreamingEnabled: $isChatStreamingEnabled,
-                useCustomChatSettings: $useCustomChatSettings,
-                chatTemperature: $chatTemperature,
-                isTemperatureEnabled: $isTemperatureEnabled,
-                isContextWindowEnabled: $isContextWindowEnabled,
-                contextWindowValue: $contextWindowValue,
-                isSystemPromptEnabled: $isSystemPromptEnabled,
-                systemPrompt: $systemPrompt,
-                thinkingOption: $thinkingOption
+                sortedModels: sortedModels
             )
             #endif
         }
         .environmentObject(executor)
+        .environmentObject(chatSettings)
         .sheet(isPresented: $showingAddModelsSheet) {
             NavigationStack {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
