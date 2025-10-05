@@ -38,6 +38,9 @@ struct MocolammaApp: App {
 
     // リフレッシュコマンドを発行するためのトリガー
     @StateObject private var appRefreshTrigger = RefreshTrigger()
+    
+    // チャットクリア要求を伝える状態変数
+    @State private var shouldClearChat: Bool = false
 
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
@@ -63,7 +66,8 @@ struct MocolammaApp: App {
                 selection: $selection,
                 showingInspector: $showingInspector,
                 showingAddModelsSheet: $showingAddModelsSheet,
-                showingAddServerSheet: $showingAddServerSheet
+                showingAddServerSheet: $showingAddServerSheet,
+                shouldClearChat: $shouldClearChat
             )
             #if os(macOS)
                 .frame(minWidth: 500, minHeight: 300)
@@ -102,7 +106,7 @@ struct MocolammaApp: App {
                 Button(action: {
                     showingAddServerSheet = true
                 }) {
-                    Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
+                    Label(String(localized: "Add Server…"), systemImage: "plus")
                 }
                 .keyboardShortcut("s", modifiers: [.option, .command])
                 .disabled(selection != "server")
@@ -110,10 +114,19 @@ struct MocolammaApp: App {
                 Button(action: {
                     showingAddModelsSheet = true
                 }) {
-                    Label(String(localized: "Add Model…", comment: "モデル追加メニューアイテム"), systemImage: "plus")
+                    Label(String(localized: "Add Model…"), systemImage: "plus")
                 }
                 .keyboardShortcut("m", modifiers: [.option, .command])
                 .disabled(selection != "models")
+                
+                Button(action: {
+                    // チャットクリア要求を設定
+                    shouldClearChat = true
+                }) {
+                    Label(String(localized: "New Chat"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("n", modifiers: [.option, .command])
+                .disabled(selection != "chat")
             }
 
             #else
@@ -128,7 +141,7 @@ struct MocolammaApp: App {
                 Button(action: {
                     selection = "settings"
                 }) {
-                    Label(String(localized: "Settings…", comment: "設定メニューアイテム"), systemImage: "gear")
+                    Label(String(localized: "Settings…"), systemImage: "gear")
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
@@ -152,7 +165,7 @@ struct MocolammaApp: App {
                 Button(action: {
                     showingAddServerSheet = true
                 }) {
-                    Label(String(localized: "Add Server…", comment: "サーバー追加メニューアイテム"), systemImage: "plus")
+                    Label(String(localized: "Add Server…"), systemImage: "plus")
                 }
                 .keyboardShortcut("s", modifiers: [.option, .command])
                 .disabled(selection != "server")
@@ -160,10 +173,19 @@ struct MocolammaApp: App {
                 Button(action: {
                     showingAddModelsSheet = true
                 }) {
-                    Label(String(localized: "Add Model…", comment: "モデル追加メニューアイテム"), systemImage: "plus")
+                    Label(String(localized: "Add Model…"), systemImage: "plus")
                 }
                 .keyboardShortcut("m", modifiers: [.option, .command])
                 .disabled(selection != "models")
+                
+                Button(action: {
+                    // チャットクリア要求を設定
+                    shouldClearChat = true
+                }) {
+                    Label(String(localized: "New Chat"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("n", modifiers: [.option, .command])
+                .disabled(selection != "chat")
             }
             #endif
         }

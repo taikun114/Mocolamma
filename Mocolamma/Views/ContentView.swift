@@ -57,14 +57,17 @@ struct ContentView: View {
     
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>) {
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
         self._showingAddServerSheet = showingAddServerSheet
+        self._shouldClearChat = shouldClearChat
     }
+    
+    @Binding var shouldClearChat: Bool
 
     var body: some View {
         Group {
@@ -254,6 +257,14 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: shouldClearChat) { oldValue, newValue in
+            if newValue {
+                // チャットクリアを実行
+                executor.clearChat()
+                // 状態をリセット
+                shouldClearChat = false
+            }
+        }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
         }
@@ -325,6 +336,6 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false))
         .environmentObject(RefreshTrigger())
 }

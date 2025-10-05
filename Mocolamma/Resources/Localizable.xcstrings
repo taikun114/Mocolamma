@@ -2510,6 +2510,7 @@
       }
     },
     "New Chat" : {
+      "comment" : "新規チャットメニューアイテム",
       "localizations" : {
         "en" : {
           "stringUnit" : {
