@@ -48,6 +48,7 @@ struct LegacyIPhoneTabView: View {
                     showingAddSheet: $showingAddModelsSheet,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
+                    isSelected: selection == "models",
                     onTogglePreview: { toggleInspector() }
                 )
             }

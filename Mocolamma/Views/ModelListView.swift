@@ -39,6 +39,7 @@ struct ModelListView: View {
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    let isSelected: Bool // 現在のタブが選択されているか
 
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
 
@@ -257,7 +258,7 @@ struct ModelListView: View {
             }
 #endif
             // プログレスバーとステータステキスト
-             if executor.isPulling || executor.isPullingErrorHold {
+             if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
                  VStack(alignment: .center, spacing: 8) {
                      ProgressView(value: executor.pullProgress) {
                          HStack(alignment: .bottom) {
@@ -388,6 +389,7 @@ struct ModelListView: View {
         showingAddSheet: .constant(false), // ダミーのBinding<Bool>
         showingDeleteConfirmation: .constant(false), // ダミーのBinding<Bool>
         modelToDelete: .constant(nil), // ダミーのBinding<OllamaModel?>
+        isSelected: true, // ダミーのisSelected
         onTogglePreview: { print("ModelListView_Previews: Dummy onTogglePreview called.") } // ダミーのクロージャ
     )
 }

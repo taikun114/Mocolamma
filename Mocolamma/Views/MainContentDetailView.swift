@@ -33,6 +33,7 @@ struct MainContentDetailView: View {
                     showingAddSheet: $showingAddModelsSheet,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
+                    isSelected: sidebarSelection == "models",
                     onTogglePreview: { showingInspector.toggle() }
                 )
                 .environmentObject(serverManager)
