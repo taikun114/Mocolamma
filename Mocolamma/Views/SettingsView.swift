@@ -13,6 +13,7 @@ struct SettingsView: View {
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var showingAbout: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     var body: some View {
         Form {
@@ -80,9 +81,18 @@ struct SettingsView: View {
                 if horizontalSizeClass == .compact { // iPhone portrait, or iPad narrow split view
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 10) {
-                            Circle()
-                                .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
-                                .frame(width: 10, height: 10)
+                            if differentiateWithoutColor {
+                                Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundStyle(localNetworkChecker.isAllowed ? .green : .red)
+                                    .fontWeight(.bold)
+                            } else {
+                                Circle()
+                                    .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                                    .frame(width: 10, height: 10)
+                            }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Local Network Access")
                                 Text("Permission is required to connect to Ollama servers on the same network.")
@@ -109,9 +119,18 @@ struct SettingsView: View {
                     }
                 } else { // .regular - iPhone landscape, iPad full screen or wider split view
                     HStack {
-                        Circle()
-                            .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
-                            .frame(width: 10, height: 10)
+                        if differentiateWithoutColor {
+                            Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundStyle(localNetworkChecker.isAllowed ? .green : .red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle()
+                                .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                                .frame(width: 10, height: 10)
+                        }
                         VStack(alignment: .leading) {
                             Text("Local Network Access")
                             Text("Permission is required to connect to Ollama servers on the same network.")
@@ -136,9 +155,18 @@ struct SettingsView: View {
             }
             #else
             HStack {
-                Circle()
-                    .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
-                    .frame(width: 10, height: 10)
+                if differentiateWithoutColor {
+                    Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(localNetworkChecker.isAllowed ? .green : .red)
+                        .fontWeight(.bold)
+                } else {
+                    Circle()
+                        .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                        .frame(width: 10, height: 10)
+                }
                 VStack(alignment: .leading) {
                     Text("Local Network Access")
                     Text("Permission is required to connect to Ollama servers on the same network.")
