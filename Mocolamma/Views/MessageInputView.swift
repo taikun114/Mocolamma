@@ -4,6 +4,7 @@ struct MessageInputView: View {
     @FocusState private var isInputFocused: Bool
     @Binding var inputText: String
     @Binding var isStreaming: Bool
+    @Binding var showingInspector: Bool
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil // 新しいクロージャを追加
@@ -33,7 +34,7 @@ struct MessageInputView: View {
                     .textFieldStyle(.plain)
                     .disabled(selectedModel == nil)
                     .onChange(of: selectedModel) { _, model in
-                        if model != nil { isInputFocused = true }
+                        if model != nil && !showingInspector { isInputFocused = true }
                     }
                     .lineLimit(1...10)
                     .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる

@@ -58,7 +58,7 @@ struct ChatView: View {
             VStack {
                 Spacer()
                 
-                ChatInputView(inputText: $executor.chatInputText, isStreaming: $isStreaming, selectedModel: currentSelectedModel) {
+                ChatInputView(inputText: $executor.chatInputText, isStreaming: $isStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
                     sendMessage()
                 } stopMessage: {
                     if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {

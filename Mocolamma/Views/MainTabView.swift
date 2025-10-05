@@ -95,6 +95,11 @@ struct MainTabView: View {
         } else {
             showingInspector.toggle()
         }
+        
+        #if os(iOS)
+        // キーボードを非表示にする
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
     }
 
     private var inspectorContent: some View {
