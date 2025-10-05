@@ -52,6 +52,7 @@
 		6D66B22A2E90186800EA3CE6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D66B1DD2E90186800EA3CE6 /* LaunchScreen.storyboard */; platformFilter = ios; };
 		6D6AF25D2E37C253008E569D /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6D6AF25C2E37C253008E569D /* MarkdownUI */; };
 		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
+		6DD8D3062E92A29B00BA273F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6DD8D3042E92A29B00BA273F /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +121,8 @@
 		6DC81A322E3236B3005F2E03 /* Mocolamma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mocolamma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DC81A402E3236B4005F2E03 /* MocolammaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MocolammaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DC81A4A2E3236B4005F2E03 /* MocolammaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MocolammaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DD8D3052E92A29B00BA273F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6DD8D3072E92A2BB00BA273F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -200,6 +203,7 @@
 				6D66B1D82E90186800EA3CE6 /* AppIcon.icon */,
 				6D66B1D92E90186800EA3CE6 /* Assets.xcassets */,
 				6D66B1DA2E90186800EA3CE6 /* Localizable.xcstrings */,
+				6DD8D3042E92A29B00BA273F /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -418,6 +422,7 @@
 				6D66B2272E90186800EA3CE6 /* Assets.xcassets in Resources */,
 				6D66B2282E90186800EA3CE6 /* Localizable.xcstrings in Resources */,
 				6D66B22A2E90186800EA3CE6 /* LaunchScreen.storyboard in Resources */,
+				6DD8D3062E92A29B00BA273F /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,6 +517,18 @@
 			targetProxy = 6DC81A4B2E3236B4005F2E03 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6DD8D3042E92A29B00BA273F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6DD8D3052E92A29B00BA273F /* en */,
+				6DD8D3072E92A2BB00BA273F /* ja */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		6DC81A522E3236B4005F2E03 /* Debug */ = {
@@ -652,7 +669,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -698,7 +715,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -739,7 +756,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -758,7 +775,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -776,7 +793,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -793,7 +810,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2184;
+				CURRENT_PROJECT_VERSION = 2185;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
