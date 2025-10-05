@@ -153,18 +153,19 @@ struct ChatView: View {
             .disabled(executor.isRunning)
             
             Menu {
-                Button("Select Model") { chatSettings.selectedModelID = nil }
-                if executor.models.isEmpty {
-                    Divider()
-                    Button(LocalizedStringKey("No models available")) {}
-                        .disabled(true)
-                }
-                ForEach(executor.models) { model in
-                    Button(action: { chatSettings.selectedModelID = model.id }) {
-                        if chatSettings.selectedModelID == model.id { Image(systemName: "checkmark") }
-                        Text(model.name)
+                Picker("Select Model", selection: $chatSettings.selectedModelID) {
+                    Text("Select Model").tag(nil as OllamaModel.ID?)
+                    ForEach(executor.models) { model in
+                        Text(model.name).tag(model.id as OllamaModel.ID?)
+                    }
+                    if executor.models.isEmpty {
+                        Divider()
+                        Text(LocalizedStringKey("No models available"))
+                            .tag(UUID() as OllamaModel.ID?) // Assign a unique, non-nil UUID
+                            .selectionDisabled(true)
                     }
                 }
+                .pickerStyle(.inline)
             } label: {
                 Image(systemName: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
