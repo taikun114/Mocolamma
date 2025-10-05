@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @State private var showingInstructions: Bool = false
     @State private var showingAbout: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
@@ -106,16 +107,21 @@ struct SettingsView: View {
                             .buttonStyle(.borderless)
                             .help("Refresh status")
                         }
-                        Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                        Button(action: { showingInstructions = true }) {
                             HStack {
                                 Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
-                                Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                                Text(localNetworkChecker.isAllowed ? "Allowed" : "How to Set Up")
                             }
                             .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.bordered)
                         .disabled(localNetworkChecker.isAllowed)
-                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
+                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "How to set up local network permission.")
+                        .alert("How to Set Up", isPresented: $showingInstructions) {
+                            Button("OK") { }
+                        } message: {
+                            Text("To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.")
+                        }
                     }
                 } else { // .regular - iPhone landscape, iPad full screen or wider split view
                     HStack {
@@ -141,15 +147,20 @@ struct SettingsView: View {
                         Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
                         .buttonStyle(.borderless)
                         .help("Refresh status")
-                        Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                        Button(action: { showingInstructions = true }) {
                             HStack {
                                 Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
-                                Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
+                                Text(localNetworkChecker.isAllowed ? "Allowed" : "How to Set Up")
                             }
                         }
                         .buttonStyle(.bordered)
                         .disabled(localNetworkChecker.isAllowed)
-                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
+                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "How to set up local network permission.")
+                        .alert("How to Set Up", isPresented: $showingInstructions) {
+                            Button("OK") { }
+                        } message: {
+                            Text("To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.")
+                        }
                     }
                 }
             }
@@ -177,7 +188,7 @@ struct SettingsView: View {
                 Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
                 .buttonStyle(.borderless)
                 .help("Refresh status")
-                Button(action: { localNetworkChecker.openSystemPreferences() }) {
+                Button(action: { showingInstructions = true }) {
                     HStack {
                         Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
                         Text(localNetworkChecker.isAllowed ? "Allowed" : "Open Settings")
@@ -185,7 +196,15 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(localNetworkChecker.isAllowed)
-                .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "Open Privacy & Security settings.")
+                .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "How to set up local network permission.")
+                .alert("How to Set Up", isPresented: $showingInstructions) {
+                    Button("OK") {
+                        localNetworkChecker.openSystemPreferences()
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick \"OK\" to open Privacy & Security settings.")
+                }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             #endif

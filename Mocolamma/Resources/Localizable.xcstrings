@@ -2065,6 +2065,38 @@
         }
       }
     },
+    "How to Set Up" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to Set Up"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定方法"
+          }
+        }
+      }
+    },
+    "How to set up local network permission." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to set up local network permission."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワーク許可の設定方法。"
+          }
+        }
+      }
+    },
     "I would be so glad if you could give a star to the repository!" : {
       "localizations" : {
         "en" : {
@@ -3063,22 +3095,6 @@
         }
       }
     },
-    "Open Privacy & Security settings." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Privacy & Security settings."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プライバシーとセキュリティ設定を開きます。"
-          }
-        }
-      }
-    },
     "Open Settings" : {
       "localizations" : {
         "en" : {
@@ -4009,6 +4025,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このモデルはチャットに対応していません。"
+          }
+        }
+      }
+    },
+    "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick \"OK\" to open Privacy & Security settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick \"OK\" to open Privacy & Security settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックすると「プライバシーとセキュリティ」設定を開きます。"
           }
         }
       }
