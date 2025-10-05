@@ -57,7 +57,7 @@ struct ContentView: View {
     
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>) {
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, isPulling: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
@@ -65,9 +65,11 @@ struct ContentView: View {
         self._showingAddModelsSheet = showingAddModelsSheet
         self._showingAddServerSheet = showingAddServerSheet
         self._shouldClearChat = shouldClearChat
+        self._isPulling = isPulling
     }
     
     @Binding var shouldClearChat: Bool
+    @Binding var isPulling: Bool
 
     var body: some View {
         Group {
@@ -265,6 +267,9 @@ struct ContentView: View {
                 shouldClearChat = false
             }
         }
+        .onChange(of: executor.isPulling) { oldValue, newValue in
+            isPulling = newValue
+        }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
         }
@@ -336,6 +341,6 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), isPulling: .constant(false))
         .environmentObject(RefreshTrigger())
 }

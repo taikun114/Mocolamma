@@ -41,6 +41,9 @@ struct MocolammaApp: App {
     
     // チャットクリア要求を伝える状態変数
     @State private var shouldClearChat: Bool = false
+    
+    // ダウンロード状態を伝える状態変数
+    @State private var isPulling: Bool = false
 
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
@@ -67,7 +70,8 @@ struct MocolammaApp: App {
                 showingInspector: $showingInspector,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingAddServerSheet: $showingAddServerSheet,
-                shouldClearChat: $shouldClearChat
+                shouldClearChat: $shouldClearChat,
+                isPulling: $isPulling
             )
             #if os(macOS)
                 .frame(minWidth: 500, minHeight: 300)
@@ -117,7 +121,7 @@ struct MocolammaApp: App {
                     Label(String(localized: "Add Model…"), systemImage: "plus")
                 }
                 .keyboardShortcut("m", modifiers: [.option, .command])
-                .disabled(selection != "models")
+                .disabled(selection != "models" || isPulling)
                 
                 Button(action: {
                     // チャットクリア要求を設定
@@ -176,7 +180,7 @@ struct MocolammaApp: App {
                     Label(String(localized: "Add Model…"), systemImage: "plus")
                 }
                 .keyboardShortcut("m", modifiers: [.option, .command])
-                .disabled(selection != "models")
+                .disabled(selection != "models" || isPulling)
                 
                 Button(action: {
                     // チャットクリア要求を設定
