@@ -11,17 +11,21 @@ struct ServerRowView: View {
 
     var body: some View {
         HStack {
-            // 接続状態を示す丸い図形
+            // 接続状態を示すインジケーター
             Group {
                 switch connectionStatus {
                 case .connected:
                     Circle()
                         .fill(Color.green)
                         .frame(width: 10, height: 10)
-                case .notConnected, .unknownHost, .some(.errorWithMessage):
+                case .notConnected, .unknownHost:
                     Circle()
                         .fill(Color.red)
                         .frame(width: 10, height: 10)
+                case .some(.errorWithMessage):
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                        .font(.caption)
                 case .checking, .none:
                     ProgressView()
                         .scaleEffect(0.5)
