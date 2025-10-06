@@ -3,7 +3,7 @@ import SwiftUI
 struct RunningModelsCountView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     let host: String
-    let connectionStatus: Bool? // Add connectionStatus
+    let connectionStatus: ServerConnectionStatus? // Add connectionStatus
     @State private var runningModels: [OllamaRunningModel] = []
     @State private var isLoading: Bool = false
     @State private var isExpanded: Bool = false
@@ -18,10 +18,12 @@ struct RunningModelsCountView: View {
     private var displayCountText: String {
         if isLoading {
             return "-"
-        } else if connectionStatus == false || connectionStatus == nil { // Not connected or checking
-            return "-"
-        } else { // Connected
-            return String(runningModels.count)
+        } else {
+            if case .connected = connectionStatus {
+                return String(runningModels.count)
+            } else {
+                return "-"
+            }
         }
     }
 
@@ -95,7 +97,7 @@ struct RunningModelsCountView: View {
 }
 
 #Preview {
-    RunningModelsCountView(host: "localhost:11434", connectionStatus: true) // Added connectionStatus for preview
+    RunningModelsCountView(host: "localhost:11434", connectionStatus: .connected) // Added connectionStatus for preview
         .environmentObject(CommandExecutor(serverManager: ServerManager()))
         .frame(width: 200)
         .padding()

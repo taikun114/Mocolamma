@@ -1,6 +1,14 @@
 import Foundation
 import Combine // Combineフレームワークをインポートして@Publishedの変更を監視可能にする
 
+// MARK: - サーバー接続ステータス
+enum ServerConnectionStatus {
+    case connected
+    case notConnected(statusCode: Int)
+    case unknownHost
+    case checking
+}
+
 // MARK: - サーバーマネージャー
 
 /// アプリケーション内でOllamaサーバーのリストと現在の選択状態を管理するクラスです。
@@ -37,8 +45,8 @@ class ServerManager: ObservableObject {
         servers.first(where: { $0.id == selectedServerID })
     }
 
-    /// 各サーバーの接続状態を保持する辞書 (nil: チェック中, true: 接続済み, false: 未接続)
-    @Published var serverConnectionStatuses: [ServerInfo.ID: Bool?] = [:]
+    /// 各サーバーの接続状態を詳細に保持する辞書
+    @Published var serverConnectionStatuses: [ServerInfo.ID: ServerConnectionStatus] = [:]
 
     /// インスペクターの再描画を誘発するためのトークン
     @Published var inspectorRefreshToken: UUID = UUID()
@@ -135,7 +143,7 @@ class ServerManager: ObservableObject {
     }
 
     /// 指定されたサーバーの接続状態を更新します。
-    func updateServerConnectionStatus(serverID: ServerInfo.ID, status: Bool?) {
+    func updateServerConnectionStatus(serverID: ServerInfo.ID, status: ServerConnectionStatus) {
         serverConnectionStatuses[serverID] = status
     }
 

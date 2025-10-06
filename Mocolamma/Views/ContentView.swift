@@ -234,11 +234,11 @@ struct ContentView: View {
             try? await Task.sleep(nanoseconds: 100_000_000)
             // サーバー接続状態を再チェック
             for server in serverManager.servers {
-                serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
+                serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
                 Task {
-                    let isConnected = await executor.checkAPIConnectivity(host: server.host)
+                    let connectionStatus = await executor.checkAPIConnectivity(host: server.host)
                     await MainActor.run {
-                        serverManager.updateServerConnectionStatus(serverID: server.id, status: isConnected)
+                        serverManager.updateServerConnectionStatus(serverID: server.id, status: connectionStatus)
                     }
                 }
             }
@@ -254,10 +254,22 @@ struct ContentView: View {
                 let previousSelection = selectedModel
                 let selectedServerID = serverManager.selectedServerID
                 selectedModel = nil
-                await executor.fetchOllamaModelsFromAPI()
+                
                 if let sid = selectedServerID {
-                    serverManager.updateServerConnectionStatus(serverID: sid, status: nil)
+                    await MainActor.run {
+                        serverManager.updateServerConnectionStatus(serverID: sid, status: .checking)
+                    }
                 }
+                
+                await executor.fetchOllamaModelsFromAPI()
+
+                if let sid = selectedServerID, let host = serverManager.servers.first(where: { $0.id == sid })?.host {
+                    let status = await executor.checkAPIConnectivity(host: host)
+                    await MainActor.run {
+                        serverManager.updateServerConnectionStatus(serverID: sid, status: status)
+                    }
+                }
+
                 await MainActor.run {
                     serverManager.inspectorRefreshToken = UUID()
                     NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)

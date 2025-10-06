@@ -2751,18 +2751,34 @@
         }
       }
     },
-    "Not Connected" : {
+    "Not Connected (Status Code: %lld)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not Connected"
+            "value" : "Not Connected (Status Code: %lld)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未接続"
+            "value" : "未接続（ステータスコード: %lld）"
+          }
+        }
+      }
+    },
+    "Not Connected (Unknown Host)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Connected (Unknown Host)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続（不明なホスト）"
           }
         }
       }

@@ -7,17 +7,22 @@ import SwiftUI
 struct ServerRowView: View {
     let server: ServerInfo
     let isSelected: Bool // API通信用の選択状態
-    let connectionStatus: Bool? // nil: チェック中, true: 接続済み, false: 未接続
+    let connectionStatus: ServerConnectionStatus? // nil: チェック中, .connected, .notConnected, .unknownHost
 
     var body: some View {
         HStack {
             // 接続状態を示す丸い図形
             Group {
-                if let status = connectionStatus {
+                switch connectionStatus {
+                case .connected:
                     Circle()
-                        .fill(status ? Color.green : Color.red)
+                        .fill(Color.green)
                         .frame(width: 10, height: 10)
-                } else {
+                case .notConnected, .unknownHost:
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 10, height: 10)
+                case .checking, .none:
                     ProgressView()
                         .scaleEffect(0.5)
                         .frame(width: 10, height: 10)
@@ -67,7 +72,7 @@ struct ServerRowView: View {
     ServerRowView(
         server: ServerInfo(name: "Local Server", host: "localhost:11434"),
         isSelected: true, // プレビュー用に選択状態を設定
-        connectionStatus: true
+        connectionStatus: .connected
     )
 }
 
@@ -75,7 +80,7 @@ struct ServerRowView: View {
     ServerRowView(
         server: ServerInfo(name: "Remote Server", host: "192.168.1.100:11434"),
         isSelected: true, // プレビュー用に選択状態を設定
-        connectionStatus: false
+        connectionStatus: .notConnected(statusCode: 404)
     )
 }
 
@@ -83,6 +88,14 @@ struct ServerRowView: View {
     ServerRowView(
         server: ServerInfo(name: "Another Server", host: "api.example.com:11434"),
         isSelected: false, // プレビュー用に非選択状態を設定
-        connectionStatus: nil
+        connectionStatus: .checking
+    )
+}
+
+#Preview("Unknown Host") {
+    ServerRowView(
+        server: ServerInfo(name: "Unknown Host", host: "unknown.host:11434"),
+        isSelected: false,
+        connectionStatus: .unknownHost
     )
 }

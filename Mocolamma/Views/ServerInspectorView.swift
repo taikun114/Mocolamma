@@ -6,7 +6,7 @@ import AppKit // For NSPasteboard
 struct ServerInspectorView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     let server: ServerInfo
-    let connectionStatus: Bool? // Can be nil while checking
+    let connectionStatus: ServerConnectionStatus? // Can be nil while checking
     @State private var ollamaVersion: String? // New state variable for Ollama version
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
 
@@ -21,21 +21,32 @@ struct ServerInspectorView: View {
                     .truncationMode(.tail)
                     .help(server.name)
 
-                // Connection status below the name in a secondary color
-                if let status = connectionStatus {
-                    HStack(spacing: 4) { // HStackで囲む
-                        Circle() // インジケーターの追加
-                            .fill(status ? .green : .red) // 接続状況に応じて色を変更
-                            .frame(width: 8, height: 8) // サイズ調整
-                        Text(status ? "Connected" : "Not Connected")
-                            .font(.subheadline)
-                            .foregroundColor(status ? .green : .secondary)
-                    }
-                } else {
+                // Connection status
+                switch connectionStatus {
+                case .connected:
                     HStack(spacing: 4) {
-                        Circle() // インジケーターの追加
-                            .fill(.gray) // Checking中は灰色
-                            .frame(width: 8, height: 8) // サイズ調整
+                        Circle().fill(.green).frame(width: 8, height: 8)
+                        Text("Connected")
+                            .font(.subheadline)
+                            .foregroundColor(.green)
+                    }
+                case .notConnected(let statusCode):
+                    HStack(spacing: 4) {
+                        Circle().fill(.red).frame(width: 8, height: 8)
+                        Text("Not Connected (Status Code: \(statusCode))")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                case .unknownHost:
+                    HStack(spacing: 4) {
+                        Circle().fill(.red).frame(width: 8, height: 8)
+                        Text("Not Connected (Unknown Host)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                case .checking, .none:
+                    HStack(spacing: 4) {
+                        Circle().fill(.gray).frame(width: 8, height: 8)
                         Text("Checking...")
                             .font(.subheadline)
                             .foregroundColor(.secondary)

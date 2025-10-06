@@ -130,9 +130,9 @@ struct ServerFormView: View {
         Task {
             let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
             // ホストに接続できることを確認
-            let isConnected = await executor.checkAPIConnectivity(host: processedHost)
+            let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
 
-            if isConnected {
+            if case .connected = connectionStatus {
                 if let server = editingServer {
                     // 編集モード: サーバーを更新
                     serverManager.updateServer(

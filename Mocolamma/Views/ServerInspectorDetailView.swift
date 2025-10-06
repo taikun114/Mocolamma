@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Server Inspector Detail View Helper
 struct ServerInspectorDetailView: View {
     let server: ServerInfo
-    let connectionStatus: Bool?
+    let connectionStatus: ServerConnectionStatus?
 
     var body: some View {
         ServerInspectorView(

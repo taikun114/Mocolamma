@@ -386,50 +386,53 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
-    /// 指定されたホストにOllama APIが接続可能かを確認します。
-    /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
-    /// - Returns: 接続に成功した場合はtrue、それ以外はfalse。
-    func checkAPIConnectivity(host: String) async -> Bool {
-        let scheme = host.hasPrefix("https://") ? "https" : "http"
-        let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
-        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
-            print("接続確認エラー: ホスト \(host) のURLが無効です")
-            return false
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "HEAD" // HEADリクエストでヘッダーのみを取得し、高速化と帯域幅の節約を図る
-        
-        do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                print("接続確認: \(host) への接続に成功しました")
-                return true
-            } else {
-                print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
-                return false
+        /// 指定されたホストにOllama APIが接続可能かを確認します。
+        /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
+        /// - Returns: 接続状態を示す `ServerConnectionStatus`。
+        func checkAPIConnectivity(host: String) async -> ServerConnectionStatus {
+            let scheme = host.hasPrefix("https://") ? "https" : "http"
+            let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+            guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
+                print("接続確認エラー: ホスト \(host) のURLが無効です")
+                return .unknownHost
             }
-        } catch let error as URLError {
-            print("\(host) への接続確認エラー: \(error.localizedDescription)")
-            // TLSエラーのチェック
-            if scheme == "https" && (
-                error.code == .secureConnectionFailed ||
-                error.code == .serverCertificateUntrusted ||
-                error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
-                error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
-            ) {
-                self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS connection error message.")
-            } else {
-                self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
-            }
-            return false
-        } catch {
-            print("\(host) への接続確認エラー: \(error.localizedDescription)")
-            self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
-            return false
-        }
-    }
     
+            var request = URLRequest(url: url)
+            request.httpMethod = "HEAD" // HEADリクエストでヘッダーのみを取得し、高速化と帯域幅の節約を図る
+    
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode == 200 {
+                        print("接続確認: \(host) への接続に成功しました")
+                        return .connected
+                    } else {
+                        print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \(httpResponse.statusCode)")
+                        return .notConnected(statusCode: httpResponse.statusCode)
+                    }
+                } else {
+                    return .unknownHost
+                }
+            } catch let error as URLError {
+                print("\(host) への接続確認エラー: \(error.localizedDescription)")
+                // TLSエラーのチェック
+                if scheme == "https" && (
+                    error.code == .secureConnectionFailed ||
+                    error.code == .serverCertificateUntrusted ||
+                    error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
+                    error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
+                ) {
+                    self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS connection error message.")
+                } else {
+                    self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
+                }
+                return .unknownHost
+            } catch {
+                print("\(host) への接続確認エラー: \(error.localizedDescription)")
+                self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
+                return .unknownHost
+            }
+        }    
     /// Ollamaのバージョンを取得します。
     /// - Parameter host: OllamaホストのURL。
     /// - Returns: Ollamaのバージョン文字列。

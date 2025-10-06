@@ -134,11 +134,11 @@ struct ServerView: View {
 
     private func checkAllServerConnectivity() {
         for server in serverManager.servers {
-            serverManager.updateServerConnectionStatus(serverID: server.id, status: nil)
+            serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
             Task {
-                let isConnected = await executor.checkAPIConnectivity(host: server.host)
+                let connectionStatus = await executor.checkAPIConnectivity(host: server.host)
                 await MainActor.run {
-                    serverManager.updateServerConnectionStatus(serverID: server.id, status: isConnected)
+                    serverManager.updateServerConnectionStatus(serverID: server.id, status: connectionStatus)
                 }
             }
         }
