@@ -5,6 +5,7 @@ import AppKit // For NSPasteboard
 
 struct ServerInspectorView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus? // Can be nil while checking
     @State private var ollamaVersion: String? // New state variable for Ollama version
@@ -25,14 +26,32 @@ struct ServerInspectorView: View {
                 switch connectionStatus {
                 case .connected:
                     HStack(spacing: 4) {
-                        Circle().fill(.green).frame(width: 8, height: 8)
+                        if differentiateWithoutColor {
+                            Image(systemName: "checkmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 8, height: 8)
+                                .foregroundColor(.green)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.green).frame(width: 8, height: 8)
+                        }
                         Text("Connected")
                             .font(.subheadline)
                             .foregroundColor(.green)
                     }
                 case .notConnected(let statusCode):
                     HStack(spacing: 4) {
-                        Circle().fill(.red).frame(width: 8, height: 8)
+                        if differentiateWithoutColor {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 8, height: 8)
+                                .foregroundColor(.red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.red).frame(width: 8, height: 8)
+                        }
                         Text("Not Connected (Status Code: \(statusCode))")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -40,9 +59,17 @@ struct ServerInspectorView: View {
                 case .errorWithMessage(let statusCode, let errorMessage):
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 4) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
-                                .font(.caption)
+                            if differentiateWithoutColor {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 8, height: 8)
+                                    .foregroundColor(.orange)
+                            } else {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                    .font(.caption)
+                            }
                             Text("Error (Status Code: \(statusCode))")
                                 .font(.subheadline)
                                 .foregroundColor(.red)
@@ -56,20 +83,40 @@ struct ServerInspectorView: View {
                     }
                 case .unknownHost:
                     HStack(spacing: 4) {
-                        Circle().fill(.red).frame(width: 8, height: 8)
+                        if differentiateWithoutColor {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 8, height: 8)
+                                .foregroundColor(.red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.red).frame(width: 8, height: 8)
+                        }
                         Text("Not Connected (Unknown Host)")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                 case .checking, .none:
                     HStack(spacing: 4) {
-                        Circle().fill(.gray).frame(width: 8, height: 8)
+                        if differentiateWithoutColor {
+                            Image(systemName: "questionmark.circle")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 8, height: 8)
+                                .foregroundColor(.gray)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.gray).frame(width: 8, height: 8)
+                        }
                         Text("Checking...")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        ProgressView()
-                            .scaleEffect(0.5)
-                            .frame(width: 10, height: 10)
+                        if !differentiateWithoutColor {
+                            ProgressView()
+                                .scaleEffect(0.5)
+                                .frame(width: 10, height: 10)
+                        }
                     }
                 }
 
@@ -96,7 +143,8 @@ struct ServerInspectorView: View {
                                 UIPasteboard.general.string = server.host
                                 #endif
                             }
-                        }                }
+                        }                
+                }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollama Version information
@@ -117,7 +165,8 @@ struct ServerInspectorView: View {
                                     UIPasteboard.general.string = ollamaVersion ?? "-"
                                     #endif
                                 }
-                            }                    }
+                            }                    
+                    }
                     VStack(alignment: .leading) {
                         Text("Running Models:")
                             .font(.subheadline)

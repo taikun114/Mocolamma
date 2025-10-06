@@ -8,6 +8,7 @@ struct ServerRowView: View {
     let server: ServerInfo
     let isSelected: Bool // API通信用の選択状態
     let connectionStatus: ServerConnectionStatus? // nil: チェック中, .connected, .notConnected, .unknownHost
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 
     var body: some View {
         HStack {
@@ -15,21 +16,62 @@ struct ServerRowView: View {
             Group {
                 switch connectionStatus {
                 case .connected:
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 10, height: 10)
+                    ZStack {
+                        if differentiateWithoutColor {
+                            Image(systemName: "checkmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundColor(.green)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle()
+                                .fill(Color.green)
+                                .frame(width: 10, height: 10)
+                        }
+                    }
                 case .notConnected, .unknownHost:
-                    Circle()
-                        .fill(Color.red)
-                        .frame(width: 10, height: 10)
+                    ZStack {
+                        if differentiateWithoutColor {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundColor(.red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 10, height: 10)
+                        }
+                    }
                 case .some(.errorWithMessage):
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                        .font(.caption)
+                    ZStack {
+                        if differentiateWithoutColor {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundColor(.orange)
+                        } else {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                                .font(.caption)
+                        }
+                    }
                 case .checking, .none:
-                    ProgressView()
-                        .scaleEffect(0.5)
-                        .frame(width: 10, height: 10)
+                    ZStack {
+                        if differentiateWithoutColor {
+                            Image(systemName: "questionmark.circle")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundColor(.gray)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.gray).frame(width: 10, height: 10)
+                        }
+                    }
                 }
             }
             .padding(.trailing, 4) // アイコンとの間にスペースを追加
