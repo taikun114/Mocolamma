@@ -51,11 +51,23 @@ struct ServerFormView: View {
                 TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .focused($isNameFieldFocused)
+                    .onSubmit {
+                        // サーバー追加ボタンが無効な場合は何もしない
+                        if !isSaveButtonDisabled {
+                            save()
+                        }
+                    }
 
                 Text("Host") // ホストラベル
                     .font(.headline)
                 TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput) // ホスト入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .onSubmit {
+                        // サーバー追加ボタンが無効な場合は何もしない
+                        if !isSaveButtonDisabled {
+                            save()
+                        }
+                    }
                 Spacer()
             }
 
@@ -111,7 +123,12 @@ struct ServerFormView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                Button(action: save) {
+                Button(action: {
+                    // サーバー追加ボタンが無効な場合は何もしない
+                    if !isSaveButtonDisabled {
+                        save()
+                    }
+                }) {
                     Image(systemName: "checkmark")
                 }
                 .keyboardShortcut(.defaultAction)

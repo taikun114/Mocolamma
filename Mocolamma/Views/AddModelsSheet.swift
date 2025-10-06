@@ -31,6 +31,12 @@ struct AddModelsSheet: View {
                 TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .focused($isTextFieldFocused)
+                    .onSubmit {
+                        // モデル追加ボタンが無効な場合は何もしない
+                        if !(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling) {
+                            add()
+                        }
+                    }
                 
                 Spacer() // This spacer is present in both old and new strings, so it should be preserved.
                 VStack(alignment: .leading, spacing: 8) {
@@ -125,7 +131,12 @@ struct AddModelsSheet: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                Button(action: add) {
+                Button(action: {
+                    // モデル追加ボタンが無効な場合は何もしない
+                    if !(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling) {
+                        add()
+                    }
+                }) {
                     Image(systemName: "plus")
                 }
                 .keyboardShortcut(.defaultAction)
