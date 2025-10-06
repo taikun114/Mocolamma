@@ -18,7 +18,7 @@ struct ServerRowView: View {
                     Circle()
                         .fill(Color.green)
                         .frame(width: 10, height: 10)
-                case .notConnected, .unknownHost:
+                case .notConnected, .unknownHost, .some(.errorWithMessage):
                     Circle()
                         .fill(Color.red)
                         .frame(width: 10, height: 10)

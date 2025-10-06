@@ -37,6 +37,21 @@ struct ServerInspectorView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
+                case .errorWithMessage(let statusCode, let errorMessage):
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 4) {
+                            Circle().fill(.red).frame(width: 8, height: 8)
+                            Text("Error (Status Code: \(statusCode))")
+                                .font(.subheadline)
+                                .foregroundColor(.red)
+                        }
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
                 case .unknownHost:
                     HStack(spacing: 4) {
                         Circle().fill(.red).frame(width: 8, height: 8)

@@ -398,17 +398,23 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
     
             var request = URLRequest(url: url)
-            request.httpMethod = "HEAD" // HEADリクエストでヘッダーのみを取得し、高速化と帯域幅の節約を図る
+            request.httpMethod = "GET" // GETリクエストに変更してエラー情報を取得
     
             do {
-                let (_, response) = try await URLSession.shared.data(for: request)
+                let (data, response) = try await URLSession.shared.data(for: request)
                 if let httpResponse = response as? HTTPURLResponse {
                     if httpResponse.statusCode == 200 {
                         print("接続確認: \(host) への接続に成功しました")
                         return .connected
                     } else {
                         print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \(httpResponse.statusCode)")
-                        return .notConnected(statusCode: httpResponse.statusCode)
+                        // エラーレスポンスからエラーメッセージを取得する
+                        var errorMessage: String? = nil
+                        if let errorResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                           let errorText = errorResponse["error"] as? String {
+                            errorMessage = errorText
+                        }
+                        return .errorWithMessage(statusCode: httpResponse.statusCode, errorMessage: errorMessage)
                     }
                 } else {
                     return .unknownHost

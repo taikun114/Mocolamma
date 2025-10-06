@@ -5,6 +5,7 @@ import Combine // Combineフレームワークをインポートして@Published
 enum ServerConnectionStatus {
     case connected
     case notConnected(statusCode: Int)
+    case errorWithMessage(statusCode: Int, errorMessage: String?)
     case unknownHost
     case checking
 }

@@ -1686,6 +1686,22 @@
         }
       }
     },
+    "Error (Status Code: %lld)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error (Status Code: %lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー（ステータスコード: %lld）"
+          }
+        }
+      }
+    },
     "Error: Failed to serialize pull request body: " : {
       "comment" : "プルリクエストボディのシリアライズ失敗のエラーメッセージ。",
       "localizations" : {
@@ -4041,6 +4057,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このモデルはチャットに対応していません。"
+          }
+        }
+      }
+    },
+    "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセスを許可するには、「設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。"
           }
         }
       }
