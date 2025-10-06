@@ -228,6 +228,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.lastSpeedSampleCompleted = 0
         self.lastPulledModelName = modelName // 最後にプルリクエストを送ったモデル名を更新
         
+        // プル処理用の特別なURLセッションを作成（タイムアウトを無制限に設定）
+        let pullConfig = URLSessionConfiguration.default
+        pullConfig.timeoutIntervalForRequest = TimeInterval(3600) // 1時間のタイムアウト（実質無制限）
+        pullConfig.timeoutIntervalForResource = TimeInterval(86400) // 24時間のタイムアウト（実質無制限）
+        let pullSession = URLSession(configuration: pullConfig, delegate: self, delegateQueue: nil)
+        
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/pull") else {
@@ -250,7 +256,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
         
         pullTask?.cancel()
-        pullTask = urlSession.dataTask(with: request)
+        pullTask = pullSession.dataTask(with: request)
         pullTask?.resume()
     }
     
