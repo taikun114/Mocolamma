@@ -30,6 +30,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
     private var lastSpeedSampleTime: Date? // 速度算出用の前回サンプル時刻
     private var lastSpeedSampleCompleted: Int64 = 0 // 速度算出用の前回完了バイト
+    private var pullStatusUpdateTimer: Timer? // プルステータスの更新タイマー
+    private var lastPullStatusUpdate: Date = Date(timeIntervalSince1970: 0) // 最後にプルステータスを更新した時間
+    private var pendingPullStatus: String? // 更新待機中のプルステータス
+    private var pendingPullTotal: Int64 = 0 // 更新待機中の合計バイト数
+    private var pendingPullCompleted: Int64 = 0 // 更新待機中の完了バイト数
+    private var pendingPullProgress: Double = 0.0 // 更新待機中の進捗
+    private let pullStatusUpdateInterval: TimeInterval = 0.5 // プルステータスの更新間隔（秒）
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
@@ -651,45 +658,61 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     
                     do {
                         let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
-                        if !self.pullHasError { self.pullStatus = response.status }
+                        
+                        // 速度計算のための処理はリアルタイムで行う
                         if let total = response.total {
-                            self.pullTotal = total
+                            self.pendingPullTotal = total
                         }
                         if let completed = response.completed {
-                            self.pullCompleted = completed
+                            self.pendingPullCompleted = completed
                         }
                         
-                        if self.pullTotal > 0 {
-                            var calculatedProgress = Double(self.pullCompleted) / Double(self.pullTotal)
+                        if self.pendingPullTotal > 0 {
+                            var calculatedProgress = Double(self.pendingPullCompleted) / Double(self.pendingPullTotal)
                             calculatedProgress = min(max(0.0, calculatedProgress), 1.0)
-                            self.pullProgress = calculatedProgress
+                            self.pendingPullProgress = calculatedProgress
                         } else {
-                            self.pullProgress = 0.0
+                            self.pendingPullProgress = 0.0
                         }
+                        
                         let now = Date()
                         if let lastTime = self.lastSpeedSampleTime {
                             let dt = now.timeIntervalSince(lastTime)
                             if dt > 0.5 { // 0.5秒以上の間隔でサンプリング
-                                let dBytes = Double(self.pullCompleted - self.lastSpeedSampleCompleted)
+                                let dBytes = Double(self.pendingPullCompleted - self.lastSpeedSampleCompleted)
                                 if dBytes >= 0 {
                                     let speed = dBytes / dt
                                     self.pullSpeedBytesPerSec = speed
-                                    if self.pullTotal > 0 {
-                                        let remainingBytes = Double(self.pullTotal - self.pullCompleted)
+                                    if self.pendingPullTotal > 0 {
+                                        let remainingBytes = Double(self.pendingPullTotal - self.pendingPullCompleted)
                                         if speed > 0 {
                                             self.pullETARemaining = remainingBytes / speed
                                         }
                                     }
                                 }
                                 self.lastSpeedSampleTime = now
-                                self.lastSpeedSampleCompleted = self.pullCompleted
+                                self.lastSpeedSampleCompleted = self.pendingPullCompleted
                             }
                         } else {
                             self.lastSpeedSampleTime = now
-                            self.lastSpeedSampleCompleted = self.pullCompleted
+                            self.lastSpeedSampleCompleted = self.pendingPullCompleted
                         }
                         
-                        print("プルステータス: \(self.pullStatus), 完了: \(self.pullCompleted), 合計: \(self.pullTotal), 進捗: \(String(format: "%.2f", self.pullProgress))")
+                        // プルステータスおよび進捗の更新は0.5秒ごとに制限
+                        if !self.pullHasError { 
+                            self.pendingPullStatus = response.status 
+                        }
+                        
+                        // UI更新タイマーを設定
+                        if self.pullStatusUpdateTimer == nil {
+                            self.pullStatusUpdateTimer = Timer.scheduledTimer(withTimeInterval: self.pullStatusUpdateInterval, repeats: true) { _ in
+                                Task { @MainActor in
+                                    self.updatePullStatusIfNeeded()
+                                }
+                            }
+                        }
+                        
+                        print("プルステータス: \(self.pullStatus), 完了: \(self.pendingPullCompleted), 合計: \(self.pendingPullTotal), 進捗: \(String(format: "%.2f", self.pendingPullProgress))")
                     } catch {
                         if let debugString = String(data: jsonData, encoding: .utf8) {
                             print("プルストリームJSONのデコードエラー: \(error.localizedDescription) - 行: \(debugString)")
@@ -750,6 +773,21 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
+    /// プルステータスを実際に更新するメソッド（0.5秒ごとに呼び出される）
+    private func updatePullStatusIfNeeded() {
+        let now = Date()
+        if now.timeIntervalSince(self.lastPullStatusUpdate) >= self.pullStatusUpdateInterval {
+            if let pendingStatus = self.pendingPullStatus {
+                self.pullStatus = pendingStatus
+                self.pendingPullStatus = nil
+            }
+            self.pullTotal = self.pendingPullTotal
+            self.pullCompleted = self.pendingPullCompleted
+            self.pullProgress = self.pendingPullProgress
+            self.lastPullStatusUpdate = now
+        }
+    }
+    
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         Task { @MainActor [weak self] in
             guard let self = self else { return }
@@ -757,6 +795,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             if task == self.pullTask {
                 self.pullTask = nil
                 self.pullLineBuffer = ""
+                
+                // プルタスク完了時にタイマーを停止
+                self.pullStatusUpdateTimer?.invalidate()
+                self.pullStatusUpdateTimer = nil
                 
                 if let error = error {
                     if self.pullHasError || self.pullStatus == NSLocalizedString("Error", comment: "プルステータス: エラー。") || self.pullStatus == NSLocalizedString("Failed", comment: "プルステータス: 失敗。") {
