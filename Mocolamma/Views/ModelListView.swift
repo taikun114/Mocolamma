@@ -366,7 +366,7 @@ struct ModelListView: View {
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .task {
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled && !executor.isRunning && !executor.isPulling {
                 appRefreshTrigger.send()
             }
