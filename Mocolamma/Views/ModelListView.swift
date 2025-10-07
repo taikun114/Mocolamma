@@ -365,9 +365,9 @@ struct ModelListView: View {
             modelToolbarContent
         }
         // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
-        .onAppear {
-            print("ModelListView Appeared. Fetching Ollama models from API.")
-            if !executor.isRunning && !executor.isPulling {
+        .task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if !Task.isCancelled && !executor.isRunning && !executor.isPulling {
                 appRefreshTrigger.send()
             }
         }

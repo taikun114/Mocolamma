@@ -82,6 +82,12 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
+        .task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if !Task.isCancelled {
+                appRefreshTrigger.send()
+            }
+        }
         .onChange(of: executor.models) { _, newModels in
             if let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
                 chatSettings.selectedModelID = nil

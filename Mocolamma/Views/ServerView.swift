@@ -115,11 +115,14 @@ struct ServerView: View {
                 Text(String(localized: "Are you sure you want to delete the selected server?\nThis action cannot be undone.", comment: "選択したサーバー削除の確認メッセージ（フォールバック）。"))
             }
         }
-                .onAppear {
+                .task {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
-            appRefreshTrigger.send()
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if !Task.isCancelled {
+                appRefreshTrigger.send()
+            }
         }
         .onChange(of: serverManager.servers) { oldServers, newServers in
             handleServerListChange(oldServers: oldServers, newServers: newServers)
