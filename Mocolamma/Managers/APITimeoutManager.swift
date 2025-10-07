@@ -21,24 +21,26 @@ enum APITimeoutOption: String, CaseIterable, Codable, Equatable, Identifiable {
 
 final class APITimeoutManager {
     static let shared = APITimeoutManager()
-    private init() {}
-    
     private let key = "api_timeout_option"
     
-    var currentOption: APITimeoutOption {
-        get {
-            if let raw = UserDefaults.standard.string(forKey: key), let opt = APITimeoutOption(rawValue: raw) {
-                return opt
+    @Published private(set) var currentOption: APITimeoutOption = .seconds30
+    
+    private init() {
+        Task {
+            if let raw = UserDefaults.standard.string(forKey: key),
+               let savedOption = APITimeoutOption(rawValue: raw) {
+                
+                await MainActor.run {
+                    self.set(option: savedOption)
+                }
             }
-            return .seconds30
-        }
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: key)
         }
     }
     
     func set(option: APITimeoutOption) {
+        guard option != currentOption else { return }
         currentOption = option
+        UserDefaults.standard.set(option.rawValue, forKey: key)
         NotificationCenter.default.post(name: .apiTimeoutChanged, object: option)
     }
 }

@@ -87,14 +87,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             .assign(to: \.apiBaseURL, on: self)
             .store(in: &cancellables)
         
-        // apiBaseURLの変更を監視し、モデルリストを再取得
-        $apiBaseURL
-            .sink { [weak self] _ in
-                Task {
-                    await self?.fetchOllamaModelsFromAPI()
-                }
-            }
-            .store(in: &cancellables)
+        // apiBaseURLの変更を監視し、モデルリストを再取得する処理を削除しました。
+        // モデルの取得は、UI側で適切なタイミングで明示的に呼び出す必要があります。
         
         NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in
             guard let self = self else { return }
