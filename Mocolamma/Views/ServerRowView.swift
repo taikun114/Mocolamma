@@ -18,6 +18,14 @@ struct ServerRowView: View {
         #endif
     }
 
+    private var spinnerScaleFactor: CGFloat {
+        #if os(iOS)
+        return indicatorSize / 15 // iOSでは少し大きく
+        #else
+        return indicatorSize / 20 // macOSでは現状維持
+        #endif
+    }
+
     var body: some View {
         HStack {
             // 接続状態を示すインジケーター
@@ -64,17 +72,9 @@ struct ServerRowView: View {
                         }
                     }
                 case .checking, .none:
-                    ZStack {
-                        if differentiateWithoutColor {
-                            Image(systemName: "questionmark.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundColor(.gray)
-                                .fontWeight(.bold)
-                        } else {
-                            Circle().fill(.gray)
-                        }
-                    }
+                    ProgressView()
+                        .scaleEffect(spinnerScaleFactor) // Use the new property
+                        .frame(width: indicatorSize, height: indicatorSize)
                 }
             }
             .frame(width: indicatorSize, height: indicatorSize)
