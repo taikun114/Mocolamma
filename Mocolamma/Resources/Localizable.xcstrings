@@ -2145,6 +2145,22 @@
         }
       }
     },
+    "If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ストリームレスポンスをオフにする場合、設定からAPIタイムアウトを無制限にすることをおすすめします。"
+          }
+        }
+      }
+    },
     "If you're not sure what to enter, you can find models on the Ollama website." : {
       "localizations" : {
         "en" : {

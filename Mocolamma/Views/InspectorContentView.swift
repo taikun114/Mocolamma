@@ -47,7 +47,12 @@ struct InspectorContentView: View {
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
-                        Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
+                        VStack(alignment: .leading) { // Added VStack
+                            Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
+                            Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } // End VStack
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Picker("Thinking", selection: $chatSettings.thinkingOption) {
