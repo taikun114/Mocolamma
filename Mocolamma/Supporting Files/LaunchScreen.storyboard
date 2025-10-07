@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" initialViewController="LAUNCH-VC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="LAUNCH-VC">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--View Controller-->
         <scene sceneID="LAUNCH-SCENE">
             <objects>
                 <viewController storyboardIdentifier="LaunchScreen" id="LAUNCH-VC" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="LAUNCH-VIEW">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="AppIcon512" translatesAutoresizingMaskIntoConstraints="NO" id="ICON">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="Launch" translatesAutoresizingMaskIntoConstraints="NO" id="ICON">
+                                <rect key="frame" x="46.666666666666657" y="276" width="300" height="300"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="160" id="ICON-W"/>
-                                    <constraint firstAttribute="height" constant="160" id="ICON-H"/>
+                                    <constraint firstAttribute="height" constant="300" id="ICON-H"/>
+                                    <constraint firstAttribute="width" constant="300" id="ICON-W"/>
                                 </constraints>
                             </imageView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="SAFE"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="ICON" firstAttribute="centerX" secondItem="LAUNCH-VIEW" secondAttribute="centerX" id="ICON-CX"/>
                             <constraint firstItem="ICON" firstAttribute="centerY" secondItem="LAUNCH-VIEW" secondAttribute="centerY" id="ICON-CY"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="SAFE"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FIRST" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="140" y="131"/>
         </scene>
     </scenes>
     <resources>
-        <image name="AppIcon512" width="512" height="512"/>
+        <image name="Launch" width="904" height="904"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
