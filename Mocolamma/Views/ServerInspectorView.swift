@@ -11,6 +11,14 @@ struct ServerInspectorView: View {
     @State private var ollamaVersion: String? // New state variable for Ollama version
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
 
+    private var indicatorSize: CGFloat {
+        #if os(iOS)
+        return 10
+        #else
+        return 8
+        #endif
+    }
+
     var body: some View {
         ScrollView { // ScrollViewを追加
             VStack(alignment: .leading, spacing: 10) {
@@ -30,11 +38,11 @@ struct ServerInspectorView: View {
                             Image(systemName: "checkmark")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 8, height: 8)
+                                .frame(width: indicatorSize, height: indicatorSize)
                                 .foregroundColor(.green)
                                 .fontWeight(.bold)
                         } else {
-                            Circle().fill(.green).frame(width: 8, height: 8)
+                            Circle().fill(.green).frame(width: indicatorSize, height: indicatorSize)
                         }
                         Text("Connected")
                             .font(.subheadline)
@@ -46,11 +54,11 @@ struct ServerInspectorView: View {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 8, height: 8)
+                                .frame(width: indicatorSize, height: indicatorSize)
                                 .foregroundColor(.red)
                                 .fontWeight(.bold)
                         } else {
-                            Circle().fill(.red).frame(width: 8, height: 8)
+                            Circle().fill(.red).frame(width: indicatorSize, height: indicatorSize)
                         }
                         Text("Not Connected (Status Code: \(statusCode))")
                             .font(.subheadline)
@@ -63,12 +71,14 @@ struct ServerInspectorView: View {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 8, height: 8)
+                                    .frame(width: indicatorSize, height: indicatorSize)
                                     .foregroundColor(.orange)
                             } else {
                                 Image(systemName: "exclamationmark.triangle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: indicatorSize, height: indicatorSize)
                                     .foregroundColor(.orange)
-                                    .font(.caption)
                             }
                             Text("Error (Status Code: \(statusCode))")
                                 .font(.subheadline)
@@ -87,11 +97,11 @@ struct ServerInspectorView: View {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 8, height: 8)
+                                .frame(width: indicatorSize, height: indicatorSize)
                                 .foregroundColor(.red)
                                 .fontWeight(.bold)
                         } else {
-                            Circle().fill(.red).frame(width: 8, height: 8)
+                            Circle().fill(.red).frame(width: indicatorSize, height: indicatorSize)
                         }
                         Text("Not Connected (Unknown Host)")
                             .font(.subheadline)
@@ -103,11 +113,11 @@ struct ServerInspectorView: View {
                             Image(systemName: "questionmark.circle")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 8, height: 8)
+                                .frame(width: indicatorSize, height: indicatorSize)
                                 .foregroundColor(.gray)
                                 .fontWeight(.bold)
                         } else {
-                            Circle().fill(.gray).frame(width: 8, height: 8)
+                            Circle().fill(.gray).frame(width: indicatorSize, height: indicatorSize)
                         }
                         Text("Checking...")
                             .font(.subheadline)

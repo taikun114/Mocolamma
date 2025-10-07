@@ -10,6 +10,14 @@ struct ServerRowView: View {
     let connectionStatus: ServerConnectionStatus? // nil: チェック中, .connected, .notConnected, .unknownHost
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 
+    private var indicatorSize: CGFloat {
+        #if os(iOS)
+        return 12
+        #else
+        return 10
+        #endif
+    }
+
     var body: some View {
         HStack {
             // 接続状態を示すインジケーター
@@ -21,13 +29,11 @@ struct ServerRowView: View {
                             Image(systemName: "checkmark")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 10, height: 10)
                                 .foregroundColor(.green)
                                 .fontWeight(.bold)
                         } else {
                             Circle()
                                 .fill(Color.green)
-                                .frame(width: 10, height: 10)
                         }
                     }
                 case .notConnected, .unknownHost:
@@ -36,13 +42,11 @@ struct ServerRowView: View {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 10, height: 10)
                                 .foregroundColor(.red)
                                 .fontWeight(.bold)
                         } else {
                             Circle()
                                 .fill(Color.red)
-                                .frame(width: 10, height: 10)
                         }
                     }
                 case .some(.errorWithMessage):
@@ -51,12 +55,12 @@ struct ServerRowView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 10, height: 10)
                                 .foregroundColor(.orange)
                         } else {
                             Image(systemName: "exclamationmark.triangle.fill")
+                                .resizable()
+                                .scaledToFit()
                                 .foregroundColor(.orange)
-                                .font(.caption)
                         }
                     }
                 case .checking, .none:
@@ -65,15 +69,15 @@ struct ServerRowView: View {
                             Image(systemName: "questionmark.circle")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 10, height: 10)
                                 .foregroundColor(.gray)
                                 .fontWeight(.bold)
                         } else {
-                            Circle().fill(.gray).frame(width: 10, height: 10)
+                            Circle().fill(.gray)
                         }
                     }
                 }
             }
+            .frame(width: indicatorSize, height: indicatorSize)
             .padding(.trailing, 4) // アイコンとの間にスペースを追加
 
             // サーバーアイコン
