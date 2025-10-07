@@ -14,6 +14,7 @@ struct InspectorContentView: View {
     @Binding var showingInspector: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @FocusState private var isSystemPromptFocused: Bool // 新しく追加
     
     var body: some View {
         Group {
@@ -70,6 +71,7 @@ struct InspectorContentView: View {
                                 Text("System Prompt")
                             }
                             TextEditor(text: $chatSettings.systemPrompt)
+                                .focused($isSystemPromptFocused) // ここにフォーカス状態をバインド
                                 .frame(height: 100)
                                 .disabled(!chatSettings.isSystemPromptEnabled)
                                 .foregroundColor(chatSettings.isSystemPromptEnabled ? .primary : .secondary)
@@ -139,6 +141,11 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
+                #if os(iOS)
+                .onTapGesture {
+                    isSystemPromptFocused = false // キーボードを閉じる
+                }
+                #endif
             } else {
                 Text("Nothing to display.")
                     .font(.title2)

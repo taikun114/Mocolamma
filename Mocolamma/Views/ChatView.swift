@@ -74,6 +74,11 @@ struct ChatView: View {
                 view.ignoresSafeArea(.container, edges: [.bottom])
             }
         }
+        #if os(iOS)
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+        #endif
         .navigationTitle("Chat")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
