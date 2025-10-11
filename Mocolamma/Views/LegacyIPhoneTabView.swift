@@ -1,7 +1,7 @@
 import SwiftUI
 import CompactSlider
 
-// MARK: - Legacy iPhone Tab View (for older iOS versions)
+// MARK: - レガシーiPhoneタブビュー（古いiOSバージョン用）
 struct LegacyIPhoneTabView: View {
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?

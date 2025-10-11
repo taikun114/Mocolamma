@@ -15,7 +15,6 @@ struct ServerFormView: View {
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
     @State private var isVerifying = false // 接続確認中の状態を追跡
     @FocusState private var isNameFieldFocused: Bool
-    // 編集中のサーバー情報 (追加の場合はnil)
     var editingServer: ServerInfo?
 
     /// 初期化。追加の場合はnil、編集の場合は既存のServerInfoを渡します。
@@ -41,23 +40,23 @@ struct ServerFormView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             #if os(macOS)
-            Text(editingServer == nil ? "Add Server" : "Edit Server") // シートのタイトル
+            Text(editingServer == nil ? "Add Server" : "Edit Server")
                 .font(.title)
                 .bold()
             #endif
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Name") // 名前ラベル
+                Text("Name")
                     .font(.headline)
-                TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
+                TextField("e.g., Ollama Server", text: $serverNameInput)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .onSubmit {
                         save()
                     }
 
-                Text("Host") // ホストラベル
+                Text("Host")
                     .font(.headline)
-                TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput) // ホスト入力フィールド
+                TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .onSubmit {
                         save()
@@ -104,9 +103,9 @@ struct ServerFormView: View {
         #if os(macOS)
         .frame(width: 350, height: 250) // シートの固定サイズ
         #endif
-        .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) { // 接続エラーアラート
+        .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) {
             Button("OK") { }
-            .keyboardShortcut(.defaultAction) // Added here
+            .keyboardShortcut(.defaultAction)
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
                 let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
                 if let server = editingServer {
@@ -183,17 +182,17 @@ struct ServerFormView: View {
     private func processHostInput(_ host: String) -> String {
         let lowercasedHost = host.lowercased()
 
-        // Find the last colon
+        // 最後のコロンを探す
         if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {
             let afterColon = lowercasedHost[lowercasedHost.index(after: lastColonIndex)...]
-            // Check if characters after the last colon are all digits
+            // 最後のコロンの後の文字がすべて数字かどうかを確認
             if !afterColon.isEmpty && afterColon.allSatisfy({ $0.isNumber }) {
-                // A port number exists, return as is
+                // ポート番号が存在する場合はそのまま返す
                 return lowercasedHost
             }
         }
 
-        // No colon, or colon not followed by a port number, append default port
+        // コロンがない、またはコロンの後にポート番号がない場合は、デフォルトポートを追加する
         return lowercasedHost + ":11434"
     }
 }

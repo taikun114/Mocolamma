@@ -3,7 +3,7 @@ import SwiftUI
 struct ChatMessagesView: View {
     @Binding var messages: [ChatMessage]
      let onRetry: ((UUID, ChatMessage) -> Void)?
-    @Binding var isOverallStreaming: Bool // New binding
+    @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
 
     var body: some View {        let supportsEffects: Bool = {
@@ -18,7 +18,7 @@ struct ChatMessagesView: View {
                     ForEach(messages) { message in
                         let isLastAssistantMessage = message.role == "assistant" && messages.last?.id == message.id
                         let isLastOwnUserMessage = message.role == "user" && messages.last(where: { $0.role == "user" })?.id == message.id
-                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, isLastOwnUserMessage: isLastOwnUserMessage, onRetry: onRetry, isStreamingAny: $isOverallStreaming, allMessages: $messages, isModelSelected: isModelSelected) // Pass $isOverallStreaming
+                        MessageView(message: message, isLastAssistantMessage: isLastAssistantMessage, isLastOwnUserMessage: isLastOwnUserMessage, onRetry: onRetry, isStreamingAny: $isOverallStreaming, allMessages: $messages, isModelSelected: isModelSelected)
                             .id(message.id)
                     }
                 }

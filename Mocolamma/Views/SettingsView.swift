@@ -79,7 +79,7 @@ struct SettingsView: View {
         Section("Permissions") {
             #if os(iOS)
             Group {
-                if horizontalSizeClass == .compact { // iPhone portrait, or iPad narrow split view
+                if horizontalSizeClass == .compact { // iPhone縦向き、またはiPad狭い分割画面
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 10) {
                             if differentiateWithoutColor {
@@ -123,7 +123,7 @@ struct SettingsView: View {
                             Text("To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.")
                         }
                     }
-                } else { // .regular - iPhone landscape, iPad full screen or wider split view
+                } else { // .regular - iPhone横向き、iPad全画面表示または広い分割画面
                     HStack {
                         if differentiateWithoutColor {
                             Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")

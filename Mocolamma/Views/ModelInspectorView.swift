@@ -1,6 +1,6 @@
 import SwiftUI
 #if os(macOS)
-import AppKit // NSPasteboard のため
+import AppKit
 #endif
 
 // MARK: - モデル詳細ビュー
@@ -8,13 +8,13 @@ import AppKit // NSPasteboard のため
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
 struct ModelInspectorView: View {
     let model: OllamaModel
-    let modelInfo: [String: JSONValue]? // 追加
-    let isLoading: Bool // 追加
-    let fetchedCapabilities: [String]? // 追加
-    let licenseBody: String? // 新しく追加: ライセンス本文
-    let licenseLink: String? // 新しく追加: ライセンスリンク
+    let modelInfo: [String: JSONValue]?
+    let isLoading: Bool
+    let fetchedCapabilities: [String]?
+    let licenseBody: String?
+    let licenseLink: String?
 
-    @State private var showingLicenseSheet = false // 新しく追加: ライセンスシート表示制御
+    @State private var showingLicenseSheet = false
 
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
@@ -51,7 +51,7 @@ struct ModelInspectorView: View {
         return nil
     }
 
-    // modelInfoからエンベディング長を取得するヘルper
+    // modelInfoからエンベディング長を取得するヘルパー
     private var embeddingLength: (formatted: String, raw: Int)? {
         guard let info = modelInfo else { return nil }
         // ".embedding_length"で終わるキーを探す
@@ -66,7 +66,7 @@ struct ModelInspectorView: View {
         return nil
     }
 
-    // 新しく追加: general.license を取得するヘルパー
+
     private var licenseName: String {
         let rawLicense = modelInfo?["general.license"]?.stringValue ?? String(localized: "Other License")
         switch rawLicense.lowercased() {
@@ -117,17 +117,16 @@ struct ModelInspectorView: View {
     }
 
     var body: some View {
-        ScrollView { // ScrollViewを追加
+        ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                // タイトルをモデルの名前に変更
-                Text(model.name) // モデル詳細のタイトルをモデル名に変更。
+                Text(model.name)
                     .font(.title2)
                     .bold()
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .help(model.name) // モデル名のフルテキストをツールチップに表示
 
-                // Capabilities Section
+                // 機能セクション
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
@@ -145,7 +144,7 @@ struct ModelInspectorView: View {
                     VStack(alignment: .leading) {
                         Text("Model Name:") // モデル名。
                         Text(model.model)
-                            .font(.title3) // フォントサイズを大きく、太字に
+                            .font(.title3)
                             .bold()
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -158,12 +157,13 @@ struct ModelInspectorView: View {
                                     #else
                                     UIPasteboard.general.string = model.model
                                     #endif
-                                }                            }
+                                }
+                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Size:") // サイズ。
                         Text(model.formattedSize)
-                            .font(.title3) // フォントサイズを大きく、太字に
+                            .font(.title3)
                             .bold()
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -176,12 +176,13 @@ struct ModelInspectorView: View {
                                     #else
                                     UIPasteboard.general.string = fullSizeText
                                     #endif
-                                }                            }
+                                }
+                            }
                     }
                     VStack(alignment: .leading) {
-                        Text("Modified At:") // 変更日。
+                        Text("Modified At:") // 変更日
                         Text(model.formattedModifiedAt)
-                            .font(.title3) // フォントサイズを大きく、太字に
+                            .font(.title3)
                             .bold()
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -194,12 +195,13 @@ struct ModelInspectorView: View {
                                     #else
                                     UIPasteboard.general.string = model.formattedModifiedAt
                                     #endif
-                                }                            }
+                                }
+                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Digest:") // ダイジェスト。
                         Text(model.digest)
-                            .font(.title3) // フォントサイズを大きく、太字に
+                            .font(.title3)
                             .bold()
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -212,25 +214,26 @@ struct ModelInspectorView: View {
                                     #else
                                     UIPasteboard.general.string = model.digest
                                     #endif
-                                }                            }
+                                }
+                            }
                     }
                 }
-                .font(.body) // ラベルのフォントサイズは維持
-                .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
+                .font(.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Divider()
 
                 Text("Details Information:") // 詳細情報（Details）。
                     .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 if let details = model.details { // ここでOptionalをアンラップします
-                    VStack(alignment: .leading, spacing: 10) { // 各VStackの間にスペースを追加
+                    VStack(alignment: .leading, spacing: 10) {
                         if let parentModel = details.parent_model, !parentModel.isEmpty {
                             VStack(alignment: .leading) {
                                 Text("Parent Model:") // 親モデル。
                                 Text(parentModel)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -243,14 +246,15 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = parentModel
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         if let format = details.format {
                             VStack(alignment: .leading) {
                                 Text("Format:") // フォーマット。
                                 Text(format)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -263,14 +267,15 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = format
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         if let family = details.family {
                             VStack(alignment: .leading) {
                                 Text("Family:") // ファミリー。
                                 Text(family)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -283,7 +288,8 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = family
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         if let families = details.families, !families.isEmpty {
@@ -291,7 +297,7 @@ struct ModelInspectorView: View {
                                 Text("Families:") // ファミリーズ。
                                 let familiesText = families.joined(separator: ", ")
                                 Text(familiesText)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -304,14 +310,15 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = familiesText
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         if let parameterSize = details.parameter_size {
                             VStack(alignment: .leading) {
                                 Text("Parameter Size:") // パラメータサイズ。
                                 Text(parameterSize)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -324,14 +331,15 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = parameterSize
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         if let quantizationLevel = details.quantization_level {
                             VStack(alignment: .leading) {
                                 Text("Quantization Level:") // 量子化レベル。
                                 Text(quantizationLevel)
-                                    .font(.title3) // フォントサイズを大きく、太字に
+                                    .font(.title3)
                                     .bold()
                                     .lineLimit(1)
                                     .truncationMode(.tail)
@@ -344,17 +352,18 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = quantizationLevel
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                     }
-                    .font(.subheadline) // ラベルのフォントサイズは維持
-                    .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
                     Text("No details available.") // 詳細情報はありません。
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading) // 内側のパディングをなくす
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 
                 Divider()
@@ -372,7 +381,7 @@ struct ModelInspectorView: View {
                     }
                 } else if modelInfo != nil {
                     VStack(alignment: .leading, spacing: 10) {
-                        // 新しく追加: ライセンス
+
                         VStack(alignment: .leading) {
                             Text("License:") // ライセンス
                             if licenseBody != nil {
@@ -404,7 +413,8 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = String(count.raw)
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         // コンテキストレングス
@@ -421,7 +431,8 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = String(length.raw)
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         // エンベディング長
@@ -438,7 +449,8 @@ struct ModelInspectorView: View {
                                             #else
                                             UIPasteboard.general.string = String(length.raw)
                                             #endif
-                                        }                                    }
+                                        }
+                                    }
                             }
                         }
                         
@@ -458,7 +470,7 @@ struct ModelInspectorView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            .padding() // ここにパディングを追加
+            .padding()
         }
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {

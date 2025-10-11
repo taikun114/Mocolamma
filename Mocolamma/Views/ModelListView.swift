@@ -1,6 +1,6 @@
 import SwiftUI
 #if os(macOS)
-import AppKit // NSPasteboard のため
+import AppKit
 #endif
 
 // MARK: - ソート順序の定義
@@ -150,7 +150,7 @@ struct ModelListView: View {
         }
 
         #if os(iOS)
-        Group { // Wrap the conditional content in a Group
+        Group { // 条件付きコンテンツをGroupでラップ
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
@@ -211,33 +211,29 @@ struct ModelListView: View {
         }
 #else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
-                // 「番号」列: 最小30、理想50、最大無制限
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
                     Text("\(model.originalIndex + 1)")
                         .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
                 }
-                .width(min: 30, ideal: 50, max: .infinity) // 番号列の幅設定を更新します
+                .width(min: 30, ideal: 50, max: .infinity)
 
-                // 「名前」列: 最小50、理想150、最大無制限
                 TableColumn("Name", value: \.name) { model in // テーブル列ヘッダー：名前。
                     Text(model.name)
                         .help(model.name)
                 }
-                .width(min: 100, ideal: 200, max: .infinity) // 名前列の幅設定を更新します
+                .width(min: 100, ideal: 200, max: .infinity)
 
-                // 「サイズ」列: 最小30、理想50、最大無制限
                 TableColumn("Size", value: \.comparableSize) { model in // テーブル列ヘッダー：サイズ。
                     Text(model.formattedSize) // formattedSizeを使用します
                         .help("\(model.formattedSize), \(model.size) B") // サイズのヘルプテキスト
                 }
-                .width(min: 50, ideal: 100, max: .infinity) // サイズ列の幅設定を更新します
+                .width(min: 50, ideal: 100, max: .infinity)
 
-                // 「変更日」列: 最小50、理想80、最大無制限
                 TableColumn("Modified At", value: \.comparableModifiedDate) { model in // テーブル列ヘッダー：変更日。
                     Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
                         .help(model.formattedModifiedAt) // 変更日のヘルプテキスト
                 }
-                .width(min: 100, ideal: 150, max: .infinity) // 変更日列の幅設定を更新します
+                .width(min: 100, ideal: 150, max: .infinity)
             }
             // Tableレベルでコンテキストメニューを設定
             .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
@@ -271,7 +267,7 @@ struct ModelListView: View {
                                      }
                                  }) {
                                      Image(systemName: "arrow.clockwise")
-                                         .help("Retry") // ヘルプテキストを追加
+                                         .help("Retry")
                                  }
                                  .buttonStyle(.plain)
                                  .padding(.top, 4)
@@ -364,7 +360,6 @@ struct ModelListView: View {
         .toolbar {
             modelToolbarContent
         }
-        // .padding(.vertical) // 上下のパディングを削除 (これはModelListViewのものです)
         .task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled && !executor.isRunning && !executor.isPulling {

@@ -1,5 +1,5 @@
 import SwiftUI
-import Foundation // Task { @MainActor in } を使用するため
+import Foundation
 import CompactSlider
 import Combine
 
@@ -20,7 +20,6 @@ struct ContentView: View {
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
 
-    // Inspector（プレビューパネル）の表示/非表示を制御するState変数を@Bindingに変更
     @Binding var showingInspector: Bool
     @StateObject private var chatSettings = ChatSettings()
 
@@ -43,9 +42,6 @@ struct ContentView: View {
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    
-    // リフレッシュトリガーを受け取る
-    
     
     // ContentViewの初期化子を更新
     init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, isPulling: Binding<Bool>) {
@@ -171,7 +167,7 @@ struct ContentView: View {
                 showingDeleteConfirmation = false
                 modelToDelete = nil
             }
-            .keyboardShortcut(.defaultAction) // Added here
+            .keyboardShortcut(.defaultAction)
         } message: {
             if let model = modelToDelete { // 手動でアンラップ
                 Text(String(localized: "Are you sure you want to delete the model \"\(model.name)\"?\nThis action cannot be undone.", comment: "モデル削除の確認メッセージ。"))
@@ -192,7 +188,6 @@ struct ContentView: View {
             }
         }
         .onChange(of: serverManager.selectedServerID) { _, _ in
-            // API通信用の選択IDが変更されても、Inspectorの表示はServerViewのlistSelectionに任せる
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
             if newServer != nil {

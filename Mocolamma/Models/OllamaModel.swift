@@ -2,7 +2,7 @@ import Foundation
 
 /// Ollama APIの /api/tags エンドポイントから返されるモデル詳細の内部構造体
 struct OllamaModelDetails: Codable, Hashable {
-    let parent_model: String? // Optional because it might be empty
+    let parent_model: String? // 親モデルが空の場合があるためOptional
     let format: String?
     let family: String?
     let families: [String]?
@@ -11,13 +11,10 @@ struct OllamaModelDetails: Codable, Hashable {
     let context_length: Int?
 }
 
-
-
-
 /// Ollama APIの /api/tags エンドポイントから返される個々のモデル情報を表すデータモデル
 struct OllamaModel: Identifiable, Hashable, Codable {
     var id: String { digest } // テーブルビューで各行を一意に識別するためのID (Codableの対象外)
-    var originalIndex: Int = 0 // 新しく追加: 元のリスト順のインデックス (Codableの対象外)
+    var originalIndex: Int = 0
 
     let name: String
     let model: String // name と同じ値だが、APIレスポンスに含まれるため保持
@@ -38,7 +35,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         case capabilities
     }
 
-    // Memberwise initializer for convenience
+    // 便宜のためのメンバーワーズイニシャライザ
     init(name: String, model: String, modifiedAt: String, size: Int64, digest: String, details: OllamaModelDetails?, capabilities: [String]?, originalIndex: Int = 0) {
         self.name = name
         self.model = model

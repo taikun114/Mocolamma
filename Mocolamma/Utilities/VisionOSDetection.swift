@@ -1,5 +1,5 @@
 import Foundation
 import SwiftUI
 
-// Helper to detect if the app is running on visionOS
+// visionOSでアプリが実行されているかどうかを検出するヘルパー
 let isiOSAppOnVision: Bool = NSClassFromString("UIWindowSceneGeometryPreferencesVision") != nil

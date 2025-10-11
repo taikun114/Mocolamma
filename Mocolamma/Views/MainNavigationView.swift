@@ -1,7 +1,7 @@
 import SwiftUI
 import CompactSlider
 
-// MARK: - Main Navigation View Helper (for older OS versions)
+// MARK: - メインナビゲーションビューヘルパー（古いOSバージョン用）
 struct MainNavigationView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?

@@ -1,19 +1,19 @@
 import Foundation
-import SwiftUI // @Published を使うため
-import Combine // CombineフレームワークをインポートしてPublisherを購読可能にする
+import SwiftUI
+import Combine
 
-@preconcurrency @MainActor // @preconcurrency を追加して、URLSessionDelegateのデリゲートメソッドに関する警告を抑制します
+@preconcurrency @MainActor
 class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessionDataDelegate {
-    @Published var output: String = "" // 公開用の生のコマンド出力（stdout + stderr + 終了メッセージ）
+    @Published var output: String = ""
     @Published var isRunning: Bool = false
     @Published var pullHttpErrorTriggered: Bool = false
     @Published var pullHttpErrorMessage: String = ""
-    @Published var models: [OllamaModel] = [] // 解析されたモデルリスト
-    @Published var apiConnectionError: Bool = false // API接続エラーの状態を追加
-    @Published var specificConnectionErrorMessage: String? // 特定の接続エラーメッセージを追加
-    @Published var chatMessages: [ChatMessage] = [] // チャットメッセージ
-    @Published var chatInputText: String = "" // チャット入力テキスト
-    @Published var isChatStreaming: Bool = false // 追加: チャットがストリーミング中かどうか
+    @Published var models: [OllamaModel] = []
+    @Published var apiConnectionError: Bool = false
+    @Published var specificConnectionErrorMessage: String?
+    @Published var chatMessages: [ChatMessage] = []
+    @Published var chatInputText: String = ""
+    @Published var isChatStreaming: Bool = false
     
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -23,7 +23,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
     @Published var pullTotal: Int64 = 0 // 合計バイト数
     @Published var pullCompleted: Int64 = 0 // 完了したバイト数
-    @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度(B/s)
+    @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度 (B/s)
     @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     @Published var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
     private var urlSession: URLSession!
@@ -43,10 +43,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
     
     // Ollama APIのベースURL
-    // ServerManagerから現在のサーバーホストを受け取るように変更
     @Published var apiBaseURL: String?
     
-    private var cancellables = Set<AnyCancellable>() // ServerManagerの変更を監視するためのSet
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - モデル情報キャッシュ
     private var modelInfoCache: [String: OllamaShowResponse] = [:]
@@ -63,7 +62,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.apiBaseURL = serverManager.currentServerHost
         super.init()
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
-        // デリゲートメソッド内で @MainActor への切り替えをTask { @MainActor in ... } で明示的に行います
         let configuration = URLSessionConfiguration.default
         let opt = APITimeoutManager.shared.currentOption
         configuration.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
@@ -79,7 +77,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                    let selectedServer = servers.first(where: { $0.id == selectedID }) {
                     return selectedServer.host
                 }
-                // フォールバックを削除し、nilを返す
                 return nil
             }
             .assign(to: \.apiBaseURL, on: self)
@@ -93,9 +90,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             .assign(to: \.apiBaseURL, on: self)
             .store(in: &cancellables)
         
-        // apiBaseURLの変更を監視し、モデルリストを再取得する処理を削除しました。
-        // モデルの取得は、UI側で適切なタイミングで明示的に呼び出す必要があります。
-        
         NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in
             guard let self = self else { return }
             let opt = APITimeoutManager.shared.currentOption
@@ -107,7 +101,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
-    /// Ollama APIからモデルリストを取得します (async/await版)
+    /// Ollama APIからモデルリストを取得します
     func fetchOllamaModelsFromAPI() async {
         guard let apiBaseURL = self.apiBaseURL else {
             // apiBaseURLがnilの場合、何もしない
@@ -123,7 +117,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
         
-        // defer を使って関数終了時に必ず isRunning を false に設定します
         defer {
             self.isRunning = false
         }
@@ -204,7 +197,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
-    /// モデルをダウンロードします (デリゲートを使用するため async化はしませんが、UI更新は @MainActor にディスパッチします)
+    /// モデルをダウンロードします
     func pullModel(modelName: String) {
         guard let apiBaseURL = self.apiBaseURL else {
             print("Ollama APIベースURLが設定されていません。モデルのプルをスキップします。")
@@ -322,7 +315,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
-    /// モデルの詳細情報を取得します (async/await版)
+    /// モデルの詳細情報を取得します
     func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
         // キャッシュに存在すればそれを返す
         if let cachedInfo = modelInfoCache[modelName] {
@@ -371,8 +364,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             // 取得した情報をキャッシュに保存
             modelInfoCache[modelName] = apiResponse
             
-            // 変更点: selectedModelContextLength の更新ロジックを削除
-            
             return apiResponse
             
         } catch {
@@ -411,7 +402,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
     
             var request = URLRequest(url: url)
-            request.httpMethod = "GET" // GETリクエストに変更してエラー情報を取得
+            request.httpMethod = "GET"
     
             do {
                 let (data, response) = try await URLSession.shared.data(for: request)
@@ -516,7 +507,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
     func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         return AsyncThrowingStream { continuation in
-            Task { @MainActor in // Ensure this runs on MainActor to update UI properties safely
+            Task { @MainActor in // UIプロパティを安全に更新するためにMainActorで実行することを保証
                 guard let apiBaseURL = self.apiBaseURL else {
                     continuation.finish(throwing: URLError(.badURL))
                     return
@@ -549,11 +540,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     
                     var finalMessages = messages
                     if useCustomChatSettings && isSystemPromptEnabled && !systemPrompt.isEmpty {
-                        // Check if a system message already exists
+                        // システムメッセージが既に存在するか確認
                         if finalMessages.firstIndex(where: { $0.role == "system" }) != nil {
-                            // It's generally better to modify the existing one if needed, but for now we assume it's correctly set up by ChatView
                         } else {
-                            // Or insert a new one if it doesn't exist
+                            // 存在しない場合は新しいものを挿入
                             finalMessages.insert(ChatMessage(role: "system", content: systemPrompt), at: 0)
                         }
                     }
@@ -579,7 +569,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 
                 let task = urlSession.dataTask(with: request)
                 self.chatContinuations[task] = (continuation: continuation, isStreaming: stream)
-                self.chatLineBuffers[task] = "" // Initialize buffer for this task
+                self.chatLineBuffers[task] = "" // このタスクのバッファを初期化
                 self.currentChatTask = task // 現在のチャットタスクを保持
                 
                 task.resume()
@@ -598,21 +588,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     func clearChat() {
         chatMessages.removeAll()
         chatInputText = ""
-        updateIsChatStreaming() // 追加
-        // 関連するストリーミング状態などもリセットする必要があればここに追加
+        updateIsChatStreaming()
         cancelChatStreaming()
     }
-    // これらのメソッドは非同期プロトコル要件を満たすために nonisolated を使用します
-    // UI更新は Task { @MainActor in ... } でメインアクターにディスパッチします
     
-    /// URLSessionDataDelegateのdidReceiveResponseメソッドです。
-    /// このメソッドは、URLSessionTaskDelegateのurlSession(_:task:didReceive:completionHandler:)と名前が似ているため、
-    /// Swiftコンパイラが「nearly matches optional requirement」警告を出すことがあります。
-    /// `@preconcurrency`属性がクラスに付与されている場合、この警告は抑制されるべきですが、
-    /// 特定のSwiftバージョンやビルド設定によっては表示され続けることがあります。
-    /// これは機能的な問題ではなく、コンパイラの振る舞いによるものです。
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        Task { @MainActor [weak self, completionHandler] in // completionHandlerをキャプチャリストに追加
+        Task { @MainActor [weak self, completionHandler] in
             guard let self = self else {
                 completionHandler(.cancel)
                 return
@@ -661,7 +642,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 }
                 
                 for line in lines {
-                    guard !line.isEmpty else { continue } // 空行はスキップします
+                    guard !line.isEmpty else { continue }
                     guard let jsonData = line.data(using: .utf8) else {
                         print("エラー: 行をDataに変換できませんでした: \(line)")
                         continue
@@ -836,7 +817,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     self.isPulling = false
                 }
             } else if let (continuation, _) = self.chatContinuations[task] {
-                // Handle chat task completion
+                // チャットタスクの完了を処理
                 if let error = error {
                     continuation.finish(throwing: error)
                 } else {
@@ -844,7 +825,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 }
             }
             
-            // Clean up resources for the completed task
+            // 完了したタスクのリソースをクリーンアップ
             self.chatContinuations.removeValue(forKey: task)
             self.chatLineBuffers.removeValue(forKey: task)
             if task == self.currentChatTask {
@@ -892,14 +873,14 @@ struct OllamaRunningModel: Decodable {
     let expires_at: Date?
     let size_vram: Int64?
 
-    var formattedVRAMSize: String? { // Add formattedVRAMSize
+    var formattedVRAMSize: String? { // VRAMサイズをフォーマット
         guard let size = size_vram else { return nil }
         let byteCountFormatter = ByteCountFormatter()
         byteCountFormatter.countStyle = .file
         return byteCountFormatter.string(fromByteCount: size)
     }
 
-    // Custom decoding to handle ISO 8601 date string
+    // ISO 8601日付文字列を処理するためのカスタムデコーディング
     enum CodingKeys: String, CodingKey {
         case name
         case expires_at

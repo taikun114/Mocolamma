@@ -6,7 +6,7 @@ struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var containerWidth: CGFloat = 0
     @State private var needsScroll: Bool = false
-    @State private var isFirstLoop: Bool = true // Track if it's the first loop
+    @State private var isFirstLoop: Bool = true // 最初のループかどうかを追跡
 
     var body: some View {
         GeometryReader { geo in
@@ -24,7 +24,7 @@ struct MarqueeText: View {
                 startScrolling()
             }
             .onChange(of: text) { _, _ in
-                isFirstLoop = true // Reset to first loop on text change
+                isFirstLoop = true // テキスト変更時に最初のループにリセット
                 startScrolling()
             }
         }
@@ -35,13 +35,13 @@ struct MarqueeText: View {
     private func startScrolling() {
         needsScroll = textWidth > containerWidth
         if needsScroll {
-            offset = isFirstLoop ? 0 : containerWidth // Start from left for first loop, right for subsequent
-            let distance = textWidth + containerWidth + 200 // Distance to scroll
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { // 3 seconds delay
+            offset = isFirstLoop ? 0 : containerWidth // 最初のループは左端から、以降は右端から開始
+            let distance = textWidth + containerWidth + 200 // スクロール距離
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { // 3秒の遅延
                 withAnimation(.linear(duration: Double(distance) / 60.0)) {
-                    offset = -textWidth - 200 // End position
+                    offset = -textWidth - 200 // 終了位置
                 }
-                // Schedule the next loop after the animation completes
+                // アニメーション完了後に次のループをスケジュール
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(distance) / 60.0) {
                     resetAndScroll()
                 }
@@ -50,13 +50,13 @@ struct MarqueeText: View {
     }
 
     private func resetAndScroll() {
-        isFirstLoop = false // Set to false for subsequent loops
-        offset = containerWidth // Reset to start position (right edge)
-        let distance = textWidth + containerWidth + 200 // Distance to scroll
+        isFirstLoop = false // 以降のループではfalseに設定
+        offset = containerWidth // スタート位置にリセット（右端）
+        let distance = textWidth + containerWidth + 200 // スクロール距離
         withAnimation(.linear(duration: Double(distance) / 60.0)) {
-            offset = -textWidth - 200 // End position
+            offset = -textWidth - 200 // 終了位置
         }
-        // Schedule the next loop after the animation completes
+        // アニメーション完了後に次のループをスケジュール
         DispatchQueue.main.asyncAfter(deadline: .now() + Double(distance) / 60.0) {
             resetAndScroll()
         }

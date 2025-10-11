@@ -73,12 +73,12 @@ struct ServerRowView: View {
                     }
                 case .checking, .none:
                     ProgressView()
-                        .scaleEffect(spinnerScaleFactor) // Use the new property
+                        .scaleEffect(spinnerScaleFactor)
                         .frame(width: indicatorSize, height: indicatorSize)
                 }
             }
             .frame(width: indicatorSize, height: indicatorSize)
-            .padding(.trailing, 4) // アイコンとの間にスペースを追加
+            .padding(.trailing, 4)
 
             // サーバーアイコン
             Image(systemName: "server.rack")

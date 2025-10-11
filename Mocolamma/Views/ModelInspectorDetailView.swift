@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Model Inspector Detail View Helper
+// MARK: - モデルインスペクター詳細ビューヘルパー
 struct ModelInspectorDetailView: View {
     let model: OllamaModel
     @EnvironmentObject var commandExecutor: CommandExecutor

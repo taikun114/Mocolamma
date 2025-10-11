@@ -4,7 +4,7 @@ struct LicenseInfoModalView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
 
-    @State private var isTextWrapped: Bool = true // 追加
+    @State private var isTextWrapped: Bool = true
 
     @State private var showingCreateDmgLinkAlert = false
     @State private var isCreateDmgLinkHovered: Bool = false
@@ -79,7 +79,6 @@ struct LicenseInfoModalView: View {
                             Image(systemName: "xmark")
                         }
                     }
-                    // ここに新しい ToolbarItem を追加
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
                             isTextWrapped.toggle()
@@ -90,7 +89,7 @@ struct LicenseInfoModalView: View {
                     }
                 }
         }
-        .onAppear { // onAppear を追加
+        .onAppear {
             isTextWrapped = true
         }
         #endif
@@ -420,11 +419,11 @@ struct LicenseInfoModalView: View {
             .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        #if os(macOS) // ここを追加
+        #if os(macOS)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Spacer().frame(height: 60)
         }
-        #endif // ここを追加
+        #endif
     }
 }
 

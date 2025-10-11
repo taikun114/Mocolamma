@@ -3,17 +3,17 @@ import SwiftUI
 struct LicenseTextView: View {
     let licenseText: String
     let licenseLink: String?
-    let licenseTitle: String // 追加
+    let licenseTitle: String
     @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
     @State private var isTextWrapped: Bool = true
-    @State private var showingLicenseLinkAlert = false // Added for license link alert
+    @State private var showingLicenseLinkAlert = false
 
     var body: some View {
         #if os(macOS)
         licenseTextViewContent
             .frame(width: 700, height: 500)
-            .frame(maxWidth: .infinity, maxHeight: .infinity) // ここに追加
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottom) { // 下部にオーバーレイとしてVisualEffectViewとボタンを配置
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
@@ -27,7 +27,7 @@ struct LicenseTextView: View {
                     HStack {
                         if let link = licenseLink, let url = URL(string: link) {
                             Button {
-                                showingLicenseLinkAlert = true // Modified
+                                showingLicenseLinkAlert = true
                             } label: {
                                 Label("Open License Page", systemImage: "paperclip")
                             }
@@ -50,7 +50,7 @@ struct LicenseTextView: View {
                 }
                 .frame(height: 60) // オーバーレイの固定高さ
             }
-            .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) { // Added here
+            .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
                 Button("Open") {
                     if let link = licenseLink, let url = URL(string: link) {
                         openURL(url)
@@ -74,7 +74,7 @@ struct LicenseTextView: View {
                     }
                     ToolbarItem(placement: .primaryAction) {
                         if let link = licenseLink, let url = URL(string: link) {
-                            Button(action: { showingLicenseLinkAlert = true }) { // Modified
+                            Button(action: { showingLicenseLinkAlert = true }) {
                                 Image(systemName: "paperclip")
                             }
                         }
@@ -92,8 +92,8 @@ struct LicenseTextView: View {
                         }
                     }
                 }
-                .modifier(NavSubtitleIfAvailable(subtitle: Text(licenseTitle))) // ここに追加
-                .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) { // Added here
+                .modifier(NavSubtitleIfAvailable(subtitle: Text(licenseTitle)))
+                .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
                     Button("Open") {
                         if let link = licenseLink, let url = URL(string: link) {
                             openURL(url)
@@ -105,7 +105,7 @@ struct LicenseTextView: View {
                     Text("Are you sure you want to open the page with license information?")
                 }
         }
-        .onAppear { // ここに onAppear を追加
+        .onAppear {
             isTextWrapped = true
         }
         #endif
@@ -113,20 +113,20 @@ struct LicenseTextView: View {
 
     private var licenseTextViewContent: some View {
         ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) {
-            VStack(alignment: .leading) { // VStack を追加
+            VStack(alignment: .leading) {
                 Text(licenseText)
                     .font(.body)
                     .monospaced()
                     .padding()
                     .fixedSize(horizontal: !isTextWrapped, vertical: false)
             }
-            .frame(maxWidth: .infinity, alignment: .leading) // VStack に frame を追加
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity) // ScrollView に frame を追加
-        #if os(macOS) // ここを追加
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        #if os(macOS)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Spacer().frame(height: 60)
         }
-        #endif // ここを追加
+        #endif
     }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 import CompactSlider
 
-// MARK: - Inspector Content Helper View
+// MARK: - インスペクターコンテンツヘルパービュー
 struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     @EnvironmentObject var chatSettings: ChatSettings
@@ -14,7 +14,7 @@ struct InspectorContentView: View {
     @Binding var showingInspector: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @FocusState private var isSystemPromptFocused: Bool // 新しく追加
+    @FocusState private var isSystemPromptFocused: Bool
     
     var body: some View {
         Group {
@@ -47,12 +47,12 @@ struct InspectorContentView: View {
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
-                        VStack(alignment: .leading) { // Added VStack
+                        VStack(alignment: .leading) {
                             Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
                             Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        } // End VStack
+                        }
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Picker("Thinking", selection: $chatSettings.thinkingOption) {

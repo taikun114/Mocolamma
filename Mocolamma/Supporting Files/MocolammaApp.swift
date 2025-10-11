@@ -25,16 +25,11 @@ struct MocolammaApp: App {
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
-    @State private var selection: String? = "server" // 状態変数をAppレベルに移動
+    @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
-    
-    // インスペクターの表示状態を管理するStateをAppレベルに移動しました。
-    // これにより、メニューコマンドから状態を操作できます。
-    @State private var showingInspector: Bool = false
-
-    // モデル追加シートの表示/非表示を制御するStateをAppレベルに移動
     @State private var showingAddModelsSheet = false
     @State private var showingAddServerSheet = false
+    @State private var showingInspector: Bool = false
 
     // リフレッシュコマンドを発行するためのトリガー
     @StateObject private var appRefreshTrigger = RefreshTrigger()
@@ -90,7 +85,6 @@ struct MocolammaApp: App {
                     Label("About Mocolamma", systemImage: "info.circle")
                 }
             }
-            // 標準のサイドバーコマンド（「サイドバーを切り替える」ボタン）を追加します。
             SidebarCommands()
             InspectorCommands()
 

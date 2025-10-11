@@ -66,9 +66,9 @@ struct ChatView: View {
                 if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
                     executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
                     executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                    executor.updateIsChatStreaming() // 追加
+                    executor.updateIsChatStreaming()
                 }
-                executor.isChatStreaming = false // 追加
+                executor.isChatStreaming = false
                 executor.cancelChatStreaming()
             }
         }
@@ -165,7 +165,7 @@ struct ChatView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if os(iOS)
-        ToolbarItemGroup(placement: .primaryAction) { // Group for Refresh and Model Selection (iOS)
+        ToolbarItemGroup(placement: .primaryAction) { // リフレッシュとモデル選択のグループ (iOS)
             Button(action: {
                 appRefreshTrigger.send()
             }) {
@@ -182,7 +182,7 @@ struct ChatView: View {
                     if executor.models.isEmpty {
                         Divider()
                         Text(LocalizedStringKey("No models available"))
-                            .tag("no-models-available-tag" as OllamaModel.ID?) // Assign a unique, non-nil String
+                            .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる
                             .selectionDisabled(true)
                     }
                 }
@@ -192,7 +192,7 @@ struct ChatView: View {
             }
         }
         #else // macOS
-        ToolbarItem(placement: .primaryAction) { // Refresh Button (macOS)
+        ToolbarItem(placement: .primaryAction) { // リフレッシュボタン（macOS）
             Button(action: {
                 appRefreshTrigger.send()
             }) {
@@ -200,7 +200,7 @@ struct ChatView: View {
             }
             .disabled(executor.isRunning)
         }
-        ToolbarItem(placement: .primaryAction) { // Model Picker (macOS)
+        ToolbarItem(placement: .primaryAction) { // モデルピッカー (macOS)
             Picker("Select Model", selection: $chatSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
@@ -210,7 +210,7 @@ struct ChatView: View {
                 if executor.models.isEmpty {
                     Divider()
                     Text(LocalizedStringKey("No models available"))
-                        .tag("no-models-available-tag" as OllamaModel.ID?) // Assign a unique, non-nil String
+                        .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる
                         .selectionDisabled(true)
                 }
             }
@@ -221,7 +221,7 @@ struct ChatView: View {
         
         #if os(iOS)
         if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between Model Group and New Chat
+            ToolbarSpacer(.fixed, placement: .primaryAction) // モデルグループと新規チャットの間のスペーサー
         }
         #endif
         
@@ -237,7 +237,7 @@ struct ChatView: View {
         
         #if os(iOS)
         if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // Spacer between New Chat and Inspector
+            ToolbarSpacer(.fixed, placement: .primaryAction) // 新規チャットとインスペクターの間のスペーサー
         }
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onToggleInspector() }) {
@@ -296,10 +296,10 @@ struct ChatView: View {
             executor.chatMessages.append(userMessage)
             
             // ユーザーメッセージ以降のアシスタントメッセージを削除
-            executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in // ChatMessageを明示的に指定
+            executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in
                 guard let messageCreatedAt = message.createdAt,
                       let userMessageCreatedAt = userMessage.createdAt else { return false }
-                return messageCreatedAt > userMessageCreatedAt && message.role == "assistant" // $0.role を message.role に変更
+                return messageCreatedAt > userMessageCreatedAt && message.role == "assistant"
             })
             
             var apiMessages = executor.chatMessages

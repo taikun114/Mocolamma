@@ -1,14 +1,14 @@
 import SwiftUI
 #if os(macOS)
-import AppKit // For NSPasteboard
+import AppKit
 #endif
 
 struct ServerInspectorView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     let server: ServerInfo
-    let connectionStatus: ServerConnectionStatus? // Can be nil while checking
-    @State private var ollamaVersion: String? // New state variable for Ollama version
+    let connectionStatus: ServerConnectionStatus? // チェック中にnilになる可能性あり
+    @State private var ollamaVersion: String? // Ollamaバージョン用の新しい状態変数
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
 
     private var indicatorSize: CGFloat {
@@ -20,9 +20,9 @@ struct ServerInspectorView: View {
     }
 
     var body: some View {
-        ScrollView { // ScrollViewを追加
+        ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                // Name styled like the model name in the model inspector
+                // モデルインスペクターのモデル名のようにスタイルされた名前
                 Text(server.name)
                     .font(.title2)
                     .bold()
@@ -30,7 +30,7 @@ struct ServerInspectorView: View {
                     .truncationMode(.tail)
                     .help(server.name)
 
-                // Connection status
+                // 接続状態
                 switch connectionStatus {
                 case .connected:
                     HStack(spacing: 4) {
@@ -149,7 +149,7 @@ struct ServerInspectorView: View {
                 Divider()
                     .padding(.vertical, 5)
 
-                // Host information
+                // ホスト情報
                 VStack(alignment: .leading) {
                     Text("Host:")
                         .font(.subheadline)
@@ -173,8 +173,8 @@ struct ServerInspectorView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                // Ollama Version information
-                VStack(alignment: .leading, spacing: 10) { // Changed spacing from 6 to 10
+                // Ollamaバージョン情報
+                VStack(alignment: .leading, spacing: 10) {
                     VStack(alignment: .leading) {
                         Text("Ollama Version:")
                             .font(.subheadline)

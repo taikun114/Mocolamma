@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Main Content Detail Helper View
+// MARK: - メインコンテンツ詳細ヘルパービュー
 struct MainContentDetailView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?

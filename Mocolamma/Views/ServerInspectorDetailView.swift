@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Server Inspector Detail View Helper
+// MARK: - サーバーインスペクター詳細ビューヘルパー
 struct ServerInspectorDetailView: View {
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus?

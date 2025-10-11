@@ -7,7 +7,7 @@ struct MessageInputView: View {
     @Binding var showingInspector: Bool
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
-    var stopMessage: (() -> Void)? = nil // 新しいクロージャを追加
+    var stopMessage: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -38,14 +38,14 @@ struct MessageInputView: View {
                     }
                     .lineLimit(1...10)
                     .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる
-                    .padding(.horizontal, 10) // テキストと枠線の間にスペースを追加
-                    .padding(.vertical, 8) // 上下の余白を追加
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
                     .background(Color.clear) // TextFieldの背景を透明にする
                     
                     .cornerRadius(16) // 角を丸くする
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1) // 枠線を追加
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
                     .onKeyPress(KeyEquivalent.return) {
                         #if os(macOS)

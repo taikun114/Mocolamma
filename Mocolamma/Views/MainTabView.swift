@@ -1,7 +1,7 @@
 import SwiftUI
 import CompactSlider
 
-// MARK: - Main Tab View (for modern OS versions)
+// MARK: - メインタブビュー（現代のOSバージョン用）
 @available(macOS 15.0, iOS 18.0, *)
 struct MainTabView: View {
     @Binding var selection: String?

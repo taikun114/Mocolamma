@@ -1,5 +1,5 @@
 import Foundation
-import Combine // Combineフレームワークをインポートして@Publishedの変更を監視可能にする
+import Combine
 
 // MARK: - サーバー接続ステータス
 enum ServerConnectionStatus {
@@ -26,7 +26,6 @@ class ServerManager: ObservableObject {
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     @Published var servers: [ServerInfo] {
         didSet {
-            // serversが変更されたときにUserDefaultsに保存
             saveServers()
         }
     }
@@ -36,9 +35,6 @@ class ServerManager: ObservableObject {
         didSet {
             // 選択されたIDが変更されたときにUserDefaultsに保存
             saveSelectedServerID()
-            // @Publishedプロパティの変更は自動的にobjectWillChangeを通知するため、
-            // ここでobjectWillChange.send()を明示的に呼び出す必要はありません。
-            // また、view update中にこれを呼び出すと警告の原因となります。
         }
     }
 

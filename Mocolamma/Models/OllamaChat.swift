@@ -1,17 +1,15 @@
-// OllamaChat.swift
-
 import SwiftUI
 import Foundation
 
-// MARK: - Chat API Request/Response Models
+// MARK: - チャットAPI リクエスト/レスポンス モデル
 
-/// Represents a single message in a chat conversation.
+/// チャット会話における単一のメッセージを表します。
 class ChatMessage: ObservableObject, Identifiable, Codable {
     let id = UUID()
     @Published var role: String
     @Published var content: String
     @Published var thinking: String?
-    @Published var images: [String]? // Base64 encoded images
+    @Published var images: [String]? // Base64でエンコードされた画像
     @Published var toolCalls: [ToolCall]?
     @Published var toolName: String?
     @Published var createdAt: String? // メッセージが作成された日時
@@ -90,7 +88,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
         try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
     }
 
-    // Default initializer for creating new messages
+    // 新しいメッセージを作成するためのデフォルトイニシャライザ
     init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false) {
         self.role = role
         self.content = content
@@ -113,18 +111,18 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
     }
 }
 
-/// Represents a tool call within a message.
+/// メッセージ内のツール呼び出しを表します。
 struct ToolCall: Codable, Hashable {
     let function: ToolFunction
 }
 
-/// Represents the function details of a tool call.
+/// ツール呼び出しの関数の詳細を表します。
 struct ToolFunction: Codable, Hashable {
     let name: String
-    let arguments: [String: JSONValue] // Use JSONValue for flexible arguments
+    let arguments: [String: JSONValue] // 柔軟な引数のためにJSONValueを使用
 }
 
-/// Represents the request body for the /api/chat endpoint.
+/// /api/chat エンドポイントのリクエストボディを表します。
 struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
@@ -153,7 +151,7 @@ struct ChatRequest: Codable {
     }
 }
 
-/// Represents the thinking option for a chat request.
+/// チャットリクエストの思考オプションを表します。
 enum ThinkingOption: String, CaseIterable, Identifiable {
     case none = "ThinkingOption_None"
     case on = "ThinkingOption_On"
@@ -166,27 +164,27 @@ enum ThinkingOption: String, CaseIterable, Identifiable {
     }
 }
 
-/// Represents tool definitions for the /api/chat endpoint.
+/// /api/chat エンドポイントのツール定義を表します。
 struct ToolDefinition: Codable {
     let type: String
     let function: ToolFunctionDefinition
 }
 
-/// Represents function definition for a tool.
+/// ツールの関数定義を表します。
 struct ToolFunctionDefinition: Codable {
     let name: String
     let description: String?
     let parameters: JSONSchema?
 }
 
-/// Represents a JSON schema for tool parameters.
+/// ツールパラメータのJSONスキーマを表します。
 struct JSONSchema: Codable {
     let type: String
     let properties: [String: JSONSchemaProperty]?
     let required: [String]?
 }
 
-/// Represents a property within a JSON schema.
+/// JSONスキーマ内のプロパティを表します。
 struct JSONSchemaProperty: Codable {
     let type: String
     let description: String?
@@ -199,7 +197,7 @@ struct JSONSchemaProperty: Codable {
     }
 }
 
-/// Represents the options for a chat request.
+/// チャットリクエストのオプションを表します。
 struct ChatRequestOptions: Codable {
     let numKeep: Int?
     let seed: Int?
@@ -298,7 +296,7 @@ struct ChatRequestOptions: Codable {
     }
 }
 
-/// Represents a streaming response chunk from the /api/chat endpoint.
+/// /api/chat エンドポイントからのストリーミング応答チャンクを表します。
 struct ChatResponseChunk: Codable {
     let model: String
     let createdAt: String
@@ -327,7 +325,7 @@ struct ChatResponseChunk: Codable {
     }
 }
 
-/// A flexible JSON value type to handle various argument types in tool calls.
+/// ツール呼び出しにおけるさまざまな引数タイプを処理するための柔軟なJSON値の型。
 enum JSONValue: Codable, Hashable {
     case string(String)
     case int(Int)
@@ -378,7 +376,7 @@ enum JSONValue: Codable, Hashable {
         }
     }
 
-    // Helper initializers for convenience
+    // 便宜のためのヘルパイニシャライザ
     init(_ value: String) { self = .string(value) }
     init(_ value: Int) { self = .int(value) }
     init(_ value: Double) { self = .double(value) }
@@ -386,7 +384,7 @@ enum JSONValue: Codable, Hashable {
     init(_ value: [JSONValue]) { self = .array(value) }
     init(_ value: [String: JSONValue]) { self = .object(value) }
 
-    // Helper properties for type-safe access
+    // 型安全なアクセスのためのヘルパープロパティ
     var stringValue: String? {
         if case .string(let value) = self { return value }
         return nil

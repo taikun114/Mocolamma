@@ -38,7 +38,7 @@ struct AddModelsSheet: View {
                         }
                     }
                 
-                Spacer() // This spacer is present in both old and new strings, so it should be preserved.
+                Spacer() // このspacerは新旧両方の文字列に存在するため、保持する必要があります。
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Find Models")
                         .font(.headline)
@@ -49,7 +49,7 @@ struct AddModelsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    #if os(iOS) // Button appears below message on iOS
+                    #if os(iOS) // iOSではボタンがメッセージの下に表示される
                     Button {
                         showingOpenLinkAlert = true
                     } label: {
@@ -67,9 +67,9 @@ struct AddModelsSheet: View {
                         Label("Open Website", systemImage: "paperclip")
                     }
                     .buttonStyle(.bordered)
-                    .controlSize(.large) // Apply controlSize for macOS
+                    .controlSize(.large) // macOS用にcontrolSizeを適用
 
-                    Spacer() // This spacer is present in both old and new strings, so it should be preserved.
+                    Spacer() // このspacerは新旧両方の文字列に存在するため、保持する必要があります。
                     Button("Cancel") { // キャンセルボタンのテキスト。
                         showingAddSheet = false
                     }

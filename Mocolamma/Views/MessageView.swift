@@ -6,7 +6,7 @@ struct MessageView: View {
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
-    @Binding var isStreamingAny: Bool // Changed to Binding
+    @Binding var isStreamingAny: Bool
     @Binding var allMessages: [ChatMessage]
     let isModelSelected: Bool
     @State private var isHovering: Bool = false
@@ -105,7 +105,7 @@ struct MessageView: View {
             #else
             .opacity(1.0)
             #endif
-            .onChange(of: isEditing) { _, _ in withAnimation { } } // Keep this onChange for isEditing
+            .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         #if os(macOS)
@@ -152,7 +152,7 @@ struct MessageView: View {
 
     @ViewBuilder
     private var revisionNavigator: some View {
-        Group { // Wrap in Group to apply disabled modifier to the whole view builder
+        Group { // ビュービルダー全体にdisabled修飾子を適用するためにGroupでラップ
             Button(action: {
                 message.currentRevisionIndex -= 1
                 let revision = message.revisions[message.currentRevisionIndex]
@@ -231,7 +231,7 @@ struct MessageView: View {
             .help("Next Revision")
             .disabled(message.currentRevisionIndex == message.revisions.count)
         }
-        .disabled(isStreamingAny) // Disable the entire revisionNavigator when streaming
+        .disabled(isStreamingAny)
     }
 
     @ViewBuilder
@@ -289,7 +289,7 @@ struct MessageView: View {
 
         @ViewBuilder
     private var editButton: some View {
-        Group { // Added Group
+        Group {
             Button(action: {
                 isEditing = true
                 isEditingFocused = true
@@ -308,8 +308,8 @@ struct MessageView: View {
             .foregroundColor(.accentColor)
             .help("Edit")
             .disabled(isStreamingAny)
-        } // End Group
-        .id(isStreamingAny) // Added id modifier
+        }
+        .id(isStreamingAny)
     }
 
     @ViewBuilder
