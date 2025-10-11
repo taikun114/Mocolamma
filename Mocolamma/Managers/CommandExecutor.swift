@@ -13,6 +13,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var specificConnectionErrorMessage: String? // 特定の接続エラーメッセージを追加
     @Published var chatMessages: [ChatMessage] = [] // チャットメッセージ
     @Published var chatInputText: String = "" // チャット入力テキスト
+    @Published var isChatStreaming: Bool = false // 追加: チャットがストリーミング中かどうか
     
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -49,6 +50,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     // MARK: - モデル情報キャッシュ
     private var modelInfoCache: [String: OllamaShowResponse] = [:]
+    
+    // isChatStreamingを更新する関数
+    func updateIsChatStreaming() {
+        isChatStreaming = chatMessages.firstIndex { $0.isStreaming } != nil
+    }
     
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
@@ -588,6 +594,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     func clearChat() {
         chatMessages.removeAll()
         chatInputText = ""
+        updateIsChatStreaming() // 追加
         // 関連するストリーミング状態などもリセットする必要があればここに追加
         cancelChatStreaming()
     }

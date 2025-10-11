@@ -51,9 +51,9 @@ struct MessageView: View {
                     HStack(spacing: 6) {
                         if message.role == "user" { Spacer() }
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) { retryButton }
+                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
                         if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
-                        if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                        if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
                             if isEditing { cancelButton; doneButton } else { editButton }
                         }
                         if message.role == "assistant" { Spacer() }

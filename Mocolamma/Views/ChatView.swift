@@ -7,7 +7,6 @@ struct ChatView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @EnvironmentObject var chatSettings: ChatSettings
     
-    @State private var isStreaming: Bool = false
     @State private var errorMessage: String?
     @State private var showEmbeddingAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
@@ -31,48 +30,58 @@ struct ChatView: View {
         }
     }
     
+    @ViewBuilder
+    private var content: some View {
+        if serverManager.selectedServer == nil {
+            ContentUnavailableView(
+                "No Server Selected",
+                systemImage: "server.rack",
+                description: Text("Please select a server in the Server tab.")
+            )
+        } else if executor.apiConnectionError {
+            ContentUnavailableView(
+                "Connection Failed",
+                systemImage: "network.slash",
+                description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
+            )
+        } else if executor.chatMessages.isEmpty {
+            ContentUnavailableView {
+                Label("Chat", systemImage: "message.fill")
+            } description: {
+                Text("Here you can perform a simple chat to check the model.")
+            }
+        } else {
+            ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil)
+        }
+    }
+    
+    @ViewBuilder
+    private var inputArea: some View {
+        VStack {
+            Spacer()
+            
+            ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
+                sendMessage()
+            } stopMessage: {
+                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                    executor.updateIsChatStreaming() // 追加
+                }
+                executor.isChatStreaming = false // 追加
+                executor.cancelChatStreaming()
+            }
+        }
+        .padding()
+        .if(horizontalSizeClass != .compact) { view in
+            view.ignoresSafeArea(.container, edges: [.bottom])
+        }
+    }
+    
     var body: some View {
         ZStack {
-            if serverManager.selectedServer == nil {
-                ContentUnavailableView(
-                    "No Server Selected",
-                    systemImage: "server.rack",
-                    description: Text("Please select a server in the Server tab.")
-                )
-            } else if executor.apiConnectionError {
-                ContentUnavailableView(
-                    "Connection Failed",
-                    systemImage: "network.slash",
-                    description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
-                )
-            } else if executor.chatMessages.isEmpty {
-                ContentUnavailableView {
-                    Label("Chat", systemImage: "message.fill")
-                } description: {
-                    Text("Here you can perform a simple chat to check the model.")
-                }
-            } else {
-                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $isStreaming, isModelSelected: chatSettings.selectedModelID != nil)
-            }
-            
-            VStack {
-                Spacer()
-                
-                ChatInputView(inputText: $executor.chatInputText, isStreaming: $isStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
-                    sendMessage()
-                } stopMessage: {
-                    if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                        executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                        executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                    }
-                    isStreaming = false
-                    executor.cancelChatStreaming()
-                }
-            }
-            .padding()
-            .if(horizontalSizeClass != .compact) { view in
-                view.ignoresSafeArea(.container, edges: [.bottom])
-            }
+            content
+            inputArea
         }
         #if os(iOS)
         .onTapGesture {
@@ -218,7 +227,7 @@ struct ChatView: View {
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 executor.clearChat()
-                isStreaming = false
+                executor.isChatStreaming = false
                 errorMessage = nil
             }) {
                 Label("New Chat", systemImage: "square.and.pencil")
@@ -244,7 +253,7 @@ struct ChatView: View {
         }
         guard !executor.chatInputText.isEmpty else { return }
         
-        isStreaming = true
+        executor.isChatStreaming = true
         let userMessage = ChatMessage(role: "user", content: executor.chatInputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         executor.chatInputText = ""
         executor.chatMessages.append(userMessage)
@@ -315,7 +324,7 @@ struct ChatView: View {
                 return
             }
             
-            isStreaming = true
+            executor.isChatStreaming = true
             Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
             
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
@@ -415,7 +424,7 @@ struct ChatView: View {
                 return
             }
             
-            isStreaming = true
+            executor.isChatStreaming = true
             Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
         }
     }
@@ -576,6 +585,6 @@ struct ChatView: View {
                 }
             }
         }
-        await MainActor.run { isStreaming = false }
+        await MainActor.run { executor.isChatStreaming = false }
     }
 }
