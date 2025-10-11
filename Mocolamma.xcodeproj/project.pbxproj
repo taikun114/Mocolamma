@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D44CEC62E9A9E0900C568FC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6D44CEC52E9A9E0900C568FC /* PrivacyInfo.xcprivacy */; };
 		6D66B1FF2E90186800EA3CE6 /* GlassProminentButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66B1CA2E90186800EA3CE6 /* GlassProminentButtonStyle.swift */; };
 		6D66B2002E90186800EA3CE6 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66B1CB2E90186800EA3CE6 /* MarqueeText.swift */; };
 		6D66B2012E90186800EA3CE6 /* NavSubtitleIfAvailable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66B1CC2E90186800EA3CE6 /* NavSubtitleIfAvailable.swift */; };
@@ -73,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6D44CEC52E9A9E0900C568FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6D66B1CA2E90186800EA3CE6 /* GlassProminentButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassProminentButtonStyle.swift; sourceTree = "<group>"; };
 		6D66B1CB2E90186800EA3CE6 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
 		6D66B1CC2E90186800EA3CE6 /* NavSubtitleIfAvailable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavSubtitleIfAvailable.swift; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 				6D66B1D92E90186800EA3CE6 /* Assets.xcassets */,
 				6D66B1DA2E90186800EA3CE6 /* Localizable.xcstrings */,
 				6DD8D3042E92A29B00BA273F /* InfoPlist.strings */,
+				6D44CEC52E9A9E0900C568FC /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -418,6 +421,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D44CEC62E9A9E0900C568FC /* PrivacyInfo.xcprivacy in Resources */,
 				6D66B2262E90186800EA3CE6 /* AppIcon.icon in Resources */,
 				6D66B2272E90186800EA3CE6 /* Assets.xcassets in Resources */,
 				6D66B2282E90186800EA3CE6 /* Localizable.xcstrings in Resources */,
@@ -669,7 +673,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -715,7 +719,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -756,7 +760,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -775,7 +779,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -793,7 +797,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -810,7 +814,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2367;
+				CURRENT_PROJECT_VERSION = 2368;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
