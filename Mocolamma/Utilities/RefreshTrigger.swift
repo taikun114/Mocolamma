@@ -6,5 +6,6 @@ class RefreshTrigger: ObservableObject {
 
     func send() {
         publisher.send(())
+        NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
     }
 }
