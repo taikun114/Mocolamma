@@ -13,6 +13,7 @@ struct ServerFormView: View {
     @State private var serverNameInput: String
     @State private var serverHostInput: String
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
+    @State private var isVerifying = false // 接続確認中の状態を追跡
     @FocusState private var isNameFieldFocused: Bool
     // 編集中のサーバー情報 (追加の場合はnil)
     var editingServer: ServerInfo?
@@ -34,7 +35,7 @@ struct ServerFormView: View {
 
     // 保存/更新ボタンを無効化するための計算プロパティ
     private var isSaveButtonDisabled: Bool {
-        serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isVerifying
     }
 
     var body: some View {
@@ -68,11 +69,28 @@ struct ServerFormView: View {
                             save()
                         }
                     }
+
+                #if os(iOS)
+                if isVerifying {
+                    HStack {
+                        ProgressView()
+                        Text("Connecting...")
+                        Spacer()
+                    }
+                    .padding(.top)
+                }
+                #endif
+
                 Spacer()
             }
 
             #if os(macOS)
-            HStack {
+            HStack(alignment: .center) {
+                if isVerifying {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                    Text("Connecting...")
+                }
                 Spacer()
                 Button("Cancel") { // キャンセルボタン
                     dismiss() // シートを閉じる
@@ -145,9 +163,11 @@ struct ServerFormView: View {
     /// 保存/更新処理
     private func save() {
         Task {
+            isVerifying = true // 接続確認を開始
             let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
             // ホストに接続できることを確認
             let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
+            isVerifying = false // 接続確認を終了
 
             if case .connected = connectionStatus {
                 if let server = editingServer {

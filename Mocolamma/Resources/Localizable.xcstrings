@@ -1035,6 +1035,22 @@
         }
       }
     },
+    "Connecting..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続中…"
+          }
+        }
+      }
+    },
     "Connection Failed" : {
       "localizations" : {
         "en" : {
