@@ -51,12 +51,8 @@ struct ServerFormView: View {
                     .font(.headline)
                 TextField("e.g., Ollama Server", text: $serverNameInput) // 名前入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .focused($isNameFieldFocused)
                     .onSubmit {
-                        // サーバー追加ボタンが無効な場合は何もしない
-                        if !isSaveButtonDisabled {
-                            save()
-                        }
+                        save()
                     }
 
                 Text("Host") // ホストラベル
@@ -64,10 +60,7 @@ struct ServerFormView: View {
                 TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput) // ホスト入力フィールド
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .onSubmit {
-                        // サーバー追加ボタンが無効な場合は何もしない
-                        if !isSaveButtonDisabled {
-                            save()
-                        }
+                        save()
                     }
 
                 #if os(iOS)
@@ -142,10 +135,7 @@ struct ServerFormView: View {
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(action: {
-                    // サーバー追加ボタンが無効な場合は何もしない
-                    if !isSaveButtonDisabled {
-                        save()
-                    }
+                    save()
                 }) {
                     Image(systemName: "checkmark")
                 }
@@ -162,6 +152,8 @@ struct ServerFormView: View {
 
     /// 保存/更新処理
     private func save() {
+        guard !isSaveButtonDisabled else { return } // 保存ボタンが無効の場合は何もしない
+
         Task {
             isVerifying = true // 接続確認を開始
             let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
