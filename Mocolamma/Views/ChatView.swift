@@ -103,7 +103,8 @@ struct ChatView: View {
             }
         }
         .onChange(of: executor.models) { _, newModels in
-            if let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+            // モデルリストが更新された際、リストが空でなければ、選択中のモデルが存在するか確認
+            if !newModels.isEmpty, let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
                 chatSettings.selectedModelID = nil
             }
         }
@@ -181,7 +182,7 @@ struct ChatView: View {
                     if executor.models.isEmpty {
                         Divider()
                         Text(LocalizedStringKey("No models available"))
-                            .tag(UUID() as OllamaModel.ID?) // Assign a unique, non-nil UUID
+                            .tag("no-models-available-tag" as OllamaModel.ID?) // Assign a unique, non-nil String
                             .selectionDisabled(true)
                     }
                 }
@@ -209,7 +210,7 @@ struct ChatView: View {
                 if executor.models.isEmpty {
                     Divider()
                     Text(LocalizedStringKey("No models available"))
-                        .tag(UUID() as OllamaModel.ID?) // Assign a unique, non-nil UUID
+                        .tag("no-models-available-tag" as OllamaModel.ID?) // Assign a unique, non-nil String
                         .selectionDisabled(true)
                 }
             }

@@ -16,7 +16,7 @@ struct OllamaModelDetails: Codable, Hashable {
 
 /// Ollama APIの /api/tags エンドポイントから返される個々のモデル情報を表すデータモデル
 struct OllamaModel: Identifiable, Hashable, Codable {
-    let id = UUID() // テーブルビューで各行を一意に識別するためのID (Codableの対象外)
+    var id: String { digest } // テーブルビューで各行を一意に識別するためのID (Codableの対象外)
     var originalIndex: Int = 0 // 新しく追加: 元のリスト順のインデックス (Codableの対象外)
 
     let name: String
