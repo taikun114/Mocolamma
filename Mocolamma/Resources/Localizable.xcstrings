@@ -2815,6 +2815,22 @@
         }
       }
     },
+    "Not Connected (Timeout)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Connected (Timeout)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続（タイムアウト）"
+          }
+        }
+      }
+    },
     "Not Connected (Unknown Host)" : {
       "localizations" : {
         "en" : {

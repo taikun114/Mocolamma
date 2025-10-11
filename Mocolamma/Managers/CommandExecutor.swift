@@ -434,6 +434,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 }
             } catch let error as URLError {
                 print("\(host) への接続確認エラー: \(error.localizedDescription)")
+                // タイムアウトエラーのチェック
+                if error.code == .timedOut {
+                    return .timedOut
+                }
                 // TLSエラーのチェック
                 if scheme == "https" && (
                     error.code == .secureConnectionFailed ||

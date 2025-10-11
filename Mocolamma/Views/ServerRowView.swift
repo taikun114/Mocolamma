@@ -44,7 +44,7 @@ struct ServerRowView: View {
                                 .fill(Color.green)
                         }
                     }
-                case .notConnected, .unknownHost:
+                case .notConnected, .unknownHost, .timedOut:
                     ZStack {
                         if differentiateWithoutColor {
                             Image(systemName: "xmark")

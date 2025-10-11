@@ -107,6 +107,22 @@ struct ServerInspectorView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
+                case .timedOut:
+                    HStack(spacing: 4) {
+                        if differentiateWithoutColor {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: indicatorSize, height: indicatorSize)
+                                .foregroundColor(.red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle().fill(.red).frame(width: indicatorSize, height: indicatorSize)
+                        }
+                        Text("Not Connected (Timeout)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
                 case .checking, .none:
                     HStack(spacing: 4) {
                         if differentiateWithoutColor {

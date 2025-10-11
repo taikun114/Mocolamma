@@ -7,6 +7,7 @@ enum ServerConnectionStatus {
     case notConnected(statusCode: Int)
     case errorWithMessage(statusCode: Int, errorMessage: String?)
     case unknownHost
+    case timedOut // タイムアウト
     case checking
 }
 
