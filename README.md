@@ -64,13 +64,16 @@ I wanted it to be easy to read and remember, while having a meaningful name, so 
 
 ### Download
 #### macOS Version
-Mocolamma can be downloaded for free from the [**releases page**](https://github.com/taikun114/Mocolamma/releases/latest), or purchased for $2.99 on the Mac App Store (App Store link is coming soon).
+Mocolamma can be downloaded for free from the [**releases page**](https://github.com/taikun114/Mocolamma/releases/latest), or purchased for $1.99 on the Mac App Store (App Store link is currently under preparation).
 
 #### iOS / iPadOS Version
-Mocolamma can be purchased for $0.99 on the App Store (App Store link is coming soon). Due to iOS / iPadOS / visionOS restrictions that prevent free installation from external sources, this pricing model is necessary.
+Mocolamma can be purchased for $1.99 on the App Store (App Store link is currently under preparation).
+
+> [!TIP]
+> Purchasing Mocolamma on the App Store for macOS, iOS / iPadOS, or visionOS will enable access from all platforms with a single purchase!
 
 > [!NOTE]
-> App Store prices may vary by country and could be automatically adjusted due to exchange rates. These prices are based on the Japanese yen prices of 500 yen for macOS and 120 yen for iOS / iPadOS / visionOS, but actual prices may differ depending on your region.
+> App Store prices may vary by country and could be automatically adjusted due to exchange rates. These prices are based on the Japanese yen prices of 250 yen for macOS and 250 yen for iOS / iPadOS / visionOS, but actual prices may differ depending on your region.
 
 ### System Requirements
 Mocolamma supports **Intel-based Macs** and **Apple Silicon Macs** running **macOS Sonoma (14.0) or later**, and **iPhones and iPads** running **iOS / iPadOS 17.0 or later**, as well as **Apple Vision Pro** running **visionOS 2.0 or later** as an iPad app.
@@ -81,13 +84,13 @@ Mocolamma supports **Intel-based Macs** and **Apple Silicon Macs** running **mac
 > Mocolamma's development settings should support visionOS 1.X as well, so I believe Mocolamma can be installed on visionOS 1.X, but since I haven't been able to test on the simulator, even if installation is successful, there's a possibility it may not work correctly.
 
 ### Differences between free and paid versions
-Mocolamma has both a free version (GitHub version) and a paid version (App Store version), but both have almost identical functionality. **The only difference is the availability of automatic updates.**\
+Mocolamma has both a free version (GitHub version, macOS only) and a paid version (App Store version), but both have almost identical functionality. **The only difference is the availability of automatic updates.**\
 The paid version can automatically update and install using App Store functionality, while the free version currently lacks update check and installation features (meaning the app's functionality is entirely unchanged!).
 
 I would appreciate it if you purchase from the App Store, but feel free to download for free first, and if you find it very useful, please consider purchasing or [**donating**](#donate)! 
 
 ## Features
-Mocolamma can connect to Ollama servers on local or external networks to manage models and perform simple chats using the models.
+Mocolamma can connect to Ollama servers on networks to manage models and perform simple chats using the models.
 
 ### Server Tab
 ![Server Tab](docs/images/Server-Tab.webp)
@@ -118,7 +121,7 @@ To make bug tracking easier, please open one Issue per issue if you want to repo
 
 ### Feedback
 If you want to submit bug reports, idea sharing, or messages to the developer (me) as someone without a GitHub account, please click [**this link**](mailto:contact.taikun@gmail.com?subject=Mocolamma%20Feedback%3A%20&body=Please%20describe%20the%20feedback%20in%20detail%3A%0D%0A%0D%0ASystem%20Information%3A%0D%0A%0D%0A-%20System%0D%0APlease%20enter%20the%20model%20of%20your%20Mac%20%2F%20iPhone%20%2F%20iPad%20%2F%20Apple%20Vision%20Pro.%0D%0A%0D%0A-%20OS%20Version%0D%0AIf%20you%20are%20experiencing%20problems%2C%20please%20enter%20the%20version%20of%20macOS%20%2F%20iOS%20%2F%20iPadOS%20%2F%20visionOS%20on%20which%20Mocolamma%20is%20running.%0D%0A%0D%0A-%20App%20Version%0D%0AIf%20you%20are%20experiencing%20problems%2C%20please%20enter%20the%20version%20of%20the%20app.%0D%0A%0D%0A) or send an email through the "Send Feedback" button on the about screen (accessed from "About Mocolamma" on macOS, or from the information button in the settings tab on iOS / iPadOS / visionOS) (please note that I may not be able to reply to all messages).\
-Opening the email sending screen from the in-app button will pre-fill necessary information such as system information (model ID, CPU architecture type, OS version information) and app version information, so I recommend sending from there.
+Opening the email sending screen from the in-app button will pre-fill necessary information such as system information (device model and OS version) and app version information, so I recommend sending from there.
 
 ### Community
 A [**Discussions page**](https://github.com/taikun114/Mocolamma/discussions) is available where you can share new features you'd like added to the app, ask questions about potential issues, or exchange opinions with others.\
