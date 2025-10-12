@@ -73,7 +73,7 @@ Mocolamma can be purchased for $1.99 on the App Store (App Store link is current
 > Purchasing Mocolamma on the App Store for macOS, iOS / iPadOS, or visionOS will enable access from all platforms with a single purchase!
 
 > [!NOTE]
-> App Store prices may vary by country and could be automatically adjusted due to exchange rates. These prices are based on the Japanese yen prices of 250 yen for macOS and 250 yen for iOS / iPadOS / visionOS, but actual prices may differ depending on your region.
+> App Store prices may vary by region and could be automatically adjusted due to exchange rates. These prices are based on the Japanese yen prices of 250 yen for macOS and 250 yen for iOS / iPadOS / visionOS, but actual prices may differ depending on your region.
 
 ### System Requirements
 Mocolamma supports **Intel-based Macs** and **Apple Silicon Macs** running **macOS Sonoma (14.0) or later**, and **iPhones and iPads** running **iOS / iPadOS 17.0 or later**, as well as **Apple Vision Pro** running **visionOS 2.0 or later** as an iPad app.
