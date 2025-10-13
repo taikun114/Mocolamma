@@ -53,10 +53,11 @@
 ## What is Mocolamma?
 ![Introduction](docs/images/Introduction.webp)
 
-Mocolamma is an Ollama management application for macOS and iOS / iPadOS that connects to Ollama servers to manage models and perform chat tests using models stored on the Ollama server.
+Mocolamma is an [**Ollama**](https://github.com/ollama/ollama) management application for macOS and iOS / iPadOS that connects to Ollama servers to manage models and perform chat tests using models stored on the Ollama server.
 
 > [!NOTE]
-> Generative AI was used in the development of Mocolamma. Therefore, the code might not follow best practices or may contain unstable code.
+> Generative AI was used in the development of Mocolamma. Therefore, the code might not follow best practices or may contain unstable code.\
+> Mocolamma is an unofficial app for Ollama and is not affiliated with Ollama in any way.
 
 ### Origin of the name
 The name "Mocolamma" is a coined word combining "**Mo**del", "**Co**ntrol", "Ol**lam**a", and "**Ma**nage".\

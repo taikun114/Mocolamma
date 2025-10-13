@@ -53,10 +53,11 @@
 ## Mocolammaとは？
 ![紹介](images/Introduction-ja.webp)
 
-Mocolammaは、macOSおよびiOS / iPadOS用のOllama管理アプリケーションで、Ollamaサーバーに接続してモデルを管理したり、Ollamaサーバーに保存されているモデルを使ってチャットのテストを行ったりすることができます。
+Mocolammaは、macOSおよびiOS / iPadOS用の[**Ollama**](https://github.com/ollama/ollama)管理アプリケーションで、Ollamaサーバーに接続してモデルを管理したり、Ollamaサーバーに保存されているモデルを使ってチャットのテストを行ったりすることができます。
 
 > [!NOTE]
-> Mocolammaの開発には生成AIが活用されました。そのため、ベストプラクティスに沿っていなかったり、不安定なコードが含まれていたりする可能性があります。
+> Mocolammaの開発には生成AIが活用されました。そのため、ベストプラクティスに沿っていなかったり、不安定なコードが含まれていたりする可能性があります。\
+> MocolammaはOllamaの非公式アプリであり、Ollamaとは一切関係がありません。
 
 ### 名前の由来
 「Mocolamma」の由来は、「**Mo**del」「**Co**ntrol」「Ol**lam**a」「**Ma**nage」を組み合わせた造語です。\
