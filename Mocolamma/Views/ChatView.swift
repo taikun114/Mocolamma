@@ -103,8 +103,9 @@ struct ChatView: View {
             }
         }
         .onChange(of: executor.models) { _, newModels in
-            // モデルリストが更新された際、リストが空でなければ、選択中のモデルが存在するか確認
-            if !newModels.isEmpty, let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+            // モデルリストが更新された際、選択中のモデルが新しいリストに存在するか確認
+            if let currentSelectedModelID = chatSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+                // 存在しない場合は選択を解除
                 chatSettings.selectedModelID = nil
             }
         }
