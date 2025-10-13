@@ -47,7 +47,18 @@ struct MessageInputView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
-                    .onKeyPress(KeyEquivalent.return) {
+                    .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
+                        #if os(macOS)
+                        if !isStreaming {
+                            sendMessage()
+                        }
+                        #else
+                        if !isStreaming {
+                            sendMessage()
+                        }
+                        #endif
+                    }
+                    .onKeyPress(KeyEquivalent.return) { // Enterキー押下時の処理（Shift+Enterでの改行用）
                         #if os(macOS)
                         if NSEvent.modifierFlags.contains(.shift) {
                             inputText += "\n"
@@ -55,8 +66,8 @@ struct MessageInputView: View {
                         } else if isStreaming {
                             return .handled
                         } else {
-                            sendMessage()
-                            return .handled
+                            // onSubmitに任せる
+                            return .ignored
                         }
                         #else
                         if isStreaming {
