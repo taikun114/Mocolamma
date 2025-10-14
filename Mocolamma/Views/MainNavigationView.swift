@@ -27,7 +27,7 @@ struct MainNavigationView: View {
                 #endif
             }
             .navigationTitle("Menu")
-            .navigationSplitViewColumnWidth(min: 150, ideal: 250, max: 500)
+            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250) // サイドバーの幅
         } detail: {
             MainContentDetailView(
                 sidebarSelection: $sidebarSelection,
@@ -51,7 +51,7 @@ struct MainNavigationView: View {
                 serverManager: serverManager,
                 showingInspector: $showingInspector
             )
-            .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+            .inspectorColumnWidth(min: 250, ideal: 250, max: 300) // インスペクタの幅
         }
     }
 }

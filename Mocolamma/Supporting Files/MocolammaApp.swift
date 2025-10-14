@@ -70,7 +70,7 @@ struct MocolammaApp: App {
                 isPulling: $isPulling
             )
             #if os(macOS)
-                .frame(minWidth: 500, minHeight: 300)
+                .frame(minWidth: 1000, minHeight: 500)
             #endif
                 .environmentObject(appRefreshTrigger)
                 .onAppear {
