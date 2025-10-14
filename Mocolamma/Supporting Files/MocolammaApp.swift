@@ -25,6 +25,7 @@ struct MocolammaApp: App {
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
+    @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
     @State private var showingAddModelsSheet = false
@@ -72,6 +73,9 @@ struct MocolammaApp: App {
                 .frame(minWidth: 500, minHeight: 300)
             #endif
                 .environmentObject(appRefreshTrigger)
+                .onAppear {
+                    localNetworkChecker.refresh()
+                }
                 .sheet(isPresented: $showingAboutSheet) {
                     AboutView()
                 }
