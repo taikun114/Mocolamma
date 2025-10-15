@@ -10,7 +10,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " %1$.1f%% completed (%2$@ / %3$@)"
+            "value" : "%1$.1f%% completed (%2$@ / %3$@)"
           }
         },
         "ja" : {
