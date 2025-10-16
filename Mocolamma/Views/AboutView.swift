@@ -55,16 +55,17 @@ struct AboutView: View {
                         Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 128, height: 128)
+                            .frame(width: 96, height: 96)
+                            .padding(8)
                             .padding(.trailing, -10)
                             .id(colorScheme)
                         #else
                         Image("AppIconLiquidGlass")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 128, height: 128)
-                            .padding(-8)
-                            .padding(.trailing, -10)
+                            .frame(width: 96, height: 96)
+                            .padding(8)
+                            .padding(.trailing, -8)
                             .id(colorScheme)
                         #endif
                     } else {
@@ -77,8 +78,8 @@ struct AboutView: View {
                         Image("AppIconLiquidGlass")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 128, height: 128)
-                            .padding(-8)
+                            .frame(width: 96, height: 96)
+                            .padding(.trailing, -4)
                             .id(colorScheme)
                         #endif
                     }
