@@ -22,8 +22,6 @@ struct AboutView: View {
     @State private var showingBugReportAlert = false
     @State private var showingCommunityAlert = false
     @State private var showingGitHubStarAlert = false
-    @State private var showingBuyMeACoffeeAlert = false
-    @State private var showingPayPalAlert = false
     @State private var showingLicenseInfoModal = false
 
     var body: some View {
@@ -393,131 +391,7 @@ struct AboutView: View {
                 }
                 #endif
 
-                #if os(iOS)
-                VStack(alignment: .leading, spacing: 8) {
-                    VStack(alignment: .leading) {
-                        Text("Buy Me Green Tea")
-                            .font(.body)
-                        Text("You can support me at Buy Me a Coffee from the price of a cup of green tea.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Button(action: { showingBuyMeACoffeeAlert = true }) {
-                        HStack {
-                            Image(systemName: "cup.and.saucer")
-                            Text("Buy Green Tea")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .help("Open link to the Buy Me a Coffee page.")
-                    .alert("Open Link?", isPresented: $showingBuyMeACoffeeAlert) {
-                        Button("Open") {
-                            if let url = URL(string: "https://www.buymeacoffee.com/i_am_taikun") {
-                                openURL(url)
-                            }
-                        }
-                        .keyboardShortcut(.defaultAction)
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Are you sure you want to open the Buy Me a Coffee page?")
-                    }
-                }
-                .padding(.vertical, 4)
-                #else
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading) {
-                        Text("Buy Me Green Tea")
-                            .font(.body)
-                        Text("You can support me at Buy Me a Coffee from the price of a cup of green tea.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Button(action: { showingBuyMeACoffeeAlert = true }) {
-                        HStack {
-                            Image(systemName: "cup.and.saucer")
-                            Text("Buy Green Tea")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .help("Open link to the Buy Me a Coffee page.")
-                    .alert("Open Link?", isPresented: $showingBuyMeACoffeeAlert) {
-                        Button("Open") {
-                            if let url = URL(string: "https://www.buymeacoffee.com/i_am_taikun") {
-                                openURL(url)
-                            }
-                        }
-                        .keyboardShortcut(.defaultAction)
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Are you sure you want to open the Buy Me a Coffee page?")
-                    }
-                }
-                #endif
 
-                #if os(iOS)
-                VStack(alignment: .leading, spacing: 8) {
-                    VStack(alignment: .leading) {
-                        Text("Donate at PayPal")
-                            .font(.body)
-                        Text("You can also donate directly at PayPal.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Button(action: { showingPayPalAlert = true }) {
-                        HStack {
-                            Image(systemName: "creditcard")
-                            Text("Donate at PayPal")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .help("Open link to the PayPal.Me.")
-                    .alert("Open Link?", isPresented: $showingPayPalAlert) {
-                        Button("Open") {
-                            if let url = URL(string: "https://paypal.me/taikun114") {
-                                openURL(url)
-                            }
-                        }
-                        .keyboardShortcut(.defaultAction)
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Are you sure you want to open the PayPal.Me page?")
-                    }
-                }
-                .padding(.vertical, 4)
-                #else
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading) {
-                        Text("Donate at PayPal")
-                            .font(.body)
-                        Text("You can also donate directly at PayPal.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Button(action: { showingPayPalAlert = true }) {
-                        HStack {
-                            Image(systemName: "creditcard")
-                            Text("Donate at PayPal")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .help("Open link to the PayPal.Me.")
-                    .alert("Open Link?", isPresented: $showingPayPalAlert) {
-                        Button("Open") {
-                            if let url = URL(string: "https://paypal.me/taikun114") {
-                                openURL(url)
-                            }
-                        }
-                        .keyboardShortcut(.defaultAction)
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Are you sure you want to open the PayPal.Me page?")
-                    }
-                }
-                #endif
             }
         }
         .formStyle(.grouped)

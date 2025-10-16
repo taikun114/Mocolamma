@@ -533,22 +533,6 @@
         }
       }
     },
-    "Are you sure you want to open the Buy Me a Coffee page?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to open the Buy Me a Coffee page?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
-          }
-        }
-      }
-    },
     "Are you sure you want to open the CompactSlider GitHub page?" : {
       "localizations" : {
         "en" : {
@@ -742,22 +726,6 @@
         }
       }
     },
-    "Are you sure you want to open the PayPal.Me page?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to open the PayPal.Me page?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPal.Meのページを開いてもよろしいですか？"
-          }
-        }
-      }
-    },
     "Are you sure you want to open the Qwen Code GitHub page?" : {
       "localizations" : {
         "en" : {
@@ -818,38 +786,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "質問や意見交換などを行いましょう"
-          }
-        }
-      }
-    },
-    "Buy Green Tea" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Green Tea"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "緑茶を奢る"
-          }
-        }
-      }
-    },
-    "Buy Me Green Tea" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me Green Tea"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "緑茶を買ってあげる"
           }
         }
       }
@@ -1472,22 +1408,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダイジェスト:"
-          }
-        }
-      }
-    },
-    "Donate at PayPal" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donate at PayPal"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPalで寄付"
           }
         }
       }
@@ -2982,22 +2902,6 @@
         }
       }
     },
-    "Open link to the Buy Me a Coffee page." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open link to the Buy Me a Coffee page."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeページへのリンクを開きます。"
-          }
-        }
-      }
-    },
     "Open link to the CompactSlider GitHub page." : {
       "localizations" : {
         "en" : {
@@ -3122,22 +3026,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "opencodeのGitHubページへのリンクを開きます。"
-          }
-        }
-      }
-    },
-    "Open link to the PayPal.Me." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open link to the PayPal.Me."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPal.Meのリンクを開きます。"
           }
         }
       }
@@ -4313,38 +4201,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VRAMサイズ: %@"
-          }
-        }
-      }
-    },
-    "You can also donate directly at PayPal." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can also donate directly at PayPal."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPalで直接寄付していただくこともできます。"
-          }
-        }
-      }
-    },
-    "You can support me at Buy Me a Coffee from the price of a cup of green tea." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can support me at Buy Me a Coffee from the price of a cup of green tea."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
           }
         }
       }
