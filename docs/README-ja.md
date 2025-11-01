@@ -65,10 +65,10 @@ Mocolammaは、macOSおよびiOS / iPadOS用の[**Ollama**](https://github.com/o
 
 ### ダウンロード
 #### macOS版
-Mocolammaは[**リリースページ**](https://github.com/taikun114/Mocolamma/releases/latest)から無料でダウンロードするか、**Mac App Storeから250円で購入する**ことができます（App Storeのリンクは現在準備中です）。
+Mocolammaは[**リリースページ**](https://github.com/taikun114/Mocolamma/releases/latest)から無料でダウンロードするか、[**Mac App Store**](https://apps.apple.com/jp/app/mocolamma/id6753896649)から250円で購入することができます。
 
 #### iOS / iPadOS版
-Mocolammaは**App Storeから250円で購入する**ことができます（App Storeのリンクは現在準備中です）。
+Mocolammaは[**App Store**](https://apps.apple.com/jp/app/mocolamma/id6753896649)から250円で購入することができます。
 
 > [!TIP]
 > macOSまたはiOS / iPadOS、visionOSのいずれかのApp StoreでMocolammaを購入すると、一度の購入ですべてのプラットフォームから利用可能になります！
@@ -83,7 +83,8 @@ Mocolammaは、**macOS Sonoma（14.0）またはそれ以降**がインストー
 
 ### 無料版と有料版の違い
 Mocolammaには無料版（GitHub版、Macのみ）と有料版（App Store版）がありますが、どちらもほとんど機能の違いはありません。**唯一の違いは自動アップデート機能の有無**です。\
-有料版ではApp Storeの機能でアップデートとインストールを自動で行うことができますが、無料版では今のところアップデート確認機能とインストール機能は搭載されていません（つまり、アプリの機能としては何一つ変わりません！）。
+有料版ではApp Storeの機能でアップデートとインストールを自動で行うことができますが、無料版では今のところアップデート確認機能とインストール機能は搭載されていません（つまり、アプリの機能としては何一つ変わりません！）。\
+また、App Store版は、Appleの審査を通るために、アプリについての画面から寄付リンクが削除されています。それ以外の違いは全くありません！
 
 私としてはApp Storeから購入してくださるとありがたいですが、まずは無料でダウンロードしてみて、とても便利だと思ったら購入したり[**寄付**](#寄付)したりしてくださると大変嬉しいです！
 
