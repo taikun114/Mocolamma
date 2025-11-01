@@ -380,32 +380,32 @@ struct MessageView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(.background.secondary.opacity(0.7))
-                     .cornerRadius(8)
-                     .onKeyPress(KeyEquivalent.return) {
-                         #if os(macOS)
-                         if NSEvent.modifierFlags.contains(.command) {
-                             Task { @MainActor in
-                                 isEditing = false
-                                 message.fixedContent = message.content
-                                 message.pendingContent = ""
-                                 onRetry?(message.id, message)
-                             }
-                             return .handled
-                         } else {
-                             Task { @MainActor in
-                                 message.content += "\n"
-                             }
-                             return .handled
-                         }
-                         #else
-                         Task { @MainActor in
-                             message.content += "\n"
-                         }
-                         return .handled
-                         #endif
-                     }
-             }
-         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+                    .cornerRadius(8)
+                    .onKeyPress(KeyEquivalent.return) {
+#if os(macOS)
+                        if NSEvent.modifierFlags.contains(.command) {
+                            Task { @MainActor in
+                                isEditing = false
+                                message.fixedContent = message.content
+                                message.pendingContent = ""
+                                onRetry?(message.id, message)
+                            }
+                            return .handled
+                        } else {
+                            // Commandキーが押されていない場合はonSubmitに処理を委譲
+                            return .ignored
+                        }
+#else
+                        // iOSではonKeyPressを削除し、onSubmitに処理を委譲
+                        return .ignored
+#endif
+                    }
+                    .onSubmit { // onSubmitで改行を挿入するように変更
+                        // 変換確定後にEnterが押されたら改行を挿入
+                        message.content += "\n"
+                    }
+              }
+          } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
