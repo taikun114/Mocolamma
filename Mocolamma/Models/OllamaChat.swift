@@ -4,7 +4,7 @@ import Foundation
 // MARK: - チャットAPI リクエスト/レスポンス モデル
 
 /// チャット会話における単一のメッセージを表します。
-class ChatMessage: ObservableObject, Identifiable, Codable {
+class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     let id = UUID()
     @Published var role: String
     @Published var content: String
@@ -108,6 +108,10 @@ class ChatMessage: ObservableObject, Identifiable, Codable {
         self.pendingContent = ""
         self.fixedThinking = thinking ?? ""
         self.pendingThinking = ""
+    }
+
+    static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
+        lhs.id == rhs.id
     }
 }
 
