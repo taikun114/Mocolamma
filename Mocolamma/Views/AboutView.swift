@@ -73,7 +73,8 @@ struct AboutView: View {
                         Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 96, height: 96)
+                            .frame(width: 128, height: 128)
+                            .padding(.trailing, -10)
                         #else
                         Image("AppIconLiquidGlass")
                             .resizable()
