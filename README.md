@@ -65,10 +65,10 @@ I wanted it to be easy to read and remember, while having a meaningful name, so 
 
 ### Download
 #### macOS Version
-Mocolamma can be downloaded for free from the [**releases page**](https://github.com/taikun114/Mocolamma/releases/latest), or purchased for $1.99 on the Mac App Store (App Store link is currently under preparation).
+Mocolamma can be downloaded for free from the [**releases page**](https://github.com/taikun114/Mocolamma/releases/latest), or purchased for $1.99 on the [**Mac App Store**](https://apps.apple.com/us/app/mocolamma/id6753896649).
 
 #### iOS / iPadOS Version
-Mocolamma can be purchased for $1.99 on the App Store (App Store link is currently under preparation).
+Mocolamma can be purchased for $1.99 on the [**App Store**](https://apps.apple.com/us/app/mocolamma/id6753896649).
 
 > [!TIP]
 > Purchasing Mocolamma on the App Store for macOS, iOS / iPadOS, or visionOS will enable access from all platforms with a single purchase!
@@ -86,7 +86,8 @@ Mocolamma supports **Intel-based Macs** and **Apple Silicon Macs** running **mac
 
 ### Differences between free and paid versions
 Mocolamma has both a free version (GitHub version, macOS only) and a paid version (App Store version), but both have almost identical functionality. **The only difference is the availability of automatic updates.**\
-The paid version can automatically update and install using App Store functionality, while the free version currently lacks update check and installation features (meaning the app's functionality is entirely unchanged!).
+The paid version can automatically update and install using App Store functionality, while the free version currently lacks update check and installation features (meaning the app's functionality is entirely unchanged!).\
+Additionally, the App Store version has had the donation link removed from the about the app screen to pass Apple's review process. There are absolutely no other differences!
 
 I would appreciate it if you purchase from the App Store, but feel free to download for free first, and if you find it very useful, please consider purchasing or [**donating**](#donate)! 
 

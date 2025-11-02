@@ -20,6 +20,14 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.0.2
+### Bug Fixes and Improvements
+- **Fix issue where the icon size for the about this app screen was incorrect on macOS Sequoia or earlier**
+- **Fix issue where the model list did not display correctly when models with the same digest as the `latest` tag existed simultaneously**
+- **Fix issue that text conversion couldn't be confirmed while typing in languages requiring text conversion within the message edit field on the chat screen**
+- **Improve chat screen to automatically scroll after sending a message**
+- **Improve the size of the chat send button on iOS / iPadOS versions**
+
 ## 1.0.1
 ### Bug Fixes and Improvements
 - **Fix issue where opening the inspector at small window sizes caused layout issues or crashes**
