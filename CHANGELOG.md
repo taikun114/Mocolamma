@@ -20,7 +20,7 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.0.2 (under development)
+## 1.0.2
 ### Bug Fixes and Improvements
 - **Fix issue where the icon size for the about this app screen was incorrect on macOS Sequoia or earlier**
 - **Fix issue where the model list did not display correctly when models with the same digest as the `latest` tag existed simultaneously**
