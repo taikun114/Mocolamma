@@ -20,9 +20,9 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.0.3 (under development)
+## 1.0.3
 ### New Features
-- **Add French localization by generated AI**
+- **Add French localization by generative AI**
   - Since I have no knowledge of French, the translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
 ### Bug Fixes and Improvements
