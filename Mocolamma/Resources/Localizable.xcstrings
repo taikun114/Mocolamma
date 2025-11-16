@@ -18,6 +18,12 @@
             "state" : "translated",
             "value" : "%1$.1f%% 完了 (%2$@ / %3$@)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% terminé (%2$@ / %3$@)"
+          }
         }
       }
     },
@@ -38,6 +44,12 @@
             "state" : "translated",
             "value" : "*接続できませんでした*"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Impossible de se connecter*"
+          }
         }
       }
     },
@@ -55,6 +67,12 @@
             "state" : "translated",
             "value" : "*メッセージがありません*"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Aucun message*"
+          }
         }
       }
     },
@@ -70,6 +88,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@、%2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
           }
         }
       },
@@ -88,6 +112,12 @@
             "state" : "translated",
             "value" : "%1$@, %2$lld B"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld o"
+          }
         }
       },
       "shouldTranslate" : false
@@ -105,6 +135,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@/s、残り時間: %2$02d:%3$02d"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s, Temps restant : %2$02d:%3$02d"
           }
         }
       }
@@ -144,6 +180,24 @@
               }
             }
           }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Jeton"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Jetons"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -172,6 +226,12 @@
             "state" : "translated",
             "value" : "1分"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 min"
+          }
         }
       }
     },
@@ -188,6 +248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "5分"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 min"
           }
         }
       }
@@ -206,6 +272,12 @@
             "state" : "translated",
             "value" : "30秒"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 sec"
+          }
         }
       }
     },
@@ -222,6 +294,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mocolammaについて"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de Mocolamma"
           }
         }
       }
@@ -240,6 +318,12 @@
             "state" : "translated",
             "value" : "Mocolammaについて…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de Mocolamma…"
+          }
         }
       }
     },
@@ -256,6 +340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "謝辞"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remerciements"
           }
         }
       }
@@ -274,6 +364,12 @@
             "state" : "translated",
             "value" : "追加"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter"
+          }
         }
       }
     },
@@ -290,6 +386,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま追加"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter quand même"
           }
         }
       }
@@ -308,6 +410,12 @@
             "state" : "translated",
             "value" : "モデルを追加"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un modèle"
+          }
         }
       }
     },
@@ -324,6 +432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルを追加…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un modèle…"
           }
         }
       }
@@ -342,6 +456,12 @@
             "state" : "translated",
             "value" : "新規追加"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter"
+          }
         }
       }
     },
@@ -358,6 +478,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバーを追加"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un serveur"
           }
         }
       }
@@ -376,6 +502,12 @@
             "state" : "translated",
             "value" : "サーバーを追加…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un serveur…"
+          }
         }
       }
     },
@@ -392,6 +524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "許可済み"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisé"
           }
         }
       }
@@ -410,6 +548,12 @@
             "state" : "translated",
             "value" : "APIデコードエラー:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de décodage de l'API :"
+          }
         }
       }
     },
@@ -426,6 +570,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "APIエラー: HTTPステータスコード %d"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur API : Code d'état HTTP %d"
           }
         }
       }
@@ -444,6 +594,12 @@
             "state" : "translated",
             "value" : "APIエラー: 不明なレスポンスタイプです。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur API : Type de réponse inconnu."
+          }
         }
       }
     },
@@ -460,6 +616,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "APIリクエストエラー:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de requête API :"
           }
         }
       }
@@ -478,6 +640,12 @@
             "state" : "translated",
             "value" : "APIタイムアウト"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Délai d'attente de l'API"
+          }
         }
       }
     },
@@ -494,6 +662,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer le modèle « %@ » ?\nCette action est irréversible."
           }
         }
       }
@@ -512,6 +686,12 @@
             "state" : "translated",
             "value" : "選択されたモデルを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer le modèle sélectionné ?\nCette action est irréversible."
+          }
         }
       }
     },
@@ -529,6 +709,12 @@
             "state" : "translated",
             "value" : "選択されたサーバーを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer le serveur sélectionné ?\nCette action est irréversible."
+          }
         }
       }
     },
@@ -538,13 +724,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete the server “%@”?\nThis action cannot be undone."
+            "value" : "Are you sure you want to delete the server \"%@\"?\nThis action cannot be undone."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer le serveur « %@ » ?\nCette action est irréversible."
           }
         }
       }
@@ -563,6 +755,12 @@
             "state" : "translated",
             "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page Buy Me a Coffee ?"
+          }
         }
       }
     },
@@ -579,6 +777,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CompactSliderのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de CompactSlider ?"
           }
         }
       }
@@ -597,6 +801,12 @@
             "state" : "translated",
             "value" : "create-dmgのGitHubページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de create-dmg ?"
+          }
         }
       }
     },
@@ -613,6 +823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubのDiscussionページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page de discussion sur GitHub ?"
           }
         }
       }
@@ -631,6 +847,12 @@
             "state" : "translated",
             "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de Gemini CLI ?"
+          }
         }
       }
     },
@@ -647,6 +869,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubの貢献者ページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page des contributeurs GitHub ?"
           }
         }
       }
@@ -665,6 +893,12 @@
             "state" : "translated",
             "value" : "GitHubのリポジトリページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page du dépôt GitHub ?"
+          }
         }
       }
     },
@@ -681,6 +915,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubのIssueページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page des problèmes sur GitHub ?"
           }
         }
       }
@@ -699,6 +939,12 @@
             "state" : "translated",
             "value" : "MarkdownUIのGitHubページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de MarkdownUI ?"
+          }
         }
       }
     },
@@ -715,6 +961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OllamaのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub d'Ollama ?"
           }
         }
       }
@@ -733,6 +985,12 @@
             "state" : "translated",
             "value" : "Ollamaのモデルページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page des modèles Ollama ?"
+          }
         }
       }
     },
@@ -749,6 +1007,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "opencodeのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub d'opencode ?"
           }
         }
       }
@@ -767,6 +1031,12 @@
             "state" : "translated",
             "value" : "ライセンス情報が記載されたページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page contenant les informations de licence ?"
+          }
         }
       }
     },
@@ -783,6 +1053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PayPal.Meのページを開いてもよろしいですか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page PayPal.Me ?"
           }
         }
       }
@@ -801,6 +1077,12 @@
             "state" : "translated",
             "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de Qwen Code ?"
+          }
         }
       }
     },
@@ -818,6 +1100,12 @@
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la fenêtre d'envoi d'e-mail de commentaires ?"
+          }
         }
       }
     },
@@ -833,6 +1121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "昇順"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Croissant"
           }
         }
       }
@@ -851,6 +1145,12 @@
             "state" : "translated",
             "value" : "質問や意見交換などを行いましょう"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posez des questions et partagez vos opinions"
+          }
         }
       }
     },
@@ -867,6 +1167,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "緑茶を奢る"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offrir un thé vert"
           }
         }
       }
@@ -885,6 +1191,12 @@
             "state" : "translated",
             "value" : "緑茶を買ってあげる"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offrez-moi un thé vert"
+          }
         }
       }
     },
@@ -901,6 +1213,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キャンセル"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
           }
         }
       }
@@ -919,6 +1237,12 @@
             "state" : "translated",
             "value" : "編集をキャンセルする"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler la modification."
+          }
         }
       }
     },
@@ -935,6 +1259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "チャット"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
           }
         }
       }
@@ -953,6 +1283,12 @@
             "state" : "translated",
             "value" : "チャット設定"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres du chat"
+          }
         }
       }
     },
@@ -969,6 +1305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認中…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification…"
           }
         }
       }
@@ -987,6 +1329,12 @@
             "state" : "translated",
             "value" : "閉じる"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
         }
       }
     },
@@ -1003,6 +1351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コミュニティ"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Communauté"
           }
         }
       }
@@ -1024,6 +1378,12 @@
             "state" : "translated",
             "value" : "編集を完了してやり直します。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer la modification et réessayer."
+          }
         }
       }
     },
@@ -1040,6 +1400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了しました"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
           }
         }
       }
@@ -1058,6 +1424,12 @@
             "state" : "translated",
             "value" : "コンプリーション"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complétion"
+          }
         }
       }
     },
@@ -1074,6 +1446,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続済み"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecté"
           }
         }
       }
@@ -1092,6 +1470,12 @@
             "state" : "translated",
             "value" : "接続中…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connexion en cours…"
+          }
         }
       }
     },
@@ -1108,6 +1492,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続に失敗しました"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la connexion"
           }
         }
       }
@@ -1126,6 +1516,12 @@
             "state" : "translated",
             "value" : "APIに接続できませんでした。\nホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de se connecter à l'API.\nVeuillez vérifier si l'hôte est correct et si le serveur Ollama est en cours d'exécution."
+          }
         }
       }
     },
@@ -1142,6 +1538,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "接続エラー"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de connexion"
           }
         }
       }
@@ -1160,6 +1562,12 @@
             "state" : "translated",
             "value" : "コンテキスト長:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longueur du contexte :"
+          }
         }
       }
     },
@@ -1176,6 +1584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コンテキストウィンドウ"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtre de contexte"
           }
         }
       }
@@ -1194,6 +1608,12 @@
             "state" : "translated",
             "value" : "貢献者"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributeurs"
+          }
         }
       }
     },
@@ -1210,6 +1630,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開発に携わった貢献者"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributeurs impliqués dans le développement"
           }
         }
       }
@@ -1228,6 +1654,12 @@
             "state" : "translated",
             "value" : "コピー"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier"
+          }
         }
       }
     },
@@ -1244,6 +1676,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル名をコピー"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le nom du modèle"
           }
         }
       }
@@ -1262,6 +1700,12 @@
             "state" : "translated",
             "value" : "Copyright ©︎ 2025 今浦大雅"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
         }
       }
     },
@@ -1279,6 +1723,12 @@
             "state" : "translated",
             "value" : "APIに接続できませんでした。\nTLSエラーが起きたため、セキュリティ保護された接続を確立できませんでした。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de se connecter à l'API.\nUne erreur TLS s'est produite, impossible d'établir une connexion sécurisée."
+          }
         }
       }
     },
@@ -1295,6 +1745,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル情報を読み込めませんでした。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger les informations sur le modèle."
           }
         }
       }
@@ -1316,6 +1772,12 @@
             "state" : "translated",
             "value" : "カスタム設定"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres personnalisés"
+          }
         }
       }
     },
@@ -1331,6 +1793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日付"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
           }
         }
       }
@@ -1349,6 +1817,12 @@
             "state" : "translated",
             "value" : "削除"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
         }
       }
     },
@@ -1365,6 +1839,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除エラー: HTTPステータスコード %1$d - %2$@（%3$@）"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de suppression : Code d'état HTTP %1$d - %2$@ sur %3$@"
           }
         }
       }
@@ -1383,6 +1863,12 @@
             "state" : "translated",
             "value" : "削除エラー: モデル「%1$@」は%2$@で見つかりませんでした（404 Not Found）。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de suppression : Modèle '%1$@' introuvable (404 Not Found) sur %2$@."
+          }
         }
       }
     },
@@ -1399,6 +1885,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除エラー: 不明なレスポンスタイプです。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de suppression : Type de réponse inconnu."
           }
         }
       }
@@ -1417,6 +1909,12 @@
             "state" : "translated",
             "value" : "モデルを削除"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le modèle"
+          }
         }
       }
     },
@@ -1433,6 +1931,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバーを削除"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le serveur"
           }
         }
       }
@@ -1451,6 +1955,12 @@
             "state" : "translated",
             "value" : "削除…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer..."
+          }
         }
       }
     },
@@ -1468,6 +1978,12 @@
             "state" : "translated",
             "value" : "モデル「%1$@」を「%2$@」から削除しています…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression du modèle '%1$@' de %2$@..."
+          }
         }
       }
     },
@@ -1483,6 +1999,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "降順"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décroissant"
           }
         }
       }
@@ -1501,6 +2023,12 @@
             "state" : "translated",
             "value" : "詳細情報:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informations détaillées :"
+          }
         }
       }
     },
@@ -1517,6 +2045,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "生成AIと開発"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Développé avec l'IA générative"
           }
         }
       }
@@ -1535,6 +2069,12 @@
             "state" : "translated",
             "value" : "ダイジェスト:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digest :"
+          }
         }
       }
     },
@@ -1551,6 +2091,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PayPalで寄付"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faire un don sur PayPal"
           }
         }
       }
@@ -1569,6 +2115,12 @@
             "state" : "translated",
             "value" : "完了"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
         }
       }
     },
@@ -1585,6 +2137,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%1$@」を「%2$@」からダウンロードしています…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement du modèle '%1$@' depuis %2$@..."
           }
         }
       }
@@ -1603,6 +2161,12 @@
             "state" : "translated",
             "value" : "例: gemma3:4b、phi4:latestなど"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ex: gemma3:4b, phi4:latest etc."
+          }
         }
       }
     },
@@ -1619,6 +2183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "例: localhost:11434または192.168.1.50:11434など"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ex: localhost:11434 ou 192.168.1.50:11434 etc."
           }
         }
       }
@@ -1637,6 +2207,12 @@
             "state" : "translated",
             "value" : "例: Ollamaサーバー"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ex: Serveur Ollama"
+          }
         }
       }
     },
@@ -1653,6 +2229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier"
           }
         }
       }
@@ -1671,6 +2253,12 @@
             "state" : "translated",
             "value" : "サーバーを編集"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le serveur"
+          }
         }
       }
     },
@@ -1687,6 +2275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier…"
           }
         }
       }
@@ -1705,6 +2299,12 @@
             "state" : "translated",
             "value" : "埋め込み"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intégration"
+          }
         }
       }
     },
@@ -1721,6 +2321,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "埋め込み長:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longueur d'intégration :"
           }
         }
       }
@@ -1739,6 +2345,12 @@
             "state" : "translated",
             "value" : "カスタム設定を有効にする"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer les paramètres personnalisés"
+          }
         }
       }
     },
@@ -1755,6 +2367,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "追加したいモデル名を入力"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le nom du modèle que vous souhaitez ajouter"
           }
         }
       }
@@ -1773,6 +2391,12 @@
             "state" : "translated",
             "value" : "エラー"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur"
+          }
         }
       }
     },
@@ -1789,6 +2413,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エラー（ステータスコード: %lld）"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur (code d'état : %lld)"
           }
         }
       }
@@ -1807,6 +2437,12 @@
             "state" : "translated",
             "value" : "エラー: プルリクエストボディのシリアライズに失敗しました:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : Échec de la sérialisation du corps de la demande de pull :"
+          }
         }
       }
     },
@@ -1823,6 +2459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エラー: リクエストボディーのシリアライズに失敗しました:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : Échec de la sérialisation du corps de la requête :"
           }
         }
       }
@@ -1841,6 +2483,12 @@
             "state" : "translated",
             "value" : "エラー: 削除するためのAPI URLが無効です。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : URL d'API non valide pour la suppression."
+          }
         }
       }
     },
@@ -1857,6 +2505,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エラー: プルするためのAPI URLが無効です。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : URL d'API non valide pour le pull."
           }
         }
       }
@@ -1875,6 +2529,12 @@
             "state" : "translated",
             "value" : "エラー: API URLが無効です。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : URL d'API non valide."
+          }
         }
       }
     },
@@ -1891,6 +2551,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エラー: Ollamaサーバーが選択されていません。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : Aucun serveur Ollama sélectionné."
           }
         }
       }
@@ -1909,6 +2575,12 @@
             "state" : "translated",
             "value" : "期限切れ: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expire le : %@"
+          }
         }
       }
     },
@@ -1925,6 +2597,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "失敗しました"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec"
           }
         }
       }
@@ -1943,6 +2621,12 @@
             "state" : "translated",
             "value" : "Ollama APIとの接続に失敗しました。ネットワーク接続やサーバーの設定をご確認ください。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la connexion à l'API Ollama. Veuillez vérifier votre connexion réseau ou les paramètres du serveur."
+          }
         }
       }
     },
@@ -1959,6 +2643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファミリーズ:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familles :"
           }
         }
       }
@@ -1977,6 +2667,12 @@
             "state" : "translated",
             "value" : "ファミリー:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Famille :"
+          }
         }
       }
     },
@@ -1993,6 +2689,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API（%@）からモデルを取得中…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupération des modèles depuis l'API (%@)..."
           }
         }
       }
@@ -2011,6 +2713,12 @@
             "state" : "translated",
             "value" : "モデルを探す"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trouver des modèles"
+          }
         }
       }
     },
@@ -2028,6 +2736,12 @@
             "state" : "translated",
             "value" : "形式:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format :"
+          }
         }
       }
     },
@@ -2044,6 +2758,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バグを見つけましたか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez trouvé un bug ?"
           }
         }
       }
@@ -2065,6 +2785,12 @@
             "state" : "translated",
             "value" : "一般"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
         }
       }
     },
@@ -2081,6 +2807,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スターをつける"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donner une étoile"
           }
         }
       }
@@ -2099,6 +2831,12 @@
             "state" : "translated",
             "value" : "GitHubリポジトリにスターをつける"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donner une étoile au dépôt GitHub"
+          }
         }
       }
     },
@@ -2115,6 +2853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アイデアがありますか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez une idée ?"
           }
         }
       }
@@ -2133,6 +2877,12 @@
             "state" : "translated",
             "value" : "ここでは、モデルの確認に使用できる簡易的なチャットを行うことができます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ici, vous pouvez effectuer un simple chat pour vérifier le modèle."
+          }
         }
       }
     },
@@ -2149,6 +2899,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インスペクタを非表示"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer l'inspecteur"
           }
         }
       }
@@ -2167,6 +2923,12 @@
             "state" : "translated",
             "value" : "ホスト"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hôte"
+          }
         }
       }
     },
@@ -2183,6 +2945,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ホスト:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hôte :"
           }
         }
       }
@@ -2201,6 +2969,12 @@
             "state" : "translated",
             "value" : "設定方法"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment configurer"
+          }
         }
       }
     },
@@ -2217,6 +2991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ローカルネットワーク許可の設定方法。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment configurer l'autorisation du réseau local."
           }
         }
       }
@@ -2235,6 +3015,12 @@
             "state" : "translated",
             "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je serais ravi si vous pouviez donner une étoile au dépôt !"
+          }
         }
       }
     },
@@ -2251,6 +3037,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大きなモデルを読み込む場合など、応答に時間がかかる場合はタイムアウトを長くすることで改善する可能性があります。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si les réponses prennent plus de temps, comme lors du chargement de grands modèles, l'augmentation du délai d'attente peut aider."
           }
         }
       }
@@ -2269,6 +3061,12 @@
             "state" : "translated",
             "value" : "ストリームレスポンスをオフにする場合、設定からAPIタイムアウトを無制限にすることをおすすめします。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous désactivez la réponse en streaming, il est recommandé de définir le délai d'attente de l'API sur illimité dans les paramètres."
+          }
         }
       }
     },
@@ -2285,6 +3083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "何を入力したら良いかわからない場合、Ollamaのウェブサイトでモデルを探すことができます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous n'êtes pas sûr de ce qu'il faut saisir, vous pouvez trouver des modèles sur le site Web d'Ollama."
           }
         }
       }
@@ -2303,6 +3107,12 @@
             "state" : "translated",
             "value" : "インスペクタ"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspecteur"
+          }
         }
       }
     },
@@ -2319,6 +3129,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ログイン時に開く"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancer à la connexion"
           }
         }
       }
@@ -2337,6 +3153,12 @@
             "state" : "translated",
             "value" : "ライセンス"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licence"
+          }
         }
       }
     },
@@ -2353,6 +3175,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ライセンス情報"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informations sur la licence"
           }
         }
       }
@@ -2371,6 +3199,12 @@
             "state" : "translated",
             "value" : "ライセンス:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licence :"
+          }
         }
       }
     },
@@ -2387,6 +3221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル情報を読み込み中…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des informations sur le modèle…"
           }
         }
       }
@@ -2405,6 +3245,12 @@
             "state" : "translated",
             "value" : "ローカルネットワークアクセス"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès au réseau local"
+          }
         }
       }
     },
@@ -2421,6 +3267,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ローカルネットワークの権限が許可されました。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'autorisation du réseau local est accordée."
           }
         }
       }
@@ -2442,6 +3294,12 @@
             "state" : "translated",
             "value" : "メニュー"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
         }
       }
     },
@@ -2462,6 +3320,12 @@
             "state" : "translated",
             "value" : "Mocolammaはオープンソースのアプリケーションです。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma est une application Open Source."
+          }
         }
       }
     },
@@ -2478,6 +3342,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルの削除に失敗しました:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la suppression du modèle :"
           }
         }
       }
@@ -2496,6 +3366,12 @@
             "state" : "translated",
             "value" : "モデルの詳細"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails du modèle"
+          }
         }
       }
     },
@@ -2512,6 +3388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル情報:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informations sur le modèle :"
           }
         }
       }
@@ -2530,6 +3412,12 @@
             "state" : "translated",
             "value" : "モデル名: "
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du modèle :"
+          }
         }
       }
     },
@@ -2546,6 +3434,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルのプルが完了しました:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pull du modèle terminé :"
           }
         }
       }
@@ -2564,6 +3458,12 @@
             "state" : "translated",
             "value" : "モデルプルエラー"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de pull du modèle"
+          }
         }
       }
     },
@@ -2580,6 +3480,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルのプルエラー: HTTPステータスコード %d"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de pull du modèle : Code d'état HTTP %d"
           }
         }
       }
@@ -2598,6 +3504,12 @@
             "state" : "translated",
             "value" : "モデルのプルに失敗しました:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du pull du modèle :"
+          }
         }
       }
     },
@@ -2614,6 +3526,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルプルに失敗しました。\nモデル名が正しいことをご確認ください。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du pull du modèle.\nVeuillez vous assurer que le nom du modèle est correct."
           }
         }
       }
@@ -2632,6 +3550,12 @@
             "state" : "translated",
             "value" : "モデルプルに失敗しました。\n不明なエラーが発生しました。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du pull du modèle.\nUne erreur inconnue s'est produite."
+          }
         }
       }
     },
@@ -2648,6 +3572,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèles"
           }
         }
       }
@@ -2666,6 +3596,12 @@
             "state" : "translated",
             "value" : "変更日"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifié le"
+          }
         }
       }
     },
@@ -2682,6 +3618,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "変更日:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifié le :"
           }
         }
       }
@@ -2700,6 +3642,12 @@
             "state" : "translated",
             "value" : "名前"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
         }
       }
     },
@@ -2716,6 +3664,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新規チャット"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau chat"
           }
         }
       }
@@ -2734,6 +3688,12 @@
             "state" : "translated",
             "value" : "次のリビジョン"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision suivante"
+          }
         }
       }
     },
@@ -2750,6 +3710,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データがありません"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune donnée disponible"
           }
         }
       }
@@ -2768,6 +3734,12 @@
             "state" : "translated",
             "value" : "詳細がありません。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun détail disponible."
+          }
         }
       }
     },
@@ -2784,6 +3756,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル情報がありません。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune information sur le modèle disponible."
           }
         }
       }
@@ -2802,6 +3780,12 @@
             "state" : "translated",
             "value" : "モデルがインストールされていません。「+」をクリックまたはタップして新しいモデルを追加してください。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun modèle n'est actuellement installé. Cliquez ou appuyez sur « + » pour ajouter un nouveau modèle."
+          }
         }
       }
     },
@@ -2818,6 +3802,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルがありません"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun modèle disponible"
           }
         }
       }
@@ -2836,6 +3826,12 @@
             "state" : "translated",
             "value" : "モデルがありません"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun modèle disponible"
+          }
         }
       }
     },
@@ -2852,6 +3848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバーが選択されていません"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun serveur sélectionné"
           }
         }
       }
@@ -2870,6 +3872,12 @@
             "state" : "translated",
             "value" : "サーバーが設定されていません。「+」をクリックまたはタップして新しいサーバーを追加してください。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun serveur n'est actuellement configuré. Cliquez ou appuyez sur « + » pour ajouter un nouveau serveur."
+          }
         }
       }
     },
@@ -2886,6 +3894,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバーがありません"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun serveur disponible"
           }
         }
       }
@@ -2904,6 +3918,12 @@
             "state" : "translated",
             "value" : "番号"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N°"
+          }
         }
       }
     },
@@ -2920,6 +3940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N° %lld"
           }
         }
       }
@@ -2938,6 +3964,12 @@
             "state" : "translated",
             "value" : "未接続（ステータスコード: %lld）"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non connecté (code d'état : %lld)"
+          }
         }
       }
     },
@@ -2954,6 +3986,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未接続（タイムアウト）"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non connecté (délai d'attente dépassé)"
           }
         }
       }
@@ -2972,6 +4010,12 @@
             "state" : "translated",
             "value" : "未接続（不明なホスト）"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non connecté (hôte inconnu)"
+          }
         }
       }
     },
@@ -2989,6 +4033,12 @@
             "state" : "translated",
             "value" : "表示するものがありません。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à afficher."
+          }
         }
       }
     },
@@ -3004,6 +4054,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro"
           }
         }
       }
@@ -3028,6 +4084,12 @@
             "state" : "translated",
             "value" : "Ollama バージョン:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version d'Ollama :"
+          }
         }
       }
     },
@@ -3044,6 +4106,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開く"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir"
           }
         }
       }
@@ -3062,6 +4130,12 @@
             "state" : "translated",
             "value" : "ライセンスページを開く"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la page de la licence"
+          }
         }
       }
     },
@@ -3079,6 +4153,12 @@
             "state" : "translated",
             "value" : "ライセンスページを開きますか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la page de la licence ?"
+          }
         }
       }
     },
@@ -3094,7 +4174,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ディスカッションページへのリンクを開きます."
+            "value" : "ディスカッションページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page de discussion."
           }
         }
       }
@@ -3113,6 +4199,12 @@
             "state" : "translated",
             "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la liste des bogues connus et la page de rapport."
+          }
         }
       }
     },
@@ -3129,6 +4221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Me a Coffeeページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page Buy Me a Coffee."
           }
         }
       }
@@ -3147,6 +4245,12 @@
             "state" : "translated",
             "value" : "CompactSliderのGitHubページへのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de CompactSlider."
+          }
         }
       }
     },
@@ -3163,6 +4267,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "create-dmgのGitHubページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de create-dmg."
           }
         }
       }
@@ -3181,6 +4291,12 @@
             "state" : "translated",
             "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de Gemini CLI."
+          }
         }
       }
     },
@@ -3197,6 +4313,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubの貢献者ページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page des contributeurs GitHub."
           }
         }
       }
@@ -3215,6 +4337,12 @@
             "state" : "translated",
             "value" : "GitHubリポジトリページへのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page du dépôt GitHub."
+          }
         }
       }
     },
@@ -3231,6 +4359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MarkdownUIのGitHubページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de MarkdownUI."
           }
         }
       }
@@ -3249,6 +4383,12 @@
             "state" : "translated",
             "value" : "OllamaのGitHubページへのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub d'Ollama."
+          }
         }
       }
     },
@@ -3265,6 +4405,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "opencodeのGitHubページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub d'opencode."
           }
         }
       }
@@ -3283,6 +4429,12 @@
             "state" : "translated",
             "value" : "PayPal.Meのリンクを開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers PayPal.Me."
+          }
         }
       }
     },
@@ -3299,6 +4451,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de Qwen Code."
           }
         }
       }
@@ -3317,6 +4475,12 @@
             "state" : "translated",
             "value" : "リンクを開きますか？"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien ?"
+          }
         }
       }
     },
@@ -3333,6 +4497,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定を開く"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres"
           }
         }
       }
@@ -3351,6 +4521,12 @@
             "state" : "translated",
             "value" : "オープンソースライセンス"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licence Open Source"
+          }
         }
       }
     },
@@ -3367,6 +4543,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メール送信画面を開きますか？"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la fenêtre d'envoi d'e-mail ?"
           }
         }
       }
@@ -3385,6 +4567,12 @@
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la fenêtre d'envoi d'e-mail de commentaires."
+          }
         }
       }
     },
@@ -3401,6 +4589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ウェブサイトを開く"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le site Web"
           }
         }
       }
@@ -3422,6 +4616,12 @@
             "state" : "translated",
             "value" : "順序"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordre"
+          }
         }
       }
     },
@@ -3438,6 +4638,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他のライセンス"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre licence"
           }
         }
       }
@@ -3456,6 +4662,12 @@
             "state" : "translated",
             "value" : "パラメーター数:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de paramètres :"
+          }
         }
       }
     },
@@ -3472,6 +4684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パラメーターサイズ:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille des paramètres :"
           }
         }
       }
@@ -3490,6 +4708,12 @@
             "state" : "translated",
             "value" : "親モデル:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèle parent :"
+          }
         }
       }
     },
@@ -3506,6 +4730,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同一ネットワーク内のOllamaサーバーに接続するには権限が必要です。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une autorisation est requise pour se connecter aux serveurs Ollama sur le même réseau."
           }
         }
       }
@@ -3524,6 +4754,12 @@
             "state" : "translated",
             "value" : "権限"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisations"
+          }
         }
       }
     },
@@ -3540,6 +4776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバータブでサーバーを選択してください。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez sélectionner un serveur dans l'onglet Serveur."
           }
         }
       }
@@ -3558,6 +4800,12 @@
             "state" : "translated",
             "value" : "準備中…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparation…"
+          }
         }
       }
     },
@@ -3575,6 +4823,12 @@
             "state" : "translated",
             "value" : "前のリビジョン"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision précédente"
+          }
         }
       }
     },
@@ -3591,6 +4845,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "量子化レベル:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niveau de quantification :"
           }
         }
       }
@@ -3620,6 +4880,12 @@
             "state" : "translated",
             "value" : "再読み込み"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser"
+          }
         }
       }
     },
@@ -3636,6 +4902,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "状態の更新"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser le statut"
           }
         }
       }
@@ -3654,6 +4926,12 @@
             "state" : "translated",
             "value" : "バグを報告"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler un bug"
+          }
         }
       }
     },
@@ -3670,6 +4948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "やり直す"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
           }
         }
       }
@@ -3688,6 +4972,12 @@
             "state" : "translated",
             "value" : "実行中"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en cours"
+          }
         }
       }
     },
@@ -3704,6 +4994,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "実行中のモデル数:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèles en cours d'exécution :"
           }
         }
       }
@@ -3722,6 +5018,12 @@
             "state" : "translated",
             "value" : "保存"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
+          }
         }
       }
     },
@@ -3738,6 +5040,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner"
           }
         }
       }
@@ -3756,6 +5064,12 @@
             "state" : "translated",
             "value" : "メニューを選択してください"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un menu."
+          }
         }
       }
     },
@@ -3772,6 +5086,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "詳細を表示するにはモデルを選択してください。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un modèle pour voir les détails."
           }
         }
       }
@@ -3790,6 +5110,12 @@
             "state" : "translated",
             "value" : "詳細を表示するにはサーバーを選択してください。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un serveur pour voir les détails."
+          }
         }
       }
     },
@@ -3806,6 +5132,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデルを選択"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner un modèle"
           }
         }
       }
@@ -3824,6 +5156,12 @@
             "state" : "translated",
             "value" : "フィードバックを送信"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer des commentaires"
+          }
         }
       }
     },
@@ -3840,6 +5178,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur"
           }
         }
       }
@@ -3858,6 +5202,12 @@
             "state" : "translated",
             "value" : "サーバーの詳細"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails du serveur"
+          }
         }
       }
     },
@@ -3874,6 +5224,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サーバー"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveurs"
           }
         }
       }
@@ -3892,6 +5248,12 @@
             "state" : "translated",
             "value" : "設定"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres"
+          }
         }
       }
     },
@@ -3908,6 +5270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres…"
           }
         }
       }
@@ -3926,6 +5294,12 @@
             "state" : "translated",
             "value" : "インスペクタを表示"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher l'inspecteur"
+          }
         }
       }
     },
@@ -3942,6 +5316,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les informations de licence pour cette application et les bibliothèques utilisées."
           }
         }
       }
@@ -3960,6 +5340,12 @@
             "state" : "translated",
             "value" : "サイズ"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille"
+          }
         }
       }
     },
@@ -3976,6 +5362,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サイズ:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille :"
           }
         }
       }
@@ -3994,6 +5386,12 @@
             "state" : "translated",
             "value" : "並び替え"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier"
+          }
         }
       }
     },
@@ -4010,6 +5408,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並び順"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier par"
           }
         }
       }
@@ -4028,6 +5432,12 @@
             "state" : "translated",
             "value" : "一部の推論モデルを使う場合に推論を行うかどうかを指定します。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie s'il faut effectuer une inférence lors de l'utilisation d'un modèle de raisonnement."
+          }
         }
       }
     },
@@ -4044,6 +5454,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "停止済み"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêté"
           }
         }
       }
@@ -4062,6 +5478,12 @@
             "state" : "translated",
             "value" : "ストリームレスポンス"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse en streaming"
+          }
         }
       }
     },
@@ -4078,6 +5500,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%1$@」を「%2$@」からの削除に成功しました。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle '%1$@' a été supprimé avec succès de %2$@."
           }
         }
       }
@@ -4096,6 +5524,12 @@
             "state" : "translated",
             "value" : "モデルの取得に成功しました。合計: %d"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèles récupérés avec succès. Total : %d"
+          }
         }
       }
     },
@@ -4112,6 +5546,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サポートとフィードバック"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support et commentaires"
           }
         }
       }
@@ -4130,6 +5570,12 @@
             "state" : "translated",
             "value" : "開発者をサポート"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soutenir le développeur"
+          }
         }
       }
     },
@@ -4146,6 +5592,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "システムプロンプト"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite système"
           }
         }
       }
@@ -4164,6 +5616,12 @@
             "state" : "translated",
             "value" : "温度"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Température"
+          }
         }
       }
     },
@@ -4180,6 +5638,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "思考"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réflexion"
           }
         }
       }
@@ -4198,6 +5662,12 @@
             "state" : "translated",
             "value" : "思考完了"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réflexion terminée"
+          }
         }
       }
     },
@@ -4214,6 +5684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "思考中..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réflexion en cours..."
           }
         }
       }
@@ -4233,6 +5709,12 @@
             "state" : "translated",
             "value" : "指定なし"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun"
+          }
         }
       }
     },
@@ -4250,6 +5732,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オフ"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé"
           }
         }
       }
@@ -4269,6 +5757,12 @@
             "state" : "translated",
             "value" : "オン"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activé"
+          }
         }
       }
     },
@@ -4285,6 +5779,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このモデルは使用できません"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce modèle ne peut pas être utilisé"
           }
         }
       }
@@ -4303,6 +5803,12 @@
             "state" : "translated",
             "value" : "このモデルはチャットに対応していません。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce modèle ne prend pas en charge le chat."
+          }
         }
       }
     },
@@ -4319,6 +5825,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ローカルネットワークアクセスを許可するには、「設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour autoriser l'accès au réseau local, allez dans Réglages → Confidentialité et sécurité → Réseau local, puis activez \"Mocolamma\" on."
           }
         }
       }
@@ -4337,6 +5849,12 @@
             "state" : "translated",
             "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックまたはタップすると「プライバシーとセキュリティ」設定を開きます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour autoriser l'accès au réseau local, allez dans Paramètres système → Confidentialité et sécurité → Réseau local, puis activez \"Mocolamma\" on.\n\nCliquez ou appuyez sur \"OK\" pour ouvrir les paramètres de confidentialité et de sécurité."
+          }
         }
       }
     },
@@ -4353,6 +5871,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インスペクタを切り替える"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basculer l'inspecteur"
           }
         }
       }
@@ -4371,6 +5895,12 @@
             "state" : "translated",
             "value" : "テキストの折り返しを切り替える"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer/Désactiver le retour à la ligne"
+          }
         }
       }
     },
@@ -4387,6 +5917,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ツール"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outils"
           }
         }
       }
@@ -4405,6 +5941,12 @@
             "state" : "translated",
             "value" : "メッセージを入力…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez votre message..."
+          }
         }
       }
     },
@@ -4421,6 +5963,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無制限"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Illimité"
           }
         }
       }
@@ -4439,6 +5987,12 @@
             "state" : "translated",
             "value" : "更新"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour"
+          }
         }
       }
     },
@@ -4455,6 +6009,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま更新"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour quand même"
           }
         }
       }
@@ -4473,6 +6033,12 @@
             "state" : "translated",
             "value" : "バージョン: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : %@"
+          }
         }
       }
     },
@@ -4489,6 +6055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン: %1$@ (%2$@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version : %1$@ (%2$@)"
           }
         }
       }
@@ -4507,6 +6079,12 @@
             "state" : "translated",
             "value" : "ビジョン"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision"
+          }
         }
       }
     },
@@ -4523,6 +6101,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VRAMサイズ: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille de la VRAM : %@"
           }
         }
       }
@@ -4541,6 +6125,12 @@
             "state" : "translated",
             "value" : "PayPalで直接寄付していただくこともできます。"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez également faire un don directement sur PayPal."
+          }
         }
       }
     },
@@ -4557,6 +6147,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez me soutenir sur Buy Me a Coffee à partir du prix d'une tasse de thé vert."
           }
         }
       }

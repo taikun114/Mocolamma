@@ -21,6 +21,10 @@ Notes
 -->
 
 ## 1.0.3 (under development)
+### New Features
+- **Add French localization by generated AI**
+  - Since I have no knowledge of French, the translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+
 ### Bug Fixes and Improvements
 - **Fix “Click” to “Click or tap”**
 - **Fix issue where network requests could fail when launching the app**
