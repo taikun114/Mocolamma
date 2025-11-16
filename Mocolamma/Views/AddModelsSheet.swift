@@ -110,16 +110,16 @@ struct AddModelsSheet: View {
         } message: {
             Text(httpErrorMessage)
         }
-        .alert(String(localized: "Open Link?", comment: "Alert title for opening an external link."), isPresented: $showingOpenLinkAlert) {
-            Button(String(localized: "Open", comment: "Button to confirm opening a link.")) {
+        .alert(String(localized: "Open Link?", comment: "外部リンクを開くアラートタイトルテキスト。"), isPresented: $showingOpenLinkAlert) {
+            Button(String(localized: "Open", comment: "開くボタン。")) {
                 if let url = URL(string: "https://ollama.com/library") {
                     openURL(url)
                 }
             }
             .keyboardShortcut(.defaultAction)
-            Button(String(localized: "Cancel", comment: "Button to cancel an action."), role: .cancel) {}
+            Button(String(localized: "Cancel", comment: "キャンセルアクションを実行するボタンテキスト。"), role: .cancel) {}
         } message: {
-            Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "Alert message asking for confirmation to open Ollama models page."))
+            Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "ユーザに、Ollamaのモデル一覧が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。"))
         }
         #if os(iOS)
         .navigationTitle("Add Model")
