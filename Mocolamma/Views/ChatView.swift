@@ -150,7 +150,7 @@ struct ChatView: View {
             Button("OK") { showEmbeddingAlert = false }
             .keyboardShortcut(.defaultAction)
         } message: {
-            Text(String(localized: "This model does not support chat.", comment: "Embedding-only model selection warning body."))
+            Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
         .alert("Error", isPresented: Binding<Bool>(
             get: { generalErrorMessage != nil },

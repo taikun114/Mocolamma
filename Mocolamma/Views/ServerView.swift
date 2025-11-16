@@ -76,7 +76,7 @@ struct ServerView: View {
                 ContentUnavailableView(
                     "No Servers Available",
                     systemImage: "server.rack",
-                    description: Text("No servers are currently configured. Click '+' to add a new server.")
+                    description: Text("No servers are currently configured. Click or tap '+' to add a new server.")
                 )
             }
         }
@@ -119,7 +119,7 @@ struct ServerView: View {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
             if !Task.isCancelled {
                 appRefreshTrigger.send()
             }

@@ -20,6 +20,15 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.0.3
+### New Features
+- **Add French localization by generative AI**
+  - Since I have no knowledge of French, the translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+
+### Bug Fixes and Improvements
+- **Fix “Click” to “Click or tap”**
+- **Fix issue where network requests could fail when launching the app**
+
 ## 1.0.2
 ### Bug Fixes and Improvements
 - **Fix issue where the icon size for the about this app screen was incorrect on macOS Sequoia or earlier**

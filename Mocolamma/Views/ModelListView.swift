@@ -279,7 +279,7 @@ struct ModelListView: View {
                          Group {
                              if horizontalSizeClass == .compact {
                                  VStack(alignment: .leading) {
-                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
                                                   executor.pullProgress * 100 as CVarArg,
                                                   ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
                                                   ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
@@ -289,14 +289,14 @@ struct ModelListView: View {
                                          let eta = Int(executor.pullETARemaining)
                                          let etaMin = eta / 60
                                          let etaSec = eta % 60
-                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
+                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
                                              .foregroundStyle(.secondary)
                                              .frame(maxWidth: .infinity, alignment: .leading)
                                      }
                                  }
                              } else {
                                  HStack {
-                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロード進捗: 完了/合計。"),
+                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
                                                   executor.pullProgress * 100 as CVarArg,
                                                   ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
                                                   ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
@@ -307,7 +307,7 @@ struct ModelListView: View {
                                          let eta = Int(executor.pullETARemaining)
                                          let etaMin = eta / 60
                                          let etaSec = eta % 60
-                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。"), speedString, etaMin, etaSec))
+                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
                                              .foregroundStyle(.secondary)
                                              .frame(maxWidth: .infinity, alignment: .trailing)
                                      }
@@ -345,7 +345,7 @@ struct ModelListView: View {
                 ContentUnavailableView(
                     "No Models Available",
                     systemImage: "tray.full",
-                    description: Text("No models are currently installed. Click '+' to add a new model.")
+                    description: Text("No models are currently installed. Click or tap '+' to add a new model.")
                 )
             } else if executor.isRunning {
                 ProgressView()
