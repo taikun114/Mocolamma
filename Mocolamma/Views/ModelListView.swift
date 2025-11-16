@@ -345,7 +345,7 @@ struct ModelListView: View {
                 ContentUnavailableView(
                     "No Models Available",
                     systemImage: "tray.full",
-                    description: Text("No models are currently installed. Click '+' to add a new model.")
+                    description: Text("No models are currently installed. Click or tap '+' to add a new model.")
                 )
             } else if executor.isRunning {
                 ProgressView()

@@ -76,7 +76,7 @@ struct ServerView: View {
                 ContentUnavailableView(
                     "No Servers Available",
                     systemImage: "server.rack",
-                    description: Text("No servers are currently configured. Click '+' to add a new server.")
+                    description: Text("No servers are currently configured. Click or tap '+' to add a new server.")
                 )
             }
         }

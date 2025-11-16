@@ -2671,18 +2671,18 @@
         }
       }
     },
-    "No models are currently installed. Click '+' to add a new model." : {
+    "No models are currently installed. Click or tap '+' to add a new model." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No models are currently installed. Click '+' to add a new model."
+            "value" : "No models are currently installed. Click or tap '+' to add a new model."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "モデルがインストールされていません。「+」をクリックして新しいモデルを追加してください。"
+            "value" : "モデルがインストールされていません。「+」をクリックまたはタップして新しいモデルを追加してください。"
           }
         }
       }
@@ -2735,18 +2735,18 @@
         }
       }
     },
-    "No servers are currently configured. Click '+' to add a new server." : {
+    "No servers are currently configured. Click or tap '+' to add a new server." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No servers are currently configured. Click '+' to add a new server."
+            "value" : "No servers are currently configured. Click or tap '+' to add a new server."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サーバーが設定されていません。「+」をクリックして新しいサーバーを追加してください。"
+            "value" : "サーバーが設定されていません。「+」をクリックまたはタップして新しいサーバーを追加してください。"
           }
         }
       }
@@ -4125,18 +4125,18 @@
         }
       }
     },
-    "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick \"OK\" to open Privacy & Security settings." : {
+    "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick or tap \"OK\" to open Privacy & Security settings." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick \"OK\" to open Privacy & Security settings."
+            "value" : "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick or tap \"OK\" to open Privacy & Security settings."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックすると「プライバシーとセキュリティ」設定を開きます。"
+            "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックまたはタップすると「プライバシーとセキュリティ」設定を開きます。"
           }
         }
       }

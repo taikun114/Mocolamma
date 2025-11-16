@@ -20,6 +20,10 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.0.3 (under development)
+### Bug Fixes and Improvements
+- **Fix “Click” to “Click or tap”**
+
 ## 1.0.2
 ### Bug Fixes and Improvements
 - **Fix issue where the icon size for the about this app screen was incorrect on macOS Sequoia or earlier**
