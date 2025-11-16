@@ -23,6 +23,7 @@ Notes
 ## 1.0.3 (under development)
 ### Bug Fixes and Improvements
 - **Fix “Click” to “Click or tap”**
+- **Fix issue where network requests could fail when launching the app**
 
 ## 1.0.2
 ### Bug Fixes and Improvements
