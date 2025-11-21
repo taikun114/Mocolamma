@@ -13,6 +13,12 @@
             "value" : "%1$.1f%% completed (%2$@ / %3$@)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% completado (%2$@ / %3$@)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -39,6 +45,12 @@
             "value" : "*Could not connect*"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*No se pudo conectar*"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -62,6 +74,12 @@
             "value" : "*No message*"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*No hay mensaje*"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -81,6 +99,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@, %2$@"
           }
         },
@@ -107,6 +131,12 @@
             "value" : "%1$@, %2$lld B"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -129,6 +159,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@/s, Time Remaining: %2$02d:%3$02d"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s, Tiempo restante: %2$02d:%3$02d"
           }
         },
         "fr" : {
@@ -163,6 +199,24 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "new",
+                  "value" : "%lld Tokens"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Token"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
                   "value" : "%lld Tokens"
                 }
               }
@@ -221,6 +275,12 @@
             "value" : "1 min"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 min"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -239,6 +299,12 @@
       "comment" : "APIタイムアウト時間の設定項目の1つとして表示される項目。",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 min"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "5 min"
@@ -267,6 +333,12 @@
             "value" : "30 sec"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 seg"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -288,6 +360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "About Mocolamma"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Mocolamma"
           }
         },
         "fr" : {
@@ -313,6 +391,12 @@
             "value" : "About Mocolamma…"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Mocolamma…"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -334,6 +418,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acknowledgements"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agradecimientos"
           }
         },
         "fr" : {
@@ -359,6 +449,12 @@
             "value" : "Add"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -380,6 +476,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Anyway"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir de todos modos"
           }
         },
         "fr" : {
@@ -405,6 +507,12 @@
             "value" : "Add Model"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir Modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -426,6 +534,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Model…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir modelo…"
           }
         },
         "fr" : {
@@ -451,6 +565,12 @@
             "value" : "Add New"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir Nuevo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -472,6 +592,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir Servidor"
           }
         },
         "fr" : {
@@ -497,6 +623,12 @@
             "value" : "Add Server…"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir servidor…"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -518,6 +650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allowed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitido"
           }
         },
         "fr" : {
@@ -543,6 +681,12 @@
             "value" : "API Decode Error: "
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de decodificación de API: "
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -564,6 +708,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API Error: HTTP Status Code %d"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de API: Código de estado HTTP %d"
           }
         },
         "fr" : {
@@ -589,6 +739,12 @@
             "value" : "API Error: Unknown response type."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de API: Tipo de respuesta desconocido."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -610,6 +766,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API Request Error: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de solicitud de API: "
           }
         },
         "fr" : {
@@ -635,6 +797,12 @@
             "value" : "API Timeout"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de espera de API"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -656,6 +824,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres eliminar el modelo \"%@\"?\nEsta acción no se puede deshacer."
           }
         },
         "fr" : {
@@ -681,6 +855,12 @@
             "value" : "Are you sure you want to delete the selected model?\nThis action cannot be undone."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres eliminar el modelo seleccionado?\nEsta acción no se puede deshacer."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -702,6 +882,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to delete the selected server?\nThis action cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres eliminar el servidor seleccionado?\nEsta acción no se puede deshacer."
           }
         },
         "fr" : {
@@ -727,6 +913,12 @@
             "value" : "Are you sure you want to delete the server \"%@\"?\nThis action cannot be undone."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres eliminar el servidor \"%@\"?\nEsta acción no se puede deshacer."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -748,6 +940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the Buy Me a Coffee page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de Buy Me a Coffee?"
           }
         },
         "fr" : {
@@ -773,6 +971,12 @@
             "value" : "Are you sure you want to open the CompactSlider GitHub page?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de CompactSlider?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -794,6 +998,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the create-dmg GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de create-dmg?"
           }
         },
         "fr" : {
@@ -819,6 +1029,12 @@
             "value" : "Are you sure you want to open the Discussion page on GitHub?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de Discusiones en GitHub?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -840,6 +1056,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the Gemini CLI GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de Gemini CLI?"
           }
         },
         "fr" : {
@@ -865,6 +1087,12 @@
             "value" : "Are you sure you want to open the GitHub contributors page?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de contribuidores de GitHub?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -886,6 +1114,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the GitHub repository page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página del repositorio de GitHub?"
           }
         },
         "fr" : {
@@ -911,6 +1145,12 @@
             "value" : "Are you sure you want to open the Issue page on GitHub?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de Incidencias en GitHub?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -932,6 +1172,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the MarkdownUI GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de MarkdownUI?"
           }
         },
         "fr" : {
@@ -957,6 +1203,12 @@
             "value" : "Are you sure you want to open the Ollama GitHub page?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de Ollama?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -978,6 +1230,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the Ollama models page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de modelos de Ollama?"
           }
         },
         "fr" : {
@@ -1003,6 +1261,12 @@
             "value" : "Are you sure you want to open the opencode GitHub page?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de opencode?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1024,6 +1288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the page with license information?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página con la información de la licencia?"
           }
         },
         "fr" : {
@@ -1049,6 +1319,12 @@
             "value" : "Are you sure you want to open the PayPal.Me page?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de PayPal.Me?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1070,6 +1346,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to open the Qwen Code GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de Qwen Code?"
           }
         },
         "fr" : {
@@ -1095,6 +1377,12 @@
             "value" : "Are you sure you want to open the send feedback email window?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la ventana de envío de correo electrónico de comentarios?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1115,6 +1403,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ascending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
           }
         },
         "fr" : {
@@ -1140,6 +1434,12 @@
             "value" : "Ask questions and share your opinions"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz preguntas y comparte tus opiniones"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1161,6 +1461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Green Tea"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprar Té Verde"
           }
         },
         "fr" : {
@@ -1186,6 +1492,12 @@
             "value" : "Buy Me Green Tea"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómprame un Té Verde"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1207,6 +1519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         },
         "fr" : {
@@ -1232,6 +1550,12 @@
             "value" : "Cancel editing."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar edición."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1250,6 +1574,12 @@
       "comment" : "チャットタブ名。",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chat"
@@ -1278,6 +1608,12 @@
             "value" : "Chat Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración de Chat"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1299,6 +1635,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Checking..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando..."
           }
         },
         "fr" : {
@@ -1324,6 +1666,12 @@
             "value" : "Close"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1345,6 +1693,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Community"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comunidad"
           }
         },
         "fr" : {
@@ -1373,6 +1727,12 @@
             "value" : "Complete editing and retry."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completar edición y reintentar."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1394,6 +1754,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Completed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completado"
           }
         },
         "fr" : {
@@ -1419,6 +1785,12 @@
             "value" : "Completion"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1440,6 +1812,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Connected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectado"
           }
         },
         "fr" : {
@@ -1465,6 +1843,12 @@
             "value" : "Connecting..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1488,6 +1872,12 @@
             "value" : "Connection Failed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de conexión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1503,12 +1893,18 @@
       }
     },
     "ConnectionError.message" : {
-      "comment" : "Connection error message when adding a server.",
+      "comment" : "Connection error message when adding a server。",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Could not connect to the API.\nPlease check if the host is correct and the Ollama server is running."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo conectar a la API.\nPor favor, comprueba si el host es correcto y si el servidor Ollama está en funcionamiento."
           }
         },
         "fr" : {
@@ -1534,6 +1930,12 @@
             "value" : "Connection Error"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de Conexión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1555,6 +1957,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Context Length:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longitud del Contexto:"
           }
         },
         "fr" : {
@@ -1580,6 +1988,12 @@
             "value" : "Context Window"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ventana de Contexto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1601,6 +2015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contributors"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contribuidores"
           }
         },
         "fr" : {
@@ -1626,6 +2046,12 @@
             "value" : "Contributors involved in the development"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contribuidores involucrados en el desarrollo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1647,6 +2073,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
           }
         },
         "fr" : {
@@ -1672,6 +2104,12 @@
             "value" : "Copy Model Name"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar Nombre del Modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1690,6 +2128,12 @@
       "comment" : "著作者情報のテキスト。日本語以外はTaiga Imauraを使用する。",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2025 Taiga Imaura"
@@ -1718,6 +2162,12 @@
             "value" : "Could not connect to API.\nTLS error occurred, could not establish a secure connection."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo conectar a la API.\nOcurrió un error de TLS, no se pudo establecer una conexión segura."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1739,6 +2189,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Could not load model information."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar la información del modelo."
           }
         },
         "fr" : {
@@ -1767,6 +2223,12 @@
             "value" : "Custom Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes Personalizados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1787,6 +2249,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha"
           }
         },
         "fr" : {
@@ -1812,6 +2280,12 @@
             "value" : "Delete"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1833,6 +2307,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Delete Error: HTTP Status Code %1$d - %2$@ on %3$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de eliminación: Código de estado HTTP %1$d - %2$@ en %3$@"
           }
         },
         "fr" : {
@@ -1858,6 +2338,12 @@
             "value" : "Delete Error: Model '%1$@' not found (404 Not Found) on %2$@."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de eliminación: Modelo '%1$@' no encontrado (404 No Encontrado) en %2$@."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1879,6 +2365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Error: Unknown response type."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de eliminación: Tipo de respuesta desconocido."
           }
         },
         "fr" : {
@@ -1904,6 +2396,12 @@
             "value" : "Delete Model"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar Modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1925,6 +2423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar Servidor"
           }
         },
         "fr" : {
@@ -1950,6 +2454,12 @@
             "value" : "Delete..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1973,6 +2483,12 @@
             "value" : "Deleting model '%1$@' from %2$@..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando el modelo '%1$@' de %2$@..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1993,6 +2509,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
           }
         },
         "fr" : {
@@ -2018,6 +2540,12 @@
             "value" : "Details Information:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información Detallada:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2039,6 +2567,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Developed with Generative AI"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desarrollado con IA Generativa"
           }
         },
         "fr" : {
@@ -2064,6 +2598,12 @@
             "value" : "Digest:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumen:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2085,6 +2625,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Donate at PayPal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donar en PayPal"
           }
         },
         "fr" : {
@@ -2110,6 +2656,12 @@
             "value" : "Done"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2131,6 +2683,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Downloading model '%1$@' from %2$@..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando modelo '%1$@' desde %2$@..."
           }
         },
         "fr" : {
@@ -2156,6 +2714,12 @@
             "value" : "e.g., gemma3:4b, phi4:latest"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., gemma3:4b, phi4:latest"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2177,6 +2741,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "e.g., localhost:11434 or 192.168.1.50:11434"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., localhost:11434 o 192.168.1.50:11434"
           }
         },
         "fr" : {
@@ -2202,6 +2772,12 @@
             "value" : "e.g., Ollama Server"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p. ej., Servidor Ollama"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2223,6 +2799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar"
           }
         },
         "fr" : {
@@ -2248,6 +2830,12 @@
             "value" : "Edit Server"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar Servidor"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2268,7 +2856,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit..."
+            "value" : "Edit…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar…"
           }
         },
         "fr" : {
@@ -2294,6 +2888,12 @@
             "value" : "Embedding"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incrustación"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2315,6 +2915,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Embedding Length:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longitud de Incrustación:"
           }
         },
         "fr" : {
@@ -2340,6 +2946,12 @@
             "value" : "Enable Custom Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilitar Ajustes Personalizados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2363,6 +2975,12 @@
             "value" : "Enter the name of the model you want to add"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el nombre del modelo que quieres añadir"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2381,6 +2999,12 @@
       "comment" : "エラー",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error"
@@ -2409,6 +3033,12 @@
             "value" : "Error (Status Code: %lld)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error (Código de estado: %lld)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2430,6 +3060,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error: Failed to serialize pull request body: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: No se pudo serializar el cuerpo de la solicitud de pull: "
           }
         },
         "fr" : {
@@ -2455,6 +3091,12 @@
             "value" : "Error: Failed to serialize request body: "
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: No se pudo serializar el cuerpo de la solicitud: "
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2476,6 +3118,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error: Invalid API URL for delete."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: URL de API no válida para eliminar."
           }
         },
         "fr" : {
@@ -2501,6 +3149,12 @@
             "value" : "Error: Invalid API URL for pull."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: URL de API no válida para pull."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2522,6 +3176,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error: Invalid API URL."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: URL de API no válida."
           }
         },
         "fr" : {
@@ -2547,6 +3207,12 @@
             "value" : "Error: No Ollama server selected."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: No se ha seleccionado ningún servidor Ollama."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2568,6 +3234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expires: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expira: %@"
           }
         },
         "fr" : {
@@ -2593,6 +3265,12 @@
             "value" : "Failed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallido"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2614,6 +3292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to connect to the Ollama API. Please check your network connection or server settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo conectar a la API de Ollama. Por favor, comprueba tu conexión de red o la configuración del servidor."
           }
         },
         "fr" : {
@@ -2639,6 +3323,12 @@
             "value" : "Families:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familias:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2660,6 +3350,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Family:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familia:"
           }
         },
         "fr" : {
@@ -2685,6 +3381,12 @@
             "value" : "Fetching models from API (%@)..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obteniendo modelos de la API (%@)..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2706,6 +3408,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Find Models"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar Modelos"
           }
         },
         "fr" : {
@@ -2731,6 +3439,12 @@
             "value" : "Format:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2752,6 +3466,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Found a bug?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Encontraste un error?"
           }
         },
         "fr" : {
@@ -2780,6 +3500,12 @@
             "value" : "General"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2801,6 +3527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Give It a Star"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dale una Estrella"
           }
         },
         "fr" : {
@@ -2826,6 +3558,12 @@
             "value" : "Give It a Star to GitHub Repository"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dale una Estrella al Repositorio de GitHub"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2847,6 +3585,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Have an idea?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Tienes una idea?"
           }
         },
         "fr" : {
@@ -2872,6 +3616,12 @@
             "value" : "Here you can perform a simple chat to check the model."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquí puedes realizar un chat simple para comprobar el modelo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2895,6 +3645,12 @@
             "value" : "Hide Inspector"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar Inspector"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2913,6 +3669,12 @@
       "comment" : "サーバーのホスト・ホスト名",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Host"
@@ -2941,6 +3703,12 @@
             "value" : "Host:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2962,6 +3730,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "How to Set Up"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo Configurar"
           }
         },
         "fr" : {
@@ -2987,6 +3761,12 @@
             "value" : "How to set up local network permission."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo configurar el permiso de red local."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3008,6 +3788,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I would be so glad if you could give a star to the repository!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Me alegraría mucho si pudieras darle una estrella al repositorio!"
           }
         },
         "fr" : {
@@ -3033,6 +3819,12 @@
             "value" : "If responses take longer, such as when loading large models, increasing the timeout may help."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si las respuestas tardan más, como al cargar modelos grandes, aumentar el tiempo de espera puede ayudar."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3054,6 +3846,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si desactivas la respuesta en streaming, se recomienda establecer el tiempo de espera de la API en ilimitado en los ajustes."
           }
         },
         "fr" : {
@@ -3079,6 +3877,12 @@
             "value" : "If you're not sure what to enter, you can find models on the Ollama website."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si no estás seguro de qué introducir, puedes encontrar modelos en el sitio web de Ollama."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3097,6 +3901,12 @@
       "comment" : "インスペクター(右サイドバー)",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspector"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inspector"
@@ -3125,6 +3935,12 @@
             "value" : "Launch at Login"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir al Iniciar Sesión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3146,6 +3962,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "License"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licencia"
           }
         },
         "fr" : {
@@ -3171,6 +3993,12 @@
             "value" : "License Information"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información de Licencia"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3192,6 +4020,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "License:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licencia:"
           }
         },
         "fr" : {
@@ -3217,6 +4051,12 @@
             "value" : "Loading model info..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando información del modelo..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3240,6 +4080,12 @@
             "value" : "Local Network Access"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso a la Red Local"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3261,6 +4107,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Local network permission is granted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El permiso de red local está concedido."
           }
         },
         "fr" : {
@@ -3289,6 +4141,12 @@
             "value" : "Menu"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menú"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3315,6 +4173,12 @@
             "value" : "Mocolamma is an Open Source Application."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma es una aplicación de código abierto."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3336,6 +4200,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model deletion failed: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al eliminar el modelo: "
           }
         },
         "fr" : {
@@ -3361,6 +4231,12 @@
             "value" : "Model Details"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalles del Modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3382,6 +4258,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model Information:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información del Modelo:"
           }
         },
         "fr" : {
@@ -3407,6 +4289,12 @@
             "value" : "Model Name:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del Modelo:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3428,6 +4316,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model pull completed: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descarga de modelo completada: "
           }
         },
         "fr" : {
@@ -3453,6 +4347,12 @@
             "value" : "Model Pull Error"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de Descarga de Modelo"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3474,6 +4374,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model pull error: HTTP Status Code %d"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de descarga de modelo: Código de estado HTTP %d"
           }
         },
         "fr" : {
@@ -3499,6 +4405,12 @@
             "value" : "Model pull failed: "
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falló la descarga del modelo: "
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3520,6 +4432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model pull failed.\nPlease make sure the model name is correct."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falló la descarga del modelo.\nPor favor, asegúrate de que el nombre del modelo es correcto."
           }
         },
         "fr" : {
@@ -3545,6 +4463,12 @@
             "value" : "Model pull failed.\nUnknown error occurred."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falló la descarga del modelo.\nOcurrió un error desconocido."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3566,6 +4490,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Models"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos"
           }
         },
         "fr" : {
@@ -3591,6 +4521,12 @@
             "value" : "Modified At"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modificado en"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3612,6 +4548,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modified At:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modificado en:"
           }
         },
         "fr" : {
@@ -3637,6 +4579,12 @@
             "value" : "Name"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3658,6 +4606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New Chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo Chat"
           }
         },
         "fr" : {
@@ -3683,6 +4637,12 @@
             "value" : "Next Revision"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente Revisión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3704,6 +4664,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No data available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay datos disponibles"
           }
         },
         "fr" : {
@@ -3729,6 +4695,12 @@
             "value" : "No details available."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay detalles disponibles."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3750,6 +4722,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No model information available."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay información del modelo disponible."
           }
         },
         "fr" : {
@@ -3775,6 +4753,12 @@
             "value" : "No models are currently installed. Click or tap '+' to add a new model."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay modelos instalados actualmente. Haz clic o pulsa '+' para añadir un nuevo modelo."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3796,6 +4780,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No models available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay modelos disponibles"
           }
         },
         "fr" : {
@@ -3821,6 +4811,12 @@
             "value" : "No Models Available"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Hay Modelos Disponibles"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3842,6 +4838,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Server Selected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún Servidor Seleccionado"
           }
         },
         "fr" : {
@@ -3867,6 +4869,12 @@
             "value" : "No servers are currently configured. Click or tap '+' to add a new server."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay servidores configurados actualmente. Haz clic o pulsa '+' para añadir un nuevo servidor."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3888,6 +4896,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Servers Available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Hay Servidores Disponibles"
           }
         },
         "fr" : {
@@ -3913,6 +4927,12 @@
             "value" : "No."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N.º"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3934,6 +4954,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No. %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N.º %lld"
           }
         },
         "fr" : {
@@ -3959,6 +4985,12 @@
             "value" : "Not Connected (Status Code: %lld)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Conectado (Código de estado: %lld)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3980,6 +5012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not Connected (Timeout)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Conectado (Tiempo de espera agotado)"
           }
         },
         "fr" : {
@@ -4005,6 +5043,12 @@
             "value" : "Not Connected (Unknown Host)"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Conectado (Host desconocido)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4028,6 +5072,12 @@
             "value" : "Nothing to display."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada que mostrar."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4048,6 +5098,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Number"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número"
           }
         },
         "fr" : {
@@ -4079,6 +5135,12 @@
             "value" : "Ollama Version:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión de Ollama:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4100,6 +5162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir"
           }
         },
         "fr" : {
@@ -4125,6 +5193,12 @@
             "value" : "Open License Page"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Página de Licencia"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4146,6 +5220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open License Page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir página de licencia?"
           }
         },
         "fr" : {
@@ -4171,6 +5251,12 @@
             "value" : "Open link to discussion page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de discusión."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4192,6 +5278,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to list of known bugs and report page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la lista de errores conocidos y a la página de informes."
           }
         },
         "fr" : {
@@ -4217,6 +5309,12 @@
             "value" : "Open link to the Buy Me a Coffee page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de Buy Me a Coffee."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4238,6 +5336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to the CompactSlider GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de CompactSlider."
           }
         },
         "fr" : {
@@ -4263,6 +5367,12 @@
             "value" : "Open link to the create-dmg GitHub page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de create-dmg."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4284,6 +5394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to the Gemini CLI GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Gemini CLI."
           }
         },
         "fr" : {
@@ -4309,6 +5425,12 @@
             "value" : "Open link to the GitHub contributors page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de contribuidores de GitHub."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4330,6 +5452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to the GitHub repository page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página del repositorio de GitHub."
           }
         },
         "fr" : {
@@ -4355,6 +5483,12 @@
             "value" : "Open link to the MarkdownUI GitHub page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de MarkdownUI."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4376,6 +5510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to the Ollama GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Ollama."
           }
         },
         "fr" : {
@@ -4401,6 +5541,12 @@
             "value" : "Open link to the opencode GitHub page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de opencode."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4422,6 +5568,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open link to the PayPal.Me."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a PayPal.Me."
           }
         },
         "fr" : {
@@ -4447,6 +5599,12 @@
             "value" : "Open link to the Qwen Code GitHub page."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Qwen Code."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4468,6 +5626,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Link?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir enlace?"
           }
         },
         "fr" : {
@@ -4493,6 +5657,12 @@
             "value" : "Open Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4514,6 +5684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Source License"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licencia de Código Abierto"
           }
         },
         "fr" : {
@@ -4539,6 +5715,12 @@
             "value" : "Open the Send Email window?"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir la ventana de Enviar Correo Electrónico?"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4562,6 +5744,12 @@
             "value" : "Open the send feedback email window."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la ventana de envío de correo electrónico de comentarios."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4583,6 +5771,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Website"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Sitio Web"
           }
         },
         "fr" : {
@@ -4611,6 +5805,12 @@
             "value" : "Order"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orden"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4632,6 +5832,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Other License"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otra Licencia"
           }
         },
         "fr" : {
@@ -4657,6 +5863,12 @@
             "value" : "Parameter Count:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número de Parámetros:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4678,6 +5890,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parameter Size:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño de Parámetros:"
           }
         },
         "fr" : {
@@ -4703,6 +5921,12 @@
             "value" : "Parent Model:"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo Padre:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4724,6 +5948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Permission is required to connect to Ollama servers on the same network."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere permiso para conectarse a los servidores de Ollama en la misma red."
           }
         },
         "fr" : {
@@ -4749,6 +5979,12 @@
             "value" : "Permissions"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4770,6 +6006,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please select a server in the Server tab."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, selecciona un servidor en la pestaña Servidor."
           }
         },
         "fr" : {
@@ -4795,6 +6037,12 @@
             "value" : "Preparing..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4818,6 +6066,12 @@
             "value" : "Previous Revision"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión Anterior"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4839,6 +6093,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quantization Level:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nivel de Cuantización:"
           }
         },
         "fr" : {
@@ -4875,6 +6135,12 @@
             "value" : "Refresh"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4896,6 +6162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refresh status"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar estado"
           }
         },
         "fr" : {
@@ -4921,6 +6193,12 @@
             "value" : "Report a Bug"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar un Error"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4942,6 +6220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retry"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
           }
         },
         "fr" : {
@@ -4967,6 +6251,12 @@
             "value" : "running"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en ejecución"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4988,6 +6278,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running Models:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos en Ejecución:"
           }
         },
         "fr" : {
@@ -5013,6 +6309,12 @@
             "value" : "Save"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5034,6 +6336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar"
           }
         },
         "fr" : {
@@ -5059,6 +6367,12 @@
             "value" : "Select a menu."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona un menú."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5080,6 +6394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select a model to see the details."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona un modelo para ver los detalles."
           }
         },
         "fr" : {
@@ -5105,6 +6425,12 @@
             "value" : "Select a server to see the details."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona un servidor para ver los detalles."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5126,6 +6452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select Model"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar Modelo"
           }
         },
         "fr" : {
@@ -5151,6 +6483,12 @@
             "value" : "Send Feedback"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar Comentarios"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5172,6 +6510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Server"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor"
           }
         },
         "fr" : {
@@ -5197,6 +6541,12 @@
             "value" : "Server Details"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalles del Servidor"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5218,6 +6568,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Servers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidores"
           }
         },
         "fr" : {
@@ -5243,6 +6599,12 @@
             "value" : "Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5264,6 +6626,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes…"
           }
         },
         "fr" : {
@@ -5289,6 +6657,12 @@
             "value" : "Show Inspector"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar Inspector"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5310,6 +6684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show license information for this application and the libraries used."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar información de licencia para esta aplicación y las bibliotecas utilizadas."
           }
         },
         "fr" : {
@@ -5335,6 +6715,12 @@
             "value" : "Size"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5356,6 +6742,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Size:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño:"
           }
         },
         "fr" : {
@@ -5381,6 +6773,12 @@
             "value" : "Sort"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5402,6 +6800,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sort by"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar por"
           }
         },
         "fr" : {
@@ -5427,6 +6831,12 @@
             "value" : "Specifies whether to perform inference when using a reasoning model."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica si se debe realizar la inferencia al usar un modelo de razonamiento."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5448,6 +6858,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stopped"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detenido"
           }
         },
         "fr" : {
@@ -5473,6 +6889,12 @@
             "value" : "Stream Response"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta en Streaming"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5494,6 +6916,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Successfully deleted model '%1$@' from %2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminó con éxito el modelo '%1$@' de %2$@."
           }
         },
         "fr" : {
@@ -5519,6 +6947,12 @@
             "value" : "Successfully fetched models. Total: %d"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos obtenidos con éxito. Total: %d"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5540,6 +6974,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Support and Feedback"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soporte y Comentarios"
           }
         },
         "fr" : {
@@ -5565,6 +7005,12 @@
             "value" : "Support Developer"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoyar al Desarrollador"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5586,6 +7032,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "System Prompt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prompt del Sistema"
           }
         },
         "fr" : {
@@ -5611,6 +7063,12 @@
             "value" : "Temperature"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temperatura"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5632,6 +7090,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thinking"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensamiento"
           }
         },
         "fr" : {
@@ -5657,6 +7121,12 @@
             "value" : "Thinking completed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensamiento completado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5678,6 +7148,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thinking..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pensando..."
           }
         },
         "fr" : {
@@ -5704,6 +7180,12 @@
             "value" : "None"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguno"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5726,6 +7208,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
           }
         },
         "fr" : {
@@ -5752,6 +7240,12 @@
             "value" : "On"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5773,6 +7267,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This model cannot be used"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este modelo no se puede utilizar"
           }
         },
         "fr" : {
@@ -5798,6 +7298,12 @@
             "value" : "This model does not support chat."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este modelo no es compatible con el chat."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5819,6 +7325,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para permitir el acceso a la red local, ve a Ajustes → Privacidad y seguridad → Red local, y activa \"Mocolamma\" on."
           }
         },
         "fr" : {
@@ -5844,6 +7356,12 @@
             "value" : "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick or tap \"OK\" to open Privacy & Security settings."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para permitir el acceso a la red local, ve a Ajustes del Sistema → Privacidad y seguridad → Red local, y activa \"Mocolamma\" on.\n\nHaz clic o pulsa \"OK\" para abrir los ajustes de Privacidad y seguridad."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5865,6 +7383,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toggle Inspector"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar Inspector"
           }
         },
         "fr" : {
@@ -5890,6 +7414,12 @@
             "value" : "Toggle Text Wrapping"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar Ajuste de Texto"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5911,6 +7441,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herramientas"
           }
         },
         "fr" : {
@@ -5936,6 +7472,12 @@
             "value" : "Type your message..."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe tu mensaje..."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5957,6 +7499,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unlimited"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilimitado"
           }
         },
         "fr" : {
@@ -5982,6 +7530,12 @@
             "value" : "Update"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6003,6 +7557,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Update Anyway"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar de todos modos"
           }
         },
         "fr" : {
@@ -6028,6 +7588,12 @@
             "value" : "Version: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: %@"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6049,6 +7615,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Version: %1$@ (%2$@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: %1$@ (%2$@)"
           }
         },
         "fr" : {
@@ -6074,6 +7646,12 @@
             "value" : "Vision"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visión"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6095,6 +7673,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VRAM Size: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño de VRAM: %@"
           }
         },
         "fr" : {
@@ -6120,6 +7704,12 @@
             "value" : "You can also donate directly at PayPal."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "También puedes donar directamente en PayPal."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6141,6 +7731,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can support me at Buy Me a Coffee from the price of a cup of green tea."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes apoyarme en Buy Me a Coffee desde el precio de una taza de té verde."
           }
         },
         "fr" : {
