@@ -1,9 +1,1 @@
-/* 
-  InfoPlist.strings
-  Mocolamma
-
-  Created by 今浦大雅 on 2025/10/05.
-  
-*/
-
 NSLocalNetworkUsageDescription = "This is required to communicate with Ollama servers existing within the local network.";
