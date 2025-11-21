@@ -13,16 +13,16 @@
             "value" : "%1$.1f%% completed (%2$@ / %3$@)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 完了 (%2$@ / %3$@)"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$.1f%% terminé (%2$@ / %3$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% 完了 (%2$@ / %3$@)"
           }
         }
       }
@@ -39,16 +39,16 @@
             "value" : "*Could not connect*"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "*接続できませんでした*"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "*Impossible de se connecter*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*接続できませんでした*"
           }
         }
       }
@@ -62,16 +62,16 @@
             "value" : "*No message*"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "*メッセージがありません*"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "*Aucun message*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*メッセージがありません*"
           }
         }
       }
@@ -84,16 +84,16 @@
             "value" : "%1$@, %2$@"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@、%2$@"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、%2$@"
           }
         }
       },
@@ -107,16 +107,16 @@
             "value" : "%1$@, %2$lld B"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$lld B"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$lld o"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
           }
         }
       },
@@ -131,16 +131,16 @@
             "value" : "%1$@/s, Time Remaining: %2$02d:%3$02d"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@/s、残り時間: %2$02d:%3$02d"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@/s, Temps restant : %2$02d:%3$02d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s、残り時間: %2$02d:%3$02d"
           }
         }
       }
@@ -169,18 +169,6 @@
             }
           }
         },
-        "ja" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld トークン"
-                }
-              }
-            }
-          }
-        },
         "fr" : {
           "variations" : {
             "plural" : {
@@ -194,6 +182,18 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld Jetons"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld トークン"
                 }
               }
             }
@@ -221,16 +221,16 @@
             "value" : "1 min"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1分"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1分"
           }
         }
       }
@@ -244,16 +244,16 @@
             "value" : "5 min"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "5分"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "5 min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5分"
           }
         }
       }
@@ -267,16 +267,16 @@
             "value" : "30 sec"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30秒"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 sec"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30秒"
           }
         }
       }
@@ -290,16 +290,16 @@
             "value" : "About Mocolamma"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mocolammaについて"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "À propos de Mocolamma"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolammaについて"
           }
         }
       }
@@ -313,16 +313,16 @@
             "value" : "About Mocolamma…"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mocolammaについて…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "À propos de Mocolamma…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolammaについて…"
           }
         }
       }
@@ -336,16 +336,16 @@
             "value" : "Acknowledgements"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "謝辞"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remerciements"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "謝辞"
           }
         }
       }
@@ -359,16 +359,16 @@
             "value" : "Add"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "追加"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加"
           }
         }
       }
@@ -382,16 +382,16 @@
             "value" : "Add Anyway"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このまま追加"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter quand même"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま追加"
           }
         }
       }
@@ -405,16 +405,16 @@
             "value" : "Add Model"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを追加"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを追加"
           }
         }
       }
@@ -428,16 +428,16 @@
             "value" : "Add Model…"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを追加…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un modèle…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを追加…"
           }
         }
       }
@@ -451,16 +451,16 @@
             "value" : "Add New"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規追加"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規追加"
           }
         }
       }
@@ -474,16 +474,16 @@
             "value" : "Add Server"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーを追加"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを追加"
           }
         }
       }
@@ -497,16 +497,16 @@
             "value" : "Add Server…"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーを追加…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un serveur…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを追加…"
           }
         }
       }
@@ -520,16 +520,16 @@
             "value" : "Allowed"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "許可済み"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autorisé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
           }
         }
       }
@@ -543,16 +543,16 @@
             "value" : "API Decode Error: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIデコードエラー:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de décodage de l'API :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIデコードエラー:"
           }
         }
       }
@@ -566,16 +566,16 @@
             "value" : "API Error: HTTP Status Code %d"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIエラー: HTTPステータスコード %d"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur API : Code d'état HTTP %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIエラー: HTTPステータスコード %d"
           }
         }
       }
@@ -589,16 +589,16 @@
             "value" : "API Error: Unknown response type."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIエラー: 不明なレスポンスタイプです。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur API : Type de réponse inconnu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIエラー: 不明なレスポンスタイプです。"
           }
         }
       }
@@ -612,16 +612,16 @@
             "value" : "API Request Error: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIリクエストエラー:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de requête API :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIリクエストエラー:"
           }
         }
       }
@@ -635,16 +635,16 @@
             "value" : "API Timeout"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIタイムアウト"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Délai d'attente de l'API"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIタイムアウト"
           }
         }
       }
@@ -658,16 +658,16 @@
             "value" : "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment supprimer le modèle « %@ » ?\nCette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -681,16 +681,16 @@
             "value" : "Are you sure you want to delete the selected model?\nThis action cannot be undone."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選択されたモデルを削除してもよろしいですか？\nこの操作は元に戻せません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment supprimer le modèle sélectionné ?\nCette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -704,16 +704,16 @@
             "value" : "Are you sure you want to delete the selected server?\nThis action cannot be undone."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選択されたサーバーを削除してもよろしいですか？\nこの操作は元に戻せません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment supprimer le serveur sélectionné ?\nCette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたサーバーを削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -727,16 +727,16 @@
             "value" : "Are you sure you want to delete the server \"%@\"?\nThis action cannot be undone."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバー「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment supprimer le serveur « %@ » ?\nCette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー「%@」を削除してもよろしいですか？\nこの操作は元に戻せません。"
           }
         }
       }
@@ -750,16 +750,16 @@
             "value" : "Are you sure you want to open the Buy Me a Coffee page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page Buy Me a Coffee ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
           }
         }
       }
@@ -773,16 +773,16 @@
             "value" : "Are you sure you want to open the CompactSlider GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CompactSliderのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub de CompactSlider ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CompactSliderのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -796,16 +796,16 @@
             "value" : "Are you sure you want to open the create-dmg GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "create-dmgのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub de create-dmg ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmgのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -819,16 +819,16 @@
             "value" : "Are you sure you want to open the Discussion page on GitHub?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubのDiscussionページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page de discussion sur GitHub ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのDiscussionページを開いてもよろしいですか？"
           }
         }
       }
@@ -842,16 +842,16 @@
             "value" : "Are you sure you want to open the Gemini CLI GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub de Gemini CLI ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -865,16 +865,16 @@
             "value" : "Are you sure you want to open the GitHub contributors page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubの貢献者ページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page des contributeurs GitHub ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubの貢献者ページを開いてもよろしいですか？"
           }
         }
       }
@@ -888,16 +888,16 @@
             "value" : "Are you sure you want to open the GitHub repository page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubのリポジトリページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page du dépôt GitHub ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのリポジトリページを開いてもよろしいですか？"
           }
         }
       }
@@ -911,16 +911,16 @@
             "value" : "Are you sure you want to open the Issue page on GitHub?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubのIssueページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page des problèmes sur GitHub ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのIssueページを開いてもよろしいですか？"
           }
         }
       }
@@ -934,16 +934,16 @@
             "value" : "Are you sure you want to open the MarkdownUI GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MarkdownUIのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub de MarkdownUI ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MarkdownUIのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -957,16 +957,16 @@
             "value" : "Are you sure you want to open the Ollama GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OllamaのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub d'Ollama ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OllamaのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -980,16 +980,16 @@
             "value" : "Are you sure you want to open the Ollama models page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollamaのモデルページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page des modèles Ollama ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollamaのモデルページを開いてもよろしいですか？"
           }
         }
       }
@@ -1003,16 +1003,16 @@
             "value" : "Are you sure you want to open the opencode GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "opencodeのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub d'opencode ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opencodeのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -1026,16 +1026,16 @@
             "value" : "Are you sure you want to open the page with license information?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンス情報が記載されたページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page contenant les informations de licence ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス情報が記載されたページを開いてもよろしいですか？"
           }
         }
       }
@@ -1049,16 +1049,16 @@
             "value" : "Are you sure you want to open the PayPal.Me page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPal.Meのページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page PayPal.Me ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPal.Meのページを開いてもよろしいですか？"
           }
         }
       }
@@ -1072,16 +1072,16 @@
             "value" : "Are you sure you want to open the Qwen Code GitHub page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la page GitHub de Qwen Code ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -1095,16 +1095,16 @@
             "value" : "Are you sure you want to open the send feedback email window?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous vraiment ouvrir la fenêtre d'envoi d'e-mail de commentaires ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
           }
         }
       }
@@ -1117,16 +1117,16 @@
             "value" : "Ascending"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "昇順"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Croissant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昇順"
           }
         }
       }
@@ -1140,16 +1140,16 @@
             "value" : "Ask questions and share your opinions"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "質問や意見交換などを行いましょう"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Posez des questions et partagez vos opinions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "質問や意見交換などを行いましょう"
           }
         }
       }
@@ -1163,16 +1163,16 @@
             "value" : "Buy Green Tea"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "緑茶を奢る"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Offrir un thé vert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "緑茶を奢る"
           }
         }
       }
@@ -1186,16 +1186,16 @@
             "value" : "Buy Me Green Tea"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "緑茶を買ってあげる"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Offrez-moi un thé vert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "緑茶を買ってあげる"
           }
         }
       }
@@ -1209,16 +1209,16 @@
             "value" : "Cancel"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キャンセル"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
           }
         }
       }
@@ -1232,16 +1232,16 @@
             "value" : "Cancel editing."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集をキャンセルする"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler la modification."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集をキャンセルする"
           }
         }
       }
@@ -1255,16 +1255,16 @@
             "value" : "Chat"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "チャット"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット"
           }
         }
       }
@@ -1278,16 +1278,16 @@
             "value" : "Chat Settings"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "チャット設定"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres du chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット設定"
           }
         }
       }
@@ -1301,16 +1301,16 @@
             "value" : "Checking..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "確認中…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vérification…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認中…"
           }
         }
       }
@@ -1324,16 +1324,16 @@
             "value" : "Close"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閉じる"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fermer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
           }
         }
       }
@@ -1347,16 +1347,16 @@
             "value" : "Community"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コミュニティ"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Communauté"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミュニティ"
           }
         }
       }
@@ -1373,16 +1373,16 @@
             "value" : "Complete editing and retry."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集を完了してやり直します。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminer la modification et réessayer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集を完了してやり直します。"
           }
         }
       }
@@ -1396,16 +1396,16 @@
             "value" : "Completed"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了しました"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了しました"
           }
         }
       }
@@ -1419,16 +1419,16 @@
             "value" : "Completion"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コンプリーション"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Complétion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンプリーション"
           }
         }
       }
@@ -1442,16 +1442,16 @@
             "value" : "Connected"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続済み"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Connecté"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続済み"
           }
         }
       }
@@ -1465,16 +1465,16 @@
             "value" : "Connecting..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続中…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Connexion en cours…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続中…"
           }
         }
       }
@@ -1488,16 +1488,16 @@
             "value" : "Connection Failed"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続に失敗しました"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec de la connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続に失敗しました"
           }
         }
       }
@@ -1511,16 +1511,16 @@
             "value" : "Could not connect to the API.\nPlease check if the host is correct and the Ollama server is running."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIに接続できませんでした。\nホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de se connecter à l'API.\nVeuillez vérifier si l'hôte est correct et si le serveur Ollama est en cours d'exécution."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIに接続できませんでした。\nホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
           }
         }
       }
@@ -1534,16 +1534,16 @@
             "value" : "Connection Error"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接続エラー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続エラー"
           }
         }
       }
@@ -1557,16 +1557,16 @@
             "value" : "Context Length:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コンテキスト長:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Longueur du contexte :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンテキスト長:"
           }
         }
       }
@@ -1580,16 +1580,16 @@
             "value" : "Context Window"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コンテキストウィンドウ"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fenêtre de contexte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンテキストウィンドウ"
           }
         }
       }
@@ -1603,16 +1603,16 @@
             "value" : "Contributors"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "貢献者"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contributeurs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貢献者"
           }
         }
       }
@@ -1626,16 +1626,16 @@
             "value" : "Contributors involved in the development"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開発に携わった貢献者"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contributeurs impliqués dans le développement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発に携わった貢献者"
           }
         }
       }
@@ -1649,16 +1649,16 @@
             "value" : "Copy"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コピー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー"
           }
         }
       }
@@ -1672,16 +1672,16 @@
             "value" : "Copy Model Name"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル名をコピー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copier le nom du modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル名をコピー"
           }
         }
       }
@@ -1695,16 +1695,16 @@
             "value" : "Copyright ©︎ 2025 Taiga Imaura"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copyright ©︎ 2025 今浦大雅"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 今浦大雅"
           }
         }
       }
@@ -1718,16 +1718,16 @@
             "value" : "Could not connect to API.\nTLS error occurred, could not establish a secure connection."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIに接続できませんでした。\nTLSエラーが起きたため、セキュリティ保護された接続を確立できませんでした。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de se connecter à l'API.\nUne erreur TLS s'est produite, impossible d'établir une connexion sécurisée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIに接続できませんでした。\nTLSエラーが起きたため、セキュリティ保護された接続を確立できませんでした。"
           }
         }
       }
@@ -1741,16 +1741,16 @@
             "value" : "Could not load model information."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル情報を読み込めませんでした。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de charger les informations sur le modèle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報を読み込めませんでした。"
           }
         }
       }
@@ -1767,16 +1767,16 @@
             "value" : "Custom Settings"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カスタム設定"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres personnalisés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム設定"
           }
         }
       }
@@ -1789,16 +1789,16 @@
             "value" : "Date"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日付"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付"
           }
         }
       }
@@ -1812,16 +1812,16 @@
             "value" : "Delete"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         }
       }
@@ -1835,16 +1835,16 @@
             "value" : "Delete Error: HTTP Status Code %1$d - %2$@ on %3$@"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除エラー: HTTPステータスコード %1$d - %2$@（%3$@）"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de suppression : Code d'état HTTP %1$d - %2$@ sur %3$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: HTTPステータスコード %1$d - %2$@（%3$@）"
           }
         }
       }
@@ -1858,16 +1858,16 @@
             "value" : "Delete Error: Model '%1$@' not found (404 Not Found) on %2$@."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除エラー: モデル「%1$@」は%2$@で見つかりませんでした（404 Not Found）。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de suppression : Modèle '%1$@' introuvable (404 Not Found) sur %2$@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: モデル「%1$@」は%2$@で見つかりませんでした（404 Not Found）。"
           }
         }
       }
@@ -1881,16 +1881,16 @@
             "value" : "Delete Error: Unknown response type."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除エラー: 不明なレスポンスタイプです。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de suppression : Type de réponse inconnu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除エラー: 不明なレスポンスタイプです。"
           }
         }
       }
@@ -1904,16 +1904,16 @@
             "value" : "Delete Model"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを削除"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer le modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを削除"
           }
         }
       }
@@ -1927,16 +1927,16 @@
             "value" : "Delete Server"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーを削除"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer le serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを削除"
           }
         }
       }
@@ -1950,16 +1950,16 @@
             "value" : "Delete..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除…"
           }
         }
       }
@@ -1973,16 +1973,16 @@
             "value" : "Deleting model '%1$@' from %2$@..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル「%1$@」を「%2$@」から削除しています…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suppression du modèle '%1$@' de %2$@..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」から削除しています…"
           }
         }
       }
@@ -1995,16 +1995,16 @@
             "value" : "Descending"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "降順"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Décroissant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "降順"
           }
         }
       }
@@ -2018,16 +2018,16 @@
             "value" : "Details Information:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細情報:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Informations détaillées :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細情報:"
           }
         }
       }
@@ -2041,16 +2041,16 @@
             "value" : "Developed with Generative AI"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "生成AIと開発"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Développé avec l'IA générative"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成AIと開発"
           }
         }
       }
@@ -2064,16 +2064,16 @@
             "value" : "Digest:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダイジェスト:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Digest :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダイジェスト:"
           }
         }
       }
@@ -2087,16 +2087,16 @@
             "value" : "Donate at PayPal"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPalで寄付"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faire un don sur PayPal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPalで寄付"
           }
         }
       }
@@ -2110,16 +2110,16 @@
             "value" : "Done"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
           }
         }
       }
@@ -2133,16 +2133,16 @@
             "value" : "Downloading model '%1$@' from %2$@..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル「%1$@」を「%2$@」からダウンロードしています…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Téléchargement du modèle '%1$@' depuis %2$@..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」からダウンロードしています…"
           }
         }
       }
@@ -2156,16 +2156,16 @@
             "value" : "e.g., gemma3:4b, phi4:latest"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "例: gemma3:4b、phi4:latestなど"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ex: gemma3:4b, phi4:latest etc."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: gemma3:4b、phi4:latestなど"
           }
         }
       }
@@ -2179,16 +2179,16 @@
             "value" : "e.g., localhost:11434 or 192.168.1.50:11434"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "例: localhost:11434または192.168.1.50:11434など"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ex: localhost:11434 ou 192.168.1.50:11434 etc."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: localhost:11434または192.168.1.50:11434など"
           }
         }
       }
@@ -2202,16 +2202,16 @@
             "value" : "e.g., Ollama Server"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "例: Ollamaサーバー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ex: Serveur Ollama"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例: Ollamaサーバー"
           }
         }
       }
@@ -2225,16 +2225,16 @@
             "value" : "Edit"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
           }
         }
       }
@@ -2248,16 +2248,16 @@
             "value" : "Edit Server"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーを編集"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier le serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーを編集"
           }
         }
       }
@@ -2271,16 +2271,16 @@
             "value" : "Edit..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集…"
           }
         }
       }
@@ -2294,16 +2294,16 @@
             "value" : "Embedding"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "埋め込み"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Intégration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "埋め込み"
           }
         }
       }
@@ -2317,16 +2317,16 @@
             "value" : "Embedding Length:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "埋め込み長:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Longueur d'intégration :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "埋め込み長:"
           }
         }
       }
@@ -2340,16 +2340,16 @@
             "value" : "Enable Custom Settings"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カスタム設定を有効にする"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activer les paramètres personnalisés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム設定を有効にする"
           }
         }
       }
@@ -2363,16 +2363,16 @@
             "value" : "Enter the name of the model you want to add"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "追加したいモデル名を入力"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisissez le nom du modèle que vous souhaitez ajouter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加したいモデル名を入力"
           }
         }
       }
@@ -2386,16 +2386,16 @@
             "value" : "Error"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
           }
         }
       }
@@ -2409,16 +2409,16 @@
             "value" : "Error (Status Code: %lld)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー（ステータスコード: %lld）"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur (code d'état : %lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー（ステータスコード: %lld）"
           }
         }
       }
@@ -2432,16 +2432,16 @@
             "value" : "Error: Failed to serialize pull request body: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: プルリクエストボディのシリアライズに失敗しました:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : Échec de la sérialisation du corps de la demande de pull :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: プルリクエストボディのシリアライズに失敗しました:"
           }
         }
       }
@@ -2455,16 +2455,16 @@
             "value" : "Error: Failed to serialize request body: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: リクエストボディーのシリアライズに失敗しました:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : Échec de la sérialisation du corps de la requête :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: リクエストボディーのシリアライズに失敗しました:"
           }
         }
       }
@@ -2478,16 +2478,16 @@
             "value" : "Error: Invalid API URL for delete."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: 削除するためのAPI URLが無効です。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : URL d'API non valide pour la suppression."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: 削除するためのAPI URLが無効です。"
           }
         }
       }
@@ -2501,16 +2501,16 @@
             "value" : "Error: Invalid API URL for pull."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: プルするためのAPI URLが無効です。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : URL d'API non valide pour le pull."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: プルするためのAPI URLが無効です。"
           }
         }
       }
@@ -2524,16 +2524,16 @@
             "value" : "Error: Invalid API URL."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: API URLが無効です。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : URL d'API non valide."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: API URLが無効です。"
           }
         }
       }
@@ -2547,16 +2547,16 @@
             "value" : "Error: No Ollama server selected."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラー: Ollamaサーバーが選択されていません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : Aucun serveur Ollama sélectionné."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー: Ollamaサーバーが選択されていません。"
           }
         }
       }
@@ -2570,16 +2570,16 @@
             "value" : "Expires: %@"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "期限切れ: %@"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expire le : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "期限切れ: %@"
           }
         }
       }
@@ -2593,16 +2593,16 @@
             "value" : "Failed"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "失敗しました"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗しました"
           }
         }
       }
@@ -2616,16 +2616,16 @@
             "value" : "Failed to connect to the Ollama API. Please check your network connection or server settings."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama APIとの接続に失敗しました。ネットワーク接続やサーバーの設定をご確認ください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec de la connexion à l'API Ollama. Veuillez vérifier votre connexion réseau ou les paramètres du serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama APIとの接続に失敗しました。ネットワーク接続やサーバーの設定をご確認ください。"
           }
         }
       }
@@ -2639,16 +2639,16 @@
             "value" : "Families:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファミリーズ:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Familles :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファミリーズ:"
           }
         }
       }
@@ -2662,16 +2662,16 @@
             "value" : "Family:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファミリー:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Famille :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファミリー:"
           }
         }
       }
@@ -2685,16 +2685,16 @@
             "value" : "Fetching models from API (%@)..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "API（%@）からモデルを取得中…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Récupération des modèles depuis l'API (%@)..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API（%@）からモデルを取得中…"
           }
         }
       }
@@ -2708,16 +2708,16 @@
             "value" : "Find Models"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを探す"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trouver des modèles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを探す"
           }
         }
       }
@@ -2731,16 +2731,16 @@
             "value" : "Format:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "形式:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Format :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "形式:"
           }
         }
       }
@@ -2754,16 +2754,16 @@
             "value" : "Found a bug?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バグを見つけましたか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous avez trouvé un bug ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バグを見つけましたか？"
           }
         }
       }
@@ -2780,16 +2780,16 @@
             "value" : "General"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一般"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Général"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
           }
         }
       }
@@ -2803,16 +2803,16 @@
             "value" : "Give It a Star"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スターをつける"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Donner une étoile"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スターをつける"
           }
         }
       }
@@ -2826,16 +2826,16 @@
             "value" : "Give It a Star to GitHub Repository"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubリポジトリにスターをつける"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Donner une étoile au dépôt GitHub"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubリポジトリにスターをつける"
           }
         }
       }
@@ -2849,16 +2849,16 @@
             "value" : "Have an idea?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アイデアがありますか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous avez une idée ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイデアがありますか？"
           }
         }
       }
@@ -2872,16 +2872,16 @@
             "value" : "Here you can perform a simple chat to check the model."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ここでは、モデルの確認に使用できる簡易的なチャットを行うことができます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ici, vous pouvez effectuer un simple chat pour vérifier le modèle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここでは、モデルの確認に使用できる簡易的なチャットを行うことができます。"
           }
         }
       }
@@ -2895,16 +2895,16 @@
             "value" : "Hide Inspector"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インスペクタを非表示"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Masquer l'inspecteur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インスペクタを非表示"
           }
         }
       }
@@ -2918,16 +2918,16 @@
             "value" : "Host"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ホスト"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hôte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホスト"
           }
         }
       }
@@ -2941,16 +2941,16 @@
             "value" : "Host:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ホスト:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hôte :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホスト:"
           }
         }
       }
@@ -2964,16 +2964,16 @@
             "value" : "How to Set Up"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定方法"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comment configurer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定方法"
           }
         }
       }
@@ -2987,16 +2987,16 @@
             "value" : "How to set up local network permission."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ローカルネットワーク許可の設定方法。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comment configurer l'autorisation du réseau local."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワーク許可の設定方法。"
           }
         }
       }
@@ -3010,16 +3010,16 @@
             "value" : "I would be so glad if you could give a star to the repository!"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Je serais ravi si vous pouviez donner une étoile au dépôt !"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
           }
         }
       }
@@ -3033,16 +3033,16 @@
             "value" : "If responses take longer, such as when loading large models, increasing the timeout may help."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "大きなモデルを読み込む場合など、応答に時間がかかる場合はタイムアウトを長くすることで改善する可能性があります。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si les réponses prennent plus de temps, comme lors du chargement de grands modèles, l'augmentation du délai d'attente peut aider."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大きなモデルを読み込む場合など、応答に時間がかかる場合はタイムアウトを長くすることで改善する可能性があります。"
           }
         }
       }
@@ -3056,16 +3056,16 @@
             "value" : "If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ストリームレスポンスをオフにする場合、設定からAPIタイムアウトを無制限にすることをおすすめします。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si vous désactivez la réponse en streaming, il est recommandé de définir le délai d'attente de l'API sur illimité dans les paramètres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ストリームレスポンスをオフにする場合、設定からAPIタイムアウトを無制限にすることをおすすめします。"
           }
         }
       }
@@ -3079,16 +3079,16 @@
             "value" : "If you're not sure what to enter, you can find models on the Ollama website."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "何を入力したら良いかわからない場合、Ollamaのウェブサイトでモデルを探すことができます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si vous n'êtes pas sûr de ce qu'il faut saisir, vous pouvez trouver des modèles sur le site Web d'Ollama."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "何を入力したら良いかわからない場合、Ollamaのウェブサイトでモデルを探すことができます。"
           }
         }
       }
@@ -3102,16 +3102,16 @@
             "value" : "Inspector"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インスペクタ"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inspecteur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インスペクタ"
           }
         }
       }
@@ -3125,16 +3125,16 @@
             "value" : "Launch at Login"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ログイン時に開く"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lancer à la connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に開く"
           }
         }
       }
@@ -3148,16 +3148,16 @@
             "value" : "License"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンス"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Licence"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス"
           }
         }
       }
@@ -3171,16 +3171,16 @@
             "value" : "License Information"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンス情報"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Informations sur la licence"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス情報"
           }
         }
       }
@@ -3194,16 +3194,16 @@
             "value" : "License:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンス:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Licence :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス:"
           }
         }
       }
@@ -3217,16 +3217,16 @@
             "value" : "Loading model info..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル情報を読み込み中…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chargement des informations sur le modèle…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報を読み込み中…"
           }
         }
       }
@@ -3240,16 +3240,16 @@
             "value" : "Local Network Access"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ローカルネットワークアクセス"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accès au réseau local"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセス"
           }
         }
       }
@@ -3263,16 +3263,16 @@
             "value" : "Local network permission is granted."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ローカルネットワークの権限が許可されました。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'autorisation du réseau local est accordée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークの権限が許可されました。"
           }
         }
       }
@@ -3289,16 +3289,16 @@
             "value" : "Menu"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニュー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニュー"
           }
         }
       }
@@ -3315,16 +3315,16 @@
             "value" : "Mocolamma is an Open Source Application."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mocolammaはオープンソースのアプリケーションです。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mocolamma est une application Open Source."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolammaはオープンソースのアプリケーションです。"
           }
         }
       }
@@ -3338,16 +3338,16 @@
             "value" : "Model deletion failed: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルの削除に失敗しました:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec de la suppression du modèle :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの削除に失敗しました:"
           }
         }
       }
@@ -3361,16 +3361,16 @@
             "value" : "Model Details"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルの詳細"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Détails du modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの詳細"
           }
         }
       }
@@ -3384,16 +3384,16 @@
             "value" : "Model Information:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル情報:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Informations sur le modèle :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報:"
           }
         }
       }
@@ -3407,16 +3407,16 @@
             "value" : "Model Name:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル名: "
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom du modèle :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル名: "
           }
         }
       }
@@ -3430,16 +3430,16 @@
             "value" : "Model pull completed: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルのプルが完了しました:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pull du modèle terminé :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルが完了しました:"
           }
         }
       }
@@ -3453,16 +3453,16 @@
             "value" : "Model Pull Error"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルプルエラー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de pull du modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルエラー"
           }
         }
       }
@@ -3476,16 +3476,16 @@
             "value" : "Model pull error: HTTP Status Code %d"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルのプルエラー: HTTPステータスコード %d"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de pull du modèle : Code d'état HTTP %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルエラー: HTTPステータスコード %d"
           }
         }
       }
@@ -3499,16 +3499,16 @@
             "value" : "Model pull failed: "
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルのプルに失敗しました:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec du pull du modèle :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルのプルに失敗しました:"
           }
         }
       }
@@ -3522,16 +3522,16 @@
             "value" : "Model pull failed.\nPlease make sure the model name is correct."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルプルに失敗しました。\nモデル名が正しいことをご確認ください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec du pull du modèle.\nVeuillez vous assurer que le nom du modèle est correct."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルに失敗しました。\nモデル名が正しいことをご確認ください。"
           }
         }
       }
@@ -3545,16 +3545,16 @@
             "value" : "Model pull failed.\nUnknown error occurred."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルプルに失敗しました。\n不明なエラーが発生しました。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec du pull du modèle.\nUne erreur inconnue s'est produite."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルプルに失敗しました。\n不明なエラーが発生しました。"
           }
         }
       }
@@ -3568,16 +3568,16 @@
             "value" : "Models"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル"
           }
         }
       }
@@ -3591,16 +3591,16 @@
             "value" : "Modified At"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "変更日"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifié le"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更日"
           }
         }
       }
@@ -3614,16 +3614,16 @@
             "value" : "Modified At:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "変更日:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifié le :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更日:"
           }
         }
       }
@@ -3637,16 +3637,16 @@
             "value" : "Name"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名前"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前"
           }
         }
       }
@@ -3660,16 +3660,16 @@
             "value" : "New Chat"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規チャット"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouveau chat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規チャット"
           }
         }
       }
@@ -3683,16 +3683,16 @@
             "value" : "Next Revision"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次のリビジョン"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révision suivante"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のリビジョン"
           }
         }
       }
@@ -3706,16 +3706,16 @@
             "value" : "No data available"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データがありません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune donnée disponible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データがありません"
           }
         }
       }
@@ -3729,16 +3729,16 @@
             "value" : "No details available."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細がありません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun détail disponible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細がありません。"
           }
         }
       }
@@ -3752,16 +3752,16 @@
             "value" : "No model information available."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル情報がありません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune information sur le modèle disponible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル情報がありません。"
           }
         }
       }
@@ -3775,16 +3775,16 @@
             "value" : "No models are currently installed. Click or tap '+' to add a new model."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルがインストールされていません。「+」をクリックまたはタップして新しいモデルを追加してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun modèle n'est actuellement installé. Cliquez ou appuyez sur « + » pour ajouter un nouveau modèle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルがインストールされていません。「+」をクリックまたはタップして新しいモデルを追加してください。"
           }
         }
       }
@@ -3798,16 +3798,16 @@
             "value" : "No models available"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルがありません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun modèle disponible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルがありません"
           }
         }
       }
@@ -3821,16 +3821,16 @@
             "value" : "No Models Available"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルがありません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun modèle disponible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルがありません"
           }
         }
       }
@@ -3844,16 +3844,16 @@
             "value" : "No Server Selected"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーが選択されていません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun serveur sélectionné"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーが選択されていません"
           }
         }
       }
@@ -3867,16 +3867,16 @@
             "value" : "No servers are currently configured. Click or tap '+' to add a new server."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーが設定されていません。「+」をクリックまたはタップして新しいサーバーを追加してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun serveur n'est actuellement configuré. Cliquez ou appuyez sur « + » pour ajouter un nouveau serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーが設定されていません。「+」をクリックまたはタップして新しいサーバーを追加してください。"
           }
         }
       }
@@ -3890,16 +3890,16 @@
             "value" : "No Servers Available"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーがありません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun serveur disponible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーがありません"
           }
         }
       }
@@ -3913,16 +3913,16 @@
             "value" : "No."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番号"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "N°"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号"
           }
         }
       }
@@ -3936,16 +3936,16 @@
             "value" : "No. %lld"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番号: %lld"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "N° %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号: %lld"
           }
         }
       }
@@ -3959,16 +3959,16 @@
             "value" : "Not Connected (Status Code: %lld)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未接続（ステータスコード: %lld）"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non connecté (code d'état : %lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続（ステータスコード: %lld）"
           }
         }
       }
@@ -3982,16 +3982,16 @@
             "value" : "Not Connected (Timeout)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未接続（タイムアウト）"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non connecté (délai d'attente dépassé)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続（タイムアウト）"
           }
         }
       }
@@ -4005,16 +4005,16 @@
             "value" : "Not Connected (Unknown Host)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未接続（不明なホスト）"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Non connecté (hôte inconnu)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未接続（不明なホスト）"
           }
         }
       }
@@ -4028,16 +4028,16 @@
             "value" : "Nothing to display."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "表示するものがありません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rien à afficher."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示するものがありません。"
           }
         }
       }
@@ -4050,16 +4050,16 @@
             "value" : "Number"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番号"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Numéro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号"
           }
         }
       }
@@ -4079,16 +4079,16 @@
             "value" : "Ollama Version:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ollama バージョン:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version d'Ollama :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama バージョン:"
           }
         }
       }
@@ -4102,16 +4102,16 @@
             "value" : "Open"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開く"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開く"
           }
         }
       }
@@ -4125,16 +4125,16 @@
             "value" : "Open License Page"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンスページを開く"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir la page de la licence"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンスページを開く"
           }
         }
       }
@@ -4148,16 +4148,16 @@
             "value" : "Open License Page?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ライセンスページを開きますか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir la page de la licence ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンスページを開きますか？"
           }
         }
       }
@@ -4171,16 +4171,16 @@
             "value" : "Open link to discussion page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ディスカッションページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page de discussion."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスカッションページへのリンクを開きます。"
           }
         }
       }
@@ -4194,16 +4194,16 @@
             "value" : "Open link to list of known bugs and report page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la liste des bogues connus et la page de rapport."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
           }
         }
       }
@@ -4217,16 +4217,16 @@
             "value" : "Open link to the Buy Me a Coffee page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page Buy Me a Coffee."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeページへのリンクを開きます。"
           }
         }
       }
@@ -4240,16 +4240,16 @@
             "value" : "Open link to the CompactSlider GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CompactSliderのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub de CompactSlider."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CompactSliderのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4263,16 +4263,16 @@
             "value" : "Open link to the create-dmg GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "create-dmgのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub de create-dmg."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmgのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4286,22 +4286,22 @@
             "value" : "Open link to the Gemini CLI GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub de Gemini CLI."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
+          }
         }
       }
     },
     "Open link to the GitHub contributors page." : {
-      "comment" : "GitHubの後継者ページへのリンクを開くボタンのツールチップテキスト。",
+      "comment" : "GitHubの貢献者ページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4309,16 +4309,16 @@
             "value" : "Open link to the GitHub contributors page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubの貢献者ページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page des contributeurs GitHub."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubの貢献者ページへのリンクを開きます。"
           }
         }
       }
@@ -4332,16 +4332,16 @@
             "value" : "Open link to the GitHub repository page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubリポジトリページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page du dépôt GitHub."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubリポジトリページへのリンクを開きます。"
           }
         }
       }
@@ -4355,16 +4355,16 @@
             "value" : "Open link to the MarkdownUI GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MarkdownUIのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub de MarkdownUI."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MarkdownUIのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4378,16 +4378,16 @@
             "value" : "Open link to the Ollama GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OllamaのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub d'Ollama."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OllamaのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4401,16 +4401,16 @@
             "value" : "Open link to the opencode GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "opencodeのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub d'opencode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opencodeのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4424,16 +4424,16 @@
             "value" : "Open link to the PayPal.Me."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPal.Meのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers PayPal.Me."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPal.Meのリンクを開きます。"
           }
         }
       }
@@ -4447,16 +4447,16 @@
             "value" : "Open link to the Qwen Code GitHub page."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien vers la page GitHub de Qwen Code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -4470,16 +4470,16 @@
             "value" : "Open Link?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "リンクを開きますか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le lien ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを開きますか？"
           }
         }
       }
@@ -4493,16 +4493,16 @@
             "value" : "Open Settings"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定を開く"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir les paramètres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
           }
         }
       }
@@ -4516,16 +4516,16 @@
             "value" : "Open Source License"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オープンソースライセンス"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Licence Open Source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オープンソースライセンス"
           }
         }
       }
@@ -4539,16 +4539,16 @@
             "value" : "Open the Send Email window?"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メール送信画面を開きますか？"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir la fenêtre d'envoi d'e-mail ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メール送信画面を開きますか？"
           }
         }
       }
@@ -4562,16 +4562,16 @@
             "value" : "Open the send feedback email window."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバックのメール送信画面を開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir la fenêtre d'envoi d'e-mail de commentaires."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックのメール送信画面を開きます。"
           }
         }
       }
@@ -4585,16 +4585,16 @@
             "value" : "Open Website"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ウェブサイトを開く"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir le site Web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイトを開く"
           }
         }
       }
@@ -4611,16 +4611,16 @@
             "value" : "Order"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "順序"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ordre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "順序"
           }
         }
       }
@@ -4634,16 +4634,16 @@
             "value" : "Other License"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その他のライセンス"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autre licence"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他のライセンス"
           }
         }
       }
@@ -4657,16 +4657,16 @@
             "value" : "Parameter Count:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パラメーター数:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nombre de paramètres :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パラメーター数:"
           }
         }
       }
@@ -4680,16 +4680,16 @@
             "value" : "Parameter Size:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パラメーターサイズ:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taille des paramètres :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パラメーターサイズ:"
           }
         }
       }
@@ -4703,16 +4703,16 @@
             "value" : "Parent Model:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "親モデル:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèle parent :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "親モデル:"
           }
         }
       }
@@ -4726,16 +4726,16 @@
             "value" : "Permission is required to connect to Ollama servers on the same network."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "同一ネットワーク内のOllamaサーバーに接続するには権限が必要です。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Une autorisation est requise pour se connecter aux serveurs Ollama sur le même réseau."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一ネットワーク内のOllamaサーバーに接続するには権限が必要です。"
           }
         }
       }
@@ -4749,16 +4749,16 @@
             "value" : "Permissions"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "権限"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autorisations"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限"
           }
         }
       }
@@ -4772,16 +4772,16 @@
             "value" : "Please select a server in the Server tab."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバータブでサーバーを選択してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez sélectionner un serveur dans l'onglet Serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバータブでサーバーを選択してください。"
           }
         }
       }
@@ -4795,16 +4795,16 @@
             "value" : "Preparing..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "準備中…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Préparation…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備中…"
           }
         }
       }
@@ -4818,16 +4818,16 @@
             "value" : "Previous Revision"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前のリビジョン"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révision précédente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前のリビジョン"
           }
         }
       }
@@ -4841,16 +4841,16 @@
             "value" : "Quantization Level:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "量子化レベル:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Niveau de quantification :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "量子化レベル:"
           }
         }
       }
@@ -4875,16 +4875,16 @@
             "value" : "Refresh"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再読み込み"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再読み込み"
           }
         }
       }
@@ -4898,16 +4898,16 @@
             "value" : "Refresh status"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "状態の更新"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiser le statut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "状態の更新"
           }
         }
       }
@@ -4921,16 +4921,16 @@
             "value" : "Report a Bug"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バグを報告"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Signaler un bug"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バグを報告"
           }
         }
       }
@@ -4944,16 +4944,16 @@
             "value" : "Retry"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "やり直す"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réessayer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やり直す"
           }
         }
       }
@@ -4967,16 +4967,16 @@
             "value" : "running"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "実行中"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "en cours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "実行中"
           }
         }
       }
@@ -4990,16 +4990,16 @@
             "value" : "Running Models:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "実行中のモデル数:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèles en cours d'exécution :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "実行中のモデル数:"
           }
         }
       }
@@ -5013,16 +5013,16 @@
             "value" : "Save"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
           }
         }
       }
@@ -5036,16 +5036,16 @@
             "value" : "Select"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選択"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionner"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択"
           }
         }
       }
@@ -5059,16 +5059,16 @@
             "value" : "Select a menu."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューを選択してください"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez un menu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューを選択してください"
           }
         }
       }
@@ -5082,16 +5082,16 @@
             "value" : "Select a model to see the details."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細を表示するにはモデルを選択してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez un modèle pour voir les détails."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細を表示するにはモデルを選択してください。"
           }
         }
       }
@@ -5105,16 +5105,16 @@
             "value" : "Select a server to see the details."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細を表示するにはサーバーを選択してください。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez un serveur pour voir les détails."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細を表示するにはサーバーを選択してください。"
           }
         }
       }
@@ -5128,16 +5128,16 @@
             "value" : "Select Model"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルを選択"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionner un modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルを選択"
           }
         }
       }
@@ -5151,16 +5151,16 @@
             "value" : "Send Feedback"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバックを送信"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer des commentaires"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックを送信"
           }
         }
       }
@@ -5174,16 +5174,16 @@
             "value" : "Server"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー"
           }
         }
       }
@@ -5197,16 +5197,16 @@
             "value" : "Server Details"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバーの詳細"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Détails du serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーの詳細"
           }
         }
       }
@@ -5220,16 +5220,16 @@
             "value" : "Servers"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サーバー"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serveurs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバー"
           }
         }
       }
@@ -5243,16 +5243,16 @@
             "value" : "Settings"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
@@ -5266,16 +5266,16 @@
             "value" : "Settings…"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
           }
         }
       }
@@ -5289,16 +5289,16 @@
             "value" : "Show Inspector"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インスペクタを表示"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afficher l'inspecteur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インスペクタを表示"
           }
         }
       }
@@ -5312,16 +5312,16 @@
             "value" : "Show license information for this application and the libraries used."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afficher les informations de licence pour cette application et les bibliothèques utilisées."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
           }
         }
       }
@@ -5335,16 +5335,16 @@
             "value" : "Size"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サイズ"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taille"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サイズ"
           }
         }
       }
@@ -5358,16 +5358,16 @@
             "value" : "Size:"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サイズ:"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taille :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サイズ:"
           }
         }
       }
@@ -5381,16 +5381,16 @@
             "value" : "Sort"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "並び替え"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び替え"
           }
         }
       }
@@ -5404,16 +5404,16 @@
             "value" : "Sort by"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "並び順"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trier par"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び順"
           }
         }
       }
@@ -5427,16 +5427,16 @@
             "value" : "Specifies whether to perform inference when using a reasoning model."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一部の推論モデルを使う場合に推論を行うかどうかを指定します。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spécifie s'il faut effectuer une inférence lors de l'utilisation d'un modèle de raisonnement."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部の推論モデルを使う場合に推論を行うかどうかを指定します。"
           }
         }
       }
@@ -5450,16 +5450,16 @@
             "value" : "Stopped"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "停止済み"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arrêté"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止済み"
           }
         }
       }
@@ -5473,16 +5473,16 @@
             "value" : "Stream Response"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ストリームレスポンス"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réponse en streaming"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ストリームレスポンス"
           }
         }
       }
@@ -5496,16 +5496,16 @@
             "value" : "Successfully deleted model '%1$@' from %2$@."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデル「%1$@」を「%2$@」からの削除に成功しました。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le modèle '%1$@' a été supprimé avec succès de %2$@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデル「%1$@」を「%2$@」からの削除に成功しました。"
           }
         }
       }
@@ -5519,16 +5519,16 @@
             "value" : "Successfully fetched models. Total: %d"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルの取得に成功しました。合計: %d"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modèles récupérés avec succès. Total : %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの取得に成功しました。合計: %d"
           }
         }
       }
@@ -5542,16 +5542,16 @@
             "value" : "Support and Feedback"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サポートとフィードバック"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Support et commentaires"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サポートとフィードバック"
           }
         }
       }
@@ -5565,16 +5565,16 @@
             "value" : "Support Developer"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開発者をサポート"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Soutenir le développeur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発者をサポート"
           }
         }
       }
@@ -5588,16 +5588,16 @@
             "value" : "System Prompt"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "システムプロンプト"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invite système"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムプロンプト"
           }
         }
       }
@@ -5611,16 +5611,16 @@
             "value" : "Temperature"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "温度"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Température"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "温度"
           }
         }
       }
@@ -5634,16 +5634,16 @@
             "value" : "Thinking"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "思考"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réflexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考"
           }
         }
       }
@@ -5657,16 +5657,16 @@
             "value" : "Thinking completed"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "思考完了"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réflexion terminée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考完了"
           }
         }
       }
@@ -5680,16 +5680,16 @@
             "value" : "Thinking..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "思考中..."
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réflexion en cours..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考中..."
           }
         }
       }
@@ -5704,16 +5704,16 @@
             "value" : "None"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "指定なし"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定なし"
           }
         }
       }
@@ -5728,16 +5728,16 @@
             "value" : "Off"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オフ"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Désactivé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフ"
           }
         }
       }
@@ -5752,16 +5752,16 @@
             "value" : "On"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オン"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オン"
           }
         }
       }
@@ -5775,16 +5775,16 @@
             "value" : "This model cannot be used"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このモデルは使用できません"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ce modèle ne peut pas être utilisé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルは使用できません"
           }
         }
       }
@@ -5798,16 +5798,16 @@
             "value" : "This model does not support chat."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このモデルはチャットに対応していません。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ce modèle ne prend pas en charge le chat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルはチャットに対応していません。"
           }
         }
       }
@@ -5821,16 +5821,16 @@
             "value" : "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ローカルネットワークアクセスを許可するには、「設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pour autoriser l'accès au réseau local, allez dans Réglages → Confidentialité et sécurité → Réseau local, puis activez \"Mocolamma\" on."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセスを許可するには、「設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。"
           }
         }
       }
@@ -5844,16 +5844,16 @@
             "value" : "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick or tap \"OK\" to open Privacy & Security settings."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックまたはタップすると「プライバシーとセキュリティ」設定を開きます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pour autoriser l'accès au réseau local, allez dans Paramètres système → Confidentialité et sécurité → Réseau local, puis activez \"Mocolamma\" on.\n\nCliquez ou appuyez sur \"OK\" pour ouvrir les paramètres de confidentialité et de sécurité."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローカルネットワークアクセスを許可するには、「システム設定」→「プライバシーとセキュリティ」→「ローカルネットワーク」と進み、「Mocolamma」をオンにします。\n\n「OK」をクリックまたはタップすると「プライバシーとセキュリティ」設定を開きます。"
           }
         }
       }
@@ -5867,16 +5867,16 @@
             "value" : "Toggle Inspector"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インスペクタを切り替える"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Basculer l'inspecteur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インスペクタを切り替える"
           }
         }
       }
@@ -5890,16 +5890,16 @@
             "value" : "Toggle Text Wrapping"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "テキストの折り返しを切り替える"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activer/Désactiver le retour à la ligne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストの折り返しを切り替える"
           }
         }
       }
@@ -5913,16 +5913,16 @@
             "value" : "Tools"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ツール"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Outils"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ツール"
           }
         }
       }
@@ -5936,16 +5936,16 @@
             "value" : "Type your message..."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メッセージを入力…"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisissez votre message..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メッセージを入力…"
           }
         }
       }
@@ -5959,16 +5959,16 @@
             "value" : "Unlimited"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無制限"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Illimité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限"
           }
         }
       }
@@ -5982,16 +5982,16 @@
             "value" : "Update"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mettre à jour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新"
           }
         }
       }
@@ -6005,16 +6005,16 @@
             "value" : "Update Anyway"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このまま更新"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mettre à jour quand même"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま更新"
           }
         }
       }
@@ -6028,16 +6028,16 @@
             "value" : "Version: %@"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バージョン: %@"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン: %@"
           }
         }
       }
@@ -6051,16 +6051,16 @@
             "value" : "Version: %1$@ (%2$@)"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バージョン: %1$@ (%2$@)"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version : %1$@ (%2$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン: %1$@ (%2$@)"
           }
         }
       }
@@ -6074,16 +6074,16 @@
             "value" : "Vision"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ビジョン"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vision"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビジョン"
           }
         }
       }
@@ -6097,16 +6097,16 @@
             "value" : "VRAM Size: %@"
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "VRAMサイズ: %@"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taille de la VRAM : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VRAMサイズ: %@"
           }
         }
       }
@@ -6120,16 +6120,16 @@
             "value" : "You can also donate directly at PayPal."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PayPalで直接寄付していただくこともできます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous pouvez également faire un don directement sur PayPal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PayPalで直接寄付していただくこともできます。"
           }
         }
       }
@@ -6143,16 +6143,16 @@
             "value" : "You can support me at Buy Me a Coffee from the price of a cup of green tea."
           }
         },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
-          }
-        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous pouvez me soutenir sur Buy Me a Coffee à partir du prix d'une tasse de thé vert."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
           }
         }
       }
