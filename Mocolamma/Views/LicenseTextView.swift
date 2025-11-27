@@ -8,9 +8,9 @@ struct LicenseTextView: View {
     @Environment(\.openURL) var openURL
     @State private var isTextWrapped: Bool = true
     @State private var showingLicenseLinkAlert = false
-
+    
     var body: some View {
-        #if os(macOS)
+#if os(macOS)
         licenseTextViewContent
             .frame(width: 700, height: 500)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -35,9 +35,9 @@ struct LicenseTextView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                         }
-
+                        
                         Spacer()
-
+                        
                         Button("Close") {
                             dismiss()
                         }
@@ -61,7 +61,7 @@ struct LicenseTextView: View {
             } message: {
                 Text("Are you sure you want to open the page with license information?")
             }
-        #else
+#else
         NavigationView {
             licenseTextViewContent
                 .navigationTitle("License")
@@ -108,9 +108,9 @@ struct LicenseTextView: View {
         .onAppear {
             isTextWrapped = true
         }
-        #endif
+#endif
     }
-
+    
     private var licenseTextViewContent: some View {
         ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) {
             VStack(alignment: .leading) {
@@ -123,10 +123,10 @@ struct LicenseTextView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        #if os(macOS)
+#if os(macOS)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Spacer().frame(height: 60)
         }
-        #endif
+#endif
     }
 }

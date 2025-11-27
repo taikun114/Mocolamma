@@ -8,7 +8,7 @@ struct AboutView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
-
+    
     private var isOS26OrLater: Bool {
         if #available(iOS 26.0, macOS 26.0, *) {
             return true
@@ -16,7 +16,7 @@ struct AboutView: View {
             return false
         }
     }
-
+    
     @State private var showingFeedbackMailAlert = false
     @State private var showingContributorsAlert = false
     @State private var showingBugReportAlert = false
@@ -25,12 +25,12 @@ struct AboutView: View {
     @State private var showingBuyMeACoffeeAlert = false
     @State private var showingPayPalAlert = false
     @State private var showingLicenseInfoModal = false
-
+    
     var body: some View {
-        #if os(macOS)
+#if os(macOS)
         aboutViewContent
             .frame(width: 550, height: 600)
-        #else
+#else
         NavigationView {
             aboutViewContent
                 .navigationTitle("About Mocolamma")
@@ -43,15 +43,15 @@ struct AboutView: View {
                     }
                 }
         }
-        #endif
+#endif
     }
-
+    
     private var aboutViewContent: some View {
         Form {
             Section(header: Text("About Mocolamma").font(.headline)) {
                 HStack(alignment: .center, spacing: 20) {
                     if isOS26OrLater {
-                        #if os(macOS)
+#if os(macOS)
                         Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -59,7 +59,7 @@ struct AboutView: View {
                             .padding(8)
                             .padding(.trailing, -10)
                             .id(colorScheme)
-                        #else
+#else
                         Image("AppIconLiquidGlass")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -67,32 +67,32 @@ struct AboutView: View {
                             .padding(8)
                             .padding(.trailing, -8)
                             .id(colorScheme)
-                        #endif
+#endif
                     } else {
-                        #if os(macOS)
+#if os(macOS)
                         Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 128, height: 128)
                             .padding(.trailing, -10)
-                        #else
+#else
                         Image("AppIconLiquidGlass")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
                             .padding(.trailing, -4)
                             .id(colorScheme)
-                        #endif
+#endif
                     }
-
+                    
                     VStack(alignment: .leading) {
                         VStack(alignment: .leading) {
                             Text("Mocolamma")
-                                #if os(macOS)
+#if os(macOS)
                                 .font(.largeTitle)
-                                #else
+#else
                                 .font(.title2)
-                                #endif
+#endif
                                 .fontWeight(.bold)
                             Group {
                                 let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
@@ -111,8 +111,8 @@ struct AboutView: View {
                             .foregroundColor(.secondary)
                     }
                 }
-
-                #if os(iOS)
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Mocolamma is an Open Source Application.")
                     Button(action: { showingLicenseInfoModal = true }) {
@@ -128,7 +128,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     Text("Mocolamma is an Open Source Application.")
                     Spacer()
@@ -144,9 +144,9 @@ struct AboutView: View {
                         LicenseInfoModalView()
                     }
                 }
-                #endif
-
-                #if os(iOS)
+#endif
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Contributors involved in the development")
                     Button(action: { showingContributorsAlert = true }) {
@@ -171,7 +171,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     Text("Contributors involved in the development")
                     Spacer()
@@ -195,11 +195,11 @@ struct AboutView: View {
                         Text("Are you sure you want to open the GitHub contributors page?")
                     }
                 }
-                #endif
+#endif
             }
-
+            
             Section(header: Text("Support and Feedback").font(.headline)) {
-                #if os(iOS)
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Found a bug?")
                     Button(action: { showingBugReportAlert = true }) {
@@ -224,7 +224,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     Text("Found a bug?")
                     Spacer()
@@ -248,9 +248,9 @@ struct AboutView: View {
                         Text("Are you sure you want to open the Issue page on GitHub?")
                     }
                 }
-                #endif
-
-                #if os(iOS)
+#endif
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Have an idea?")
                     Button(action: { showingFeedbackMailAlert = true }) {
@@ -264,7 +264,7 @@ struct AboutView: View {
                     .help("Open the send feedback email window.")
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     Text("Have an idea?")
                     Spacer()
@@ -277,9 +277,9 @@ struct AboutView: View {
                     .buttonStyle(.bordered)
                     .help("Open the send feedback email window.")
                 }
-                #endif
-
-                #if os(iOS)
+#endif
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Ask questions and share your opinions")
                     Button(action: { showingCommunityAlert = true }) {
@@ -304,7 +304,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     Text("Ask questions and share your opinions")
                     Spacer()
@@ -328,11 +328,11 @@ struct AboutView: View {
                         Text("Are you sure you want to open the Discussion page on GitHub?")
                     }
                 }
-                #endif
+#endif
             }
-
+            
             Section(header: Text("Support Developer").font(.headline)) {
-                #if os(iOS)
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Give It a Star to GitHub Repository")
@@ -363,7 +363,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
                         Text("Give It a Star to GitHub Repository")
@@ -393,9 +393,9 @@ struct AboutView: View {
                         Text("Are you sure you want to open the GitHub repository page?")
                     }
                 }
-                #endif
-
-                #if os(iOS)
+#endif
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Buy Me Green Tea")
@@ -426,7 +426,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
                         Text("Buy Me Green Tea")
@@ -456,9 +456,9 @@ struct AboutView: View {
                         Text("Are you sure you want to open the Buy Me a Coffee page?")
                     }
                 }
-                #endif
-
-                #if os(iOS)
+#endif
+                
+#if os(iOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Donate at PayPal")
@@ -489,7 +489,7 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
-                #else
+#else
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
                         Text("Donate at PayPal")
@@ -519,7 +519,7 @@ struct AboutView: View {
                         Text("Are you sure you want to open the PayPal.Me page?")
                     }
                 }
-                #endif
+#endif
             }
         }
         .formStyle(.grouped)
@@ -535,28 +535,28 @@ struct AboutView: View {
             Text("Are you sure you want to open the send feedback email window?")
         }
     }
-
+    
     private func formattedFeedbackSubject() -> String {
         let appName = "Mocolamma"
         let languageCode = Locale.current.language.languageCode?.identifier
         let subjectPrefix: String = (languageCode == "ja") ? "\(appName)のフィードバック: " : "\(appName) Feedback: "
         return subjectPrefix.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
     }
-
+    
     private func formattedFeedbackBody() -> String {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
         let appBuildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"
         let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
-        #if arch(arm64)
+#if arch(arm64)
         let cpuArchitecture = "Apple Silicon (arm64)"
-        #elseif arch(x86_64)
+#elseif arch(x86_64)
         let cpuArchitecture = "Intel (x86_64)"
-        #else
+#else
         let cpuArchitecture = "N/A"
-        #endif
-
+#endif
+        
         let osType: String
-        #if os(iOS)
+#if os(iOS)
         if ProcessInfo.processInfo.isiOSAppOnMac {
             osType = "macOS (iPad App)"
         } else if UIDevice.current.userInterfaceIdiom == .pad {
@@ -568,43 +568,43 @@ struct AboutView: View {
         } else {
             osType = "iOS / iPadOS (Unknown)"
         }
-        #elseif os(macOS)
+#elseif os(macOS)
         osType = "macOS"
-        #else
+#else
         osType = "Unknown"
-        #endif
-
+#endif
+        
         let languageCode = Locale.current.language.languageCode?.identifier
         let body: String
         if languageCode == "ja" {
             body = """
             フィードバック内容を具体的に説明してください:
-
-
+            
+            
             システム情報:
-
+            
             ・OSの種類
             　\(osType)
-
+            
             ・OSバージョン
             　\(osVersion)
-
+            
             ・アプリ
             　バージョン\(appVersion)（ビルド\(appBuildNumber)）
             """
         } else {
             body = """
             Please describe your feedback in detail:
-
-
+            
+            
             System Information:
-
+            
             ・OS Type
             　\(osType)
-
+            
             ・OS Version
             　\(osVersion)
-
+            
             ・App
             　Version \(appVersion) (Build \(appBuildNumber))
             """

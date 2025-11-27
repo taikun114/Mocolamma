@@ -19,7 +19,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
     @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
-
+    
     // 新しいプロパティ（やり直し履歴など）
     @Published var revisions: [ChatMessage] = [] // やり直し履歴
     @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
@@ -32,7 +32,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var finalEvalCount: Int? // 最終的なトークン数
     @Published var finalEvalDuration: Int? // 最終的な評価時間
     @Published var finalIsStopped: Bool = false // 最終的な停止状態
-
+    
     // ストリーミング表示最適化向けの分割バッファ
     // fixed: 確定テキスト（Markdownで描画、ほとんど更新しない）
     // pending: 差分テキスト（頻繁に更新、1行Textで軽量に表示）
@@ -40,7 +40,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var pendingContent: String = ""
     @Published var fixedThinking: String = ""
     @Published var pendingThinking: String = ""
-
+    
     enum CodingKeys: String, CodingKey {
         case role
         case content
@@ -53,7 +53,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
     }
-
+    
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.role = try container.decode(String.self, forKey: .role)
@@ -66,14 +66,14 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.totalDuration = try container.decodeIfPresent(Int.self, forKey: .totalDuration)
         self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
-
+        
         // 復元時は固定領域に全体を入れておく
         self.fixedContent = self.content
         self.pendingContent = ""
         self.fixedThinking = self.thinking ?? ""
         self.pendingThinking = ""
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(role, forKey: .role)
@@ -87,7 +87,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(evalCount, forKey: .evalCount)
         try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
     }
-
+    
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
     init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false) {
         self.role = role
@@ -103,13 +103,13 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.isStreaming = isStreaming
         self.isStopped = isStopped
         self.isThinkingCompleted = isThinkingCompleted
-
+        
         self.fixedContent = content
         self.pendingContent = ""
         self.fixedThinking = thinking ?? ""
         self.pendingThinking = ""
     }
-
+    
     static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
         lhs.id == rhs.id
     }
@@ -134,7 +134,7 @@ struct ChatRequest: Codable {
     let think: Bool?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
-
+    
     enum CodingKeys: String, CodingKey {
         case model
         case messages
@@ -143,7 +143,7 @@ struct ChatRequest: Codable {
         case options
         case tools
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(model, forKey: .model)
@@ -160,9 +160,9 @@ enum ThinkingOption: String, CaseIterable, Identifiable {
     case none = "ThinkingOption_None"
     case on = "ThinkingOption_On"
     case off = "ThinkingOption_Off"
-
+    
     var id: String { self.rawValue }
-
+    
     var localizedName: LocalizedStringKey {
         LocalizedStringKey(rawValue)
     }
@@ -193,7 +193,7 @@ struct JSONSchemaProperty: Codable {
     let type: String
     let description: String?
     let `enum`: [String]?
-
+    
     enum CodingKeys: String, CodingKey {
         case type
         case description
@@ -225,7 +225,7 @@ struct ChatRequestOptions: Codable {
     let useMmap: Bool?
     let numThread: Int?
     let keepAlive: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case numKeep = "num_keep"
         case seed
@@ -250,7 +250,7 @@ struct ChatRequestOptions: Codable {
         case numThread = "num_thread"
         case keepAlive = "keep_alive"
     }
-
+    
     init(
         numKeep: Int? = nil,
         seed: Int? = nil,
@@ -313,7 +313,7 @@ struct ChatResponseChunk: Codable {
     let evalCount: Int?
     let evalDuration: Int?
     let doneReason: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case model
         case createdAt = "created_at"
@@ -338,7 +338,7 @@ enum JSONValue: Codable, Hashable {
     case array([JSONValue])
     case object([String: JSONValue])
     case null
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let string = try? container.decode(String.self) {
@@ -359,7 +359,7 @@ enum JSONValue: Codable, Hashable {
             throw DecodingError.typeMismatch(JSONValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unsupported JSONValue type"))
         }
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -379,7 +379,7 @@ enum JSONValue: Codable, Hashable {
             try container.encodeNil()
         }
     }
-
+    
     // 便宜のためのヘルパイニシャライザ
     init(_ value: String) { self = .string(value) }
     init(_ value: Int) { self = .int(value) }
@@ -387,7 +387,7 @@ enum JSONValue: Codable, Hashable {
     init(_ value: Bool) { self = .bool(value) }
     init(_ value: [JSONValue]) { self = .array(value) }
     init(_ value: [String: JSONValue]) { self = .object(value) }
-
+    
     // 型安全なアクセスのためのヘルパープロパティ
     var stringValue: String? {
         if case .string(let value) = self { return value }
@@ -413,7 +413,7 @@ enum JSONValue: Codable, Hashable {
         if case .object(let value) = self { return value }
         return nil
     }
-
+    
     static func == (lhs: JSONValue, rhs: JSONValue) -> Bool {
         switch (lhs, rhs) {
         case (.string(let l), .string(let r)): return l == r
@@ -426,7 +426,7 @@ enum JSONValue: Codable, Hashable {
         default: return false
         }
     }
-
+    
     func hash(into hasher: inout Hasher) {
         switch self {
         case .string(let value): hasher.combine(value)

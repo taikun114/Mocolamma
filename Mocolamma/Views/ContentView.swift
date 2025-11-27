@@ -12,17 +12,17 @@ struct ContentView: View {
     @ObservedObject var serverManager: ServerManager
     // CommandExecutorはServerManagerに依存するため、後から初期化
     @StateObject var executor: CommandExecutor
-
+    
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     // サイドバー/タブの選択状態をAppレベルから受け取ります
     @Binding var selection: String?
     
     // NavigationSplitViewのサイドバーの表示状態を制御するState変数
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
-
+    
     @Binding var showingInspector: Bool
     @StateObject private var chatSettings = ChatSettings()
-
+    
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingAddServerSheet: Bool
@@ -33,12 +33,12 @@ struct ContentView: View {
     @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
         .init(\.originalIndex, order: .forward)
     ]
-
+    
     // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)
     }
-
+    
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
@@ -57,10 +57,10 @@ struct ContentView: View {
     
     @Binding var shouldClearChat: Bool
     @Binding var isPulling: Bool
-
+    
     var body: some View {
         Group {
-            #if os(macOS)
+#if os(macOS)
             MainNavigationView(
                 sidebarSelection: $selection,
                 selectedModel: $selectedModel,
@@ -75,7 +75,7 @@ struct ContentView: View {
                 columnVisibility: $columnVisibility,
                 sortedModels: sortedModels
             )
-            #elseif os(iOS)
+#elseif os(iOS)
             if #available(iOS 18.0, *) {
                 MainTabView(
                     selection: $selection,
@@ -122,7 +122,7 @@ struct ContentView: View {
                     )
                 }
             }
-            #else
+#else
             MainNavigationView(
                 sidebarSelection: $selection,
                 selectedModel: $selectedModel,
@@ -137,7 +137,7 @@ struct ContentView: View {
                 columnVisibility: $columnVisibility,
                 sortedModels: sortedModels
             )
-            #endif
+#endif
         }
         .environmentObject(executor)
         .environmentObject(chatSettings)
@@ -211,7 +211,7 @@ struct ContentView: View {
             Task { await performRefreshForCurrentSelection() }
         }
     }
-
+    
     private func updateSelectedServerForInspector() {
         guard let selectedID = serverManager.selectedServerID,
               let server = serverManager.servers.first(where: { $0.id == selectedID }) else {
@@ -233,7 +233,7 @@ struct ContentView: View {
                 Task {
                     let maxRetries = 3
                     var finalStatus: ServerConnectionStatus?
-
+                    
                     for attempt in 1...maxRetries {
                         let status = await executor.checkAPIConnectivity(host: server.host)
                         finalStatus = status
@@ -241,7 +241,7 @@ struct ContentView: View {
                         // 接続成功、またはリトライ対象外のエラー（サーバーからのメッセージ付き応答など）ならループを抜ける
                         if case .connected = status { break }
                         if case .errorWithMessage = status { break }
-
+                        
                         // リトライ対象のエラーの場合
                         print("Attempt \(attempt) of \(maxRetries) failed for \(server.host). Status: \(status)")
                         if attempt < maxRetries {
@@ -249,7 +249,7 @@ struct ContentView: View {
                             try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒待機
                         }
                     }
-
+                    
                     if let status = finalStatus {
                         await MainActor.run {
                             serverManager.updateServerConnectionStatus(serverID: server.id, status: status)
@@ -277,14 +277,14 @@ struct ContentView: View {
                 }
                 
                 await executor.fetchOllamaModelsFromAPI()
-
+                
                 if let sid = selectedServerID, let host = serverManager.servers.first(where: { $0.id == sid })?.host {
                     let status = await executor.checkAPIConnectivity(host: host)
                     await MainActor.run {
                         serverManager.updateServerConnectionStatus(serverID: sid, status: status)
                     }
                 }
-
+                
                 await MainActor.run {
                     serverManager.inspectorRefreshToken = UUID()
                     NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)

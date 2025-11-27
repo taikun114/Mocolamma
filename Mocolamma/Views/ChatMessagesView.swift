@@ -11,7 +11,7 @@ struct ChatMessagesView: View {
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
     let isUsingSafeAreaBar: Bool
-
+    
     private var reduceMotionEnabled: Bool {
 #if os(iOS)
         return UIAccessibility.isReduceMotionEnabled
@@ -21,15 +21,15 @@ struct ChatMessagesView: View {
         return false
 #endif
     }
-
+    
     private var supportsEffects: Bool {
-        #if os(iOS)
-            if #available(iOS 26, *) { return true } else { return false }
-        #else
-            if #available(macOS 26, *) { return true } else { return false }
-        #endif
+#if os(iOS)
+        if #available(iOS 26, *) { return true } else { return false }
+#else
+        if #available(macOS 26, *) { return true } else { return false }
+#endif
     }
-
+    
     var body: some View {
         ChatMessagesScrollView(
             messages: $messages,
@@ -51,7 +51,7 @@ struct ChatMessagesScrollView: View {
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
     let isUsingSafeAreaBar: Bool
-
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -94,15 +94,15 @@ struct MessageViewWrapper: View {
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
-
+    
     private var isLastAssistantMessage: Bool {
         message.role == "assistant" && messages.last?.id == message.id
     }
-
+    
     private var isLastOwnUserMessage: Bool {
         message.role == "user" && messages.last(where: { $0.role == "user" })?.id == message.id
     }
-
+    
     var body: some View {
         MessageView(
             message: message,

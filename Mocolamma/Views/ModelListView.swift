@@ -17,7 +17,7 @@ enum SortCriterion: String, CaseIterable, Identifiable {
 enum SortOrder: String, CaseIterable, Identifiable {
     case ascending = "Ascending"
     case descending = "Descending"
-
+    
     var id: String { self.rawValue }
 }
 
@@ -40,14 +40,14 @@ struct ModelListView: View {
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     let isSelected: Bool // 現在のタブが選択されているか
-
+    
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
-
+    
     // MARK: - Sorting State
     @State private var sortCriterion: SortCriterion = .number
     @State private var sortOrderOption: SortOrder = .ascending
     
-
+    
     // 現在のソート順に基づいてモデルリストを返すComputed Property
     var sortedModels: [OllamaModel] {
         let models = executor.models
@@ -72,7 +72,7 @@ struct ModelListView: View {
             }
         }
     }
-
+    
     // ナビゲーションのサブタイトルを生成するComputed Property
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
@@ -81,7 +81,7 @@ struct ModelListView: View {
             return Text("No Server Selected")
         }
     }
-
+    
     
     private func parseError(from output: String) -> String? {
         if let data = output.data(using: .utf8),
@@ -103,7 +103,7 @@ struct ModelListView: View {
     
     @ToolbarContentBuilder
     private var modelToolbarContent: some ToolbarContent {
-        #if os(macOS)
+#if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 appRefreshTrigger.send()
@@ -112,9 +112,9 @@ struct ModelListView: View {
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
         }
-        #endif
-
-        #if os(iOS)
+#endif
+        
+#if os(iOS)
         ToolbarItem(placement: .primaryAction) {
             Menu {
                 Picker("Sort by", selection: $sortCriterion) {
@@ -138,8 +138,8 @@ struct ModelListView: View {
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
         }
-        #endif
-
+#endif
+        
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 showingAddSheet = true
@@ -148,8 +148,8 @@ struct ModelListView: View {
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
-
-        #if os(iOS)
+        
+#if os(iOS)
         Group { // 条件付きコンテンツをGroupでラップ
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
@@ -160,9 +160,9 @@ struct ModelListView: View {
                 }
             }
         }
-        #endif
+#endif
     }
-
+    
     var body: some View {
         let copyIconName = {
             if #available(macOS 15.0, iOS 18.0, *) {
@@ -171,53 +171,53 @@ struct ModelListView: View {
                 return "doc.on.doc"
             }
         }()
-
+        
         VStack {
 #if os(iOS)
-        List(selection: $selectedModel) {
-            ForEach(sortedModels) { model in
-                HStack(alignment: .center, spacing: 16) {
-                    Text("\(model.originalIndex + 1)")
-                        .foregroundColor(.secondary)
-                        .frame(minWidth: 20, alignment: .center)
-                        .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
-                    
-                    VStack(alignment: .leading) {
-                        Text(model.name)
-                            .fontWeight(.bold)
-                            .lineLimit(1)
-                            .help(model.name)
-                        Text("\(model.formattedSize), \(model.formattedModifiedAt)")
-                            .font(.caption)
+            List(selection: $selectedModel) {
+                ForEach(sortedModels) { model in
+                    HStack(alignment: .center, spacing: 16) {
+                        Text("\(model.originalIndex + 1)")
                             .foregroundColor(.secondary)
+                            .frame(minWidth: 20, alignment: .center)
+                            .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
+                        
+                        VStack(alignment: .leading) {
+                            Text(model.name)
+                                .fontWeight(.bold)
+                                .lineLimit(1)
+                                .help(model.name)
+                            Text("\(model.formattedSize), \(model.formattedModifiedAt)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .tag(model.id)
+                    .contextMenu {
+                        Button {
+#if os(iOS)
+                            UIPasteboard.general.string = model.name
+#else
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(model.name, forType: .string)
+#endif
+                        } label: {
+                            Label("Copy Model Name", systemImage: copyIconName)
+                        }
+                        
+                        Button(role: .destructive) {
+                            modelToDelete = model
+                            showingDeleteConfirmation = true
+                        } label: {
+                            Label("Delete...", systemImage: "trash")
+                        }
                     }
                 }
-                .tag(model.id)
-                .contextMenu {
-                    Button {
-                        #if os(iOS)
-                        UIPasteboard.general.string = model.name
-                        #else
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(model.name, forType: .string)
-                        #endif
-                    } label: {
-                        Label("Copy Model Name", systemImage: copyIconName)
-                    }
-                    
-                    Button(role: .destructive) {
-                        modelToDelete = model
-                        showingDeleteConfirmation = true
-                    } label: {
-                        Label("Delete...", systemImage: "trash")
-                    }
-                }
+                .onDelete(perform: deleteModel)
             }
-            .onDelete(perform: deleteModel)
-        }
-        .refreshable {
-            appRefreshTrigger.send()
-        }
+            .refreshable {
+                appRefreshTrigger.send()
+            }
 #else
             Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
                 TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
@@ -225,19 +225,19 @@ struct ModelListView: View {
                         .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
                 }
                 .width(min: 30, ideal: 50, max: .infinity)
-
+                
                 TableColumn("Name", value: \.name) { model in // テーブル列ヘッダー：名前。
                     Text(model.name)
                         .help(model.name)
                 }
                 .width(min: 100, ideal: 200, max: .infinity)
-
+                
                 TableColumn("Size", value: \.comparableSize) { model in // テーブル列ヘッダー：サイズ。
                     Text(model.formattedSize) // formattedSizeを使用します
                         .help("\(model.formattedSize), \(model.size) B") // サイズのヘルプテキスト
                 }
                 .width(min: 50, ideal: 100, max: .infinity)
-
+                
                 TableColumn("Modified At", value: \.comparableModifiedDate) { model in // テーブル列ヘッダー：変更日。
                     Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
                         .help(model.formattedModifiedAt) // 変更日のヘルプテキスト
@@ -252,90 +252,90 @@ struct ModelListView: View {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.name, forType: .string)
                     }
-
-
+                    
+                    
                     Button("Delete...", systemImage: "trash", role: .destructive) {
                         modelToDelete = model
                         showingDeleteConfirmation = true
                     }
-
+                    
                 }
             }
 #endif
             // プログレスバーとステータステキスト
-             if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
-                 VStack(alignment: .center, spacing: 8) {
-                     ProgressView(value: executor.pullProgress) {
-                         HStack(alignment: .bottom) {
-                             Text(executor.pullStatus)
-                             Spacer()
-                             if executor.isPullingErrorHold && executor.pullHasError {
-                                 Button(action: {
-                                     if !executor.lastPulledModelName.isEmpty {
-                                         executor.pullModel(modelName: executor.lastPulledModelName)
-                                     }
-                                 }) {
-                                     Image(systemName: "arrow.clockwise")
-                                         .help("Retry")
-                                 }
-                                 .buttonStyle(.plain)
-                                 .padding(.top, 4)
-                                 .padding(.bottom, 2)
-                                 .contentShape(Rectangle())
-                             }
-                         }
-                     } currentValueLabel: {
-                         Group {
-                             if horizontalSizeClass == .compact {
-                                 VStack(alignment: .leading) {
-                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                                                  executor.pullProgress * 100 as CVarArg,
-                                                  ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                                  ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                     if executor.pullSpeedBytesPerSec > 0 {
-                                         let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                         let eta = Int(executor.pullETARemaining)
-                                         let etaMin = eta / 60
-                                         let etaSec = eta % 60
-                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
-                                             .foregroundStyle(.secondary)
-                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                     }
-                                 }
-                             } else {
-                                 HStack {
-                                     Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                                                  executor.pullProgress * 100 as CVarArg,
-                                                  ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                                  ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                     Spacer()
-                                     if executor.pullSpeedBytesPerSec > 0 {
-                                         let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                         let eta = Int(executor.pullETARemaining)
-                                         let etaMin = eta / 60
-                                         let etaSec = eta % 60
-                                         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
-                                             .foregroundStyle(.secondary)
-                                             .frame(maxWidth: .infinity, alignment: .trailing)
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                     .progressViewStyle(.linear)
-                     if let errorText = parseError(from: executor.output) {
-                         MarqueeText(text: errorText)
-                             .foregroundColor(.red)
-                             .padding(.top, 2)
-                             .frame(maxWidth: .infinity, minHeight: 14)
-                     }
-                 }
-                 .padding(.horizontal, 12)
-                 .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
-                 .padding(.bottom, 12)
-             }
+            if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
+                VStack(alignment: .center, spacing: 8) {
+                    ProgressView(value: executor.pullProgress) {
+                        HStack(alignment: .bottom) {
+                            Text(executor.pullStatus)
+                            Spacer()
+                            if executor.isPullingErrorHold && executor.pullHasError {
+                                Button(action: {
+                                    if !executor.lastPulledModelName.isEmpty {
+                                        executor.pullModel(modelName: executor.lastPulledModelName)
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.clockwise")
+                                        .help("Retry")
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top, 4)
+                                .padding(.bottom, 2)
+                                .contentShape(Rectangle())
+                            }
+                        }
+                    } currentValueLabel: {
+                        Group {
+                            if horizontalSizeClass == .compact {
+                                VStack(alignment: .leading) {
+                                    Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
+                                                executor.pullProgress * 100 as CVarArg,
+                                                ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                                ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    if executor.pullSpeedBytesPerSec > 0 {
+                                        let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+                                        let eta = Int(executor.pullETARemaining)
+                                        let etaMin = eta / 60
+                                        let etaSec = eta % 60
+                                        Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
+                                            .foregroundStyle(.secondary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                }
+                            } else {
+                                HStack {
+                                    Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
+                                                executor.pullProgress * 100 as CVarArg,
+                                                ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
+                                                ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    Spacer()
+                                    if executor.pullSpeedBytesPerSec > 0 {
+                                        let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+                                        let eta = Int(executor.pullETARemaining)
+                                        let etaMin = eta / 60
+                                        let etaSec = eta % 60
+                                        Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
+                                            .foregroundStyle(.secondary)
+                                            .frame(maxWidth: .infinity, alignment: .trailing)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .progressViewStyle(.linear)
+                    if let errorText = parseError(from: executor.output) {
+                        MarqueeText(text: errorText)
+                            .foregroundColor(.red)
+                            .padding(.top, 2)
+                            .frame(maxWidth: .infinity, minHeight: 14)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
+                .padding(.bottom, 12)
+            }
         }
         .overlay(alignment: .center) {
             if serverManager.selectedServer == nil {
@@ -365,7 +365,7 @@ struct ModelListView: View {
         
         .navigationTitle("Models")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
-
+        
         .toolbar {
             modelToolbarContent
         }
@@ -385,7 +385,7 @@ struct ModelListView: View {
     // プレビュー用にダミーのServerManagerインスタンスを作成
     let previewServerManager = ServerManager()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
-
+    
     return ModelListView(
         executor: previewCommandExecutor, // ダミーのCommandExecutorインスタンス
         selectedModel: .constant(nil), // ダミーのBinding<OllamaModel.ID?>

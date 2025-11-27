@@ -8,17 +8,17 @@ struct ServerView: View {
     @ObservedObject var serverManager: ServerManager
     @ObservedObject var executor: CommandExecutor
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-
+    
     @State private var showingAddServerSheet = false
     @State private var serverToEdit: ServerInfo?
     @State private var showingDeleteConfirmationServer = false
     @State private var serverToDelete: ServerInfo?
     @State private var listSelection: ServerInfo.ID?
-
+    
     let onTogglePreview: () -> Void
-
+    
     @Binding var selectedServerForInspector: ServerInfo?
-
+    
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
             return Text(LocalizedStringKey(serverName))
@@ -26,10 +26,10 @@ struct ServerView: View {
             return Text("No Server Selected")
         }
     }
-
+    
     @ToolbarContentBuilder
     private var serverToolbarContent: some ToolbarContent {
-        #if os(macOS)
+#if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 appRefreshTrigger.send()
@@ -37,8 +37,8 @@ struct ServerView: View {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
         }
-        #endif
-
+#endif
+        
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 showingAddServerSheet = true
@@ -46,8 +46,8 @@ struct ServerView: View {
                 Label("Add Server", systemImage: "plus")
             }
         }
-
-        #if os(iOS)
+        
+#if os(iOS)
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
         }
@@ -56,9 +56,9 @@ struct ServerView: View {
                 Label("Inspector", systemImage: "sidebar.trailing")
             }
         }
-        #endif
+#endif
     }
-
+    
     var body: some View {
         ServerListViewContent(
             serverManager: serverManager,
@@ -115,7 +115,7 @@ struct ServerView: View {
                 Text(String(localized: "Are you sure you want to delete the selected server?\nThis action cannot be undone.", comment: "選択したサーバー削除の確認メッセージ（フォールバック）。"))
             }
         }
-                .task {
+        .task {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
@@ -134,7 +134,7 @@ struct ServerView: View {
             listSelection = newID
         }
     }
-
+    
     private func checkAllServerConnectivity() {
         for server in serverManager.servers {
             serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
@@ -146,7 +146,7 @@ struct ServerView: View {
             }
         }
     }
-
+    
     private func handleServerListChange(oldServers: [ServerInfo], newServers: [ServerInfo]) {
         if let selectedID = serverManager.selectedServerID, !newServers.contains(where: { $0.id == selectedID }) {
             serverManager.selectedServerID = newServers.first?.id
@@ -154,7 +154,7 @@ struct ServerView: View {
         listSelection = serverManager.selectedServerID
         appRefreshTrigger.send()
     }
-
+    
     private func handleListSelectionChange(oldID: ServerInfo.ID?, newID: ServerInfo.ID?) {
         if let newID = newID {
             selectedServerForInspector = serverManager.servers.first(where: { $0.id == newID })
@@ -172,7 +172,7 @@ private struct ServerListViewContent: View {
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
     @ObservedObject var appRefreshTrigger: RefreshTrigger
-
+    
     var body: some View {
         List(selection: $listSelection) {
             ForEach(serverManager.servers) { server in
@@ -207,26 +207,26 @@ private struct ServerListViewContent: View {
                     }
                     .tint(.blue)
                 }
-                #if os(iOS)
+#if os(iOS)
                 .onTapGesture {
                     listSelection = server.id
                 }
-                #endif
+#endif
             }
             .onMove(perform: serverManager.moveServer)
         }
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
-            #if os(macOS)
+#if os(macOS)
             if let selectedID = selectedIDs.first {
                 serverManager.selectedServerID = selectedID
             }
-            #endif
+#endif
         }
-        #if os(iOS)
+#if os(iOS)
         .refreshable {
             appRefreshTrigger.send()
         }
-        #endif
+#endif
     }
 }
 
@@ -238,28 +238,28 @@ private struct ServerRowContent: View {
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
     let isSelected: Bool
-
+    
     var body: some View {
         ServerRowView(
             server: server,
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
-        #if os(iOS)
+#if os(iOS)
         .contentShape(Rectangle())
         
-        #endif
+#endif
         .contextMenu { // 右クリックコンテキストメニュー
             Button("Select", systemImage: "checkmark.circle") {
                 serverManager.selectedServerID = server.id
             }
             
-
+            
             Button("Edit...", systemImage: "pencil") { // 編集ボタン
                 serverToEdit = server
             }
             
-
+            
             Button("Delete...", systemImage: "trash", role: .destructive) { // 削除ボタン
                 serverToDelete = server
                 showingDeleteConfirmationServer = true
@@ -274,14 +274,14 @@ private struct ServerRowContent: View {
 #Preview {
     let previewServerManager = ServerManager()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
-
+    
     previewServerManager.servers = [
         ServerInfo(name: "Local", host: "localhost:11434"),
         ServerInfo(name: "Remote Server 1", host: "192.168.1.50:11434"),
         ServerInfo(name: "Remote Server 2", host: "api.example.com:11434")
     ]
     previewServerManager.selectedServerID = previewServerManager.servers.first?.id
-
+    
     return ServerView(
         serverManager: previewServerManager,
         executor: previewCommandExecutor,

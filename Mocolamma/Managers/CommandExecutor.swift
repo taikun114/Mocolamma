@@ -390,63 +390,63 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         }
     }
     
-        /// 指定されたホストにOllama APIが接続可能かを確認します。
-        /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
-        /// - Returns: 接続状態を示す `ServerConnectionStatus`。
-        func checkAPIConnectivity(host: String) async -> ServerConnectionStatus {
-            let scheme = host.hasPrefix("https://") ? "https" : "http"
-            let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
-            guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
-                print("接続確認エラー: ホスト \(host) のURLが無効です")
-                return .unknownHost
-            }
-    
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-    
-            do {
-                let (data, response) = try await URLSession.shared.data(for: request)
-                if let httpResponse = response as? HTTPURLResponse {
-                    if httpResponse.statusCode == 200 {
-                        print("接続確認: \(host) への接続に成功しました")
-                        return .connected
-                    } else {
-                        print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \(httpResponse.statusCode)")
-                        // エラーレスポンスからエラーメッセージを取得する
-                        var errorMessage: String? = nil
-                        if let errorResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                           let errorText = errorResponse["error"] as? String {
-                            errorMessage = errorText
-                        }
-                        return .errorWithMessage(statusCode: httpResponse.statusCode, errorMessage: errorMessage)
+    /// 指定されたホストにOllama APIが接続可能かを確認します。
+    /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
+    /// - Returns: 接続状態を示す `ServerConnectionStatus`。
+    func checkAPIConnectivity(host: String) async -> ServerConnectionStatus {
+        let scheme = host.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
+            print("接続確認エラー: ホスト \(host) のURLが無効です")
+            return .unknownHost
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("接続確認: \(host) への接続に成功しました")
+                    return .connected
+                } else {
+                    print("接続確認: \(host) への接続に失敗しました - HTTPステータスコード: \(httpResponse.statusCode)")
+                    // エラーレスポンスからエラーメッセージを取得する
+                    var errorMessage: String? = nil
+                    if let errorResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let errorText = errorResponse["error"] as? String {
+                        errorMessage = errorText
                     }
-                } else {
-                    return .unknownHost
+                    return .errorWithMessage(statusCode: httpResponse.statusCode, errorMessage: errorMessage)
                 }
-            } catch let error as URLError {
-                print("\(host) への接続確認エラー: \(error.localizedDescription)")
-                // タイムアウトエラーのチェック
-                if error.code == .timedOut {
-                    return .timedOut
-                }
-                // TLSエラーのチェック
-                if scheme == "https" && (
-                    error.code == .secureConnectionFailed ||
-                    error.code == .serverCertificateUntrusted ||
-                    error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
-                    error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
-                ) {
-                    self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS接続エラー時のメッセージ。")
-                } else {
-                    self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
-                }
-                return .unknownHost
-            } catch {
-                print("\(host) への接続確認エラー: \(error.localizedDescription)")
-                self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
+            } else {
                 return .unknownHost
             }
-        }    
+        } catch let error as URLError {
+            print("\(host) への接続確認エラー: \(error.localizedDescription)")
+            // タイムアウトエラーのチェック
+            if error.code == .timedOut {
+                return .timedOut
+            }
+            // TLSエラーのチェック
+            if scheme == "https" && (
+                error.code == .secureConnectionFailed ||
+                error.code == .serverCertificateUntrusted ||
+                error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
+                error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
+            ) {
+                self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS接続エラー時のメッセージ。")
+            } else {
+                self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
+            }
+            return .unknownHost
+        } catch {
+            print("\(host) への接続確認エラー: \(error.localizedDescription)")
+            self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
+            return .unknownHost
+        }
+    }
     /// Ollamaのバージョンを取得します。
     /// - Parameter host: OllamaホストのURL。
     /// - Returns: Ollamaのバージョン文字列。
@@ -484,7 +484,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             return nil
         }
     }
-
+    
     /// 現在メモリにロードされているモデルのリストを取得します。
     func fetchRunningModels(host: String? = nil) async -> [OllamaRunningModel]? {
         guard let base = host ?? apiBaseURL else { return nil }
@@ -518,7 +518,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     continuation.finish(throwing: URLError(.badURL))
                     return
                 }
-
+                
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -583,7 +583,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         currentChatTask = nil
         print("Chat streaming cancelled.")
     }
-
+    
     /// チャット履歴と入力テキストをクリアします。
     func clearChat() {
         chatMessages.removeAll()
@@ -691,8 +691,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         }
                         
                         // プルステータスおよび進捗の更新は0.5秒ごとに制限
-                        if !self.pullHasError { 
-                            self.pendingPullStatus = response.status 
+                        if !self.pullHasError {
+                            self.pendingPullStatus = response.status
                         }
                         
                         // UI更新タイマーを設定
@@ -872,25 +872,25 @@ struct OllamaRunningModel: Decodable {
     let name: String
     let expires_at: Date?
     let size_vram: Int64?
-
+    
     var formattedVRAMSize: String? { // VRAMサイズをフォーマット
         guard let size = size_vram else { return nil }
         let byteCountFormatter = ByteCountFormatter()
         byteCountFormatter.countStyle = .file
         return byteCountFormatter.string(fromByteCount: size)
     }
-
+    
     // ISO 8601日付文字列を処理するためのカスタムデコーディング
     enum CodingKeys: String, CodingKey {
         case name
         case expires_at
         case size_vram
     }
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
-
+        
         if let expiresAtString = try? container.decode(String.self, forKey: .expires_at) {
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]

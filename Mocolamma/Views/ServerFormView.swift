@@ -9,14 +9,14 @@ struct ServerFormView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @ObservedObject var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
     @ObservedObject var executor: CommandExecutor // 接続確認のためにCommandExecutorのインスタンスを受け取ります
-
+    
     @State private var serverNameInput: String
     @State private var serverHostInput: String
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
     @State private var isVerifying = false // 接続確認中の状態を追跡
     @FocusState private var isNameFieldFocused: Bool
     var editingServer: ServerInfo?
-
+    
     /// 初期化。追加の場合はnil、編集の場合は既存のServerInfoを渡します。
     /// - Parameters:
     ///   - serverManager: ServerManagerのインスタンス。
@@ -26,25 +26,25 @@ struct ServerFormView: View {
         self.serverManager = serverManager
         self.executor = executor
         self.editingServer = editingServer
-
+        
         // 編集モードの場合、既存のサーバー情報で入力フィールドを初期化
         _serverNameInput = State(initialValue: editingServer?.name ?? "")
         _serverHostInput = State(initialValue: editingServer?.host ?? "")
     }
-
+    
     // 保存/更新ボタンを無効化するための計算プロパティ
     private var isSaveButtonDisabled: Bool {
         serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isVerifying
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            #if os(macOS)
+#if os(macOS)
             Text(editingServer == nil ? "Add Server" : "Edit Server")
                 .font(.title)
                 .bold()
-            #endif
-
+#endif
+            
             VStack(alignment: .leading, spacing: 10) {
                 Text("Name")
                     .font(.headline)
@@ -53,7 +53,7 @@ struct ServerFormView: View {
                     .onSubmit {
                         save()
                     }
-
+                
                 Text("Host")
                     .font(.headline)
                 TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput)
@@ -61,8 +61,8 @@ struct ServerFormView: View {
                     .onSubmit {
                         save()
                     }
-
-                #if os(iOS)
+                
+#if os(iOS)
                 if isVerifying {
                     HStack {
                         ProgressView()
@@ -71,12 +71,12 @@ struct ServerFormView: View {
                     }
                     .padding(.top)
                 }
-                #endif
-
+#endif
+                
                 Spacer()
             }
-
-            #if os(macOS)
+            
+#if os(macOS)
             HStack(alignment: .center) {
                 if isVerifying {
                     ProgressView()
@@ -89,7 +89,7 @@ struct ServerFormView: View {
                 }
                 .controlSize(.large)
                 .keyboardShortcut(.cancelAction) // Escキーでキャンセル
-
+                
                 Button(editingServer == nil ? "Save" : "Update") { // 保存/更新ボタン
                     save()
                 }
@@ -97,15 +97,15 @@ struct ServerFormView: View {
                 .controlSize(.large)
                 .disabled(isSaveButtonDisabled)
             }
-            #endif
+#endif
         }
         .padding()
-        #if os(macOS)
+#if os(macOS)
         .frame(width: 350, height: 250) // シートの固定サイズ
-        #endif
+#endif
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) {
             Button("OK") { }
-            .keyboardShortcut(.defaultAction)
+                .keyboardShortcut(.defaultAction)
             Button(editingServer == nil ? "Add Anyway" : "Update Anyway") {
                 let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
                 if let server = editingServer {
@@ -123,7 +123,7 @@ struct ServerFormView: View {
         } message: {
             Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "ConnectionError.message"))
         }
-        #if os(iOS)
+#if os(iOS)
         .navigationTitle(editingServer == nil ? "Add Server" : "Edit Server")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -146,20 +146,20 @@ struct ServerFormView: View {
         .onAppear {
             isNameFieldFocused = true
         }
-        #endif
+#endif
     }
-
+    
     /// 保存/更新処理
     private func save() {
         guard !isSaveButtonDisabled else { return } // 保存ボタンが無効の場合は何もしない
-
+        
         Task {
             isVerifying = true // 接続確認を開始
             let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
             // ホストに接続できることを確認
             let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
             isVerifying = false // 接続確認を終了
-
+            
             if case .connected = connectionStatus {
                 if let server = editingServer {
                     // 編集モード: サーバーを更新
@@ -178,10 +178,10 @@ struct ServerFormView: View {
             }
         }
     }
-
+    
     private func processHostInput(_ host: String) -> String {
         let lowercasedHost = host.lowercased()
-
+        
         // 最後のコロンを探す
         if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {
             let afterColon = lowercasedHost[lowercasedHost.index(after: lastColonIndex)...]
@@ -191,7 +191,7 @@ struct ServerFormView: View {
                 return lowercasedHost
             }
         }
-
+        
         // コロンがない、またはコロンの後にポート番号がない場合は、デフォルトポートを追加する
         return lowercasedHost + ":11434"
     }
@@ -202,7 +202,7 @@ struct ServerFormView: View {
 #Preview {
     let previewServerManager = ServerManager()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
-
+    
     // 追加モードのプレビュー
     return ServerFormView(serverManager: previewServerManager, executor: previewCommandExecutor, editingServer: nil)
 }
@@ -211,7 +211,7 @@ struct ServerFormView: View {
     let previewServerManager = ServerManager()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
     let dummyServer = ServerInfo(name: "Test Server", host: "192.168.1.100:11434")
-
+    
     // 編集モードのプレビュー
     return ServerFormView(serverManager: previewServerManager, executor: previewCommandExecutor, editingServer: dummyServer)
 }

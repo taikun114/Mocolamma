@@ -9,23 +9,23 @@ struct ServerRowView: View {
     let isSelected: Bool // API通信用の選択状態
     let connectionStatus: ServerConnectionStatus? // nil: チェック中, .connected, .notConnected, .unknownHost
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-
+    
     private var indicatorSize: CGFloat {
-        #if os(iOS)
+#if os(iOS)
         return 12
-        #else
+#else
         return 10
-        #endif
+#endif
     }
-
+    
     private var spinnerScaleFactor: CGFloat {
-        #if os(iOS)
+#if os(iOS)
         return indicatorSize / 15 // iOSでは少し大きく
-        #else
+#else
         return indicatorSize / 20 // macOSでは現状維持
-        #endif
+#endif
     }
-
+    
     var body: some View {
         HStack {
             // 接続状態を示すインジケーター
@@ -79,14 +79,14 @@ struct ServerRowView: View {
             }
             .frame(width: indicatorSize, height: indicatorSize)
             .padding(.trailing, 4)
-
+            
             // サーバーアイコン
             Image(systemName: "server.rack")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32, height: 32)
                 .foregroundColor(.secondary) // アイコンの色はセカンダリカラーに設定
-
+            
             VStack(alignment: .leading) { // テキストコンテンツをVStackでグループ化
                 Text(server.name)
                     .font(.headline)
@@ -102,9 +102,9 @@ struct ServerRowView: View {
                         .help(server.host) // ホスト名のヘルプテキスト
                 }
             }
-
+            
             Spacer() // チェックマークを右に寄せる
-
+            
             // サーバーがAPI通信用として選択されている場合のみチェックマークを表示
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")

@@ -12,7 +12,7 @@ struct InspectorContentView: View {
     let selectedServerForInspector: ServerInfo?
     @ObservedObject var serverManager: ServerManager
     @Binding var showingInspector: Bool
-
+    
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @FocusState private var isSystemPromptFocused: Bool
     
@@ -87,8 +87,8 @@ struct InspectorContentView: View {
                                     RoundedRectangle(cornerRadius: 4)
                                         .stroke(
                                             colorSchemeContrast == .increased 
-                                                ? (chatSettings.isSystemPromptEnabled ? Color.primary : Color.secondary) 
-                                                : Color.clear,
+                                            ? (chatSettings.isSystemPromptEnabled ? Color.primary : Color.secondary) 
+                                            : Color.clear,
                                             lineWidth: 1
                                         )
                                 )
@@ -120,7 +120,7 @@ struct InspectorContentView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .disabled(!chatSettings.useCustomChatSettings)
                         .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
-
+                        
                         VStack {
                             Toggle(isOn: $chatSettings.isContextWindowEnabled) {
                                 Text("Context Window")
@@ -146,11 +146,11 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
-                #if os(iOS)
+#if os(iOS)
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
                 }
-                #endif
+#endif
             } else {
                 Text("Nothing to display.")
                     .font(.title2)
@@ -159,7 +159,7 @@ struct InspectorContentView: View {
                     .padding()
             }
         }
-        #if os(macOS)
+#if os(macOS)
         .toolbar {
             Spacer()
             Button {
@@ -169,6 +169,6 @@ struct InspectorContentView: View {
             }
             .help("Toggle Inspector")
         }
-        #endif
+#endif
     }
 }

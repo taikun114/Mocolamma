@@ -22,14 +22,14 @@ class ServerManager: ObservableObject {
     private let selectedServerIDKey = "selected_ollama_server_id"
     // ユーザーがデフォルトサーバーを削除したかどうかを追跡するUserDefaultsキー
     private let didUserDeleteDefaultServerKey = "did_user_delete_default_server"
-
+    
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     @Published var servers: [ServerInfo] {
         didSet {
             saveServers()
         }
     }
-
+    
     /// 現在選択されているサーバーのID。
     @Published var selectedServerID: ServerInfo.ID? {
         didSet {
@@ -37,18 +37,18 @@ class ServerManager: ObservableObject {
             saveSelectedServerID()
         }
     }
-
+    
     /// 現在選択されているサーバー。
     var selectedServer: ServerInfo? {
         servers.first(where: { $0.id == selectedServerID })
     }
-
+    
     /// 各サーバーの接続状態を詳細に保持する辞書
     @Published var serverConnectionStatuses: [ServerInfo.ID: ServerConnectionStatus] = [:]
-
+    
     /// インスペクターの再描画を誘発するためのトークン
     @Published var inspectorRefreshToken: UUID = UUID()
-
+    
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合はnilを返します。
     var currentServerHost: String? {
@@ -58,7 +58,7 @@ class ServerManager: ObservableObject {
         }
         return nil
     }
-
+    
     /// ServerManagerのイニシャライザ。保存されたサーバーリストを読み込み、デフォルトサーバーを設定します。
     init() {
         // UserDefaultsからサーバーリストを読み込む
@@ -69,26 +69,26 @@ class ServerManager: ObservableObject {
             // 保存されたサーバーがない場合は空の配列で初期化
             self.servers = []
         }
-
-        #if os(macOS)
+        
+#if os(macOS)
         // デフォルトの「ローカル」サーバーが存在するか、またはユーザーが削除したかを確認
         let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
         let didUserDeleteDefaultServer = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
-
+        
         if !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteDefaultServer {
             servers.insert(localServer, at: 0)
         }
-        #endif
+#endif
         
         // 以前選択されていたサーバーIDを読み込む
         if let savedSelectedIDString = UserDefaults.standard.string(forKey: selectedServerIDKey),
            let savedSelectedID = UUID(uuidString: savedSelectedIDString) {
             self.selectedServerID = savedSelectedID
         }
-
+        
         
     }
-
+    
     /// 新しいサーバーをリストに追加します。
     /// - Parameters:
     ///   - name: 追加するサーバーの名前。
@@ -107,7 +107,7 @@ class ServerManager: ObservableObject {
             servers[index] = serverInfo
         }
     }
-
+    
     /// 指定されたサーバーをリストから削除します。
     /// - Parameter server: 削除するServerInfoオブジェクト。
     func deleteServer(_ server: ServerInfo) {
@@ -118,13 +118,13 @@ class ServerManager: ObservableObject {
             selectedServerID = servers.first?.id
         }
         serverConnectionStatuses[server.id] = nil
-
+        
         // 削除されたサーバーがデフォルトサーバーの場合、フラグを設定
         if server.id == ServerInfo.defaultServerID {
             UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
         }
     }
-
+    
     /// 指定されたインデックスセットのサーバーをリストから削除します。
     /// - Parameter offsets: 削除するサーバーのインデックスセット。
     func deleteServers(at offsets: IndexSet) {
@@ -139,24 +139,24 @@ class ServerManager: ObservableObject {
             serverConnectionStatuses[id] = nil
         }
     }
-
+    
     /// 指定されたサーバーの接続状態を更新します。
     func updateServerConnectionStatus(serverID: ServerInfo.ID, status: ServerConnectionStatus) {
         serverConnectionStatuses[serverID] = status
     }
-
+    
     /// 現在のサーバーリストをUserDefaultsに保存します。
     private func saveServers() {
         if let encoded = try? JSONEncoder().encode(servers) {
             UserDefaults.standard.set(encoded, forKey: serversKey)
         }
     }
-
+    
     /// 現在選択されているサーバーIDをUserDefaultsに保存します。
     private func saveSelectedServerID() {
         UserDefaults.standard.set(selectedServerID?.uuidString, forKey: selectedServerIDKey)
     }
-
+    
     /// サーバーのリスト内の項目を移動します。
     /// - Parameters:
     ///   - source: 移動元のインデックスセット。

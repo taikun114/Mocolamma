@@ -15,7 +15,7 @@ struct OllamaModelDetails: Codable, Hashable {
 struct OllamaModel: Identifiable, Hashable, Codable {
     var id: String { name } // テーブルビューで各行を一意に識別するためのID (Codableの対象外)
     var originalIndex: Int = 0
-
+    
     let name: String
     let model: String // name と同じ値だが、APIレスポンスに含まれるため保持
     let modified_at: String // ISO 8601形式の文字列
@@ -23,7 +23,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let digest: String
     let details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
-
+    
     // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)
     enum CodingKeys: String, CodingKey {
         case name
@@ -34,7 +34,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         case details
         case capabilities
     }
-
+    
     // 便宜のためのメンバーワーズイニシャライザ
     init(name: String, model: String, modifiedAt: String, size: Int64, digest: String, details: OllamaModelDetails?, capabilities: [String]?, originalIndex: Int = 0) {
         self.name = name
@@ -46,7 +46,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.capabilities = capabilities
         self.originalIndex = originalIndex
     }
-
+    
     // Decodable のカスタムイニシャライザ
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -57,20 +57,20 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.digest = try container.decode(String.self, forKey: .digest)
         self.details = try container.decodeIfPresent(OllamaModelDetails.self, forKey: .details)
         self.capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities)
-
+        
         // originalIndex は API レスポンスに含まれないため、ここでは初期化しない
         // CommandExecutor で API 応答後に設定する
         self.originalIndex = 0 // デフォルト値
     }
-
-
+    
+    
     // MARK: - Sorting Helpers
-
+    
     /// サイズ (バイト単位の数値) をGB単位のDoubleに変換して比較用に使用
     var comparableSize: Double {
         return Double(size) // sizeがInt64なので直接Doubleに変換
     }
-
+    
     /// modified_at (ISO 8601文字列) をDateオブジェクトに変換して比較用に使用
     var comparableModifiedDate: Date {
         let formatter = ISO8601DateFormatter()
@@ -78,14 +78,14 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
         return formatter.date(from: modified_at) ?? Date.distantPast
     }
-
+    
     /// サイズを判読可能な文字列に変換するヘルパー
     var formattedSize: String {
         let byteCountFormatter = ByteCountFormatter()
         byteCountFormatter.countStyle = .file
         return byteCountFormatter.string(fromByteCount: size)
     }
-
+    
     /// modified_at を判読可能な日付文字列に変換するヘルパー
     var formattedModifiedAt: String {
         let dateFormatter = DateFormatter()

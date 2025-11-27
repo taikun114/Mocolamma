@@ -7,10 +7,10 @@ struct ChatInputView: View {
     let selectedModel: OllamaModel?
     let sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
-
+    
     var body: some View {
         MessageInputView(inputText: $inputText, isStreaming: $isStreaming, showingInspector: $showingInspector, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
-        #if os(iOS)
+#if os(iOS)
             .gesture(
                 DragGesture().onChanged { value in
                     if value.translation.height > 30 { // 30ポイント下にドラッグ
@@ -18,12 +18,12 @@ struct ChatInputView: View {
                     }
                 }
             )
-        #endif
+#endif
     }
-
-    #if os(iOS)
+    
+#if os(iOS)
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-    #endif
+#endif
 }

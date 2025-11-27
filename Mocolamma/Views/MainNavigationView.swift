@@ -15,16 +15,16 @@ struct MainNavigationView: View {
     @Binding var modelToDelete: OllamaModel?
     @Binding var columnVisibility: NavigationSplitViewVisibility
     let sortedModels: [OllamaModel]
-
+    
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             List(selection: $sidebarSelection) {
                 Label("Server", systemImage: "server.rack").tag("server")
                 Label("Models", systemImage: "tray.full").tag("models")
                 Label("Chat", systemImage: "message").tag("chat")
-                #if os(iOS)
+#if os(iOS)
                 Label("Settings", systemImage: "gear").tag("settings")
-                #endif
+#endif
             }
             .navigationTitle("Menu")
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250) // サイドバーの幅

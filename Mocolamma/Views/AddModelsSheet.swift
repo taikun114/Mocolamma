@@ -18,11 +18,11 @@ struct AddModelsSheet: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            #if os(macOS)
+#if os(macOS)
             Text("Add Model") // モデル追加シートのタイトル。
                 .font(.title)
                 .bold()
-            #endif
+#endif
             
             VStack(alignment: .leading, spacing: 10) {
                 Text("Enter the name of the model you want to add") // モデル追加シートの説明。
@@ -49,17 +49,17 @@ struct AddModelsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    #if os(iOS) // iOSではボタンがメッセージの下に表示される
+#if os(iOS) // iOSではボタンがメッセージの下に表示される
                     Button {
                         showingOpenLinkAlert = true
                     } label: {
                         Label("Open Website", systemImage: "paperclip")
                     }
                     .buttonStyle(.bordered)
-                    #endif
+#endif
                 }
-
-                #if os(macOS)
+                
+#if os(macOS)
                 HStack {
                     Button {
                         showingOpenLinkAlert = true
@@ -68,7 +68,7 @@ struct AddModelsSheet: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large) // macOS用にcontrolSizeを適用
-
+                    
                     Spacer() // このspacerは新旧両方の文字列に存在するため、保持する必要があります。
                     Button("Cancel") { // キャンセルボタンのテキスト。
                         showingAddSheet = false
@@ -83,13 +83,13 @@ struct AddModelsSheet: View {
                     .keyboardShortcut(.defaultAction) // Enterキーで実行
                     .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
                 }
-                #endif
+#endif
             }
         }
         .padding()
-        #if os(macOS)
+#if os(macOS)
         .frame(width: 400, height: 250) // シートの固定サイズ
-        #endif
+#endif
         .onReceive(executor.$pullHttpErrorTriggered) { triggered in
             if triggered && !pullErrorTriggeredSeen {
                 httpErrorMessage = executor.pullHttpErrorMessage
@@ -106,7 +106,7 @@ struct AddModelsSheet: View {
         }
         .alert("Model Pull Error", isPresented: $showHttpErrorAlert) {
             Button("OK") { showHttpErrorAlert = false }
-            .keyboardShortcut(.defaultAction)
+                .keyboardShortcut(.defaultAction)
         } message: {
             Text(httpErrorMessage)
         }
@@ -121,7 +121,7 @@ struct AddModelsSheet: View {
         } message: {
             Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "ユーザに、Ollamaのモデル一覧が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。"))
         }
-        #if os(iOS)
+#if os(iOS)
         .navigationTitle("Add Model")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -147,7 +147,7 @@ struct AddModelsSheet: View {
         .onAppear {
             isTextFieldFocused = true
         }
-        #endif
+#endif
     }
     
     private func add() {
