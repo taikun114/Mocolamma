@@ -20,10 +20,14 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.0.4
+## 1.0.4 (under development)
 ### New Features
 - **Add Spanish (`es`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+
+### Bug Fixes and Improvements
+- **Fix issue that `scrollEdgeEffect` did not work in chat view**
+  - On iOS / iPadOS 26 and macOS 26 and later, the chat input field background now blurs to blend in.
 
 ## 1.0.3
 ### New Features

@@ -10,6 +10,7 @@ struct ChatMessagesView: View {
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
+    let isUsingSafeAreaBar: Bool
 
     private var reduceMotionEnabled: Bool {
 #if os(iOS)
@@ -36,7 +37,8 @@ struct ChatMessagesView: View {
             isOverallStreaming: $isOverallStreaming,
             isModelSelected: isModelSelected,
             supportsEffects: supportsEffects,
-            reduceMotionEnabled: reduceMotionEnabled
+            reduceMotionEnabled: reduceMotionEnabled,
+            isUsingSafeAreaBar: isUsingSafeAreaBar
         )
     }
 }
@@ -48,6 +50,7 @@ struct ChatMessagesScrollView: View {
     let isModelSelected: Bool
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
+    let isUsingSafeAreaBar: Bool
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -65,7 +68,9 @@ struct ChatMessagesScrollView: View {
                     }
                 }
                 .padding()
-                .padding(.bottom, 50)
+                .if(!isUsingSafeAreaBar) { view in
+                    view.padding(.bottom, 50)
+                }
                 Spacer().id("bottom-spacer")
             }
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
