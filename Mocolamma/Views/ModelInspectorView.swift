@@ -117,6 +117,14 @@ struct ModelInspectorView: View {
     }
 
     var body: some View {
+        let copyIconName = {
+            if #available(macOS 15.0, iOS 18.0, *) {
+                return "document.on.document"
+            } else {
+                return "doc.on.doc"
+            }
+        }()
+
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 Text(model.name)
@@ -150,7 +158,7 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.model) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
+                                 Button("Copy", systemImage: copyIconName) {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.model, forType: .string)
@@ -169,7 +177,7 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(sizeTooltipText) // 読みやすいサイズ + フルサイズ表記をツールチップに表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
+                                 Button("Copy", systemImage: copyIconName) {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(fullSizeText, forType: .string)
@@ -188,7 +196,7 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
+                                 Button("Copy", systemImage: copyIconName) {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
@@ -207,7 +215,7 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.digest) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
+                                 Button("Copy", systemImage: copyIconName) {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.digest, forType: .string)
@@ -239,7 +247,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parentModel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parentModel, forType: .string)
@@ -260,7 +268,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(format) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(format, forType: .string)
@@ -281,7 +289,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(family) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(family, forType: .string)
@@ -303,7 +311,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(familiesText) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(familiesText, forType: .string)
@@ -324,7 +332,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parameterSize) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parameterSize, forType: .string)
@@ -345,7 +353,7 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(quantizationLevel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(quantizationLevel, forType: .string)
@@ -406,7 +414,7 @@ struct ModelInspectorView: View {
                                 Text(count.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(count.raw), forType: .string)
@@ -424,7 +432,7 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)
@@ -442,7 +450,7 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
+                                         Button("Copy", systemImage: copyIconName) {
                                             #if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)

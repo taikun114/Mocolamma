@@ -239,7 +239,13 @@ struct MessageView: View {
         Button(action: {
             onRetry?(message.id, message)
         }) {
-            Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
+            Group {
+                if #available(macOS 15.0, iOS 18.0, *) {
+                    Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
+                } else {
+                    Image(systemName: "arrow.circlepath")
+                }
+            }
                 .contentShape(Rectangle())
                 .padding(5)
         }
@@ -273,7 +279,13 @@ struct MessageView: View {
             UIPasteboard.general.string = contentToCopy
             #endif
         }) {
-            Image(systemName: "document.on.document")
+            Group {
+                if #available(macOS 15.0, iOS 18.0, *) {
+                    Image(systemName: "document.on.document")
+                } else {
+                    Image(systemName: "doc.on.doc")
+                }
+            }
                 .contentShape(Rectangle())
                 .padding(5)
         }

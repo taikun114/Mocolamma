@@ -163,7 +163,16 @@ struct ModelListView: View {
         #endif
     }
 
-    var body: some View {        VStack {
+    var body: some View {
+        let copyIconName = {
+            if #available(macOS 15.0, iOS 18.0, *) {
+                return "document.on.document"
+            } else {
+                return "doc.on.doc"
+            }
+        }()
+
+        VStack {
 #if os(iOS)
         List(selection: $selectedModel) {
             ForEach(sortedModels) { model in
@@ -193,7 +202,7 @@ struct ModelListView: View {
                         NSPasteboard.general.setString(model.name, forType: .string)
                         #endif
                     } label: {
-                        Label("Copy Model Name", systemImage: "document.on.document")
+                        Label("Copy Model Name", systemImage: copyIconName)
                     }
                     
                     Button(role: .destructive) {
@@ -239,7 +248,7 @@ struct ModelListView: View {
             .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
                 if let selectedID = selectedIDs.first,
                    let model = sortedModels.first(where: { $0.id == selectedID }) {
-                    Button("Copy Model Name", systemImage: "document.on.document") {
+                    Button("Copy Model Name", systemImage: copyIconName) {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.name, forType: .string)
                     }

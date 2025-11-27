@@ -20,6 +20,14 @@ struct ServerInspectorView: View {
     }
 
     var body: some View {
+        let copyIconName = {
+            if #available(macOS 15.0, iOS 18.0, *) {
+                return "document.on.document"
+            } else {
+                return "doc.on.doc"
+            }
+        }()
+
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 // モデルインスペクターのモデル名のようにスタイルされた名前
@@ -161,7 +169,7 @@ struct ServerInspectorView: View {
                         .help(server.host)
                         .foregroundColor(.primary)
                              .contextMenu {
-                            Button("Copy", systemImage: "document.on.document") {
+                            Button("Copy", systemImage: copyIconName) {
                                 #if os(macOS)
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(server.host, forType: .string)
@@ -183,7 +191,7 @@ struct ServerInspectorView: View {
                             .bold()
                             .foregroundColor(.primary)
                              .contextMenu {
-                                Button("Copy", systemImage: "document.on.document") {
+                                Button("Copy", systemImage: copyIconName) {
                                     #if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)

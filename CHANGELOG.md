@@ -30,6 +30,7 @@ Notes
   - On iOS / iPadOS 26 and macOS 26 and later, the chat input field background now blurs to blend in.
 - **Fix issue where network requests could fail when launching the app**
   - Since this issue occasionally occurred in the previous fix, I added a retry function to the network check performed when the app launches to ensure this issue is resolved.
+- **Fix issue where the copy button and retry button icons were not displayed in the chat screen on iOS / iPadOS 17 and macOS 14**
 
 ## 1.0.3
 ### New Features
