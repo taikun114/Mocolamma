@@ -231,9 +231,29 @@ struct ContentView: View {
             for server in serverManager.servers {
                 serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
                 Task {
-                    let connectionStatus = await executor.checkAPIConnectivity(host: server.host)
-                    await MainActor.run {
-                        serverManager.updateServerConnectionStatus(serverID: server.id, status: connectionStatus)
+                    let maxRetries = 3
+                    var finalStatus: ServerConnectionStatus?
+
+                    for attempt in 1...maxRetries {
+                        let status = await executor.checkAPIConnectivity(host: server.host)
+                        finalStatus = status
+                        
+                        // 接続成功、またはリトライ対象外のエラー（サーバーからのメッセージ付き応答など）ならループを抜ける
+                        if case .connected = status { break }
+                        if case .errorWithMessage = status { break }
+
+                        // リトライ対象のエラーの場合
+                        print("Attempt \(attempt) of \(maxRetries) failed for \(server.host). Status: \(status)")
+                        if attempt < maxRetries {
+                            print("Retrying in 0.5 seconds...")
+                            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒待機
+                        }
+                    }
+
+                    if let status = finalStatus {
+                        await MainActor.run {
+                            serverManager.updateServerConnectionStatus(serverID: server.id, status: status)
+                        }
                     }
                 }
             }

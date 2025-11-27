@@ -28,6 +28,8 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix issue that `scrollEdgeEffect` did not work in chat view**
   - On iOS / iPadOS 26 and macOS 26 and later, the chat input field background now blurs to blend in.
+- **Fix issue where network requests could fail when launching the app**
+  - Since this issue occasionally occurred in the previous fix, I added a retry function to the network check performed when the app launches to ensure this issue is resolved.
 
 ## 1.0.3
 ### New Features
