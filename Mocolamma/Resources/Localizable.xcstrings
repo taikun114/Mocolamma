@@ -2,11 +2,25 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     " %.1f%% completed (%@ / %@)" : {
       "comment" : "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% abgeschlossen (%2$@ / %3$@)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -34,11 +48,25 @@
       }
     },
     "-" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "*Could not connect*" : {
       "comment" : "チャットのメッセージバブルに表示される、Ollamaサーバーに接続できなかったときにイタリック体で表示されるMarkdownメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Verbindung fehlgeschlagen*"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -68,6 +96,12 @@
     "*No message*" : {
       "comment" : "チャットのメッセージバブルに表示される、受信したメッセージが1つもなかったとき(最初のレスポンスを受信する前にユーザがキャンセルした場合など)にイタリック体で表示されるMarkdownメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Keine Nachricht*"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -96,6 +130,12 @@
     },
     "%@, %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -125,6 +165,12 @@
     },
     "%@, %lld B" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -155,6 +201,12 @@
     "%@/s, Time Remaining: %02d:%02d" : {
       "comment" : "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s, Verbleibende Zeit: %2$02d:%3$02d"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -182,11 +234,37 @@
       }
     },
     "%lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "%lld Tokens" : {
       "comment" : "AIモデルからの応答に使われたトークン数",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Token"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Token"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -257,6 +335,12 @@
     },
     "%lld/%lld" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/%2$lld"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -269,6 +353,12 @@
     "1 min" : {
       "comment" : "APIタイムアウト時間の設定項目の1つとして表示される項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Min."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -298,6 +388,12 @@
     "5 min" : {
       "comment" : "APIタイムアウト時間の設定項目の1つとして表示される項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Min."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -327,6 +423,12 @@
     "30 sec" : {
       "comment" : "APIタイムアウト時間の設定項目の1つとして表示される項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Sek."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -356,6 +458,12 @@
     "About Mocolamma" : {
       "comment" : "メニューバーやヘッドラインなどに表示される、このアプリ(Mocolamma)についてのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Mocolamma"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -385,6 +493,12 @@
     "About Mocolamma…" : {
       "comment" : "メニューバーやヘッドラインなどに表示される、このアプリ(Mocolamma)についてのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Mocolamma…"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -414,6 +528,12 @@
     "Acknowledgements" : {
       "comment" : "このアプリで使われたオープンソースライセンスのパッケージなどを紹介する「謝辞」セクションのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danksagungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -443,6 +563,12 @@
     "Add" : {
       "comment" : "新たなサーバーやモデルを追加するための追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -472,6 +598,12 @@
     "Add Anyway" : {
       "comment" : "サーバー追加・編集画面で入力したホスト名と通信できなかった場合でもこの設定を保存するためのこのまま追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trotzdem hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -501,6 +633,12 @@
     "Add Model" : {
       "comment" : "新たなモデルを追加するための追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -530,6 +668,12 @@
     "Add Model…" : {
       "comment" : "メニューバーに表示される、新たなモデルを追加するための追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell hinzufügen…"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -559,6 +703,12 @@
     "Add New" : {
       "comment" : "新たな項目を追加するための新規追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -588,6 +738,12 @@
     "Add Server" : {
       "comment" : "新たなサーバーを追加するための追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -617,6 +773,12 @@
     "Add Server…" : {
       "comment" : "メニューバーに表示されると、新たなサーバーを追加するための追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server hinzufügen…"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -646,6 +808,12 @@
     "Allowed" : {
       "comment" : "必要な権限が与えられたかどうかを表示するための項目に表示される、その権限が許可された状態であることを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -675,6 +843,12 @@
     "API Decode Error: " : {
       "comment" : "APIデコードエラーのプレフィックスメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Decodierungsfehler: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -704,6 +878,12 @@
     "API Error: HTTP Status Code %d" : {
       "comment" : "HTTPステータスコードのエラーメッセージ。HTTPステータスコード。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Fehler: HTTP Status Code %d"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -733,6 +913,12 @@
     "API Error: Unknown response type." : {
       "comment" : "不明なAPIレスポンスタイプのエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Fehler: Unbekannter Antworttyp."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -762,6 +948,12 @@
     "API Request Error: " : {
       "comment" : "APIリクエストエラーのプレフィックスメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Anfragefehler: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -791,6 +983,12 @@
     "API Timeout" : {
       "comment" : "APIタイムアウト時間に関する設定項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-Zeitüberschreitung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -820,6 +1018,12 @@
     "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone." : {
       "comment" : "モデル削除の確認メッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie das Modell \"%@\" wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -849,6 +1053,12 @@
     "Are you sure you want to delete the selected model?\nThis action cannot be undone." : {
       "comment" : "選択したモデル削除の確認メッセージ（フォールバック）。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie das ausgewählte Modell wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -878,6 +1088,12 @@
     "Are you sure you want to delete the selected server?\nThis action cannot be undone." : {
       "comment" : "選択したサーバー削除の確認メッセージ（フォールバック）。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie den ausgewählten Server wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -907,6 +1123,12 @@
     "Are you sure you want to delete the server \"%@\"?\nThis action cannot be undone." : {
       "comment" : "サーバー削除の確認メッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie den Server \"%@\" wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -936,6 +1158,12 @@
     "Are you sure you want to open the Buy Me a Coffee page?" : {
       "comment" : "ユーザに、Buy Me a Coffeeのページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Buy Me a Coffee Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -965,6 +1193,12 @@
     "Are you sure you want to open the CompactSlider GitHub page?" : {
       "comment" : "ユーザに、CompactSliderのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die CompactSlider GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -994,6 +1228,12 @@
     "Are you sure you want to open the create-dmg GitHub page?" : {
       "comment" : "ユーザに、create-dmgのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die create-dmg GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1023,6 +1263,12 @@
     "Are you sure you want to open the Discussion page on GitHub?" : {
       "comment" : "ユーザに、GitHubのディスカッションページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Diskussionsseite auf GitHub wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1052,6 +1298,12 @@
     "Are you sure you want to open the Gemini CLI GitHub page?" : {
       "comment" : "ユーザに、Gemini CLIのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Gemini CLI GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1081,6 +1333,12 @@
     "Are you sure you want to open the GitHub contributors page?" : {
       "comment" : "ユーザに、GitHubの貢献者情報が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die GitHub Mitwirkende-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1110,6 +1368,12 @@
     "Are you sure you want to open the GitHub repository page?" : {
       "comment" : "ユーザに、GitHub上で公開されている、このアプリ(Mocolamma)のリポジトリページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die GitHub Repository Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1139,6 +1403,12 @@
     "Are you sure you want to open the Issue page on GitHub?" : {
       "comment" : "ユーザに、GitHub上で公開されている、このアプリ(Mocolamma)のIssueページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Issue Seite auf GitHub wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1168,6 +1438,12 @@
     "Are you sure you want to open the MarkdownUI GitHub page?" : {
       "comment" : "ユーザに、MarkdownUIのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die MarkdownUI GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1197,6 +1473,12 @@
     "Are you sure you want to open the Ollama GitHub page?" : {
       "comment" : "ユーザに、OllamaのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Ollama GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1226,6 +1508,12 @@
     "Are you sure you want to open the Ollama models page?" : {
       "comment" : "ユーザに、Ollamaのモデル一覧が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Ollama Modelle Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1255,6 +1543,12 @@
     "Are you sure you want to open the opencode GitHub page?" : {
       "comment" : "ユーザに、opencodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die opencode GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1284,6 +1578,12 @@
     "Are you sure you want to open the page with license information?" : {
       "comment" : "モデルのライセンスページにあるライセンスページを開くボタンを押した際に表示される、ユーザに、このモデルのライセンス情報が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Seite mit Lizenzinformationen wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1313,6 +1613,12 @@
     "Are you sure you want to open the PayPal.Me page?" : {
       "comment" : "ユーザに、PayPal.Meのページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die PayPal.Me Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1342,6 +1648,12 @@
     "Are you sure you want to open the Qwen Code GitHub page?" : {
       "comment" : "ユーザに、Qwen CodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Qwen Code GitHub Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1371,6 +1683,12 @@
     "Are you sure you want to open the send feedback email window?" : {
       "comment" : "ユーザに、フィードバックを送信するためのメール送信画面を開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie das Fenster zum Senden einer Feedback-E-Mail wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1399,6 +1717,12 @@
     },
     "Ascending" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufsteigend"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1428,6 +1752,12 @@
     "Ask questions and share your opinions" : {
       "comment" : "コミュニティーページへのアクセスを促すテキストメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellen Sie Fragen und teilen Sie Ihre Meinungen mit"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1457,6 +1787,12 @@
     "Buy Green Tea" : {
       "comment" : "Buy Me a Coffeeを使って、開発者に緑茶を購入する(寄付する)ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grünen Tee kaufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1486,6 +1822,12 @@
     "Buy Me Green Tea" : {
       "comment" : "Buy Me a Coffeeを使って、開発者に緑茶を買ってあげる(寄付する)ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaufen Sie mir einen grünen Tee"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1515,6 +1857,12 @@
     "Cancel" : {
       "comment" : "キャンセルアクションを実行するボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1544,6 +1892,12 @@
     "Cancel editing." : {
       "comment" : "メッセージの編集をキャンセルするボタンのツールチップに表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeitung abbrechen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1573,6 +1927,12 @@
     "Chat" : {
       "comment" : "チャットタブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1602,6 +1962,12 @@
     "Chat Settings" : {
       "comment" : "チャット設定のヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat-Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1631,6 +1997,12 @@
     "Checking..." : {
       "comment" : "サーバーに接続することができるかどうかを確認しているときに表示される確認中テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird überprüft..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1660,6 +2032,12 @@
     "Close" : {
       "comment" : "閉じるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1689,6 +2067,12 @@
     "Community" : {
       "comment" : "コミュニティーページにアクセスするためのコミュニティーボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1716,11 +2100,25 @@
       }
     },
     "CompactSlider by Alexey Bukhtin" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CompactSlider by Alexey Bukhtin"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Complete editing and retry." : {
       "comment" : "メッセージ編集画面の完了ボタンのツールチップに表示されるメッセージ。このボタンをクリックすると編集を完了して、編集されたメッセージをAPIに送信されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeitung abschließen und erneut versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1750,6 +2148,12 @@
     "Completed" : {
       "comment" : "Ollamaサーバー上でモデルのダウンロードに成功したときの完了メッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgeschlossen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1779,6 +2183,12 @@
     "Completion" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルがコンプリーション(テキスト補完)に対応している場合はこのタグが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vervollständigung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1808,6 +2218,12 @@
     "Connected" : {
       "comment" : "Ollamaサーバーと正しく接続することができた場合のメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbunden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1837,6 +2253,12 @@
     "Connecting..." : {
       "comment" : "Ollamaサーバーとの接続を試みている間に表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinden..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1866,6 +2288,12 @@
     "Connection Failed" : {
       "comment" : "Ollamaサーバーとの接続に失敗した場合に表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung fehlgeschlagen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1895,6 +2323,12 @@
     "ConnectionError.message" : {
       "comment" : "Connection error message when adding a server。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung zur API fehlgeschlagen.\nBitte überprüfen Sie, ob der Host korrekt ist und der Ollama-Server läuft."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1924,6 +2358,12 @@
     "ConnectionError.title" : {
       "comment" : "接続エラーのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindungsfehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1953,6 +2393,12 @@
     "Context Length:" : {
       "comment" : "モデルが持つコンテキスト長を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontextlänge:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1982,6 +2428,12 @@
     "Context Window" : {
       "comment" : "チャット設定でコンテキストウィンドウを指定するためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontextfenster"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2011,6 +2463,12 @@
     "Contributors" : {
       "comment" : "このアプリ(Mocolamma)の開発に携わった貢献者が記載されたページを開くためのボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitwirkende"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2040,6 +2498,12 @@
     "Contributors involved in the development" : {
       "comment" : "このアプリ(Mocolamma)の開発に携わった貢献者が記載されたページを開くためのボタンの横に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Entwicklungsprozess beteiligte Mitwirkende"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2069,6 +2533,12 @@
     "Copy" : {
       "comment" : "コピーボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2098,6 +2568,12 @@
     "Copy Model Name" : {
       "comment" : "モデル名をコピーするボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellnamen kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2127,6 +2603,12 @@
     "Copyright ©︎ 2025 Taiga Imaura" : {
       "comment" : "著作者情報のテキスト。日本語以外はTaiga Imauraを使用する。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2156,6 +2638,12 @@
     "Could not connect to API.\nTLS error occurred, could not establish a secure connection." : {
       "comment" : "TLS接続エラー時のメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung zur API fehlgeschlagen.\nEs ist ein TLS-Fehler aufgetreten, eine sichere Verbindung konnte nicht hergestellt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2185,6 +2673,12 @@
     "Could not load model information." : {
       "comment" : "モデル情報を読み込むことができなかったときに表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellinformationen konnten nicht geladen werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2212,11 +2706,25 @@
       }
     },
     "create-dmg by Andrey Tarantsov and Andrew Janke" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Custom Settings" : {
       "comment" : "チャット設定にあるカスタム設定セクションのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2245,6 +2753,12 @@
     },
     "Date" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2274,6 +2788,12 @@
     "Delete" : {
       "comment" : "削除ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2303,6 +2823,12 @@
     "Delete Error: HTTP Status Code %d - %@ on %@" : {
       "comment" : "Ollamaサーバーからモデルを削除しようとしたときのエラーメッセージ。エラーコード - エラーメッセージ on サーバーURL。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschfehler: HTTP Status Code %1$d - %2$@ auf %3$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2332,6 +2858,12 @@
     "Delete Error: Model '%@' not found (404 Not Found) on %@." : {
       "comment" : "Ollamaサーバーからモデルを削除しようとしたとき、削除しようとしているモデルがサーバー上に見つからない場合のエラーメッセージ。モデル名 not found (404 Not Found) on サーバーURL。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschfehler: Modell '%1$@' nicht gefunden (404 Not Found) auf %2$@."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2361,6 +2893,12 @@
     "Delete Error: Unknown response type." : {
       "comment" : "Ollamaサーバーからモデルを削除しようとした時、不明なレスポンスタイプが返ってきた場合のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschfehler: Unbekannter Antworttyp."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2390,6 +2928,12 @@
     "Delete Model" : {
       "comment" : "モデルを削除するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2419,6 +2963,12 @@
     "Delete Server" : {
       "comment" : "サーバーを削除するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2448,6 +2998,12 @@
     "Delete..." : {
       "comment" : "削除ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2477,6 +3033,12 @@
     "Deleting model '%@' from %@..." : {
       "comment" : "Ollamaサーバーからモデルを削除しているときに表示されるメッセージ。モデル名 from サーバーURL。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösche Modell '%1$@' von %2$@..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2505,6 +3067,12 @@
     },
     "Descending" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absteigend"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2534,6 +3102,12 @@
     "Details Information:" : {
       "comment" : "詳細情報セクションのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detailinformationen:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2563,6 +3137,12 @@
     "Developed with Generative AI" : {
       "comment" : "生成AIを使って開発したことを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit generativer KI entwickelt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2592,6 +3172,12 @@
     "Digest:" : {
       "comment" : "各モデル固有のハッシュ値が表示される見出しテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digest:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2621,6 +3207,12 @@
     "Donate at PayPal" : {
       "comment" : "PayPalを使って寄付するセクションのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spenden via PayPal"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2650,6 +3242,12 @@
     "Done" : {
       "comment" : "完了ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2679,6 +3277,12 @@
     "Downloading model '%@' from %@..." : {
       "comment" : "Ollamaサーバー上でモデルをダウンロード中に表示されるメッセージ。モデル名 from サーバーURL",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lade Modell '%1$@' von %2$@ herunter..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2708,6 +3312,12 @@
     "e.g., gemma3:4b, phi4:latest" : {
       "comment" : "モデル追加画面のモデル名入力欄に表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z.B. gemma3:4b, phi4:latest"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2737,6 +3347,12 @@
     "e.g., localhost:11434 or 192.168.1.50:11434" : {
       "comment" : "サーバー追加画面のホスト名入力欄に表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z.B. localhost:11434 oder 192.168.1.50:11434"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2766,6 +3382,12 @@
     "e.g., Ollama Server" : {
       "comment" : "サーバー追加画面のサーバー名入力欄に表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "z.B. Ollama Server"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2795,6 +3417,12 @@
     "Edit" : {
       "comment" : "編集ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2824,6 +3452,12 @@
     "Edit Server" : {
       "comment" : "サーバーを編集するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server bearbeiten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2853,6 +3487,12 @@
     "Edit..." : {
       "comment" : "編集ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2882,6 +3522,12 @@
     "Embedding" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルが埋め込み(エンベディング)モデルである場合はこのタグが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einbettung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2911,6 +3557,12 @@
     "Embedding Length:" : {
       "comment" : "モデルが持つ埋め込み長を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einbettungslänge:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2940,6 +3592,12 @@
     "Enable Custom Settings" : {
       "comment" : "チャット設定内でカスタム設定を有効化するかどうかのトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte Einstellungen aktivieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2969,6 +3627,12 @@
     "Enter the name of the model you want to add" : {
       "comment" : "入力欄に、追加したいモデル名を入力するように促すメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie den Namen des hinzuzufügenden Modells ein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2998,6 +3662,12 @@
     "Error" : {
       "comment" : "エラー",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3027,6 +3697,12 @@
     "Error (Status Code: %lld)" : {
       "comment" : "エラーメッセージ。HTTPステータスコード。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler (Status Code: %lld)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3056,6 +3732,12 @@
     "Error: Failed to serialize pull request body: " : {
       "comment" : "Ollamaサーバー上でモデルをダウンロードしようとした際に、リクエストボディのシリアライズに失敗した場合のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Serialisierung des Pull-Request-Bodys fehlgeschlagen: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3085,6 +3767,12 @@
     "Error: Failed to serialize request body: " : {
       "comment" : "リクエストボディのシリアライズ失敗のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Serialisierung des Request-Bodys fehlgeschlagen: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3114,6 +3802,12 @@
     "Error: Invalid API URL for delete." : {
       "comment" : "削除用API URLが無効な場合のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Ungültige API-URL zum Löschen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3143,6 +3837,12 @@
     "Error: Invalid API URL for pull." : {
       "comment" : "Ollamaサーバー上でモデルをダウンロードしようとした際に、APIURLが無効だった場合に表示されるエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Ungültige API-URL zum Herunterladen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3172,6 +3872,12 @@
     "Error: Invalid API URL." : {
       "comment" : "無効なAPI URLのエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Ungültige API-URL."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3201,6 +3907,12 @@
     "Error: No Ollama server selected." : {
       "comment" : "Ollamaサーバーからモデルを削除しようとした際にモデルが選択されていなかった場合に表示されるイランメッセージ。\nOllamaサーバーが選択されていないときのエラーメッセージ。\nOllamaサーバーが選択されていない時にモデルのダウンロードを行おうとした場合のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Kein Ollama-Server ausgewählt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3230,6 +3942,12 @@
     "Expires: %@" : {
       "comment" : "サーバー上で現在読み込まれているモデルが期限切れになる(メモリから解放される)予定の日付が表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft ab: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3259,6 +3977,12 @@
     "Failed" : {
       "comment" : "プルステータス: 失敗。\n失敗",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlgeschlagen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3288,6 +4012,12 @@
     "Failed to connect to the Ollama API. Please check your network connection or server settings." : {
       "comment" : "Ollama APIに接続できなかったときに表示されるエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung zur Ollama API fehlgeschlagen. Bitte überprüfen Sie Ihre Netzwerkverbindung oder Servereinstellungen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3317,6 +4047,12 @@
     "Families:" : {
       "comment" : "モデルが属しているファミリー(複数可)が表示されるタイトルテキスト。複数形。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familien:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3346,6 +4082,12 @@
     "Family:" : {
       "comment" : "モデルが属しているファミリー(単独)が表示されるタイトルテキスト。単数形。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Familie:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3375,6 +4117,12 @@
     "Fetching models from API (%@)..." : {
       "comment" : "Ollamaサーバーからモデルリストを取得中のメッセージ。API (サーバーURL)...。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hole Modelle von API (%@)..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3404,6 +4152,12 @@
     "Find Models" : {
       "comment" : "モデルを探すボタンのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelle finden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3433,6 +4187,12 @@
     "Format:" : {
       "comment" : "モデルのファイル形式を表すタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3462,6 +4222,12 @@
     "Found a bug?" : {
       "comment" : "バグ報告ボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler gefunden?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3489,11 +4255,25 @@
       }
     },
     "Gemini CLI by Google" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "General" : {
       "comment" : "一般設定のヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3523,6 +4303,12 @@
     "Give It a Star" : {
       "comment" : "リポジトリにスターをつけるボタンテキスト。このボタンを押すとこのアプリ(Mocolamma)のリポジトリのリンクを開く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sterne vergeben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3552,6 +4338,12 @@
     "Give It a Star to GitHub Repository" : {
       "comment" : "リポジトリにスターをつけるボタンの項目テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergeben Sie einen Stern für das GitHub Repository"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3581,6 +4373,12 @@
     "Have an idea?" : {
       "comment" : "フィードバック送信ボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haben Sie eine Idee?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3610,6 +4408,12 @@
     "Here you can perform a simple chat to check the model." : {
       "comment" : "チャット画面が空っぽの時に表示される、チャット機能を紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier können Sie einen einfachen Chat durchführen, um das Modell zu überprüfen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3639,6 +4443,12 @@
     "Hide Inspector" : {
       "comment" : "インスペクター(右サイドバー)を隠すボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspektor ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3668,6 +4478,12 @@
     "Host" : {
       "comment" : "サーバーのホスト・ホスト名",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3697,6 +4513,12 @@
     "Host:" : {
       "comment" : "サーバーのホスト・ホスト名",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3726,6 +4548,12 @@
     "How to Set Up" : {
       "comment" : "ローカルネットワーク権限を設定するための方法が記載されたアラートを表示するためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3755,6 +4583,12 @@
     "How to set up local network permission." : {
       "comment" : "ローカルネットワーク権限を設定するための方法が記載されたアラートに表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So richten Sie die lokale Netzwerkberechtigung ein."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3784,6 +4618,12 @@
     "I would be so glad if you could give a star to the repository!" : {
       "comment" : "リポジトリにスターをつけるボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich würde mich sehr freuen, wenn Sie dem Repository einen Stern geben könnten!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3813,6 +4653,12 @@
     "If responses take longer, such as when loading large models, increasing the timeout may help." : {
       "comment" : "APIタイムアウト時間を設定するための設定項目を説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Antworten länger dauern, z.B. beim Laden großer Modelle, kann eine Erhöhung des Timeouts helfen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3842,6 +4688,12 @@
     "If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings." : {
       "comment" : "チャット設定のストリームレスポンスを切り替えるトグルスイッチに表示される説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie die Stream-Antwort deaktivieren, wird empfohlen, das API-Timeout in den Einstellungen auf unbegrenzt zu setzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3871,6 +4723,12 @@
     "If you're not sure what to enter, you can find models on the Ollama website." : {
       "comment" : "モデル追加画面に表示される、Ollamaのモデル一覧ページを開くよう促すためのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie nicht wissen, was Sie eingeben sollen, finden Sie Modelle auf der Ollama-Website von Ollama."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3900,6 +4758,12 @@
     "Inspector" : {
       "comment" : "インスペクター(右サイドバー)",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspektor"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3929,6 +4793,12 @@
     "Launch at Login" : {
       "comment" : "ログイン時にこのアプリ(Mocolamma)を開くかどうかを設定するトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Login starten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3958,6 +4828,12 @@
     "License" : {
       "comment" : "モデル情報に表示されるライセンスのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3987,6 +4863,12 @@
     "License Information" : {
       "comment" : "ライセンス情報を表示するためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzinformationen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4016,6 +4898,12 @@
     "License:" : {
       "comment" : "モデル情報に表示されるライセンスのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenz:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4045,6 +4933,12 @@
     "Loading model info..." : {
       "comment" : "モデル情報を読み込んでいるときに表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellinformationen werden geladen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4074,6 +4968,12 @@
     "Local Network Access" : {
       "comment" : "ローカルネットワークアクセスの権限状態を表示する設定項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokaler Netzwerkzugriff"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4103,6 +5003,12 @@
     "Local network permission is granted." : {
       "comment" : "ローカルネットワークアクセスの許可済みボタンのツールチップに表示される、ローカルネットワークの権限が与えられていることを示すメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokale Netzwerkberechtigung ist erteilt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4130,11 +5036,25 @@
       }
     },
     "MarkdownUI by Guillermo Gonzalez" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MarkdownUI by Guillermo Gonzalez"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Menu" : {
       "comment" : "この画面がメニューであることを表すヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menü"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4162,11 +5082,25 @@
       }
     },
     "Mocolamma" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Mocolamma is an Open Source Application." : {
       "comment" : "このアプリ(Mocolamma)がオープンソースアプリであることを表示するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma ist eine Open Source Anwendung."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4196,6 +5130,12 @@
     "Model deletion failed: " : {
       "comment" : "Ollamaサーバーからモデルの削除に失敗した場合のプレフィックスメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelllöschung fehlgeschlagen: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4225,6 +5165,12 @@
     "Model Details" : {
       "comment" : "モデル詳細ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelldetails"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4254,6 +5200,12 @@
     "Model Information:" : {
       "comment" : "モデル情報のヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellinformationen:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4283,6 +5235,12 @@
     "Model Name:" : {
       "comment" : "モデル名のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellname:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4312,6 +5270,12 @@
     "Model pull completed: " : {
       "comment" : "Ollamaサーバー上でモデルのダウンロード完了メッセージのプレフィックス。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull abgeschlossen: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4341,6 +5305,12 @@
     "Model Pull Error" : {
       "comment" : "モデルプル(モデルダウンロード)のエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull-Fehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4370,6 +5340,12 @@
     "Model pull error: HTTP Status Code %d" : {
       "comment" : "モデルプルエラー: HTTPステータスコード。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull-Fehler: HTTP Status Code %d"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4399,6 +5375,12 @@
     "Model pull failed: " : {
       "comment" : "Ollamaサーバー上でモデルダウンロード失敗メッセージのプレフィックス。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull fehlgeschlagen: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4428,6 +5410,12 @@
     "Model pull failed.\nPlease make sure the model name is correct." : {
       "comment" : "400 Bad Request: likely wrong model name",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull fehlgeschlagen.\nBitte stellen Sie sicher, dass der Modellname korrekt ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4457,6 +5445,12 @@
     "Model pull failed.\nUnknown error occurred." : {
       "comment" : "Non-400 error fallback message",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell-Pull fehlgeschlagen.\nUnbekannter Fehler aufgetreten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4486,6 +5480,12 @@
     "Models" : {
       "comment" : "モデルタブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelle"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4515,6 +5515,12 @@
     "Modified At" : {
       "comment" : "このモデルの変更日を表示するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt geändert am"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4544,6 +5550,12 @@
     "Modified At:" : {
       "comment" : "このモデルの変更日を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt geändert am:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4573,6 +5585,12 @@
     "Name" : {
       "comment" : "モデル名を表示するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4602,6 +5620,12 @@
     "New Chat" : {
       "comment" : "メニューバーに表示される、新規チャットボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Chat"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4631,6 +5655,12 @@
     "Next Revision" : {
       "comment" : "メッセージを次のリビジョンに切り替えるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Revision"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4660,6 +5690,12 @@
     "No data available" : {
       "comment" : "データが得られなかったときのメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Daten verfügbar"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4689,6 +5725,12 @@
     "No details available." : {
       "comment" : "詳細情報が得られなかったときのメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Details verfügbar."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4718,6 +5760,12 @@
     "No model information available." : {
       "comment" : "モデル情報を得られなかったときのメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Modellinformationen verfügbar."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4747,6 +5795,12 @@
     "No models are currently installed. Click or tap '+' to add a new model." : {
       "comment" : "モデルが1つもインストールされていない時に、ユーザに+ボタンをクリックしてモデルを追加するよう促す紹介メッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es sind derzeit keine Modelle installiert. Klicken oder tippen Sie auf '+' um ein neues Modell hinzuzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4776,6 +5830,12 @@
     "No models available" : {
       "comment" : "チャット画面のモデルピッカーでモデルが1つも存在しない場合のダミーアイテム。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Modelle verfügbar"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4805,6 +5865,12 @@
     "No Models Available" : {
       "comment" : "モデルが1つもインストールされていない時に表示されるヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Modelle verfügbar"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4834,6 +5900,12 @@
     "No Server Selected" : {
       "comment" : "サーバーが選択されていない時に表示されるヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Server ausgewählt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4863,6 +5935,12 @@
     "No servers are currently configured. Click or tap '+' to add a new server." : {
       "comment" : "サーバーが1つも設定されていない時に、ユーザに+ボタンをクリックしてサーバーを追加するよう促す紹介メッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es sind derzeit keine Server konfiguriert. Klicken oder tippen Sie auf '+' um einen neuen Server hinzuzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4892,6 +5970,12 @@
     "No Servers Available" : {
       "comment" : "サーバーが1つも存在しないときに表示されるヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Server verfügbar"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4921,6 +6005,12 @@
     "No." : {
       "comment" : "番号リストの見出しテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nr."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4950,6 +6040,12 @@
     "No. %lld" : {
       "comment" : "番号リストのテキスト。No. 1やNo. 2のように表示される。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nr. %lld"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4979,6 +6075,12 @@
     "Not Connected (Status Code: %lld)" : {
       "comment" : "サーバーに接続できなかったときのステータスコード付きテキスト。HTTPステータスコード。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verbunden (Status Code: %lld)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5008,6 +6110,12 @@
     "Not Connected (Timeout)" : {
       "comment" : "タイムアウトエラーによりサーバーに接続できなかったときのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verbunden (Zeitüberschreitung)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5037,6 +6145,12 @@
     "Not Connected (Unknown Host)" : {
       "comment" : "不明なホストによりサーバーに接続できなかったときのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verbunden (Unbekannter Host)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5066,6 +6180,12 @@
     "Nothing to display." : {
       "comment" : "表示するものが何もない時に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts anzuzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5094,6 +6214,12 @@
     },
     "Number" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummer"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5121,14 +6247,36 @@
       }
     },
     "OK" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Ollama" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Ollama Version:" : {
       "comment" : "接続先サーバーのOllamaバージョンを表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama Version:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5158,6 +6306,12 @@
     "Open" : {
       "comment" : "開くボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5187,6 +6341,12 @@
     "Open License Page" : {
       "comment" : "ライセンスページを開くボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzseite öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5216,6 +6376,12 @@
     "Open License Page?" : {
       "comment" : "ライセンスページを開くかどうかを尋ねるアラートタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzseite öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5245,6 +6411,12 @@
     "Open link to discussion page." : {
       "comment" : "ディスカッションページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Diskussionsseite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5274,6 +6446,12 @@
     "Open link to list of known bugs and report page." : {
       "comment" : "既知のバグや報告リストへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Liste bekannter Fehler und Berichtsseite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5303,6 +6481,12 @@
     "Open link to the Buy Me a Coffee page." : {
       "comment" : "Buy Me a Coffeeページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Buy Me a Coffee Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5332,6 +6516,12 @@
     "Open link to the CompactSlider GitHub page." : {
       "comment" : "CompactSliderのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur CompactSlider GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5361,6 +6551,12 @@
     "Open link to the create-dmg GitHub page." : {
       "comment" : "create-dmgのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur create-dmg GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5390,6 +6586,12 @@
     "Open link to the Gemini CLI GitHub page." : {
       "comment" : "Gemini CLIのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Gemini CLI GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5419,6 +6621,12 @@
     "Open link to the GitHub contributors page." : {
       "comment" : "GitHubの貢献者ページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur GitHub Mitwirkende-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5448,6 +6656,12 @@
     "Open link to the GitHub repository page." : {
       "comment" : "GitHubのリポジトリページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur GitHub Repository Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5477,6 +6691,12 @@
     "Open link to the MarkdownUI GitHub page." : {
       "comment" : "MarkdownUIのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur MarkdownUI GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5506,6 +6726,12 @@
     "Open link to the Ollama GitHub page." : {
       "comment" : "OllamaのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Ollama GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5535,6 +6761,12 @@
     "Open link to the opencode GitHub page." : {
       "comment" : "opencodeのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur opencode GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5564,6 +6796,12 @@
     "Open link to the PayPal.Me." : {
       "comment" : "PayPal.Meへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zu PayPal.Me öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5593,6 +6831,12 @@
     "Open link to the Qwen Code GitHub page." : {
       "comment" : "Qwen CodeのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Qwen Code GitHub Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5622,6 +6866,12 @@
     "Open Link?" : {
       "comment" : "外部リンクを開くアラートタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5651,6 +6901,12 @@
     "Open Settings" : {
       "comment" : "設定を開くボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5680,6 +6936,12 @@
     "Open Source License" : {
       "comment" : "オープンソースライセンスのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Source Lizenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5709,6 +6971,12 @@
     "Open the Send Email window?" : {
       "comment" : "メールの送信画面を開いても良いかを尋ねるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zum Senden einer E-Mail öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5738,6 +7006,12 @@
     "Open the send feedback email window." : {
       "comment" : "フィードバック送信ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zum Senden einer Feedback-E-Mail öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5767,6 +7041,12 @@
     "Open Website" : {
       "comment" : "Ollamaのモデル一覧が記載されたページを開くボタンのウェブサイトを開くテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5794,11 +7074,25 @@
       }
     },
     "opencode by SST" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opencode by SST"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Order" : {
       "comment" : "並び順を切り替えるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestellung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5828,6 +7122,12 @@
     "Other License" : {
       "comment" : "その他のライセンスであることを表すヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Lizenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5857,6 +7157,12 @@
     "Parameter Count:" : {
       "comment" : "そのモデルの詳細なパラメーター数を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parameteranzahl:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5886,6 +7192,12 @@
     "Parameter Size:" : {
       "comment" : "そのモデルのパラメーター数を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parametergröße:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5915,6 +7227,12 @@
     "Parent Model:" : {
       "comment" : "そのモデルの親モデルを表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elternmodell:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5944,6 +7262,12 @@
     "Permission is required to connect to Ollama servers on the same network." : {
       "comment" : "ローカルネットワークアクセスの許可が必要であることを表すメッセージテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigung zum Verbinden mit Ollama-Servern im selben Netzwerk erforderlich."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5973,6 +7297,12 @@
     "Permissions" : {
       "comment" : "権限に関する設定のセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6002,6 +7332,12 @@
     "Please select a server in the Server tab." : {
       "comment" : "ユーザに、サーバータブでサーバーを選択するよう促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte wählen Sie einen Server im Server-Tab aus."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6031,6 +7367,12 @@
     "Preparing..." : {
       "comment" : "Ollamaサーバー上でモデルダウンロードを開始したときの準備中に表示されるメッセージ。\nプルステータス: 準備中。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorbereiten..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6060,6 +7402,12 @@
     "Previous Revision" : {
       "comment" : "メッセージを前のリビジョンに切り替えるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorherige Revision"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6089,6 +7437,12 @@
     "Quantization Level:" : {
       "comment" : "モデルの量子化レベルを表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantisierungslevel:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6117,6 +7471,12 @@
     },
     "Qwen Code by Qwen" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code von Qwen"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6129,6 +7489,12 @@
     "Refresh" : {
       "comment" : "リストを更新するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6158,6 +7524,12 @@
     "Refresh status" : {
       "comment" : "ステータスを更新するボタンに表示されるツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status aktualisieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6187,6 +7559,12 @@
     "Report a Bug" : {
       "comment" : "バグを報告するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler melden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6216,6 +7594,12 @@
     "Retry" : {
       "comment" : "メッセージの送信をやり直すボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederholen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6245,6 +7629,12 @@
     "running" : {
       "comment" : "実行中のモデル数を表示するサフィックステキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "läuft"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6274,6 +7664,12 @@
     "Running Models:" : {
       "comment" : "実行中のモデル数を表示するタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufende Modelle:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6303,6 +7699,12 @@
     "Save" : {
       "comment" : "保存ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6332,6 +7734,12 @@
     "Select" : {
       "comment" : "選択ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswählen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6361,6 +7769,12 @@
     "Select a menu." : {
       "comment" : "メニューを選択するよう促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie ein Menü aus."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6390,6 +7804,12 @@
     "Select a model to see the details." : {
       "comment" : "詳細を見るために、モデルを選択するよう促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie ein Modell aus, um die Details anzuzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6419,6 +7839,12 @@
     "Select a server to see the details." : {
       "comment" : "詳細を見るために、サーバーを選択するよう促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie einen Server aus, um die Details anzuzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6448,6 +7874,12 @@
     "Select Model" : {
       "comment" : "チャット画面に表示されるモデルピッカーで、モデルが1つも選択されていないときにモデルを選択するよう促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell auswählen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6477,6 +7909,12 @@
     "Send Feedback" : {
       "comment" : "フィードバックを送信ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback senden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6506,6 +7944,12 @@
     "Server" : {
       "comment" : "サーバータブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6535,6 +7979,12 @@
     "Server Details" : {
       "comment" : "サーバー詳細のヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server-Details"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6564,6 +8014,12 @@
     "Servers" : {
       "comment" : "サーバータブのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6593,6 +8049,12 @@
     "Settings" : {
       "comment" : "設定画面のヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6622,6 +8084,12 @@
     "Settings…" : {
       "comment" : "メニューバーに表示される、設定ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen…"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6651,6 +8119,12 @@
     "Show Inspector" : {
       "comment" : "インスペクター(右サイドバー)を表示するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspektor anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6680,6 +8154,12 @@
     "Show license information for this application and the libraries used." : {
       "comment" : "このアプリのライセンス情報を表示するボタンのツールチップに表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzinformationen für diese Anwendung und die verwendeten Bibliotheken anzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6709,6 +8189,12 @@
     "Size" : {
       "comment" : "モデルサイズのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6738,6 +8224,12 @@
     "Size:" : {
       "comment" : "モデルサイズのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6767,6 +8259,12 @@
     "Sort" : {
       "comment" : "並び順。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6796,6 +8294,12 @@
     "Sort by" : {
       "comment" : "並び替えボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren nach"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6825,6 +8329,12 @@
     "Specifies whether to perform inference when using a reasoning model." : {
       "comment" : "思考に対応したモデルで、思考を使うかどうかを切り替える設定項目の説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt an, ob bei der Verwendung eines Denkmodells Inferenzen durchgeführt werden sollen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6854,6 +8364,12 @@
     "Stopped" : {
       "comment" : "メッセージの受信を途中で停止した場合にメッセージバブルの下に表示される停止しましたテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestoppt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6883,6 +8399,12 @@
     "Stream Response" : {
       "comment" : "ストリームレスポンスを切り替えるトグルスイッチ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stream-Antwort"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6912,6 +8434,12 @@
     "Successfully deleted model '%@' from %@." : {
       "comment" : "Ollamaサーファーからモデルを削除することに成功した場合のメッセージ。モデル名 from サーバーURL。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell '%1$@' erfolgreich von %2$@ gelöscht."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -6941,6 +8469,12 @@
     "Successfully fetched models. Total: %d" : {
       "comment" : "Ollamaサーバー上からモデル情報を取得することができた場合のメッセージ。合計モデル数。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelle erfolgreich abgerufen. Gesamt: %d"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6970,6 +8504,12 @@
     "Support and Feedback" : {
       "comment" : "サポートとフィードバックセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support und Feedback"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6999,6 +8539,12 @@
     "Support Developer" : {
       "comment" : "開発者をサポートするセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwickler unterstützen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7028,6 +8574,12 @@
     "System Prompt" : {
       "comment" : "システムプロンプトの入力欄のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System-Prompt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7057,6 +8609,12 @@
     "Temperature" : {
       "comment" : "モデルの温度パラメーターを設定する項目のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temperatur"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7086,6 +8644,12 @@
     "Thinking" : {
       "comment" : "モデルの思考を有効化するかどうかを切り替えるとグルスイッチ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denken"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7115,6 +8679,12 @@
     "Thinking completed" : {
       "comment" : "思考が完了したことを表す折りたたみセクションテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denken abgeschlossen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7144,6 +8714,12 @@
     "Thinking..." : {
       "comment" : "思考中であることを表す折りたたみセクションテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denken..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7174,6 +8750,12 @@
       "comment" : "思考機能を指定しないオプション項目。",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7204,6 +8786,12 @@
       "comment" : "思考機能をオフに指定するオプション項目。",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7234,6 +8822,12 @@
       "comment" : "思考機能をオンにしてするオプション項目。",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7263,6 +8857,12 @@
     "This model cannot be used" : {
       "comment" : "チャット画面でモデルを選択したとき、そのモデルがチャットに使用できない場合に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell kann nicht verwendet werden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7292,6 +8892,12 @@
     "This model does not support chat." : {
       "comment" : "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell unterstützt keinen Chat."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7321,6 +8927,12 @@
     "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on." : {
       "comment" : "iOSとiPadOSでこのアプリ(Mocolamma)にローカルネットワーク許可を与えるための方法を紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um den lokalen Netzwerkzugriff zu erlauben, gehen Sie zu Einstellungen → Datenschutz & Sicherheit → Lokales Netzwerk und aktivieren Sie \"Mocolamma\"."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7350,6 +8962,12 @@
     "To allow local network access, go to System Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.\n\nClick or tap \"OK\" to open Privacy & Security settings." : {
       "comment" : "macOSでこのアプリ(Mocolamma)にローカルネットワーク許可を与えるための方法を紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um den lokalen Netzwerkzugriff zu erlauben, gehen Sie zu Systemeinstellungen → Datenschutz & Sicherheit → Lokales Netzwerk und aktivieren Sie \"Mocolamma\".\n\nKlicken oder tippen Sie auf \"OK\", um die Datenschutz- & Sicherheitseinstellungen zu öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7379,6 +8997,12 @@
     "Toggle Inspector" : {
       "comment" : "インスペクター(右サイドバー)の表示を切り替えるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspektor umschalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7408,6 +9032,12 @@
     "Toggle Text Wrapping" : {
       "comment" : "テキストの折り返しを切り替えるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textumbruch umschalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7437,6 +9067,12 @@
     "Tools" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルがツールの呼び出しに対応している場合はこのタグが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tools"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7466,6 +9102,12 @@
     "Type your message..." : {
       "comment" : "チャット画面のメッセージ入力欄に表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie Ihre Nachricht ein..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7495,6 +9137,12 @@
     "Unlimited" : {
       "comment" : "APIタイムアウト設定を無制限にするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbegrenzt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7524,6 +9172,12 @@
     "Update" : {
       "comment" : "サーバー編集画面でサーバー設定を更新して保存するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7553,6 +9207,12 @@
     "Update Anyway" : {
       "comment" : "サーバー追加時に入力したサーバーに接続できなかった場合に、接続できないことを無視してそのまま追加するためのボタン標準名",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trotzdem aktualisieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -7582,6 +9242,12 @@
     "Version: %@" : {
       "comment" : "使用されたオープンソースライブラリのバージョンを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7611,6 +9277,12 @@
     "Version: %@ (%@)" : {
       "comment" : "このアプリのバージョン情報を表示するためのテキスト。バージョン番号 (ビルド番号)",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %1$@ (%2$@)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -7640,6 +9312,12 @@
     "Vision" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルがビジョン(画像認識)に対応している場合はこのタグが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7669,6 +9347,12 @@
     "VRAM Size: %@" : {
       "comment" : "現在読み込まれているこのモデルのVRAM使用容量。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VRAM-Größe: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7698,6 +9382,12 @@
     "You can also donate directly at PayPal." : {
       "comment" : "PayPalを使って直接寄付することができることを紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können auch direkt über PayPal spenden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7727,6 +9417,12 @@
     "You can support me at Buy Me a Coffee from the price of a cup of green tea." : {
       "comment" : "Buy Me a Coffeeを使って開発者を緑茶1杯分の価格からサポートすることができることを紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können mich bei Buy Me a Coffee ab dem Preis einer Tasse grünen Tees unterstützen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
