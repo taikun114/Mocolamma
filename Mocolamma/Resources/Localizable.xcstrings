@@ -9309,6 +9309,41 @@
         }
       }
     },
+    "View" : {
+      "comment" : "macOSとiPadOSのメニューバーにある「表示」メニュー名",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Présentation"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示"
+          }
+        }
+      }
+    },
     "Vision" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルがビジョン(画像認識)に対応している場合はこのタグが表示されます。",
       "localizations" : {

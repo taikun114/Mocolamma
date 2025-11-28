@@ -92,8 +92,24 @@ struct MocolammaApp: App {
             SidebarCommands()
             InspectorCommands()
             
-            // リフレッシュコマンドを表示メニューの先頭に追加
+            // 表示メニュー
             CommandGroup(before: .sidebar) {
+                Picker("View", selection: $selection) {
+                    Label("Server", systemImage: "server.rack")
+                        .tag("server" as String?)
+                        .keyboardShortcut("1", modifiers: .command)
+                    Label("Models", systemImage: "tray.full")
+                        .tag("models" as String?)
+                        .keyboardShortcut("2", modifiers: .command)
+                    Label("Chat", systemImage: "message")
+                        .tag("chat" as String?)
+                        .keyboardShortcut("3", modifiers: .command)
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+
+                Divider()
+
                 Button(action: {
                     appRefreshTrigger.send()
                 }) {
@@ -150,8 +166,24 @@ struct MocolammaApp: App {
             SidebarCommands()
             InspectorCommands()
             
-            // リフレッシュコマンドを表示メニューの先頭に追加（iPadOS）
+            // 表示メニュー（iPadOS）
             CommandGroup(before: .sidebar) {
+                Picker("View", selection: $selection) {
+                    Label("Server", systemImage: "server.rack")
+                        .tag("server" as String?)
+                        .keyboardShortcut("1", modifiers: .command)
+                    Label("Models", systemImage: "tray.full")
+                        .tag("models" as String?)
+                        .keyboardShortcut("2", modifiers: .command)
+                    Label("Chat", systemImage: "message")
+                        .tag("chat" as String?)
+                        .keyboardShortcut("3", modifiers: .command)
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+
+                Divider()
+
                 Button(action: {
                     appRefreshTrigger.send()
                 }) {
