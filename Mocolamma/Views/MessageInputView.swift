@@ -94,7 +94,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             } else {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -107,7 +107,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             }
 #else
             if #available(macOS 26, *) {
@@ -122,7 +122,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             } else {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -135,7 +135,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             }
 #endif
             

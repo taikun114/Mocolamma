@@ -31,6 +31,7 @@ Notes
 - **Fix issue where network requests could fail when launching the app**
   - Since this issue occasionally occurred in the previous fix, I added a retry function to the network check performed when the app launches to ensure this issue is resolved.
 - **Fix issue where the copy button and retry button icons were not displayed in the chat screen on iOS / iPadOS 17 and macOS 14**
+- **Fix issue where the stop button could not be pressed when “Select Model” was chosen in the model picker of the chat screen**
 
 ## 1.0.3
 ### New Features
