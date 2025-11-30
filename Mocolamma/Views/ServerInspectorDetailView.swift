@@ -4,7 +4,7 @@ import SwiftUI
 struct ServerInspectorDetailView: View {
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus?
-
+    
     var body: some View {
         ServerInspectorView(
             server: server,

@@ -13,13 +13,13 @@ struct MessageView: View {
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
     @Environment(\.colorScheme) private var colorScheme
-
+    
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone]
         return formatter
     }()
-
+    
     var body: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
@@ -28,17 +28,17 @@ struct MessageView: View {
                 .cornerRadius(16)
                 .lineSpacing(4)
                 .textSelection(.enabled)
-
+            
             HStack {
                 EmptyView()
             }
             .id(isStreamingAny)
             
-            #if os(iOS)
+#if os(iOS)
             Spacer().frame(height: 8)
-            #endif
+#endif
             Group {
-                #if os(iOS)
+#if os(iOS)
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
@@ -59,7 +59,7 @@ struct MessageView: View {
                         if message.role == "assistant" { Spacer() }
                     }
                 }
-                #else
+#else
                 HStack {
                     if message.role == "user" {
                         Spacer()
@@ -67,23 +67,23 @@ struct MessageView: View {
                     Text(dateString)
                         .font(.caption2)
                         .foregroundColor(.secondary)
-
+                    
                     if message.role == "assistant" {
                         tokenAndSpeed
                     }
-
+                    
                     if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
                         revisionNavigator
                     }
-
+                    
                     if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
                         retryButton
                     }
-
+                    
                     if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
                         copyButton
                     }
-
+                    
                     if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
                         if isEditing {
                             cancelButton
@@ -92,33 +92,33 @@ struct MessageView: View {
                             editButton
                         }
                     }
-
+                    
                     if message.role == "assistant" {
                         Spacer()
                     }
                 }
-                #endif
+#endif
             }
-            #if os(macOS)
+#if os(macOS)
             .opacity((isHovering && (!message.isStreaming || message.isStopped)) ? 1.0 : 0.0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
-            #else
+#else
             .opacity(1.0)
-            #endif
+#endif
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-        #if os(macOS)
+#if os(macOS)
         .padding(message.role == "user" ? .leading : .trailing, 64)
-        #else
+#else
         .padding(message.role == "user" ? .leading : .trailing, 0)
-        #endif
+#endif
         .contentShape(Rectangle())
-         #if os(macOS)
-         .onHover { isHovering = $0 }
-         #endif
+#if os(macOS)
+        .onHover { isHovering = $0 }
+#endif
     }
-
+    
     private var dateString: String {
         dateFormatter.string(from: {
             if let createdAtString = message.createdAt,
@@ -132,7 +132,7 @@ struct MessageView: View {
             return Date()
         }())
     }
-
+    
     @ViewBuilder
     private var tokenAndSpeed: some View {
         if message.isStopped {
@@ -149,7 +149,7 @@ struct MessageView: View {
                 .foregroundColor(.secondary)
         }
     }
-
+    
     @ViewBuilder
     private var revisionNavigator: some View {
         Group { // ビュービルダー全体にdisabled修飾子を適用するためにGroupでラップ
@@ -164,7 +164,7 @@ struct MessageView: View {
                 message.evalCount = revision.evalCount
                 message.evalDuration = revision.evalDuration
                 message.isStopped = revision.isStopped
-
+                
                 message.fixedContent = message.content
                 message.pendingContent = ""
                 message.fixedThinking = message.thinking ?? ""
@@ -174,22 +174,22 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-            #if os(iOS)
+#if os(iOS)
             .font(.body)
-            #else
+#else
             .font(.caption2)
-            #endif
+#endif
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
             .help("Previous Revision")
             .disabled(message.currentRevisionIndex == 0)
-
+            
             if message.revisions.count > 0 {
                 Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
-
+            
             Button(action: {
                 message.currentRevisionIndex += 1
                 if message.currentRevisionIndex < message.revisions.count {
@@ -221,11 +221,11 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-            #if os(iOS)
+#if os(iOS)
             .font(.body)
-            #else
+#else
             .font(.caption2)
-            #endif
+#endif
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
             .help("Next Revision")
@@ -233,31 +233,37 @@ struct MessageView: View {
         }
         .disabled(isStreamingAny)
     }
-
+    
     @ViewBuilder
     private var retryButton: some View {
         Button(action: {
             onRetry?(message.id, message)
         }) {
-            Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
-                .contentShape(Rectangle())
-                .padding(5)
+            Group {
+                if #available(macOS 15.0, iOS 18.0, *) {
+                    Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
+                } else {
+                    Image(systemName: "arrow.circlepath")
+                }
+            }
+            .contentShape(Rectangle())
+            .padding(5)
         }
-        #if os(iOS)
+#if os(iOS)
         .font(.body)
-        #else
+#else
         .font(.caption2)
-        #endif
+#endif
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Retry")
         .disabled(!isModelSelected)
     }
-
+    
     @ViewBuilder
     private var copyButton: some View {
         Button(action: {
-            #if os(macOS)
+#if os(macOS)
             let pasteboard = NSPasteboard.general
             pasteboard.clearContents()
             var contentToCopy = message.content
@@ -265,29 +271,35 @@ struct MessageView: View {
                 contentToCopy = "<think>\(thinking)</think>\n" + message.content
             }
             pasteboard.setString(contentToCopy, forType: .string)
-            #else
+#else
             var contentToCopy = message.content
             if let thinking = message.thinking, !thinking.isEmpty {
                 contentToCopy = "<think>\(thinking)</think>\n" + message.content
             }
             UIPasteboard.general.string = contentToCopy
-            #endif
+#endif
         }) {
-            Image(systemName: "document.on.document")
-                .contentShape(Rectangle())
-                .padding(5)
+            Group {
+                if #available(macOS 15.0, iOS 18.0, *) {
+                    Image(systemName: "document.on.document")
+                } else {
+                    Image(systemName: "doc.on.doc")
+                }
+            }
+            .contentShape(Rectangle())
+            .padding(5)
         }
-        #if os(iOS)
+#if os(iOS)
         .font(.body)
-        #else
+#else
         .font(.caption2)
-        #endif
+#endif
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Copy")
     }
-
-        @ViewBuilder
+    
+    @ViewBuilder
     private var editButton: some View {
         Group {
             Button(action: {
@@ -299,11 +311,11 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-            #if os(iOS)
+#if os(iOS)
             .font(.body)
-            #else
+#else
             .font(.caption2)
-            #endif
+#endif
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
             .help("Edit")
@@ -311,7 +323,7 @@ struct MessageView: View {
         }
         .id(isStreamingAny)
     }
-
+    
     @ViewBuilder
     private var cancelButton: some View {
         Button(action: {
@@ -319,11 +331,11 @@ struct MessageView: View {
             message.content = message.fixedContent
         }) {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
-                #if os(iOS)
+#if os(iOS)
                 .font(.body)
-                #else
+#else
                 .font(.caption2)
-                #endif
+#endif
                 .bold()
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -334,7 +346,7 @@ struct MessageView: View {
         .help(String(localized: "Cancel editing."))
         .disabled(message.isStreaming)
     }
-
+    
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
@@ -344,11 +356,11 @@ struct MessageView: View {
             onRetry?(message.id, message)
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
-                #if os(iOS)
+#if os(iOS)
                 .font(.body)
-                #else
+#else
                 .font(.caption2)
-                #endif
+#endif
                 .bold()
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -362,7 +374,7 @@ struct MessageView: View {
         .transaction { $0.disablesAnimations = true }
         .id(isStreamingAny ? "on" : "off")
     }
-
+    
     @ViewBuilder
     private var messageContentView: some View {
         if isEditing && message.role == "user" {
@@ -404,8 +416,8 @@ struct MessageView: View {
                         // 変換確定後にEnterが押されたら改行を挿入
                         message.content += "\n"
                     }
-              }
-          } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+            }
+        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
@@ -430,14 +442,14 @@ struct MessageView: View {
                         .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
                 }
                 .padding(.bottom, 4)
-
+                
                 streamingContentBody
             }
         } else {
             streamingContentBody
         }
     }
-
+    
     @ViewBuilder
     private var streamingContentBody: some View {
         if message.isStreaming && message.fixedContent.isEmpty && message.pendingContent.isEmpty {
@@ -467,7 +479,7 @@ struct MessageView: View {
             }
         }
     }
-
+    
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -496,7 +508,7 @@ extension Theme {
                 FontFamilyVariant(.monospaced)
                 BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
             }
-
+        
             .heading1 { configuration in
                 configuration.label
                     .markdownTextStyle {
@@ -577,11 +589,11 @@ extension Theme {
                         }
                         .markdownMargin(top: .em(0.3))
                         .padding()
-                    }
-                    .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.vertical, 8)
                 }
+                .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.vertical, 8)
+            }
             .tableCell { configuration in
                 configuration.label
                     .padding(8)

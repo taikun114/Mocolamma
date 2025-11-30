@@ -7,14 +7,14 @@ struct RunningModelsCountView: View {
     @State private var runningModels: [OllamaRunningModel] = []
     @State private var isLoading: Bool = false
     @State private var isExpanded: Bool = false
-
+    
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter
     }()
-
+    
     private var displayCountText: String {
         if isLoading {
             return "-"
@@ -26,7 +26,7 @@ struct RunningModelsCountView: View {
             }
         }
     }
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .bottom, spacing: 4) {
@@ -39,7 +39,7 @@ struct RunningModelsCountView: View {
                     .foregroundColor(.secondary)
                     .padding(.bottom, 2)
             }
-
+            
             if runningModels.count > 0 {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(runningModels, id: \.name) { model in
@@ -48,13 +48,13 @@ struct RunningModelsCountView: View {
                                 .font(.subheadline)
                                 .bold()
                                 .foregroundColor(.primary)
-
+                            
                             if let formattedVRAMSize = model.formattedVRAMSize {
                                 Text("VRAM Size: \(formattedVRAMSize)")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-
+                            
                             if let expiresAt = model.expires_at {
                                 Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
                                     .font(.caption)
@@ -78,7 +78,7 @@ struct RunningModelsCountView: View {
             Task { await refresh() }
         }
     }
-
+    
     private func refresh() async {
         await MainActor.run {
             isLoading = true

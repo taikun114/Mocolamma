@@ -16,7 +16,7 @@ struct LegacyIPhoneTabView: View {
     let sortedModels: [OllamaModel]
     
     @State private var isInspectorSheetPresented = false
-
+    
     var body: some View {
         TabView(selection: $selection) {
             NavigationStack {
@@ -29,7 +29,7 @@ struct LegacyIPhoneTabView: View {
             }
             .tabItem { Label("Server", systemImage: "server.rack") }
             .tag("server")
-
+            
             NavigationStack {
                 ModelListView(
                     executor: executor,
@@ -46,7 +46,7 @@ struct LegacyIPhoneTabView: View {
             .environmentObject(executor)
             .tabItem { Label("Models", systemImage: "tray.full") }
             .tag("models")
-
+            
             NavigationStack {
                 ChatView(
                     showingInspector: $showingInspector,
@@ -57,7 +57,7 @@ struct LegacyIPhoneTabView: View {
             .environmentObject(executor)
             .tabItem { Label("Chat", systemImage: "message") }
             .tag("chat")
-
+            
             NavigationStack {
                 SettingsView()
             }
@@ -78,13 +78,13 @@ struct LegacyIPhoneTabView: View {
                         }
                     }
                     .navigationTitle(inspectorTitle)
-                    #if os(iOS)
+#if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
-                    #endif
+#endif
             }
         }
     }
-
+    
     private func toggleInspector() {
         if isiOSAppOnVision {
             isInspectorSheetPresented.toggle()
@@ -92,12 +92,12 @@ struct LegacyIPhoneTabView: View {
             showingInspector.toggle()
         }
         
-        #if os(iOS)
+#if os(iOS)
         // キーボードを非表示にする
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        #endif
+#endif
     }
-
+    
     private var inspectorContent: some View {
         InspectorContentView(
             selection: selection,
@@ -109,7 +109,7 @@ struct LegacyIPhoneTabView: View {
         )
         .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
     }
-
+    
     private var inspectorTitle: String {
         switch selection {
         case "server":

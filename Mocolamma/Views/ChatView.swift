@@ -31,63 +31,91 @@ struct ChatView: View {
     }
     
     @ViewBuilder
-    private var content: some View {
-        if serverManager.selectedServer == nil {
-            ContentUnavailableView(
-                "No Server Selected",
-                systemImage: "server.rack",
-                description: Text("Please select a server in the Server tab.")
-            )
-        } else if executor.apiConnectionError {
-            ContentUnavailableView(
-                "Connection Failed",
-                systemImage: "network.slash",
-                description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
-            )
-        } else if executor.chatMessages.isEmpty {
-            ContentUnavailableView {
-                Label("Chat", systemImage: "message.fill")
-            } description: {
-                Text("Here you can perform a simple chat to check the model.")
-            }
-        } else {
-            ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil)
-        }
+    private var chatContent: some View {
+        ZStack {
+            if serverManager.selectedServer == nil {
+                ContentUnavailableView(
+                    "No Server Selected",
+                    systemImage: "server.rack",
+                    description: Text("Please select a server in the Server tab.")
+                )
+            } else if executor.apiConnectionError {
+                ContentUnavailableView(
+                    "Connection Failed",
+                    systemImage: "network.slash",
+                    description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
+                )
+            } else if executor.chatMessages.isEmpty {
+                ContentUnavailableView {
+                    Label("Chat", systemImage: "message.fill")
+                } description: {
+                    Text("Here you can perform a simple chat to check the model.")
+                }
+            } else {
+                // OSバージョン26以降かどうかの条件分岐
+                if #available(iOS 26.0, macOS 26.0, *) {
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true)
+                } else {
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false)
+                }
+            }        }
+        .frame(maxHeight: .infinity) // Make sure it fills the available height
     }
     
     @ViewBuilder
-    private var inputArea: some View {
-        VStack {
-            Spacer()
-            
-            ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
-                sendMessage()
-            } stopMessage: {
-                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                    executor.updateIsChatStreaming()
-                }
-                executor.isChatStreaming = false
-                executor.cancelChatStreaming()
+    private func makeSafeAreaBarContent() -> some View {
+        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
+            sendMessage()
+        } stopMessage: {
+            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                executor.updateIsChatStreaming()
             }
+            executor.isChatStreaming = false
+            executor.cancelChatStreaming()
         }
         .padding()
-        .if(horizontalSizeClass != .compact) { view in
-            view.ignoresSafeArea(.container, edges: [.bottom])
-        }
     }
     
     var body: some View {
-        ZStack {
-            content
-            inputArea
+        Group {
+            if #available(iOS 26.0, macOS 26.0, *) {
+                chatContent
+                    .safeAreaBar(edge: .bottom) {
+                        makeSafeAreaBarContent()
+                    }
+            } else {
+                ZStack {
+                    chatContent
+                    
+                    VStack {
+                        Spacer()
+                        
+                        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
+                            sendMessage()
+                        } stopMessage: {
+                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                                executor.updateIsChatStreaming()
+                            }
+                            executor.isChatStreaming = false
+                            executor.cancelChatStreaming()
+                        }
+                    }
+                    .padding()
+                    .if(horizontalSizeClass != .compact) { view in
+                        view.ignoresSafeArea(.container, edges: [.bottom])
+                    }
+                }
+            }
         }
-        #if os(iOS)
+#if os(iOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
-        #endif
+#endif
         .navigationTitle("Chat")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
@@ -148,7 +176,7 @@ struct ChatView: View {
         }
         .alert("This model cannot be used", isPresented: $showEmbeddingAlert) {
             Button("OK") { showEmbeddingAlert = false }
-            .keyboardShortcut(.defaultAction)
+                .keyboardShortcut(.defaultAction)
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
@@ -157,7 +185,7 @@ struct ChatView: View {
             set: { if !$0 { generalErrorMessage = nil } }
         )) {
             Button("OK") { generalErrorMessage = nil }
-            .keyboardShortcut(.defaultAction)
+                .keyboardShortcut(.defaultAction)
         } message: {
             Text(generalErrorMessage ?? "An unknown error occurred.")
         }
@@ -165,7 +193,7 @@ struct ChatView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        #if os(iOS)
+#if os(iOS)
         ToolbarItemGroup(placement: .primaryAction) { // リフレッシュとモデル選択のグループ (iOS)
             Button(action: {
                 appRefreshTrigger.send()
@@ -192,7 +220,7 @@ struct ChatView: View {
                 Image(systemName: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
-        #else // macOS
+#else // macOS
         ToolbarItem(placement: .primaryAction) { // リフレッシュボタン（macOS）
             Button(action: {
                 appRefreshTrigger.send()
@@ -218,13 +246,13 @@ struct ChatView: View {
             .pickerStyle(.menu)
             .frame(maxWidth: 150)
         }
-        #endif
+#endif
         
-        #if os(iOS)
+#if os(iOS)
         if #available(iOS 26, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction) // モデルグループと新規チャットの間のスペーサー
         }
-        #endif
+#endif
         
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
@@ -236,7 +264,7 @@ struct ChatView: View {
             }
         }
         
-        #if os(iOS)
+#if os(iOS)
         if #available(iOS 26, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction) // 新規チャットとインスペクターの間のスペーサー
         }
@@ -245,7 +273,7 @@ struct ChatView: View {
                 Label("Inspector", systemImage: "sidebar.trailing")
             }
         }
-        #endif
+#endif
     }
     
     private func sendMessage() {
@@ -590,3 +618,4 @@ struct ChatView: View {
         await MainActor.run { executor.isChatStreaming = false }
     }
 }
+

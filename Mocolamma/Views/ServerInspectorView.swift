@@ -10,16 +10,24 @@ struct ServerInspectorView: View {
     let connectionStatus: ServerConnectionStatus? // チェック中にnilになる可能性あり
     @State private var ollamaVersion: String? // Ollamaバージョン用の新しい状態変数
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
-
+    
     private var indicatorSize: CGFloat {
-        #if os(iOS)
+#if os(iOS)
         return 10
-        #else
+#else
         return 8
-        #endif
+#endif
     }
-
+    
     var body: some View {
+        let copyIconName = {
+            if #available(macOS 15.0, iOS 18.0, *) {
+                return "document.on.document"
+            } else {
+                return "doc.on.doc"
+            }
+        }()
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 // モデルインスペクターのモデル名のようにスタイルされた名前
@@ -29,7 +37,7 @@ struct ServerInspectorView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .help(server.name)
-
+                
                 // 接続状態
                 switch connectionStatus {
                 case .connected:
@@ -145,10 +153,10 @@ struct ServerInspectorView: View {
                         }
                     }
                 }
-
+                
                 Divider()
                     .padding(.vertical, 5)
-
+                
                 // ホスト情報
                 VStack(alignment: .leading) {
                     Text("Host:")
@@ -160,14 +168,14 @@ struct ServerInspectorView: View {
                         .truncationMode(.tail)
                         .help(server.host)
                         .foregroundColor(.primary)
-                             .contextMenu {
-                            Button("Copy", systemImage: "document.on.document") {
-                                #if os(macOS)
+                        .contextMenu {
+                            Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(server.host, forType: .string)
-                                #else
+#else
                                 UIPasteboard.general.string = server.host
-                                #endif
+#endif
                             }
                         }                
                 }
@@ -182,21 +190,21 @@ struct ServerInspectorView: View {
                             .font(.title3)
                             .bold()
                             .foregroundColor(.primary)
-                             .contextMenu {
-                                Button("Copy", systemImage: "document.on.document") {
-                                    #if os(macOS)
+                            .contextMenu {
+                                Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
-                                    #else
+#else
                                     UIPasteboard.general.string = ollamaVersion ?? "-"
-                                    #endif
+#endif
                                 }
                             }                    
                     }
                     VStack(alignment: .leading) {
                         Text("Running Models:")
                             .font(.subheadline)
-                                                RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
+                        RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
                             .environmentObject(commandExecutor)
                     }
                 }
@@ -219,7 +227,7 @@ struct ServerInspectorView: View {
                         }
                     }
                 }
-
+                
                 Spacer()
             }
             .padding()

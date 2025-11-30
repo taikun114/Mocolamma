@@ -7,7 +7,7 @@ struct MarqueeText: View {
     @State private var containerWidth: CGFloat = 0
     @State private var needsScroll: Bool = false
     @State private var isFirstLoop: Bool = true // 最初のループかどうかを追跡
-
+    
     var body: some View {
         GeometryReader { geo in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -31,7 +31,7 @@ struct MarqueeText: View {
         .frame(height: 14)
         .clipped()
     }
-
+    
     private func startScrolling() {
         needsScroll = textWidth > containerWidth
         if needsScroll {
@@ -48,7 +48,7 @@ struct MarqueeText: View {
             }
         }
     }
-
+    
     private func resetAndScroll() {
         isFirstLoop = false // 以降のループではfalseに設定
         offset = containerWidth // スタート位置にリセット（右端）

@@ -20,6 +20,21 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.0.4
+### New Features
+- **Add German (`de`), Spanish (`es`) localization by generative AI**
+  - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+- **Add access to each tab in the “View” menu**
+  - Added menu items to the “View” menu in the menu bar to open the “Server,” “Model,” and “Chat” tabs. Press `⌘ (Command)` + `1` to open the “Server” tab, `⌘ (Command)` + `2` for the ‘Model’ tab, and `⌘ (Command)` + `3` for the “Chat” tab.
+
+### Bug Fixes and Improvements
+- **Fix issue that `scrollEdgeEffect` did not work in chat view**
+  - On iOS / iPadOS 26 and macOS 26 and later, the chat input field background now blurs to blend in.
+- **Fix issue where network requests could fail when launching the app**
+  - Since this issue occasionally occurred in the previous fix, I added a retry function to the network check performed when the app launches to ensure this issue is resolved.
+- **Fix issue where the copy button and retry button icons were not displayed in the chat screen on iOS / iPadOS 17 and macOS 14**
+- **Fix issue where the stop button could not be pressed when “Select Model” was chosen in the model picker of the chat screen**
+
 ## 1.0.3
 ### New Features
 - **Add French localization by generative AI**

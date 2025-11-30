@@ -21,9 +21,9 @@ struct SettingsView: View {
             content
         }
         .formStyle(.grouped)
-        #if os(macOS)
+#if os(macOS)
         .frame(width: 400, height: 400)
-        #else
+#else
         .navigationTitle("Settings")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -35,11 +35,11 @@ struct SettingsView: View {
                 }
             }
         }
-        #endif
+#endif
         .onAppear {
-            #if os(macOS)
+#if os(macOS)
             launchAtLogin = LoginItemManager.shared.isEnabled
-            #endif
+#endif
             apiTimeoutSelection = APITimeoutManager.shared.currentOption
             localNetworkChecker.refresh()
         }
@@ -48,12 +48,12 @@ struct SettingsView: View {
     @ViewBuilder
     private var content: some View {
         Section("General") {
-            #if os(macOS)
+#if os(macOS)
             Toggle("Launch at Login", isOn: $launchAtLogin)
                 .onChange(of: launchAtLogin) { _, newValue in
                     LoginItemManager.shared.setEnabled(newValue)
                 }
-            #endif
+#endif
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("API Timeout")
@@ -77,7 +77,7 @@ struct SettingsView: View {
         }
         
         Section("Permissions") {
-            #if os(iOS)
+#if os(iOS)
             Group {
                 if horizontalSizeClass == .compact { // iPhone縦向き、またはiPad狭い分割画面
                     VStack(alignment: .leading, spacing: 12) {
@@ -145,8 +145,8 @@ struct SettingsView: View {
                         }
                         Spacer()
                         Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
-                        .buttonStyle(.borderless)
-                        .help("Refresh status")
+                            .buttonStyle(.borderless)
+                            .help("Refresh status")
                         Button(action: { showingInstructions = true }) {
                             HStack {
                                 Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
@@ -164,7 +164,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            #else
+#else
             HStack {
                 if differentiateWithoutColor {
                     Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
@@ -186,8 +186,8 @@ struct SettingsView: View {
                 }
                 Spacer()
                 Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
-                .buttonStyle(.borderless)
-                .help("Refresh status")
+                    .buttonStyle(.borderless)
+                    .help("Refresh status")
                 Button(action: { showingInstructions = true }) {
                     HStack {
                         Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
@@ -207,7 +207,7 @@ struct SettingsView: View {
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            #endif
+#endif
         }
     }
 }
@@ -249,11 +249,11 @@ final class LocalNetworkPermissionChecker: ObservableObject {
     }
     
     func openSystemPreferences() {
-        #if os(macOS)
+#if os(macOS)
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
             NSWorkspace.shared.open(url)
         }
-        #endif
+#endif
     }
 }
 

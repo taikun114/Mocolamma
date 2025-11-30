@@ -18,9 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 @main
 struct MocolammaApp: App {
-    #if os(macOS)
+#if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    #endif
+#endif
     @Environment(\.openWindow) private var openWindow
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
@@ -31,7 +31,7 @@ struct MocolammaApp: App {
     @State private var showingAddModelsSheet = false
     @State private var showingAddServerSheet = false
     @State private var showingInspector: Bool = false
-
+    
     // リフレッシュコマンドを発行するためのトリガー
     @StateObject private var appRefreshTrigger = RefreshTrigger()
     
@@ -40,7 +40,7 @@ struct MocolammaApp: App {
     
     // ダウンロード状態を伝える状態変数
     @State private var isPulling: Bool = false
-
+    
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
         switch selection {
@@ -50,13 +50,13 @@ struct MocolammaApp: App {
             return true
         }
     }
-
+    
 #if os(macOS)
     init() {
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
     }
 #endif
-
+    
     var body: some Scene {
         WindowGroup() {
             // ContentViewにrefreshTriggerのPublisherを渡します。
@@ -69,19 +69,19 @@ struct MocolammaApp: App {
                 shouldClearChat: $shouldClearChat,
                 isPulling: $isPulling
             )
-            #if os(macOS)
-                .frame(minWidth: 1000, minHeight: 500)
-            #endif
-                .environmentObject(appRefreshTrigger)
-                .onAppear {
-                    localNetworkChecker.refresh()
-                }
-                .sheet(isPresented: $showingAboutSheet) {
-                    AboutView()
-                }
+#if os(macOS)
+            .frame(minWidth: 1000, minHeight: 500)
+#endif
+            .environmentObject(appRefreshTrigger)
+            .onAppear {
+                localNetworkChecker.refresh()
+            }
+            .sheet(isPresented: $showingAboutSheet) {
+                AboutView()
+            }
         }
         .commands {
-            #if os(macOS)
+#if os(macOS)
             CommandGroup(replacing: .appInfo) {
                 Button(action: {
                     openWindow(id: "about-window")
@@ -91,9 +91,25 @@ struct MocolammaApp: App {
             }
             SidebarCommands()
             InspectorCommands()
-
-            // リフレッシュコマンドを表示メニューの先頭に追加
+            
+            // 表示メニュー
             CommandGroup(before: .sidebar) {
+                Picker("View", selection: $selection) {
+                    Label("Server", systemImage: "server.rack")
+                        .tag("server" as String?)
+                        .keyboardShortcut("1", modifiers: .command)
+                    Label("Models", systemImage: "tray.full")
+                        .tag("models" as String?)
+                        .keyboardShortcut("2", modifiers: .command)
+                    Label("Chat", systemImage: "message")
+                        .tag("chat" as String?)
+                        .keyboardShortcut("3", modifiers: .command)
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+
+                Divider()
+
                 Button(action: {
                     appRefreshTrigger.send()
                 }) {
@@ -103,7 +119,7 @@ struct MocolammaApp: App {
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
                 Divider()
             }
-
+            
             CommandGroup(replacing: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 Button(action: {
                     showingAddServerSheet = true
@@ -112,7 +128,7 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("s", modifiers: [.option, .command])
                 .disabled(selection != "server")
-
+                
                 Button(action: {
                     showingAddModelsSheet = true
                 }) {
@@ -130,8 +146,8 @@ struct MocolammaApp: App {
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
             }
-
-            #else
+            
+#else
             // iPadOSの場合、設定メニュー項目を置き換えてアプリ内設定を開く
             CommandGroup(replacing: .appSettings) {
                 Button(action: {
@@ -149,9 +165,25 @@ struct MocolammaApp: App {
             }
             SidebarCommands()
             InspectorCommands()
-
-            // リフレッシュコマンドを表示メニューの先頭に追加（iPadOS）
+            
+            // 表示メニュー（iPadOS）
             CommandGroup(before: .sidebar) {
+                Picker("View", selection: $selection) {
+                    Label("Server", systemImage: "server.rack")
+                        .tag("server" as String?)
+                        .keyboardShortcut("1", modifiers: .command)
+                    Label("Models", systemImage: "tray.full")
+                        .tag("models" as String?)
+                        .keyboardShortcut("2", modifiers: .command)
+                    Label("Chat", systemImage: "message")
+                        .tag("chat" as String?)
+                        .keyboardShortcut("3", modifiers: .command)
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+
+                Divider()
+
                 Button(action: {
                     appRefreshTrigger.send()
                 }) {
@@ -161,7 +193,7 @@ struct MocolammaApp: App {
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
                 Divider()
             }
-
+            
             // iPadOSでも「サーバーを追加」メニュー項目を追加
             CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 Button(action: {
@@ -171,7 +203,7 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("s", modifiers: [.option, .command])
                 .disabled(selection != "server")
-
+                
                 Button(action: {
                     showingAddModelsSheet = true
                 }) {
@@ -189,25 +221,25 @@ struct MocolammaApp: App {
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
             }
-            #endif
+#endif
         }
-        #if os(macOS)
+#if os(macOS)
         .defaultSize(width: 1000, height: 600)
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
-        #endif
-
-        #if os(macOS)
+#endif
+        
+#if os(macOS)
         Settings {
             SettingsView()
         }
-
+        
         Window("About Mocolamma", id: "about-window") {
             AboutView()
         }
         .defaultSize(width: 500, height: 600)
         .windowResizability(.contentSize)
-        #endif
+#endif
     }
 }
 

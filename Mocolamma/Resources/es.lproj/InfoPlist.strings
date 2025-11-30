@@ -1,0 +1,1 @@
+NSLocalNetworkUsageDescription = "Es necesario para comunicarse con servidores Ollama que se encuentran en su red local.";

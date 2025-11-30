@@ -12,7 +12,7 @@ struct MainContentDetailView: View {
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
-
+    
     var body: some View {
         Group {
             if sidebarSelection == "models" {

@@ -13,14 +13,14 @@ struct ModelInspectorView: View {
     let fetchedCapabilities: [String]?
     let licenseBody: String?
     let licenseLink: String?
-
+    
     @State private var showingLicenseSheet = false
-
+    
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
         return "\(model.size)"
     }
-
+    
     // サイズのツールチップ用テキスト（読みやすいサイズ + フルサイズ表記）
     private var sizeTooltipText: String {
         return "\(model.formattedSize)、\(model.size) B"
@@ -35,7 +35,7 @@ struct ModelInspectorView: View {
         let formattedCount = numberFormatter.string(from: NSNumber(value: count)) ?? String(count)
         return (formattedCount, count)
     }
-
+    
     // modelInfoからコンテキスト長を取得するヘルパー
     private var contextLength: (formatted: String, raw: Int)? {
         guard let info = modelInfo else { return nil }
@@ -50,7 +50,7 @@ struct ModelInspectorView: View {
         }
         return nil
     }
-
+    
     // modelInfoからエンベディング長を取得するヘルパー
     private var embeddingLength: (formatted: String, raw: Int)? {
         guard let info = modelInfo else { return nil }
@@ -65,8 +65,8 @@ struct ModelInspectorView: View {
         }
         return nil
     }
-
-
+    
+    
     private var licenseName: String {
         let rawLicense = modelInfo?["general.license"]?.stringValue ?? String(localized: "Other License")
         switch rawLicense.lowercased() {
@@ -78,9 +78,9 @@ struct ModelInspectorView: View {
             return rawLicense
         }
     }
-
+    
     // MARK: - ヘルパー関数
-
+    
     private func tagView(for capability: String) -> some View {
         let displayText: String
         let iconName: String
@@ -115,8 +115,16 @@ struct ModelInspectorView: View {
         .background(Capsule().fill(Color.accentColor.opacity(0.2)))
         .foregroundColor(.accentColor)
     }
-
+    
     var body: some View {
+        let copyIconName = {
+            if #available(macOS 15.0, iOS 18.0, *) {
+                return "document.on.document"
+            } else {
+                return "doc.on.doc"
+            }
+        }()
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 Text(model.name)
@@ -125,7 +133,7 @@ struct ModelInspectorView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .help(model.name) // モデル名のフルテキストをツールチップに表示
-
+                
                 // 機能セクション
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -137,9 +145,9 @@ struct ModelInspectorView: View {
                         
                     }
                 }
-
+                
                 Divider()
-
+                
                 Group {
                     VStack(alignment: .leading) {
                         Text("Model Name:") // モデル名。
@@ -150,13 +158,13 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.model) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
-                                    #if os(macOS)
+                                Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.model, forType: .string)
-                                    #else
+#else
                                     UIPasteboard.general.string = model.model
-                                    #endif
+#endif
                                 }
                             }
                     }
@@ -169,13 +177,13 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(sizeTooltipText) // 読みやすいサイズ + フルサイズ表記をツールチップに表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
-                                    #if os(macOS)
+                                Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(fullSizeText, forType: .string)
-                                    #else
+#else
                                     UIPasteboard.general.string = fullSizeText
-                                    #endif
+#endif
                                 }
                             }
                     }
@@ -188,13 +196,13 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
-                                    #if os(macOS)
+                                Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
-                                    #else
+#else
                                     UIPasteboard.general.string = model.formattedModifiedAt
-                                    #endif
+#endif
                                 }
                             }
                     }
@@ -207,26 +215,26 @@ struct ModelInspectorView: View {
                             .truncationMode(.tail)
                             .help(model.digest) // ツールチップにフルテキストを表示
                             .contextMenu {
-                                 Button("Copy", systemImage: "document.on.document") {
-                                    #if os(macOS)
+                                Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(model.digest, forType: .string)
-                                    #else
+#else
                                     UIPasteboard.general.string = model.digest
-                                    #endif
+#endif
                                 }
                             }
                     }
                 }
                 .font(.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
+                
                 Divider()
-
+                
                 Text("Details Information:") // 詳細情報（Details）。
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
-
+                
                 if let details = model.details { // ここでOptionalをアンラップします
                     VStack(alignment: .leading, spacing: 10) {
                         if let parentModel = details.parent_model, !parentModel.isEmpty {
@@ -239,13 +247,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parentModel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parentModel, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = parentModel
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -260,13 +268,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(format) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(format, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = format
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -281,13 +289,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(family) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(family, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = family
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -303,13 +311,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(familiesText) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(familiesText, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = familiesText
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -324,13 +332,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(parameterSize) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(parameterSize, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = parameterSize
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -345,13 +353,13 @@ struct ModelInspectorView: View {
                                     .truncationMode(.tail)
                                     .help(quantizationLevel) // ツールチップにフルテキストを表示
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(quantizationLevel, forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = quantizationLevel
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -367,10 +375,10 @@ struct ModelInspectorView: View {
                 }
                 
                 Divider()
-
+                
                 Text("Model Information:") // モデル情報セクションのタイトル
                     .font(.headline)
-
+                
                 if isLoading {
                     HStack(spacing: 8) {
                         ProgressView()
@@ -381,7 +389,7 @@ struct ModelInspectorView: View {
                     }
                 } else if modelInfo != nil {
                     VStack(alignment: .leading, spacing: 10) {
-
+                        
                         VStack(alignment: .leading) {
                             Text("License:") // ライセンス
                             if licenseBody != nil {
@@ -406,13 +414,13 @@ struct ModelInspectorView: View {
                                 Text(count.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(count.raw), forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = String(count.raw)
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -424,13 +432,13 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = String(length.raw)
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -442,13 +450,13 @@ struct ModelInspectorView: View {
                                 Text(length.formatted)
                                     .font(.title3).bold()
                                     .contextMenu {
-                                         Button("Copy", systemImage: "document.on.document") {
-                                            #if os(macOS)
+                                        Button("Copy", systemImage: copyIconName) {
+#if os(macOS)
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(String(length.raw), forType: .string)
-                                            #else
+#else
                                             UIPasteboard.general.string = String(length.raw)
-                                            #endif
+#endif
                                         }
                                     }
                             }
@@ -456,11 +464,11 @@ struct ModelInspectorView: View {
                         
                         // もし情報が一つもなければ
                         if parameterCount == nil && contextLength == nil && embeddingLength == nil && licenseBody == nil {
-                             Text("No model information available.")
+                            Text("No model information available.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
-
+                        
                     }
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)

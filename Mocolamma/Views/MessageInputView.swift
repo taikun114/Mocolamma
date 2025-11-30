@@ -8,11 +8,11 @@ struct MessageInputView: View {
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
-
+    
     var body: some View {
         HStack(alignment: .bottom) {
             ZStack(alignment: .leading) {
-                #if os(iOS)
+#if os(iOS)
                 if #available(iOS 26, *) {
                     Color.clear
                         .glassEffect(in: .rect(cornerRadius: 16.0))
@@ -20,7 +20,7 @@ struct MessageInputView: View {
                     VisualEffectView(material: .systemThinMaterial)
                         .cornerRadius(16)
                 }
-                #else
+#else
                 if #available(macOS 26, *) {
                     Color.clear
                         .glassEffect(in: .rect(cornerRadius: 16.0))
@@ -28,7 +28,7 @@ struct MessageInputView: View {
                     VisualEffectView(material: .headerView, blendingMode: .withinWindow)
                         .cornerRadius(16)
                 }
-                #endif
+#endif
                 TextField("Type your message...", text: $inputText, axis: .vertical)
                     .focused($isInputFocused)
                     .textFieldStyle(.plain)
@@ -41,25 +41,25 @@ struct MessageInputView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(Color.clear) // TextFieldの背景を透明にする
-                    
+                
                     .cornerRadius(16) // 角を丸くする
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
                     .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
-                        #if os(macOS)
+#if os(macOS)
                         if !isStreaming {
                             sendMessage()
                         }
-                        #else
+#else
                         if !isStreaming {
                             sendMessage()
                         }
-                        #endif
+#endif
                     }
                     .onKeyPress(KeyEquivalent.return) { // Enterキー押下時の処理（Shift+Enterでの改行用）
-                        #if os(macOS)
+#if os(macOS)
                         if NSEvent.modifierFlags.contains(.shift) {
                             inputText += "\n"
                             return .handled
@@ -69,19 +69,19 @@ struct MessageInputView: View {
                             // onSubmitに任せる
                             return .ignored
                         }
-                        #else
+#else
                         if isStreaming {
                             return .handled
                         } else {
                             sendMessage()
                             return .handled
                         }
-                        #endif
+#endif
                     }
             }
             .fixedSize(horizontal: false, vertical: true)
-
-            #if os(iOS)
+            
+#if os(iOS)
             if #available(iOS 26, *) {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -94,7 +94,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             } else {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -107,9 +107,9 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             }
-            #else
+#else
             if #available(macOS 26, *) {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -122,7 +122,7 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             } else {
                 Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                     ZStack {
@@ -135,10 +135,10 @@ struct MessageInputView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled((!isStreaming && inputText.isEmpty) || selectedModel == nil)
+                .disabled(isStreaming ? false : (inputText.isEmpty || selectedModel == nil))
             }
-            #endif
-
+#endif
+            
         }
         .background(Color.clear)
     }
