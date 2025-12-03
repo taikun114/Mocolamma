@@ -30,7 +30,13 @@ struct ModelInspectorDetailView: View {
             await MainActor.run {
                 self.modelInfo = fetchedResponse?.model_info
                 self.licenseBody = fetchedResponse?.license
-                self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+                // デモモデルの場合はテスト用ライセンスURLを設定
+                if model.name == "demo:0b" || model.name == "demo2:0b" {
+                    self.licenseLink = "https://example.com/"
+                } else {
+                    // 通常のモデルでは、model_infoからライセンスリンクを取得
+                    self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+                }
                 self.fetchedCapabilities = fetchedResponse?.capabilities
                 self.isLoadingInfo = false
             }

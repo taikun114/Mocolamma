@@ -12,20 +12,43 @@ struct ServerInfo: Identifiable, Codable, Equatable {
     let id: UUID // 各サーバーを一意に識別するためのID
     var name: String // サーバーの表示名
     var host: String // サーバーのホストURL (例: "localhost:11434" または "192.168.1.50:11434")
+    let isDemo: Bool // デモサーバーであるかどうか
     
     /// 新しいServerInfoインスタンスを初期化します。
     /// - Parameters:
     ///   - id: サーバーの一意なID。デフォルトで新しいUUIDが生成されます。
     ///   - name: サーバーの表示名。
     ///   - host: サーバーのホストURL。
-    init(id: UUID = UUID(), name: String, host: String) {
+    ///   - isDemo: デモサーバーかどうか。
+    init(id: UUID = UUID(), name: String, host: String, isDemo: Bool = false) {
         self.id = id
         self.name = name
         self.host = host
+        self.isDemo = isDemo
+    }
+    
+    // Codableのためのキー
+    enum CodingKeys: String, CodingKey {
+        case connectionStatus
+        case id
+        case name
+        case host
+        case isDemo
+    }
+    
+    // Decodableのためのイニシャライザー
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        connectionStatus = try container.decodeIfPresent(Bool.self, forKey: .connectionStatus)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        host = try container.decode(String.self, forKey: .host)
+        // isDemoプロパティが存在しない場合でもnilを許容し、デフォルト値をfalseとする
+        isDemo = try container.decodeIfPresent(Bool.self, forKey: .isDemo) ?? false
     }
     
     // Equatableプロトコルの実装（ID・名前・ホストで比較）
     static func == (lhs: ServerInfo, rhs: ServerInfo) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name && lhs.host == rhs.host
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.host == rhs.host && lhs.isDemo == rhs.isDemo
     }
 }

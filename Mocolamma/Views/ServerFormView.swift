@@ -154,33 +154,59 @@ struct ServerFormView: View {
         guard !isSaveButtonDisabled else { return } // 保存ボタンが無効の場合は何もしない
         
         Task {
-            isVerifying = true // 接続確認を開始
-            let processedHost = processHostInput(serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines))
-            // ホストに接続できることを確認
-            let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
-            isVerifying = false // 接続確認を終了
+            let trimmedHost = serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            if case .connected = connectionStatus {
+            // ホスト名が「demo-mode」の場合はデモサーバーとして扱う
+            if trimmedHost.lowercased() == "demo-mode" {
+                isVerifying = false // 接続確認は行わない
+                
+                // デモモードの場合、接続確認は行わず、デモサーバーを直接追加
                 if let server = editingServer {
                     // 編集モード: サーバーを更新
                     serverManager.updateServer(
-                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: "demo-mode", isDemo: true)
                     )
                 } else {
-                    // 追加モード: 新しいサーバーを追加
-                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                    // 追加モード: 新しいデモサーバーを追加
+                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: "demo-mode", isDemo: true)
                 }
                 appRefreshTrigger.send() // リフレッシュをトリガー
                 dismiss() // シートを閉じる
             } else {
-                // 接続失敗: アラートを表示
-                showingConnectionErrorAlert = true
+                isVerifying = true // 接続確認を開始
+                let processedHost = processHostInput(trimmedHost)
+                
+                // ホスト名が「demo-mode」でない場合は通常の接続確認を行う
+                let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
+                isVerifying = false // 接続確認を終了
+                
+                if case .connected = connectionStatus {
+                    if let server = editingServer {
+                        // 編集モード: サーバーを更新
+                        serverManager.updateServer(
+                            serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                        )
+                    } else {
+                        // 追加モード: 新しいサーバーを追加
+                        serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                    }
+                    appRefreshTrigger.send() // リフレッシュをトリガー
+                    dismiss() // シートを閉じる
+                } else {
+                    // 接続失敗: アラートを表示
+                    showingConnectionErrorAlert = true
+                }
             }
         }
     }
     
     private func processHostInput(_ host: String) -> String {
         let lowercasedHost = host.lowercased()
+        
+        // ホスト名が「demo-mode」の場合は特別処理
+        if lowercasedHost == "demo-mode" {
+            return "demo-mode"
+        }
         
         // 最後のコロンを探す
         if let lastColonIndex = lowercasedHost.lastIndex(of: ":") {

@@ -20,12 +20,15 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.0.4
+## 1.1.0
 ### New Features
 - **Add German (`de`), Spanish (`es`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 - **Add access to each tab in the “View” menu**
   - Added menu items to the “View” menu in the menu bar to open the “Server,” “Model,” and “Chat” tabs. Press `⌘ (Command)` + `1` to open the “Server” tab, `⌘ (Command)` + `2` for the ‘Model’ tab, and `⌘ (Command)` + `3` for the “Chat” tab.
+- **Add demo mode**
+  - I implemented a demo mode that allows testing the app's basic functionality for App Store review.
+  - You can access demo mode by adding a server with hostname `demo-mode` (server name is optional) and selecting it.
 
 ### Bug Fixes and Improvements
 - **Fix issue that `scrollEdgeEffect` did not work in chat view**

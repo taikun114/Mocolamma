@@ -4149,6 +4149,41 @@
         }
       }
     },
+    "Fetching models from demo server..." : {
+      "comment" : "デモサーバーからモデルリストを取得中のメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrufen von Modellen vom Demo-Server..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetching models from demo server..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obteniendo modelos del servidor de demostración..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupération des modèles depuis le serveur de démonstration..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デモサーバーからモデルを取得中…"
+          }
+        }
+      }
+    },
     "Find Models" : {
       "comment" : "モデルを探すボタンのテキスト。",
       "localizations" : {
@@ -8462,6 +8497,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モデル「%1$@」を「%2$@」からの削除に成功しました。"
+          }
+        }
+      }
+    },
+    "Successfully fetched models from demo server. Total: %d" : {
+      "comment" : "デモサーバーからモデル情報を取得した場合のメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelle erfolgreich vom Demo-Server abgerufen. Insgesamt: %d"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully fetched models from demo server. Total: %d"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelos obtenidos exitosamente del servidor de demostración. Total: %d"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modèles récupérés avec succès depuis le serveur de démonstration. Total : %d"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デモサーバーからモデルを正常に取得しました。合計: %d"
           }
         }
       }
