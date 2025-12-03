@@ -55,6 +55,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         isChatStreaming = chatMessages.firstIndex { $0.isStreaming } != nil
     }
     
+    /// デモサーバーかどうかを判定します
+    private func isDemoServer() -> Bool {
+        guard let host = apiBaseURL else { return false }
+        return host == "demo-mode"
+    }
+    
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
     init(serverManager: ServerManager) {
@@ -103,6 +109,65 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// Ollama APIからモデルリストを取得します
     func fetchOllamaModelsFromAPI() async {
+        if isDemoServer() {
+            // デモサーバーの場合、固定のデモデータを返す
+            self.output = NSLocalizedString("Fetching models from demo server...", comment: "デモサーバーからモデルリストを取得中のメッセージ。")
+            self.isRunning = true
+            defer { self.isRunning = false }
+            
+            // 5分前と3分前の日付をISO 8601形式で計算
+            let fiveMinutesAgo = Date().addingTimeInterval(-300) // 5分前
+            let threeMinutesAgo = Date().addingTimeInterval(-180) // 3分前
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            
+            // デモデータのモデルリストを設定
+            let demoModelDetails = OllamaModelDetails(
+                parent_model: "",
+                format: "gguf",
+                family: "demo",
+                families: ["demo"],
+                parameter_size: "0B",
+                quantization_level: "Q4_K_M",
+                context_length: 2048
+            )
+            
+            let demoModel1 = OllamaModel(
+                name: "demo:0b",
+                model: "demo:0b",
+                modifiedAt: formatter.string(from: fiveMinutesAgo),
+                size: 0,
+                digest: "000000000000", // ダイジェストは固定
+                details: demoModelDetails,
+                capabilities: nil,
+                originalIndex: 0
+            )
+            let demoModel2 = OllamaModel(
+                name: "demo2:0b",
+                model: "demo2:0b",
+                modifiedAt: formatter.string(from: threeMinutesAgo),
+                size: 0,
+                digest: "000000000001", // ダイジェストは固定
+                details: demoModelDetails,
+                capabilities: nil,
+                originalIndex: 1
+            )
+            
+            self.models = [
+                demoModel1,
+                demoModel2
+            ].enumerated().map { (index, model) in
+                var mutableModel = model
+                mutableModel.originalIndex = index
+                return mutableModel
+            }
+            
+            let successMessage = String(format: NSLocalizedString("Successfully fetched models from demo server. Total: %d", comment: "デモサーバーからモデル情報を取得した場合のメッセージ。"), self.models.count)
+            self.output = successMessage
+            self.apiConnectionError = false // 成功時はエラーなし
+            return
+        }
+        
         guard let apiBaseURL = self.apiBaseURL else {
             // apiBaseURLがnilの場合、何もしない
             print("Ollama API base URL is not set. Skipping model list retrieval.")
@@ -317,6 +382,115 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// モデルの詳細情報を取得します
     func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
+        if isDemoServer() {
+            // デモサーバーの場合、固定のデモデータを返す
+            print("Fetching model \(modelName) details from demo server.")
+            
+            // モデル名に基づいて異なるデータを返す
+            let isDemoModel1 = modelName == "demo:0b"
+            let isDemoModel2 = modelName == "demo2:0b"
+            
+            if isDemoModel1 || isDemoModel2 {
+                // デモモデルの情報を生成
+                let modelDetails = OllamaModelDetails(
+                    parent_model: "",
+                    format: "gguf",
+                    family: "demo",
+                    families: ["demo"],
+                    parameter_size: "0B",
+                    quantization_level: "Q4_K_M",
+                    context_length: 2048 // context_lengthを追加
+                )
+                
+                // モデル情報の作成
+                let modelInfo: [String: JSONValue] = [
+                    "general.parameter_count": .int(0),
+                    "llama.context_length": .int(2048),
+                    "llama.embedding_length": .int(2048)
+                ]
+                
+                let response = OllamaShowResponse(
+                    license: #"""
+                      _____         _     _     _                         
+                     |_   _|__  ___| |_  | |   (_) ___ ___ _ __  ___  ___ 
+                       | |/ _ \/ __| __| | |   | |/ __/ _ \ '_ \/ __|/ _ \
+                       | |  __/\__ \ |_  | |___| | (_|  __/ | | \__ \  __/
+                       |_|\___||___/\__| |_____|_|\___\___|_| |_|___/\___|
+                                                                          
+                    
+                    This is a test license. In actual use, the license text included with each model
+                    will be displayed here.
+                    
+                    --------------------------------------------------------------------------------
+                    
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Primis netus venenatis
+                    litora tempor accumsan. Amet mollis ad elementum diam inceptos. Commodo mauris
+                    nam sem lacinia lacinia. Quam erat fermentum purus sem ad. Et rutrum mattis
+                    semper nisi phasellus. Venenatis ante feugiat gravida elementum risus.
+                    
+                    Scelerisque velit eget risus nisi curae. Suspendisse cum sagittis arcu vel odio.
+                    Cras diam senectus fermentum vehicula viverra. Feugiat eu eros lacus class mi.
+                    Dignissim porta habitant ante netus duis. Sollicitudin egestas dignissim aptent
+                    orci vitae. Litora nullam tellus semper posuere mus.
+                    
+                    Mauris risus sit cras faucibus purus. Dictumst suscipit vitae ad commodo morbi.
+                    Rutrum euismod imperdiet suscipit facilisi mattis. Quisque eros venenatis enim
+                    nisl ac. Tortor mus natoque tincidunt potenti potenti. Cubilia nulla aptent
+                    laoreet vivamus justo. Proin elit praesent habitasse eleifend nunc.
+                    
+                    Scelerisque nec nam dolor est varius. Maecenas luctus posuere aliquam id lectus.
+                    Congue penatibus vitae feugiat enim pellentesque. Interdum habitasse habitasse
+                    potenti dictumst sed. Mattis pulvinar malesuada lectus volutpat sociosqu. Vel
+                    duis at aenean purus ridiculus. Dictumst lectus vel euismod sit molestie.
+                    
+                    Ridiculus vestibulum eros semper orci natoque. Luctus urna porta eleifend ligula
+                    tempus. Vitae porttitor mus justo sem luctus. Ac sociis interdum ad ultricies
+                    mus. Dui cras enim venenatis sed phasellus. Ac nisl massa sociosqu fermentum
+                    elit. Condimentum nostra proin luctus phasellus morbi.
+                    
+                    Platea sapien dui fringilla dolor porttitor. Porta arcu curabitur est neque est.
+                    Class id senectus arcu pulvinar auctor. Dignissim nisl lorem magna erat
+                    lobortis. Ad primis mattis turpis sociosqu bibendum. Congue etiam parturient
+                    inceptos sagittis ante. Sit urna est vehicula habitasse taciti.
+                    
+                    Morbi nam curae fermentum consectetur dictum. Diam semper nullam nisl pulvinar
+                    nisi. Diam neque sit sodales laoreet nisl. Imperdiet auctor interdum congue id
+                    inceptos. Orci nullam auctor elit id conubia. Morbi viverra dolor maecenas
+                    nostra ullamcorper. Mauris habitasse odio porta blandit nisi.
+                    
+                    Suscipit velit primis egestas nascetur magnis. Vivamus penatibus posuere
+                    imperdiet velit integer. Consequat eget tincidunt blandit sodales primis. Sem
+                    pharetra conubia malesuada dui ad. Imperdiet urna venenatis litora cum faucibus.
+                    Convallis erat class vehicula phasellus massa. Eros himenaeos fusce donec
+                    quisque integer.
+                    
+                    Commodo fusce justo et id dui. Class tincidunt posuere natoque dictum massa.
+                    Magna justo ultricies consequat non iaculis. Rutrum condimentum per mus faucibus
+                    massa. Aptent lorem nec velit nunc tempor. Montes varius pharetra pharetra
+                    maecenas felis. Ridiculus primis dictumst habitasse amet metus.
+                    
+                    Ridiculus sed facilisi velit pretium velit. Laoreet rhoncus leo adipiscing
+                    sapien gravida. Ac adipiscing viverra nulla fringilla tortor. Pulvinar posuere
+                    adipiscing volutpat quisque faucibus. Platea mauris maecenas neque congue
+                    consectetur. Dapibus sed varius tincidunt maecenas curae. Fringilla mi donec
+                    laoreet curae facilisi.
+                    """#,
+                    modelfile: nil,
+                    parameters: nil,
+                    template: nil,
+                    details: modelDetails,
+                    model_info: modelInfo,
+                    capabilities: ["completion", "tools", "thinking", "vision"] // 機能タグ
+                )
+                
+                // キャッシュにも保存
+                modelInfoCache[modelName] = response
+                print("Successfully returned demo model \(modelName) details.")
+                
+                return response
+            }
+        }
+        
         // キャッシュに存在すればそれを返す
         if let cachedInfo = modelInfoCache[modelName] {
             print("Fetched model \(modelName) details from cache.")
@@ -394,6 +568,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Parameter host: 接続を試みるホストURL文字列 (例: "localhost:11434")。
     /// - Returns: 接続状態を示す `ServerConnectionStatus`。
     func checkAPIConnectivity(host: String) async -> ServerConnectionStatus {
+        // デモサーバーの場合は常に接続済みを返す
+        if host == "demo-mode" {
+            return .connected
+        }
+        
         let scheme = host.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
@@ -451,6 +630,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Parameter host: OllamaホストのURL。
     /// - Returns: Ollamaのバージョン文字列。
     func fetchOllamaVersion(host: String) async throws -> String {
+        if host == "demo-mode" {
+            // デモサーバーの場合は固定のバージョンを返す
+            return "0.0.0"
+        }
+        
         let scheme = host.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/version") else {
@@ -470,7 +654,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// 現在メモリにロードされているモデル数を取得します。
     func fetchRunningModelsCount(host: String? = nil) async -> Int? {
-        guard let base = host ?? apiBaseURL else { return nil }
+        let base = host ?? apiBaseURL
+        if base == "demo-mode" {
+            // デモサーバーの場合は固定の実行中モデル数を返す
+            return 1
+        }
+        
+        guard let base = base else { return nil }
         let scheme = base.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
@@ -487,7 +677,18 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     
     /// 現在メモリにロードされているモデルのリストを取得します。
     func fetchRunningModels(host: String? = nil) async -> [OllamaRunningModel]? {
-        guard let base = host ?? apiBaseURL else { return nil }
+        let base = host ?? apiBaseURL
+        if base == "demo-mode" {
+            // デモサーバーの場合は固定の実行中モデルを返す
+            let fiveMinutesLater = Date().addingTimeInterval(300) // 5分後
+            return [OllamaRunningModel(
+                name: "demo:0b",
+                expires_at: fiveMinutesLater,
+                size_vram: 0 // 0バイト
+            )]
+        }
+        
+        guard let base = base else { return nil }
         let scheme = base.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
@@ -506,6 +707,128 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
     func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+        if isDemoServer() {
+            // デモサーバーの場合、固定のデモデータを返す
+            return AsyncThrowingStream { continuation in
+                Task { @MainActor in
+                    // チャットストリームを開始
+                    let created_at = Date()
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                    
+                    if stream {
+                        // ストリーミングモード（stream: true）
+                        
+                        // チンキングオプションがONの場合、Thinkingメッセージを送信
+                        if thinkingOption == .on {
+                            let thinkingMessages = ["Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".!"]
+                            
+                            for thinkingMessage in thinkingMessages {
+                                // 0.5秒ごとにThinkingメッセージを送信
+                                try await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+                                
+                                let responseChunk = ChatResponseChunk(
+                                    model: model,
+                                    createdAt: formatter.string(from: created_at),
+                                    message: ChatMessage(
+                                        role: "assistant",
+                                        content: "",
+                                        thinking: thinkingMessage
+                                    ),
+                                    done: false,
+                                    totalDuration: nil,
+                                    loadDuration: nil,
+                                    promptEvalCount: nil,
+                                    promptEvalDuration: nil,
+                                    evalCount: nil,
+                                    evalDuration: nil,
+                                    doneReason: nil
+                                )
+                                
+                                continuation.yield(responseChunk)
+                            }
+                        }
+                        
+                        let responseMessages = ["This ", "is ", "a ", "test", "!"]
+                        
+                        for responseMessage in responseMessages {
+                            // 0.5秒ごとにレスポンスメッセージを送信
+                            try await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+                            
+                            let responseChunk = ChatResponseChunk(
+                                model: model,
+                                createdAt: formatter.string(from: created_at),
+                                message: ChatMessage(
+                                    role: "assistant",
+                                    content: responseMessage
+                                ),
+                                done: false,
+                                totalDuration: nil,
+                                loadDuration: nil,
+                                promptEvalCount: nil,
+                                promptEvalDuration: nil,
+                                evalCount: nil,
+                                evalDuration: nil,
+                                doneReason: nil
+                            )
+                            
+                            continuation.yield(responseChunk)
+                        }
+                        
+                        // 最後のチャンクを送信（done: true）
+                        try await Task.sleep(nanoseconds: 100_000_000) // 少し待ってから完了を送信
+                        let finalChunk = ChatResponseChunk(
+                            model: model,
+                            createdAt: formatter.string(from: created_at),
+                            message: ChatMessage(
+                                role: "assistant",
+                                content: ""
+                            ),
+                            done: true,
+                            totalDuration: 1000000000,  // 1秒
+                            loadDuration: 100000000,   // 0.1秒
+                            promptEvalCount: 10,
+                            promptEvalDuration: 100000000, // 0.1秒
+                            evalCount: 5,
+                            evalDuration: 500000000,  // 0.5秒
+                            doneReason: "stop"
+                        )
+                        
+                        continuation.yield(finalChunk)
+                        continuation.finish()
+                    } else {
+                        // 非ストリーミングモード（stream: false）
+                        try await Task.sleep(nanoseconds: 5_000_000_000) // 5秒遅延
+                        
+                        // 思考モードが有効な場合、thinkingプロパティを持つメッセージを含める
+                        let fullResponse = "This is a test!"
+                        let thinkingResponse = thinkingOption == .on ? "Testing... Testing... Testing...!" : nil
+                        
+                        let responseChunk = ChatResponseChunk(
+                            model: model,
+                            createdAt: formatter.string(from: created_at),
+                            message: ChatMessage(
+                                role: "assistant",
+                                content: fullResponse,
+                                thinking: thinkingResponse
+                            ),
+                            done: true,
+                            totalDuration: 1000000,
+                            loadDuration: 100000,
+                            promptEvalCount: 10,
+                            promptEvalDuration: 100000,
+                            evalCount: 5,
+                            evalDuration: 200000,
+                            doneReason: "stop"
+                        )
+                        
+                        continuation.yield(responseChunk)
+                        continuation.finish()
+                    }
+                }
+            }
+        }
+        
         return AsyncThrowingStream { continuation in
             Task { @MainActor in // UIプロパティを安全に更新するためにMainActorで実行することを保証
                 guard let apiBaseURL = self.apiBaseURL else {
@@ -880,6 +1203,13 @@ struct OllamaRunningModel: Decodable {
         return byteCountFormatter.string(fromByteCount: size)
     }
     
+    // イニシャライザを追加
+    init(name: String, expires_at: Date?, size_vram: Int64?) {
+        self.name = name
+        self.expires_at = expires_at
+        self.size_vram = size_vram
+    }
+    
     // ISO 8601日付文字列を処理するためのカスタムデコーディング
     enum CodingKeys: String, CodingKey {
         case name
@@ -901,3 +1231,4 @@ struct OllamaRunningModel: Decodable {
         size_vram = try? container.decode(Int64.self, forKey: .size_vram)
     }
 }
+
