@@ -106,7 +106,7 @@ struct AboutView: View {
                         Text("Developed with Generative AI")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("Copyright ©︎ 2025 Taiga Imaura")
+                        Text("Copyright ©︎ 2026 Taiga Imaura")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }

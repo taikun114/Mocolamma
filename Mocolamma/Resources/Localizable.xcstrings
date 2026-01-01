@@ -2600,37 +2600,37 @@
         }
       }
     },
-    "Copyright ©︎ 2025 Taiga Imaura" : {
+    "Copyright ©︎ 2026 Taiga Imaura" : {
       "comment" : "著作者情報のテキスト。日本語以外はTaiga Imauraを使用する。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 今浦大雅"
+            "value" : "Copyright ©︎ 2026 今浦大雅"
           }
         }
       }

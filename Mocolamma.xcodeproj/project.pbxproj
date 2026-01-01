@@ -682,7 +682,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -695,7 +695,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Mocolamma;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2025 Taiga Imaura";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2026 Taiga Imaura";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This is required to communicate with Ollama servers existing within the local network.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -729,7 +729,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -742,7 +742,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Mocolamma;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2025 Taiga Imaura";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2026 Taiga Imaura";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This is required to communicate with Ollama servers existing within the local network.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -771,7 +771,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -790,7 +790,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -808,7 +808,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -825,7 +825,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2547;
+				CURRENT_PROJECT_VERSION = 2548;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
