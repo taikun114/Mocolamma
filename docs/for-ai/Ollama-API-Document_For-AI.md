@@ -1,6 +1,6 @@
 # How to use Ollama API
 
-Original: https://github.com/ollama/ollama/blob/3515cc377ce2506c95a0ea408fd5d15d306fc6aa/docs/api.md
+Original: https://github.com/ollama/ollama/blob/099a0f18ef29a95d8d6c4fe1343e48e0d9f4cdd7/docs/api.md
 
 ## Endpoints
 
@@ -16,6 +16,7 @@ Original: https://github.com/ollama/ollama/blob/3515cc377ce2506c95a0ea408fd5d15d
 - [Generate Embeddings](#generate-embeddings)
 - [List Running Models](#list-running-models)
 - [Version](#version)
+- [Experimental: Image Generation](#image-generation-experimental)
 
 ## Conventions
 
@@ -50,13 +51,22 @@ Generate a response for a given prompt with a provided model. This is a streamin
 Advanced parameters (optional):
 
 - `format`: the format to return a response in. Format can be `json` or a JSON schema
-- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.md#valid-parameters-and-values) such as `temperature`
+- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.mdx#valid-parameters-and-values) such as `temperature`
 - `system`: system message to (overrides what is defined in the `Modelfile`)
 - `template`: the prompt template to use (overrides what is defined in the `Modelfile`)
 - `stream`: if `false` the response will be returned as a single response object, rather than a stream of objects
 - `raw`: if `true` no formatting will be applied to the prompt. You may choose to use the `raw` parameter if you are specifying a full templated prompt in your request to the API
 - `keep_alive`: controls how long the model will stay loaded into memory following the request (default: `5m`)
 - `context` (deprecated): the context parameter returned from a previous request to `/generate`, this can be used to keep a short conversational memory
+
+Experimental image generation parameters (for image generation models only):
+
+> [!WARNING]
+> These parameters are experimental and may change in future versions.
+
+- `width`: width of the generated image in pixels
+- `height`: height of the generated image in pixels
+- `steps`: number of diffusion steps
 
 #### Structured outputs
 
@@ -106,7 +116,7 @@ The final response in the stream also includes additional data about the generat
 - `context`: an encoding of the conversation used in this response, this can be sent in the next request to keep a conversational memory
 - `response`: empty if the response was streamed, if not streamed, this will contain the full response
 
-To calculate how fast the response is generated in tokens per second (token/s), divide `eval_count` / `eval_duration` * `10^9`.
+To calculate how fast the response is generated in tokens per second (token/s), divide `eval_count` / `eval_duration` \* `10^9`.
 
 ```json
 {
@@ -507,7 +517,7 @@ The `message` object has the following fields:
 Advanced parameters (optional):
 
 - `format`: the format to return a response in. Format can be `json` or a JSON schema.
-- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.md#valid-parameters-and-values) such as `temperature`
+- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.mdx#valid-parameters-and-values) such as `temperature`
 - `stream`: if `false` the response will be returned as a single response object, rather than a stream of objects
 - `keep_alive`: controls how long the model will stay loaded into memory following the request (default: `5m`)
 
@@ -619,25 +629,26 @@ curl http://localhost:11434/api/chat -d '{
 ##### Response
 
 A stream of JSON objects is returned:
+
 ```json
 {
-    "model": "llama3.2",
-    "created_at": "2025-07-07T20:22:19.184789Z",
-    "message": {
-        "role": "assistant",
-        "content": "",
-        "tool_calls": [
-            {
-                "function": {
-                    "name": "get_weather",
-                    "arguments": {
-                        "city": "Tokyo"
-                    }
-                },
-            }
-        ]
-    },
-    "done": false
+  "model": "llama3.2",
+  "created_at": "2025-07-07T20:22:19.184789Z",
+  "message": {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+      {
+        "function": {
+          "name": "get_weather",
+          "arguments": {
+            "city": "Tokyo"
+          }
+        }
+      }
+    ]
+  },
+  "done": false
 }
 ```
 
@@ -645,8 +656,8 @@ Final response:
 
 ```json
 {
-  "model":"llama3.2",
-  "created_at":"2025-07-07T20:22:19.19314Z",
+  "model": "llama3.2",
+  "created_at": "2025-07-07T20:22:19.19314Z",
   "message": {
     "role": "assistant",
     "content": ""
@@ -703,7 +714,6 @@ curl http://localhost:11434/api/chat -d '{
 
 ##### Request
 
-
 ```shell
 curl http://localhost:11434/api/chat -d '{
   "model": "llama3.2",
@@ -732,7 +742,7 @@ curl http://localhost:11434/api/chat -d '{
       }
     }
   ],
-  "stream": false 
+  "stream": false
 }'
 ```
 
@@ -752,7 +762,7 @@ curl http://localhost:11434/api/chat -d '{
           "arguments": {
             "city": "Tokyo"
           }
-        },
+        }
       }
     ]
   },
@@ -803,7 +813,10 @@ curl -X POST http://localhost:11434/api/chat -H "Content-Type: application/json"
 {
   "model": "llama3.1",
   "created_at": "2024-12-06T00:46:58.265747Z",
-  "message": { "role": "assistant", "content": "{\"age\": 22, \"available\": false}" },
+  "message": {
+    "role": "assistant",
+    "content": "{\"age\": 22, \"available\": false}"
+  },
   "done_reason": "stop",
   "done": true,
   "total_duration": 2254970291,
@@ -873,7 +886,6 @@ Final response:
 }
 ```
 
-
 #### Chat request (With history, with tools)
 
 ##### Request
@@ -893,11 +905,11 @@ curl http://localhost:11434/api/chat -d '{
       "tool_calls": [
         {
           "function": {
-            "name": "get_temperature",
+            "name": "get_weather",
             "arguments": {
               "city": "Toronto"
             }
-          },
+          }
         }
       ]
     },
@@ -905,7 +917,7 @@ curl http://localhost:11434/api/chat -d '{
     {
       "role": "tool",
       "content": "11 degrees celsius",
-      "tool_name": "get_temperature",
+      "tool_name": "get_weather"
     }
   ],
   "stream": false,
@@ -950,9 +962,7 @@ curl http://localhost:11434/api/chat -d '{
   "eval_count": 11,
   "eval_duration": 90282125
 }
-
 ```
-
 
 #### Chat request (with images)
 
@@ -1125,7 +1135,7 @@ curl http://localhost:11434/api/chat -d '{
 ```json
 {
   "model": "llama3.2",
-  "created_at":"2024-09-12T21:17:29.110811Z",
+  "created_at": "2024-09-12T21:17:29.110811Z",
   "message": {
     "role": "assistant",
     "content": ""
@@ -1156,7 +1166,7 @@ A single JSON object is returned:
 ```json
 {
   "model": "llama3.2",
-  "created_at":"2024-09-12T21:33:17.547535Z",
+  "created_at": "2024-09-12T21:33:17.547535Z",
   "message": {
     "role": "assistant",
     "content": ""
@@ -1173,9 +1183,10 @@ POST /api/create
 ```
 
 Create a model from:
- * another model;
- * a safetensors directory; or
- * a GGUF file.
+
+- another model;
+- a safetensors directory; or
+- a GGUF file.
 
 If you are creating a model from a safetensors directory or from a GGUF file, you must [create a blob](#create-a-blob) for each of the files and then use the file name and SHA256 digest associated with each blob in the `files` field.
 
@@ -1188,18 +1199,18 @@ If you are creating a model from a safetensors directory or from a GGUF file, yo
 - `template`: (optional) the prompt template for the model
 - `license`: (optional) a string or list of strings containing the license or licenses for the model
 - `system`: (optional) a string containing the system prompt for the model
-- `parameters`: (optional) a dictionary of parameters for the model (see [Modelfile](./modelfile.md#valid-parameters-and-values) for a list of parameters)
+- `parameters`: (optional) a dictionary of parameters for the model (see [Modelfile](./modelfile.mdx#valid-parameters-and-values) for a list of parameters)
 - `messages`: (optional) a list of message objects used to create a conversation
 - `stream`: (optional) if `false` the response will be returned as a single response object, rather than a stream of objects
 - `quantize` (optional): quantize a non-quantized (e.g. float16) model
 
 #### Quantization types
 
-| Type | Recommended |
-| --- | :-: |
-| q4_K_M | * |
-| q4_K_S | |
-| q8_0 | * |
+| Type   | Recommended |
+| ------ | :---------: |
+| q4_K_M |     \*      |
+| q4_K_S |             |
+| q8_0   |     \*      |
 
 ### Examples
 
@@ -1270,7 +1281,6 @@ A stream of JSON objects is returned:
 
 Create a model from a GGUF file. The `files` parameter should be filled out with the file name and SHA256 digest of the GGUF file you wish to use. Use [/api/blobs/:digest](#push-a-blob) to push the GGUF file to the server before calling this API.
 
-
 ##### Request
 
 ```shell
@@ -1292,7 +1302,6 @@ A stream of JSON objects is returned:
 {"status":"writing manifest"}
 {"status":"success"}
 ```
-
 
 #### Create a model from a Safetensors directory
 
@@ -1408,9 +1417,7 @@ A single JSON object will be returned.
         "parent_model": "",
         "format": "gguf",
         "family": "qwen2",
-        "families": [
-          "qwen2"
-        ],
+        "families": ["qwen2"],
         "parameter_size": "7.6B",
         "quantization_level": "Q4_K_M"
       }
@@ -1425,9 +1432,7 @@ A single JSON object will be returned.
         "parent_model": "",
         "format": "gguf",
         "family": "llama",
-        "families": [
-          "llama"
-        ],
+        "families": ["llama"],
         "parameter_size": "3.2B",
         "quantization_level": "Q4_K_M"
       }
@@ -1463,20 +1468,18 @@ curl http://localhost:11434/api/show -d '{
 
 ```json5
 {
-  "modelfile": "# Modelfile generated by \"ollama show\"\n# To build a new Modelfile based on this one, replace the FROM line with:\n# FROM llava:latest\n\nFROM /Users/matt/.ollama/models/blobs/sha256:200765e1283640ffbd013184bf496e261032fa75b99498a9613be4e94d63ad52\nTEMPLATE \"\"\"{{ .System }}\nUSER: {{ .Prompt }}\nASSISTANT: \"\"\"\nPARAMETER num_ctx 4096\nPARAMETER stop \"\u003c/s\u003e\"\nPARAMETER stop \"USER:\"\nPARAMETER stop \"ASSISTANT:\"",
-  "parameters": "num_keep                       24\nstop                           \"<|start_header_id|>\"\nstop                           \"<|end_header_id|>\"\nstop                           \"<|eot_id|>\"",
-  "template": "{{ if .System }}<|start_header_id|>system<|end_header_id|>\n\n{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>\n\n{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>\n\n{{ .Response }}<|eot_id|>",
-  "details": {
-    "parent_model": "",
-    "format": "gguf",
-    "family": "llama",
-    "families": [
-      "llama"
-    ],
-    "parameter_size": "8.0B",
-    "quantization_level": "Q4_0"
+  modelfile: '# Modelfile generated by "ollama show"\n# To build a new Modelfile based on this one, replace the FROM line with:\n# FROM llava:latest\n\nFROM /Users/matt/.ollama/models/blobs/sha256:200765e1283640ffbd013184bf496e261032fa75b99498a9613be4e94d63ad52\nTEMPLATE """{{ .System }}\nUSER: {{ .Prompt }}\nASSISTANT: """\nPARAMETER num_ctx 4096\nPARAMETER stop "\u003c/s\u003e"\nPARAMETER stop "USER:"\nPARAMETER stop "ASSISTANT:"',
+  parameters: 'num_keep                       24\nstop                           "<|start_header_id|>"\nstop                           "<|end_header_id|>"\nstop                           "<|eot_id|>"',
+  template: "{{ if .System }}<|start_header_id|>system<|end_header_id|>\n\n{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>\n\n{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>\n\n{{ .Response }}<|eot_id|>",
+  details: {
+    parent_model: "",
+    format: "gguf",
+    family: "llama",
+    families: ["llama"],
+    parameter_size: "8.0B",
+    quantization_level: "Q4_0",
   },
-  "model_info": {
+  model_info: {
     "general.architecture": "llama",
     "general.file_type": 2,
     "general.parameter_count": 8030261248,
@@ -1493,16 +1496,13 @@ curl http://localhost:11434/api/show -d '{
     "llama.vocab_size": 128256,
     "tokenizer.ggml.bos_token_id": 128000,
     "tokenizer.ggml.eos_token_id": 128009,
-    "tokenizer.ggml.merges": [],            // populates if `verbose=true`
+    "tokenizer.ggml.merges": [], // populates if `verbose=true`
     "tokenizer.ggml.model": "gpt2",
     "tokenizer.ggml.pre": "llama-bpe",
-    "tokenizer.ggml.token_type": [],        // populates if `verbose=true`
-    "tokenizer.ggml.tokens": []             // populates if `verbose=true`
+    "tokenizer.ggml.token_type": [], // populates if `verbose=true`
+    "tokenizer.ggml.tokens": [], // populates if `verbose=true`
   },
-  "capabilities": [
-    "completion",
-    "vision"
-  ],
+  capabilities: ["completion", "vision"],
 }
 ```
 
@@ -1595,7 +1595,7 @@ Then there is a series of downloading responses. Until any of the download is co
 
 ```json
 {
-  "status": "downloading digestname",
+  "status": "pulling digestname",
   "digest": "digestname",
   "total": 2142590208,
   "completed": 241970
@@ -1708,8 +1708,9 @@ Generate embeddings from a model
 Advanced parameters:
 
 - `truncate`: truncates the end of each input to fit within context length. Returns error if `false` and context length is exceeded. Defaults to `true`
-- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.md#valid-parameters-and-values) such as `temperature`
+- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.mdx#valid-parameters-and-values) such as `temperature`
 - `keep_alive`: controls how long the model will stay loaded into memory following the request (default: `5m`)
+- `dimensions`: number of dimensions for the embedding
 
 ### Examples
 
@@ -1727,10 +1728,12 @@ curl http://localhost:11434/api/embed -d '{
 ```json
 {
   "model": "all-minilm",
-  "embeddings": [[
-    0.010071029, -0.0017594862, 0.05007221, 0.04692972, 0.054916814,
-    0.008599704, 0.105441414, -0.025878139, 0.12958129, 0.031952348
-  ]],
+  "embeddings": [
+    [
+      0.010071029, -0.0017594862, 0.05007221, 0.04692972, 0.054916814,
+      0.008599704, 0.105441414, -0.025878139, 0.12958129, 0.031952348
+    ]
+  ],
   "total_duration": 14143917,
   "load_duration": 1019500,
   "prompt_eval_count": 8
@@ -1751,17 +1754,21 @@ curl http://localhost:11434/api/embed -d '{
 ```json
 {
   "model": "all-minilm",
-  "embeddings": [[
-    0.010071029, -0.0017594862, 0.05007221, 0.04692972, 0.054916814,
-    0.008599704, 0.105441414, -0.025878139, 0.12958129, 0.031952348
-  ],[
-    -0.0098027075, 0.06042469, 0.025257962, -0.006364387, 0.07272725,
-    0.017194884, 0.09032035, -0.051705178, 0.09951512, 0.09072481
-  ]]
+  "embeddings": [
+    [
+      0.010071029, -0.0017594862, 0.05007221, 0.04692972, 0.054916814,
+      0.008599704, 0.105441414, -0.025878139, 0.12958129, 0.031952348
+    ],
+    [
+      -0.0098027075, 0.06042469, 0.025257962, -0.006364387, 0.07272725,
+      0.017194884, 0.09032035, -0.051705178, 0.09951512, 0.09072481
+    ]
+  ]
 }
 ```
 
 ## List Running Models
+
 ```
 GET /api/ps
 ```
@@ -1792,9 +1799,7 @@ A single JSON object will be returned.
         "parent_model": "",
         "format": "gguf",
         "family": "llama",
-        "families": [
-          "llama"
-        ],
+        "families": ["llama"],
         "parameter_size": "7.2B",
         "quantization_level": "Q4_0"
       },
@@ -1822,7 +1827,7 @@ Generate embeddings from a model
 
 Advanced parameters:
 
-- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.md#valid-parameters-and-values) such as `temperature`
+- `options`: additional model parameters listed in the documentation for the [Modelfile](./modelfile.mdx#valid-parameters-and-values) such as `temperature`
 - `keep_alive`: controls how long the model will stay loaded into memory following the request (default: `5m`)
 
 ### Examples
@@ -1841,8 +1846,10 @@ curl http://localhost:11434/api/embeddings -d '{
 ```json
 {
   "embedding": [
-    0.5670403838157654, 0.009260174818336964, 0.23178744316101074, -0.2916173040866852, -0.8924556970596313,
-    0.8785552978515625, -0.34576427936553955, 0.5742510557174683, -0.04222835972905159, -0.137906014919281
+    0.5670403838157654, 0.009260174818336964, 0.23178744316101074,
+    -0.2916173040866852, -0.8924556970596313, 0.8785552978515625,
+    -0.34576427936553955, 0.5742510557174683, -0.04222835972905159,
+    -0.137906014919281
   ]
 }
 ```
@@ -1871,4 +1878,54 @@ curl http://localhost:11434/api/version
 }
 ```
 
+## Experimental Features
 
+### Image Generation (Experimental)
+
+> [!WARNING]
+> Image generation is experimental and may change in future versions.
+
+Image generation is now supported through the standard `/api/generate` endpoint when using image generation models. The API automatically detects when an image generation model is being used.
+
+See the [Generate a completion](#generate-a-completion) section for the full API documentation. The experimental image generation parameters (`width`, `height`, `steps`) are documented there.
+
+#### Example
+
+##### Request
+
+```shell
+curl http://localhost:11434/api/generate -d '{
+  "model": "x/z-image-turbo",
+  "prompt": "a sunset over mountains",
+  "width": 1024,
+  "height": 768
+}'
+```
+
+##### Response (streaming)
+
+Progress updates during generation:
+
+```json
+{
+  "model": "x/z-image-turbo",
+  "created_at": "2024-01-15T10:30:00.000000Z",
+  "completed": 5,
+  "total": 20,
+  "done": false
+}
+```
+
+##### Final Response
+
+```json
+{
+  "model": "x/z-image-turbo",
+  "created_at": "2024-01-15T10:30:15.000000Z",
+  "image": "iVBORw0KGgoAAAANSUhEUg...",
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 15000000000,
+  "load_duration": 2000000000
+}
+```
