@@ -100,6 +100,9 @@ struct ModelInspectorView: View {
         case "embedding":
             displayText = String(localized: "Embedding")
             iconName = "square.stack.3d.up"
+        case "image":
+            displayText = String(localized: "Image")
+            iconName = "photo"
         default:
             displayText = capability
             iconName = "tag"

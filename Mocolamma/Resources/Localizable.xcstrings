@@ -9414,6 +9414,41 @@
         }
       }
     },
+    "Image" : {
+      "comment" : "モデルの持っている機能として表示されるタグ。このモデルが画像生成に対応している場合はこのタグが表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
+          }
+        }
+      }
+    },
     "Vision" : {
       "comment" : "モデルの持っている機能として表示されるタグ。このモデルがビジョン(画像認識)に対応している場合はこのタグが表示されます。",
       "localizations" : {
