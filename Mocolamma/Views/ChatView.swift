@@ -8,7 +8,7 @@ struct ChatView: View {
     @EnvironmentObject var chatSettings: ChatSettings
     
     @State private var errorMessage: String?
-    @State private var showEmbeddingAlert: Bool = false
+    @State private var showUnsupportedModelAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
     
     @Binding var showingInspector: Bool
@@ -154,16 +154,23 @@ struct ChatView: View {
                     } else {
                         contextLength = nil
                     }
-                    let isEmbeddingOnly = {
+                    let isUnsupportedModel = {
                         let caps = response.capabilities ?? []
                         let detFamilies = response.details?.families ?? []
-                        if !caps.isEmpty { return caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" } }
-                        if !detFamilies.isEmpty { return detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding" }
-                        return false
+                        
+                        // 埋め込みモデルの判定
+                        let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
+                        let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
+                        
+                        // 画像生成モデルの判定（イメージのみの場合）
+                        let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
+                        
+                        return isEmbedding || isEmbeddingFamily || isImage
                     }()
-                    if isEmbeddingOnly {
+                    
+                    if isUnsupportedModel {
                         chatSettings.selectedModelID = nil
-                        showEmbeddingAlert = true
+                        showUnsupportedModelAlert = true
                         return
                     }
                     chatSettings.selectedModelContextLength = contextLength
@@ -174,8 +181,8 @@ struct ChatView: View {
                 }
             }
         }
-        .alert("This model cannot be used", isPresented: $showEmbeddingAlert) {
-            Button("OK") { showEmbeddingAlert = false }
+        .alert("This model cannot be used", isPresented: $showUnsupportedModelAlert) {
+            Button("OK") { showUnsupportedModelAlert = false }
                 .keyboardShortcut(.defaultAction)
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
