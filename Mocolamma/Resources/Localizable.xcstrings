@@ -1015,6 +1015,41 @@
         }
       }
     },
+    "Are you sure you want to clear the chat history?" : {
+      "comment" : "新規チャットを開始する前に、現在のチャット履歴を消去しても良いか確認する際のメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie den Chat-Verlauf wirklich löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to clear the chat history?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás seguro de que quieres borrar el historial de chat?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment effacer l'historique du chat ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット履歴を消去してもよろしいですか？"
+          }
+        }
+      }
+    },
     "Are you sure you want to delete the model \"%@\"?\nThis action cannot be undone." : {
       "comment" : "モデル削除の確認メッセージ。",
       "localizations" : {
@@ -2025,6 +2060,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認中…"
+          }
+        }
+      }
+    },
+    "Clear Chat History" : {
+      "comment" : "アクションシートなどのボタンに表示される、チャット履歴を消去するためのテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat-Verlauf löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Chat History"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar historial de chat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer l'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャット履歴を消去"
           }
         }
       }
@@ -4786,6 +4856,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "何を入力したら良いかわからない場合、Ollamaのウェブサイトでモデルを探すことができます。"
+          }
+        }
+      }
+    },
+    "Image" : {
+      "comment" : "モデルの持っている機能として表示されるタグ。このモデルが画像生成に対応している場合はこのタグが表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
@@ -9410,41 +9515,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示"
-          }
-        }
-      }
-    },
-    "Image" : {
-      "comment" : "モデルの持っている機能として表示されるタグ。このモデルが画像生成に対応している場合はこのタグが表示されます。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imagen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
           }
         }
       }

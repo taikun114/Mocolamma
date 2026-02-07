@@ -10,6 +10,7 @@ struct ChatView: View {
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
+    @State private var showingNewChatConfirm: Bool = false
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -263,11 +264,24 @@ struct ChatView: View {
         
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                executor.clearChat()
-                executor.isChatStreaming = false
-                errorMessage = nil
+                if !executor.chatMessages.isEmpty {
+                    showingNewChatConfirm = true
+                }
             }) {
                 Label("New Chat", systemImage: "square.and.pencil")
+            }
+            .disabled(executor.chatMessages.isEmpty)
+            .confirmationDialog(
+                String(localized: "Are you sure you want to clear the chat history?"),
+                isPresented: $showingNewChatConfirm,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "Clear Chat History"), role: .destructive) {
+                    executor.clearChat()
+                    executor.isChatStreaming = false
+                    errorMessage = nil
+                }
+                Button(String(localized: "Cancel"), role: .cancel) { }
             }
         }
         
@@ -625,4 +639,3 @@ struct ChatView: View {
         await MainActor.run { executor.isChatStreaming = false }
     }
 }
-
