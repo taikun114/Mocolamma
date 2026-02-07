@@ -21,8 +21,8 @@ struct LicenseInfoModalView: View {
     @State private var showingMarkdownUILinkAlert = false
     @State private var isMarkdownUILinkHovered: Bool = false
     
-    @State private var showingOpencodeLinkAlert = false
-    @State private var isOpencodeLinkHovered: Bool = false
+    @State private var showingOpenCodeLinkAlert = false
+    @State private var isOpenCodeLinkHovered: Bool = false
     
     @State private var showingOllamaLinkAlert = false
     @State private var isOllamaLinkHovered: Bool = false
@@ -37,10 +37,10 @@ struct LicenseInfoModalView: View {
     
     private let compactSliderVersionString: String = "2.0.9"
     private let markdownUIVersionString: String = "2.4.1"
-    private let geminiCLIVersionString: String = "0.17.1"
+    private let geminiCLIVersionString: String = "0.27.3"
     private let qwenCodeVersionString: String = "0.3.0"
     private let createDmgVersionString: String = "1.2.2"
-    private let opencodeVersionString: String = "0.4.2"
+    private let openCodeVersionString: String = "0.4.2"
     
     var body: some View {
 #if os(macOS)
@@ -337,27 +337,27 @@ struct LicenseInfoModalView: View {
                     .padding(.vertical, 1)
                     .fixedSize(horizontal: !isTextWrapped, vertical: false)
                 
-                // MARK: opencode
+                // MARK: OpenCode
                 VStack(alignment: .leading) {
-                    Button(action: { showingOpencodeLinkAlert = true }) {
-                        Text("opencode by SST")
+                    Button(action: { showingOpenCodeLinkAlert = true }) {
+                        Text("OpenCode by Anomaly")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.accentColor)
-                            .underline(isOpencodeLinkHovered)
+                            .underline(isOpenCodeLinkHovered)
                     }
                     .buttonStyle(.plain)
-                    .help("Open link to the opencode GitHub page.")
+                    .help("Open link to the OpenCode GitHub page.")
                     .padding(.bottom, 1)
-                    .onHover { hovered in isOpencodeLinkHovered = hovered }
-                    .alert("Open Link?", isPresented: $showingOpencodeLinkAlert) {
+                    .onHover { hovered in isOpenCodeLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingOpenCodeLinkAlert) {
                         Button("Open") {
-                            if let url = URL(string: "https://github.com/sst/opencode") { openURL(url) }
+                            if let url = URL(string: "https://github.com/anomalyco/opencode") { openURL(url) }
                         }
                         Button("Cancel", role: .cancel) {}
-                    } message: { Text("Are you sure you want to open the opencode GitHub page?") }
+                    } message: { Text("Are you sure you want to open the OpenCode GitHub page?") }
                     
-                    Text("Version: \(opencodeVersionString)")
+                    Text("Version: \(openCodeVersionString)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 1)

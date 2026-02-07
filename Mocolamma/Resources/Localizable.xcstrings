@@ -1540,37 +1540,37 @@
         }
       }
     },
-    "Are you sure you want to open the opencode GitHub page?" : {
-      "comment" : "ユーザに、opencodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
+    "Are you sure you want to open the OpenCode GitHub page?" : {
+      "comment" : "ユーザに、OpenCodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchten Sie die opencode GitHub Seite wirklich öffnen?"
+            "value" : "Möchten Sie die OpenCode GitHub Seite wirklich öffnen?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to open the opencode GitHub page?"
+            "value" : "Are you sure you want to open the OpenCode GitHub page?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Seguro que quieres abrir la página de GitHub de opencode?"
+            "value" : "¿Seguro que quieres abrir la página de GitHub de OpenCode?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment ouvrir la page GitHub d'opencode ?"
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub d'OpenCode ?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "opencodeのGitHubページを開いてもよろしいですか？"
+            "value" : "OpenCodeのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -6793,37 +6793,37 @@
         }
       }
     },
-    "Open link to the opencode GitHub page." : {
-      "comment" : "opencodeのGitHubページへのリンクを開くボタンのツールチップテキスト。",
+    "Open link to the OpenCode GitHub page." : {
+      "comment" : "OpenCodeのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Link zur opencode GitHub Seite öffnen."
+            "value" : "Link zur OpenCode GitHub Seite öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open link to the opencode GitHub page."
+            "value" : "Open link to the OpenCode GitHub page."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abrir enlace a la página de GitHub de opencode."
+            "value" : "Abrir enlace a la página de GitHub de OpenCode."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrir le lien vers la page GitHub d'opencode."
+            "value" : "Ouvrir le lien vers la page GitHub d'OpenCode."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "opencodeのGitHubページへのリンクを開きます。"
+            "value" : "OpenCodeのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -7108,12 +7108,12 @@
         }
       }
     },
-    "opencode by SST" : {
+    "OpenCode by Anomaly" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "opencode by SST"
+            "value" : "OpenCode by Anomaly"
           }
         }
       },

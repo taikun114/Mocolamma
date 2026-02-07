@@ -45,7 +45,7 @@
   - [寄付](#寄付)
 - [クレジット](#クレジット)
   - [Ollama by Ollama](#ollama-by-ollama)
-  - [Gemini CLI by Google / Qwen Code by Qwen / opencode by SST](#gemini-cli-by-google--qwen-code-by-qwen--opencode-by-sst)
+  - [Gemini CLI by Google / Qwen Code by Qwen / OpenCode by Anomaly](#gemini-cli-by-google--qwen-code-by-qwen--opencode-by-anomaly)
   - [MarkdownUI by Guillermo Gonzalez](#markdownui-by-guillermo-gonzalez)
   - [CompactSlider by Alexey Bukhtin](#compactslider-by-alexey-bukhtin)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
@@ -150,7 +150,7 @@ PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taik
 ### [Ollama](https://github.com/ollama/ollama) by Ollama
 MocolammaはOllamaサーバーやモデルを管理・操作するために特化して作られたアプリです。OllamaがなければMocolammaが登場する事はなかったでしょう。
 
-### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [opencode](https://github.com/sst/opencode) by SST
+### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [OpenCode](https://github.com/anomalyco/opencode) by Anomaly
 Mocolammaの開発にはこれらの素晴らしい生成AIツールが使用されました。Swiftを含むプログラムの知識が一切ない自分にとって、生成AIの力がなければこのアプリを完成させることはできなかったでしょう。
 
 ### [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui/tree/main) by Guillermo Gonzalez

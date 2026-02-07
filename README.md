@@ -45,7 +45,7 @@
   - [Donate](#donate)
 - [Credits](#credits)
   - [Ollama by Ollama](#ollama-by-ollama)
-  - [Gemini CLI by Google / Qwen Code by Qwen / opencode by SST](#gemini-cli-by-google--qwen-code-by-qwen--opencode-by-sst)
+  - [Gemini CLI by Google / Qwen Code by Qwen / OpenCode by Anomaly](#gemini-cli-by-google--qwen-code-by-qwen--opencode-by-anomaly)
   - [MarkdownUI by Guillermo Gonzalez](#markdownui-by-guillermo-gonzalez)
   - [CompactSlider by Alexey Bukhtin](#compactslider-by-alexey-bukhtin)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
@@ -153,7 +153,7 @@ If you have a PayPal account, you can donate directly through [**PayPal**](https
 ### [Ollama](https://github.com/ollama/ollama) by Ollama
 Mocolamma is an app specialized in managing and operating Ollama servers and models. Without Ollama, Mocolamma would not have emerged.
 
-### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [opencode](https://github.com/sst/opencode) by SST
+### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [OpenCode](https://github.com/anomalyco/opencode) by Anomaly
 These excellent generative AI tools were used in the development of Mocolamma. For someone like me with no knowledge of programming including Swift, I wouldn't have been able to complete this app without the power of generative AI.
 
 ### [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui/tree/main) by Guillermo Gonzalez

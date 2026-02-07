@@ -137,7 +137,7 @@ iOS 18.0以降のデバイスでアプリケーションのメインタブベー
 
 #### `LicenseInfoModalView.swift`
 
-アプリケーションと依存関係のライセンス情報を表示するモーダルビューです。Mocolamma自身のライセンスと、Ollama、CompactSlider、MarkdownUI、Gemini CLI、opencode、create-dmgなどのオープンソースプロジェクトのライセンスおよびバージョン情報が含まれます。
+アプリケーションと依存関係のライセンス情報を表示するモーダルビューです。Mocolamma自身のライセンスと、Ollama、CompactSlider、MarkdownUI、Gemini CLI、OpenCode、create-dmgなどのオープンソースプロジェクトのライセンスおよびバージョン情報が含まれます。
 
 #### `LicenseTextView.swift`
 
