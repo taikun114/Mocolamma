@@ -133,14 +133,23 @@ struct ServerFormView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                Button(action: {
-                    save()
-                }) {
-                    Image(systemName: "checkmark")
+                if #available(iOS 26.0, *) {
+                    Button(role: .confirm) {
+                        save()
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(isSaveButtonDisabled)
+                    .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
+                } else {
+                    Button(action: {
+                        save()
+                    }) {
+                        Image(systemName: "checkmark")
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(isSaveButtonDisabled)
+                    .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
                 }
-                .keyboardShortcut(.defaultAction)
-                .disabled(isSaveButtonDisabled)
-                .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
             }
         }
         .onAppear {

@@ -137,7 +137,13 @@ struct AddModelsSheet: View {
                         add()
                     }
                 }) {
-                    Image(systemName: "plus")
+                    if #available(iOS 26.0, *) {
+                        Image(systemName: "plus")
+                            .foregroundStyle(.white)
+                            .opacity(0.8)
+                    } else {
+                        Image(systemName: "plus")
+                    }
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
