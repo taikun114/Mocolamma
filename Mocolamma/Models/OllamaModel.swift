@@ -21,7 +21,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let modified_at: String // ISO 8601形式の文字列
     let size: Int64 // バイト単位の数値
     let digest: String
-    let details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
+    var details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
     
     // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)

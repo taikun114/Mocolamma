@@ -535,6 +535,19 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             
             let apiResponse = try JSONDecoder().decode(OllamaShowResponse.self, from: data)
             print("Successfully retrieved model \(modelName) details.")
+            
+            // 取得した情報で、リスト内のモデル情報を更新する
+            if let index = self.models.firstIndex(where: { $0.name == modelName }) {
+                // detailsを更新
+                if let newDetails = apiResponse.details {
+                    self.models[index].details = newDetails
+                }
+                // capabilitiesを更新
+                if let newCapabilities = apiResponse.capabilities {
+                    self.models[index].capabilities = newCapabilities
+                }
+            }
+            
             // 取得した情報をキャッシュに保存
             modelInfoCache[modelName] = apiResponse
             

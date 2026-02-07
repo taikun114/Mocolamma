@@ -11,9 +11,14 @@ struct ModelInspectorDetailView: View {
     @State private var isLoadingInfo: Bool = false
     @State private var fetchedCapabilities: [String]?
     
+    // commandExecutor.models から最新のモデル情報を取得するための計算プロパティ
+    private var latestModel: OllamaModel {
+        commandExecutor.models.first(where: { $0.id == model.id }) ?? model
+    }
+    
     var body: some View {
         ModelInspectorView(
-            model: model,
+            model: latestModel,
             modelInfo: modelInfo,
             isLoading: isLoadingInfo,
             fetchedCapabilities: fetchedCapabilities,
