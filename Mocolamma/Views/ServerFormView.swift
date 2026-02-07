@@ -155,6 +155,7 @@ struct ServerFormView: View {
         .onAppear {
             isNameFieldFocused = true
         }
+        .interactiveDismissDisabled()
 #endif
     }
     

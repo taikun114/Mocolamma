@@ -153,6 +153,7 @@ struct AddModelsSheet: View {
         .onAppear {
             isTextFieldFocused = true
         }
+        .interactiveDismissDisabled()
 #endif
     }
     
