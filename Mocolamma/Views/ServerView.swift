@@ -14,6 +14,7 @@ struct ServerView: View {
     @State private var showingDeleteConfirmationServer = false
     @State private var serverToDelete: ServerInfo?
     @State private var listSelection: ServerInfo.ID?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     let onTogglePreview: () -> Void
     
@@ -53,7 +54,7 @@ struct ServerView: View {
         }
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onTogglePreview() }) {
-                Label("Inspector", systemImage: "sidebar.trailing")
+                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
             }
         }
 #endif

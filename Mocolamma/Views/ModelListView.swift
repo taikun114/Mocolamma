@@ -156,7 +156,7 @@ struct ModelListView: View {
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(action: { onTogglePreview() }) {
-                    Label("Inspector", systemImage: "sidebar.trailing")
+                    Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
                 }
             }
         }

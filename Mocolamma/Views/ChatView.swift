@@ -291,7 +291,7 @@ struct ChatView: View {
         }
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onToggleInspector() }) {
-                Label("Inspector", systemImage: "sidebar.trailing")
+                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
             }
         }
 #endif
