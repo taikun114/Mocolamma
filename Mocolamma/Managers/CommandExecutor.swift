@@ -125,9 +125,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             self.isRunning = true
             defer { self.isRunning = false }
             
-            // 5分前と3分前の日付をISO 8601形式で計算
+            // 5分前、3分前、10分前の日付をISO 8601形式で計算
             let fiveMinutesAgo = Date().addingTimeInterval(-300) // 5分前
             let threeMinutesAgo = Date().addingTimeInterval(-180) // 3分前
+            let tenMinutesAgo = Date().addingTimeInterval(-600) // 10分前
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             
@@ -140,6 +141,16 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 parameter_size: "0B",
                 quantization_level: "Q4_K_M",
                 context_length: 2048
+            )
+            
+            let demoImageDetails = OllamaModelDetails(
+                parent_model: "",
+                format: "safetensors",
+                family: "demo",
+                families: nil,
+                parameter_size: "0B",
+                quantization_level: "FP4",
+                context_length: nil
             )
             
             let demoModel1 = OllamaModel(
@@ -162,10 +173,21 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 capabilities: nil,
                 originalIndex: 1
             )
+            let demoModel3 = OllamaModel(
+                name: "demo-image:0b",
+                model: "demo-image:0b",
+                modifiedAt: formatter.string(from: tenMinutesAgo),
+                size: 0,
+                digest: "000000000002",
+                details: demoImageDetails,
+                capabilities: ["image"],
+                originalIndex: 2
+            )
             
             self.models = [
                 demoModel1,
-                demoModel2
+                demoModel2,
+                demoModel3
             ].enumerated().map { (index, model) in
                 var mutableModel = model
                 mutableModel.originalIndex = index
@@ -399,25 +421,43 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             // モデル名に基づいて異なるデータを返す
             let isDemoModel1 = modelName == "demo:0b"
             let isDemoModel2 = modelName == "demo2:0b"
+            let isDemoImage = modelName == "demo-image:0b"
             
-            if isDemoModel1 || isDemoModel2 {
+            if isDemoModel1 || isDemoModel2 || isDemoImage {
                 // デモモデルの情報を生成
-                let modelDetails = OllamaModelDetails(
-                    parent_model: "",
-                    format: "gguf",
-                    family: "demo",
-                    families: ["demo"],
-                    parameter_size: "0B",
-                    quantization_level: "Q4_K_M",
-                    context_length: 2048 // context_lengthを追加
-                )
+                let modelDetails: OllamaModelDetails
+                let modelInfo: [String: JSONValue]
+                let capabilities: [String]
                 
-                // モデル情報の作成
-                let modelInfo: [String: JSONValue] = [
-                    "general.parameter_count": .int(0),
-                    "llama.context_length": .int(2048),
-                    "llama.embedding_length": .int(2048)
-                ]
+                if isDemoImage {
+                    modelDetails = OllamaModelDetails(
+                        parent_model: "",
+                        format: "safetensors",
+                        family: "demo",
+                        families: nil,
+                        parameter_size: "0B",
+                        quantization_level: "FP4",
+                        context_length: nil
+                    )
+                    modelInfo = [:] // パラメータ数、コンテキスト長、埋め込み長は無し
+                    capabilities = ["image"]
+                } else {
+                    modelDetails = OllamaModelDetails(
+                        parent_model: "",
+                        format: "gguf",
+                        family: "demo",
+                        families: ["demo"],
+                        parameter_size: "0B",
+                        quantization_level: "Q4_K_M",
+                        context_length: 2048
+                    )
+                    modelInfo = [
+                        "general.parameter_count": .int(0),
+                        "llama.context_length": .int(2048),
+                        "llama.embedding_length": .int(2048)
+                    ]
+                    capabilities = ["completion", "tools", "thinking", "vision"]
+                }
                 
                 let response = OllamaShowResponse(
                     license: #"""
@@ -490,7 +530,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     template: nil,
                     details: modelDetails,
                     model_info: modelInfo,
-                    capabilities: ["completion", "tools", "thinking", "vision"] // 機能タグ
+                    capabilities: capabilities // ここで定義したcapabilitiesを使用
                 )
                 
                 // キャッシュにも保存
