@@ -995,7 +995,6 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
     func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
-            // ... (demo server logic remains the same)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
                     let created_at = Date()
@@ -1006,13 +1005,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     if stream {
                         // ステップごとの進捗をシミュレート
                         for i in 1...steps {
+                            // 各ステップの間隔をシミュレート
                             try await Task.sleep(nanoseconds: 200_000_000) // 0.2秒
+                            
                             let chunk = ImageGenerationResponseChunk(
                                 model: model,
                                 createdAt: createdAtString,
                                 response: nil,
                                 done: false,
-                                image: nil,
+                                image: nil, // 中間ステップでは画像を送らない
                                 completed: i,
                                 total: steps,
                                 totalDuration: nil,
@@ -1025,13 +1026,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                             continuation.yield(chunk)
                         }
                         
-                        // 完了
+                        // 完了：センタークロップした画像を送る
+                        let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
                             createdAt: createdAtString,
                             response: "",
                             done: true,
-                            image: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", // 1x1 transparent png
+                            image: finalImageString,
                             completed: steps,
                             total: steps,
                             totalDuration: 1000000000,  // 1秒
@@ -1044,13 +1046,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         continuation.yield(finalChunk)
                         continuation.finish()
                     } else {
+                        // 非ストリーミング：少し待ってから完成品を返す
                         try await Task.sleep(nanoseconds: 2_000_000_000)
+                        let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
                             createdAt: createdAtString,
                             response: "",
                             done: true,
-                            image: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+                            image: finalImageString,
                             completed: steps,
                             total: steps,
                             totalDuration: 2000000000,
@@ -1113,6 +1117,63 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             }
         }
     }
+    
+    /// デモモード用の画像を処理（切り抜き）してBase64文字列を返します
+    private func processDemoImage(targetWidth: CGFloat, targetHeight: CGFloat) -> String? {
+        let assetName = "ImageGenerationTestImage"
+        
+        #if os(macOS)
+        guard let image = NSImage(named: assetName),
+              let tiffData = image.tiffRepresentation,
+              let ciImage = CIImage(data: tiffData) else {
+            print("Demo mode: Failed to load asset '\(assetName)'")
+            return nil
+        }
+        #else
+        guard let image = UIImage(named: assetName),
+              let ciImage = CIImage(image: image) else {
+            print("Demo mode: Failed to load asset '\(assetName)'")
+            return nil
+        }
+        #endif
+        
+        // 1. センタークロップ（指定されたアスペクト比で切り抜き）
+        let sourceExtent = ciImage.extent
+        let targetAspectRatio = targetWidth / targetHeight
+        let sourceAspectRatio = sourceExtent.width / sourceExtent.height
+        
+        var cropRect = sourceExtent
+        if targetAspectRatio > sourceAspectRatio {
+            // ターゲットの方が横長 -> 元画像の上下を削る
+            let newHeight = sourceExtent.width / targetAspectRatio
+            cropRect = CGRect(x: 0, y: (sourceExtent.height - newHeight) / 2, width: sourceExtent.width, height: newHeight)
+        } else {
+            // ターゲットの方が縦長 -> 元画像の左右を削る
+            let newWidth = sourceExtent.height * targetAspectRatio
+            cropRect = CGRect(x: (sourceExtent.width - newWidth) / 2, y: 0, width: newWidth, height: sourceExtent.height)
+        }
+        
+        var croppedImage = ciImage.cropped(to: cropRect)
+        // クロップ後の座標を(0,0)基準にリセット
+        croppedImage = croppedImage.transformed(by: CGAffineTransform(translationX: -cropRect.origin.x, y: -cropRect.origin.y))
+        
+        // 2. 画像の書き出し（PNG形式）
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(croppedImage, from: croppedImage.extent) else { return nil }
+        
+        #if os(macOS)
+        let resultImage = NSImage(cgImage: cgImage, size: croppedImage.extent.size)
+        guard let data = resultImage.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: data),
+              let pngData = bitmap.representation(using: .png, properties: [:]) else { return nil }
+        return pngData.base64EncodedString()
+        #else
+        let resultImage = UIImage(cgImage: cgImage)
+        guard let pngData = resultImage.pngData() else { return nil }
+        return pngData.base64EncodedString()
+        #endif
+    }
+    
     
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         Task { @MainActor [weak self, completionHandler] in
