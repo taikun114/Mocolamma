@@ -162,16 +162,26 @@ struct MessageView: View {
     }
     
     private func formatDuration(nanoseconds: Int) -> String {
-        let seconds = Double(nanoseconds) / 1_000_000_000.0
-        if seconds < 1.0 {
-            return String(format: "%.2fs", seconds)
-        } else if seconds < 60.0 {
-            return String(format: "%.1fs", seconds)
-        } else {
-            let minutes = Int(seconds) / 60
-            let remainingSeconds = seconds.truncatingRemainder(dividingBy: 60)
-            return String(format: "%dm %.1fs", minutes, remainingSeconds)
+        let totalSeconds = Int(round(Double(nanoseconds) / 1_000_000_000.0))
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        var parts: [String] = []
+        
+        if hours > 0 {
+            parts.append(String(format: NSLocalizedString("%dh", comment: "Duration hours (English)"), hours))
         }
+        
+        if minutes > 0 || hours > 0 {
+            parts.append(String(format: NSLocalizedString("%dm", comment: "Duration minutes (English)"), minutes))
+        }
+        
+        parts.append(String(format: NSLocalizedString("%ds", comment: "Duration seconds (English)"), seconds))
+        
+        // 日本語環境の場合の特殊処理（もしxcstringsだけで解決できない場合のため）
+        // ただし、本来は xcstrings で "%dh" を "%d時間" に翻訳するのがベストプラクティスです。
+        return parts.joined(separator: " ")
     }
     
     @ViewBuilder

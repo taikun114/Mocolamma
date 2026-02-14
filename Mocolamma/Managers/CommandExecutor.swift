@@ -1028,6 +1028,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         
                         // 完了：センタークロップした画像を送る
                         let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
+                        let totalSimulatedDuration = Int(Double(steps) * 200_000_000) // 1ステップ0.2秒(200ms)
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
                             createdAt: createdAtString,
@@ -1036,7 +1037,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                             image: finalImageString,
                             completed: steps,
                             total: steps,
-                            totalDuration: 1000000000,  // 1秒
+                            totalDuration: totalSimulatedDuration,
                             loadDuration: nil,
                             promptEvalCount: nil,
                             promptEvalDuration: nil,
@@ -1049,6 +1050,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         // 非ストリーミング：少し待ってから完成品を返す
                         try await Task.sleep(nanoseconds: 2_000_000_000)
                         let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
+                        let totalSimulatedDuration = Int(Double(steps) * 200_000_000)
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
                             createdAt: createdAtString,
@@ -1057,7 +1059,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                             image: finalImageString,
                             completed: steps,
                             total: steps,
-                            totalDuration: 2000000000,
+                            totalDuration: totalSimulatedDuration,
                             loadDuration: nil,
                             promptEvalCount: nil,
                             promptEvalDuration: nil,
