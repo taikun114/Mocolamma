@@ -59,6 +59,17 @@ struct MainTabView: View {
             .tabItem { Label("Chat", systemImage: "message") }
             .tag("chat")
             
+            NavigationStack {
+                ImageGenerationView(
+                    showingInspector: $showingInspector,
+                    onToggleInspector: toggleInspector
+                )
+            }
+            .environmentObject(serverManager)
+            .environmentObject(executor)
+            .tabItem { Label("Image Generation", systemImage: "photo") }
+            .tag("image_generation")
+            
 #if os(iOS)
             NavigationStack {
                 SettingsView()

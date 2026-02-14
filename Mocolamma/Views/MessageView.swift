@@ -52,7 +52,8 @@ struct MessageView: View {
                         if message.role == "user" { Spacer() }
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
                         if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
+                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) && !message.isImageGeneration { copyButton }
                         if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
                             if isEditing { cancelButton; doneButton } else { editButton }
                         }
@@ -80,7 +81,11 @@ struct MessageView: View {
                         retryButton
                     }
                     
-                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
+                    if message.isImageGeneration && message.generatedImage != nil {
+                        downloadButton
+                    }
+                    
+                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) && !message.isImageGeneration {
                         copyButton
                     }
                     
@@ -139,6 +144,12 @@ struct MessageView: View {
             Text("Stopped")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+        } else if message.isImageGeneration {
+            if let duration = message.totalDuration {
+                Text(formatDuration(nanoseconds: duration))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
         } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
             Text("\(evalCount) Tokens")
                 .font(.caption2)
@@ -147,6 +158,19 @@ struct MessageView: View {
             Text(String(format: "%.2f Tok/s", tokensPerSecond))
                 .font(.caption2)
                 .foregroundColor(.secondary)
+        }
+    }
+    
+    private func formatDuration(nanoseconds: Int) -> String {
+        let seconds = Double(nanoseconds) / 1_000_000_000.0
+        if seconds < 1.0 {
+            return String(format: "%.2fs", seconds)
+        } else if seconds < 60.0 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let minutes = Int(seconds) / 60
+            let remainingSeconds = seconds.truncatingRemainder(dividingBy: 60)
+            return String(format: "%dm %.1fs", minutes, remainingSeconds)
         }
     }
     
@@ -164,6 +188,7 @@ struct MessageView: View {
                 message.evalCount = revision.evalCount
                 message.evalDuration = revision.evalDuration
                 message.isStopped = revision.isStopped
+                message.generatedImage = revision.generatedImage
                 
                 message.fixedContent = message.content
                 message.pendingContent = ""
@@ -202,6 +227,7 @@ struct MessageView: View {
                     message.evalCount = revision.evalCount
                     message.evalDuration = revision.evalDuration
                     message.isStopped = revision.isStopped
+                    message.generatedImage = revision.generatedImage
                 } else {
                     message.content = message.latestContent ?? ""
                     message.thinking = message.finalThinking
@@ -211,6 +237,7 @@ struct MessageView: View {
                     message.evalCount = message.finalEvalCount
                     message.evalDuration = message.finalEvalDuration
                     message.isStopped = message.finalIsStopped
+                    message.generatedImage = message.revisions.last?.generatedImage // 最新のリビジョンの画像を使用（適宜調整）
                 }
                 message.fixedContent = message.content
                 message.pendingContent = ""
@@ -258,6 +285,45 @@ struct MessageView: View {
         .foregroundColor(.accentColor)
         .help("Retry")
         .disabled(!isModelSelected)
+    }
+    
+    @ViewBuilder
+    private var downloadButton: some View {
+        Button(action: {
+            saveImage()
+        }) {
+            Image(systemName: "arrow.down.to.line")
+                .contentShape(Rectangle())
+                .padding(5)
+        }
+#if os(iOS)
+        .font(.body)
+#else
+        .font(.caption2)
+#endif
+        .buttonStyle(.plain)
+        .foregroundColor(.accentColor)
+        .help("Download Image")
+    }
+    
+    private func saveImage() {
+        guard let base64String = message.generatedImage,
+              let data = Data(base64Encoded: base64String),
+              let image = PlatformImage(data: data) else { return }
+        
+#if os(macOS)
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.png]
+        savePanel.nameFieldStringValue = "generated_image.png"
+        savePanel.begin { response in
+            if response == .OK, let url = savePanel.url {
+                try? data.write(to: url)
+            }
+        }
+#else
+        let imageSaver = ImageSaver()
+        imageSaver.writeToPhotoAlbum(image: image)
+#endif
     }
     
     @ViewBuilder
@@ -417,6 +483,39 @@ struct MessageView: View {
                         message.content += "\n"
                     }
             }
+        } else if message.isImageGeneration && message.role == "assistant" {
+            VStack(alignment: .leading, spacing: 10) {
+                if let base64String = message.generatedImage,
+                   let data = Data(base64Encoded: base64String),
+                   let image = PlatformImage(data: data) {
+                    Image(platformImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(8)
+                } else if message.isStreaming {
+                    VStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.regular)
+                        
+                        if let completed = message.imageProgressCompleted, let total = message.imageProgressTotal {
+                            ProgressView(value: Double(completed), total: Double(total))
+                                .progressViewStyle(.linear)
+                            Text("\(completed) / \(total)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Generating image...")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                } else {
+                    Text("Failed to generate image.")
+                        .foregroundColor(.red)
+                }
+            }
         } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
             VStack(alignment: .leading) {
                 DisclosureGroup {
@@ -487,6 +586,38 @@ struct MessageView: View {
         return formatter
     }
 }
+
+// MARK: - Platform Compatibility
+
+#if os(macOS)
+typealias PlatformImage = NSImage
+extension Image {
+    init(platformImage: NSImage) {
+        self.init(nsImage: platformImage)
+    }
+}
+#else
+typealias PlatformImage = UIImage
+extension Image {
+    init(platformImage: UIImage) {
+        self.init(uiImage: platformImage)
+    }
+}
+
+class ImageSaver: NSObject {
+    func writeToPhotoAlbum(image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
+    }
+
+    @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            print("Error saving image: \(error.localizedDescription)")
+        } else {
+            print("Successfully saved image to photo album.")
+        }
+    }
+}
+#endif
 
 extension Theme {
     static func simple(for message: ChatMessage) -> Theme {

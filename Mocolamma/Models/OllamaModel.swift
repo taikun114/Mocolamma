@@ -93,6 +93,21 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         dateFormatter.timeStyle = .short // 例: 9:30 PM
         return dateFormatter.string(from: comparableModifiedDate)
     }
+    
+    /// 画像生成モデルかどうかを判定するヘルパー
+    var isImageModel: Bool {
+        // capabilitiesに"image"が含まれているか
+        if let caps = capabilities, caps.contains(where: { $0.lowercased() == "image" }) {
+            return true
+        }
+        // familiesに"image"が含まれているか
+        if let families = details?.families, families.contains(where: { $0.lowercased() == "image" }) {
+            return true
+        }
+        // モデル名に"image"や"stable-diffusion"などが含まれている場合も考慮（ヒューリスティック）
+        let lowerName = name.lowercased()
+        return lowerName.contains("image") || lowerName.contains("diffusion") || lowerName.contains("flux")
+    }
 }
 
 extension OllamaModel {

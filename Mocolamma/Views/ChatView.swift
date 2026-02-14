@@ -65,7 +65,7 @@ struct ChatView: View {
     
     @ViewBuilder
     private func makeSafeAreaBarContent() -> some View {
-        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
+        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
             sendMessage()
         } stopMessage: {
             if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
@@ -93,7 +93,7 @@ struct ChatView: View {
                     VStack {
                         Spacer()
                         
-                        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, selectedModel: currentSelectedModel) {
+                        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
                             sendMessage()
                         } stopMessage: {
                             if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
@@ -637,5 +637,381 @@ struct ChatView: View {
             }
         }
         await MainActor.run { executor.isChatStreaming = false }
+    }
+}
+
+struct ImageGenerationView: View {
+    @EnvironmentObject var executor: CommandExecutor
+    @EnvironmentObject var serverManager: ServerManager
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @EnvironmentObject var imageSettings: ImageGenerationSettings
+    
+    @State private var errorMessage: String?
+    @State private var generalErrorMessage: String? = nil
+    @State private var showingClearConfirm: Bool = false
+    
+    @Binding var showingInspector: Bool
+    var onToggleInspector: () -> Void
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    @State private var imageInputText: String = ""
+    
+    private var currentSelectedModel: OllamaModel? {
+        if let id = imageSettings.selectedModelID {
+            return executor.models.first(where: { $0.id == id })
+        }
+        return nil
+    }
+    
+    private var subtitle: Text {
+        if let serverName = serverManager.selectedServer?.name {
+            return Text(LocalizedStringKey(serverName))
+        } else {
+            return Text("No Server Selected")
+        }
+    }
+    
+    @ViewBuilder
+    private var content: some View {
+        ZStack {
+            if serverManager.selectedServer == nil {
+                ContentUnavailableView(
+                    "No Server Selected",
+                    systemImage: "server.rack",
+                    description: Text("Please select a server in the Server tab.")
+                )
+            } else if executor.apiConnectionError {
+                ContentUnavailableView(
+                    "Connection Failed",
+                    systemImage: "network.slash",
+                    description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
+                )
+            } else if executor.imageMessages.isEmpty {
+                ContentUnavailableView {
+                    Label("Image Generation", systemImage: "photo.stack.fill")
+                } description: {
+                    Text("Here you can generate images using models that support image generation.")
+                }
+            } else {
+                ChatMessagesView(
+                    messages: $executor.imageMessages,
+                    onRetry: retryGeneration,
+                    isOverallStreaming: $executor.isImageStreaming,
+                    isModelSelected: imageSettings.selectedModelID != nil,
+                    isUsingSafeAreaBar: {
+                        if #available(iOS 26.0, macOS 26.0, *) { return true }
+                        return false
+                    }()
+                )
+            }
+        }
+        .frame(maxHeight: .infinity)
+    }
+    
+    @ViewBuilder
+    private func makeInputArea() -> some View {
+        ChatInputView(
+            inputText: $imageInputText,
+            isStreaming: $executor.isImageStreaming,
+            showingInspector: $showingInspector,
+            placeholder: "Enter a prompt...",
+            selectedModel: currentSelectedModel
+        ) {
+            generateImage()
+        } stopMessage: {
+            if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
+                last.isStreaming = false
+                last.isStopped = true
+            }
+            executor.isImageStreaming = false
+            executor.cancelImageGeneration()
+        }
+        .padding()
+    }
+    
+    var body: some View {
+        Group {
+            if #available(iOS 26.0, macOS 26.0, *) {
+                content
+                    .safeAreaBar(edge: .bottom) {
+                        makeInputArea()
+                    }
+            } else {
+                ZStack {
+                    content
+                    
+                    VStack {
+                        Spacer()
+                        makeInputArea()
+                    }
+                }
+            }
+        }
+#if os(iOS)
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
+#endif
+        .navigationTitle("Image Generation")
+        .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
+        .toolbar { toolbarContent }
+        .onAppear {
+            if let current = imageSettings.selectedModelID, !executor.models.contains(where: { $0.id == current }) {
+                imageSettings.selectedModelID = nil
+            }
+        }
+        .task {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            if !Task.isCancelled {
+                appRefreshTrigger.send()
+            }
+        }
+        .onChange(of: executor.models) { _, newModels in
+            if let currentSelectedModelID = imageSettings.selectedModelID, !newModels.contains(where: { $0.id == currentSelectedModelID }) {
+                imageSettings.selectedModelID = nil
+            }
+        }
+        .alert(Text("Error Occurred"), isPresented: Binding<Bool>(
+            get: { generalErrorMessage != nil },
+            set: { if !$0 { generalErrorMessage = nil } }
+        )) {
+            Button("OK") { generalErrorMessage = nil }
+                .keyboardShortcut(.defaultAction)
+        } message: {
+            if let errorMessage = generalErrorMessage {
+                Text(errorMessage)
+            } else {
+                Text("An unknown error occurred.")
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+#if os(iOS)
+        ToolbarItemGroup(placement: .primaryAction) {
+            Button(action: {
+                appRefreshTrigger.send()
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+            
+            Menu {
+                Picker("Select Model", selection: $imageSettings.selectedModelID) {
+                    Text("Select Model").tag(nil as OllamaModel.ID?)
+                    ForEach(executor.models.filter { $0.isImageModel }) { model in
+                        Text(model.name).tag(model.id as OllamaModel.ID?)
+                    }
+                    if executor.models.filter({ $0.isImageModel }).isEmpty {
+                        Divider()
+                        Text(LocalizedStringKey("No models available"))
+                            .tag("no-image-models-available-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Image(systemName: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+            }
+        }
+#else
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                appRefreshTrigger.send()
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Picker("Select Model", selection: $imageSettings.selectedModelID) {
+                Text("Select Model").tag(nil as OllamaModel.ID?)
+                Divider()
+                ForEach(executor.models.filter { $0.isImageModel }) { model in
+                    Text(model.name).tag(model.id as OllamaModel.ID?)
+                }
+                if executor.models.filter({ $0.isImageModel }).isEmpty {
+                    Divider()
+                    Text(LocalizedStringKey("No models available"))
+                        .tag("no-image-models-available-tag" as OllamaModel.ID?)
+                        .selectionDisabled(true)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: 150)
+        }
+#endif
+        
+#if os(iOS)
+        if #available(iOS 26, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction) // モデルグループと新規生成の間のスペーサー
+        }
+#endif
+        
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+                if !executor.imageMessages.isEmpty {
+                    showingClearConfirm = true
+                }
+            }) {
+                Label("New Generation", systemImage: "square.and.pencil")
+            }
+            .disabled(executor.imageMessages.isEmpty)
+            .confirmationDialog(
+                String(localized: "Are you sure you want to clear the generation history?"),
+                isPresented: $showingClearConfirm,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "Clear History"), role: .destructive) {
+                    executor.clearImageGeneration()
+                    imageInputText = ""
+                }
+                Button(String(localized: "Cancel"), role: .cancel) { }
+            }
+        }
+        
+#if os(iOS)
+        if #available(iOS 26, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction) // 新規生成とインスペクターの間のスペーサー
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { onToggleInspector() }) {
+                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
+            }
+        }
+#endif
+    }
+    
+    private func generateImage() {
+        guard let model = currentSelectedModel else {
+            generalErrorMessage = "Please select a model first."
+            return
+        }
+        guard !imageInputText.isEmpty else { return }
+        
+        let prompt = imageInputText
+        imageInputText = ""
+        executor.isImageStreaming = true
+        
+        let userMessage = ChatMessage(role: "user", content: prompt, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        executor.imageMessages.append(userMessage)
+        
+        let assistantMessage = ChatMessage(
+            role: "assistant",
+            content: "",
+            createdAt: MessageView.iso8601Formatter.string(from: Date()),
+            isStreaming: true,
+            isImageGeneration: true
+        )
+        executor.imageMessages.append(assistantMessage)
+        let assistantMessageId = assistantMessage.id
+        
+        Task {
+            await runImageGeneration(for: assistantMessageId, prompt: prompt, model: model)
+        }
+    }
+    
+    private func retryGeneration(for messageId: UUID, with messageToRetry: ChatMessage) {
+        // 画像生成のリトライロジック
+        guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { return }
+        
+        let prompt: String
+        if executor.imageMessages[index].role == "user" {
+            prompt = executor.imageMessages[index].content
+            executor.imageMessages.removeSubrange(index+1..<executor.imageMessages.count)
+        } else {
+            guard index > 0 else { return }
+            prompt = executor.imageMessages[index-1].content
+            
+            // 現在のメッセージをリビジョンに保存
+            let archived = ChatMessage(
+                role: "assistant",
+                content: executor.imageMessages[index].content,
+                createdAt: executor.imageMessages[index].createdAt,
+                totalDuration: executor.imageMessages[index].totalDuration,
+                isStreaming: false,
+                generatedImage: executor.imageMessages[index].generatedImage,
+                isImageGeneration: true
+            )
+            executor.imageMessages[index].revisions.append(archived)
+            executor.imageMessages[index].currentRevisionIndex = executor.imageMessages[index].revisions.count
+            
+            // 再初期化
+            executor.imageMessages[index].generatedImage = nil
+            executor.imageMessages[index].imageProgressCompleted = nil
+            executor.imageMessages[index].imageProgressTotal = nil
+            executor.imageMessages[index].isStreaming = true
+            executor.imageMessages[index].isStopped = false
+        }
+        
+        guard let model = currentSelectedModel else { return }
+        executor.isImageStreaming = true
+        
+        if executor.imageMessages[index].role == "user" {
+            let assistantMessage = ChatMessage(
+                role: "assistant",
+                content: "",
+                createdAt: MessageView.iso8601Formatter.string(from: Date()),
+                isStreaming: true,
+                isImageGeneration: true
+            )
+            executor.imageMessages.append(assistantMessage)
+            Task { await runImageGeneration(for: assistantMessage.id, prompt: prompt, model: model) }
+        } else {
+            Task { await runImageGeneration(for: messageId, prompt: prompt, model: model) }
+        }
+    }
+    
+    private func runImageGeneration(for messageId: UUID, prompt: String, model: OllamaModel) async {
+        do {
+            for try await chunk in executor.generateImage(
+                model: model.name,
+                prompt: prompt,
+                stream: imageSettings.isStreamingEnabled,
+                width: imageSettings.finalWidth,
+                height: imageSettings.finalHeight,
+                steps: imageSettings.finalSteps
+            ) {
+                guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { break }
+                
+                await MainActor.run {
+                    if let completed = chunk.completed {
+                        executor.imageMessages[index].imageProgressCompleted = completed
+                    }
+                    if let total = chunk.total {
+                        executor.imageMessages[index].imageProgressTotal = total
+                    }
+                    if let img = chunk.image {
+                        executor.imageMessages[index].generatedImage = img
+                    }
+                    if let createdAt = chunk.createdAt {
+                        executor.imageMessages[index].createdAt = createdAt
+                    }
+                    
+                    if chunk.done {
+                        executor.imageMessages[index].isStreaming = false
+                        executor.imageMessages[index].totalDuration = chunk.totalDuration
+                    }
+                }
+            }
+        } catch {
+            print("Image generation error: \(error)")
+            if let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) {
+                await MainActor.run {
+                    executor.imageMessages[index].isStreaming = false
+                    executor.imageMessages[index].isStopped = true
+                    // 500エラーなどの場合にメッセージを表示
+                    if executor.imageMessages[index].generatedImage == nil {
+                        executor.imageMessages[index].fixedContent = "Error: \(error.localizedDescription)"
+                    }
+                    generalErrorMessage = "Image Generation Error: \(error.localizedDescription)"
+                }
+            }
+        }
+        await MainActor.run { 
+            executor.isImageStreaming = false 
+            executor.updateIsImageStreaming()
+        }
     }
 }

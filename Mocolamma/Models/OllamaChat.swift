@@ -20,6 +20,12 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
     
+    // 画像生成関連のプロパティ
+    @Published var generatedImage: String? // 生成された画像 (Base64)
+    @Published var imageProgressCompleted: Int? // 現在のステップ数
+    @Published var imageProgressTotal: Int? // 合計ステップ数
+    @Published var isImageGeneration: Bool = false // 画像生成メッセージかどうか
+    
     // 新しいプロパティ（やり直し履歴など）
     @Published var revisions: [ChatMessage] = [] // やり直し履歴
     @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
@@ -52,6 +58,8 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         case totalDuration = "total_duration"
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
+        case generatedImage = "generated_image"
+        case isImageGeneration = "is_image_generation"
     }
     
     required init(from decoder: Decoder) throws {
@@ -66,6 +74,8 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.totalDuration = try container.decodeIfPresent(Int.self, forKey: .totalDuration)
         self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
+        self.generatedImage = try container.decodeIfPresent(String.self, forKey: .generatedImage)
+        self.isImageGeneration = try container.decodeIfPresent(Bool.self, forKey: .isImageGeneration) ?? false
         
         // 復元時は固定領域に全体を入れておく
         self.fixedContent = self.content
@@ -86,10 +96,12 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(totalDuration, forKey: .totalDuration)
         try container.encodeIfPresent(evalCount, forKey: .evalCount)
         try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
+        try container.encodeIfPresent(generatedImage, forKey: .generatedImage)
+        try container.encode(isImageGeneration, forKey: .isImageGeneration)
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
-    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false) {
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
         self.role = role
         self.content = content
         self.thinking = thinking
@@ -103,6 +115,8 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.isStreaming = isStreaming
         self.isStopped = isStopped
         self.isThinkingCompleted = isThinkingCompleted
+        self.generatedImage = generatedImage
+        self.isImageGeneration = isImageGeneration
         
         self.fixedContent = content
         self.pendingContent = ""
@@ -454,4 +468,104 @@ class ChatSettings: ObservableObject {
     @Published var isSystemPromptEnabled: Bool = false
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
+}
+
+// MARK: - 画像生成API リクエスト/レスポンス モデル
+
+/// /api/generate エンドポイントのリクエストボディを表します（画像生成用）。
+struct ImageGenerationRequest: Codable {
+    let model: String
+    let prompt: String
+    let stream: Bool
+    let width: Int?
+    let height: Int?
+    let steps: Int?
+    let options: ChatRequestOptions? // チャットと共通のオプションも使用可能
+    
+    enum CodingKeys: String, CodingKey {
+        case model
+        case prompt
+        case stream
+        case width
+        case height
+        case steps
+        case options
+    }
+}
+
+/// /api/generate エンドポイントからのストリーミング応答チャンクを表します（画像生成用）。
+struct ImageGenerationResponseChunk: Codable {
+    let model: String
+    let createdAt: String?
+    let response: String?
+    let done: Bool
+    let image: String? // Base64でエンコードされた画像
+    let completed: Int? // 現在のステップ数
+    let total: Int? // 合計ステップ数
+    let totalDuration: Int?
+    let loadDuration: Int?
+    let promptEvalCount: Int?
+    let promptEvalDuration: Int?
+    let evalCount: Int?
+    let evalDuration: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case model
+        case createdAt = "created_at"
+        case response
+        case done
+        case image
+        case completed
+        case total
+        case totalDuration = "total_duration"
+        case loadDuration = "load_duration"
+        case promptEvalCount = "prompt_eval_count"
+        case promptEvalDuration = "prompt_eval_duration"
+        case evalCount = "eval_count"
+        case evalDuration = "eval_duration"
+    }
+}
+
+// MARK: - 画像生成設定
+
+@MainActor
+class ImageGenerationSettings: ObservableObject {
+    @Published var selectedModelID: OllamaModel.ID?
+    @Published var isStreamingEnabled: Bool = true
+    
+    // 基本設定
+    @Published var width: Double = 512
+    @Published var height: Double = 512
+    @Published var steps: Double = 20
+    
+    // カスタム設定
+    @Published var useCustomSettings: Bool = false
+    @Published var customWidthEnabled: Bool = false
+    @Published var customWidth: String = ""
+    @Published var customHeightEnabled: Bool = false
+    @Published var customHeight: String = ""
+    @Published var customStepsEnabled: Bool = false
+    @Published var customSteps: String = ""
+    
+    // 実際にAPIに送る値を取得するヘルパー
+    var finalWidth: Int {
+        if useCustomSettings && customWidthEnabled, let val = Int(customWidth) {
+            return val
+        }
+        return Int(width)
+    }
+    
+    var finalHeight: Int {
+        if useCustomSettings && customHeightEnabled, let val = Int(customHeight) {
+            return val
+        }
+        return Int(height)
+    }
+    
+    var finalSteps: Int {
+        if useCustomSettings && customStepsEnabled, let val = Int(customSteps) {
+            return val
+        }
+        return Int(steps)
+    }
 }

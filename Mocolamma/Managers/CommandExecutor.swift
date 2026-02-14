@@ -14,6 +14,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var chatMessages: [ChatMessage] = []
     @Published var chatInputText: String = ""
     @Published var isChatStreaming: Bool = false
+    @Published var imageMessages: [ChatMessage] = []
+    @Published var isImageStreaming: Bool = false
     
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false
@@ -40,7 +42,10 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private let pullStatusUpdateInterval: TimeInterval = 0.5 // プルステータスの更新間隔（秒）
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
+    private var imageContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ImageGenerationResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
+    private var imageLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
+    private var currentImageTask: URLSessionDataTask? // 現在の画像生成タスクを保持
     
     // Ollama APIのベースURL
     @Published var apiBaseURL: String?
@@ -53,6 +58,11 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     // isChatStreamingを更新する関数
     func updateIsChatStreaming() {
         isChatStreaming = chatMessages.firstIndex { $0.isStreaming } != nil
+    }
+    
+    // isImageStreamingを更新する関数
+    func updateIsImageStreaming() {
+        isImageStreaming = imageMessages.firstIndex { $0.isStreaming } != nil
     }
     
     /// デモサーバーかどうかを判定します
@@ -895,7 +905,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     }
                     
                     let encoder = JSONEncoder()
-                    encoder.outputFormatting = .prettyPrinted // デバッグ用に整形
+                    encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化
                     request.httpBody = try encoder.encode(chatRequest)
                     print("DEBUG: Final Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
                 } catch {
@@ -920,6 +930,13 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         print("Chat streaming cancelled.")
     }
     
+    /// 現在進行中の画像生成ストリームをキャンセルします。
+    func cancelImageGeneration() {
+        currentImageTask?.cancel()
+        currentImageTask = nil
+        print("Image generation cancelled.")
+    }
+    
     /// チャット履歴と入力テキストをクリアします。
     func clearChat() {
         chatMessages.removeAll()
@@ -928,28 +945,165 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         cancelChatStreaming()
     }
     
+    /// 画像生成履歴をクリアします。
+    func clearImageGeneration() {
+        imageMessages.removeAll()
+        updateIsImageStreaming()
+        cancelImageGeneration()
+    }
+    
+    /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
+    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
+        if isDemoServer() {
+            // ... (demo server logic remains the same)
+            return AsyncThrowingStream { continuation in
+                Task { @MainActor in
+                    let created_at = Date()
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                    let createdAtString = formatter.string(from: created_at)
+                    
+                    if stream {
+                        // ステップごとの進捗をシミュレート
+                        for i in 1...steps {
+                            try await Task.sleep(nanoseconds: 200_000_000) // 0.2秒
+                            let chunk = ImageGenerationResponseChunk(
+                                model: model,
+                                createdAt: createdAtString,
+                                response: nil,
+                                done: false,
+                                image: nil,
+                                completed: i,
+                                total: steps,
+                                totalDuration: nil,
+                                loadDuration: nil,
+                                promptEvalCount: nil,
+                                promptEvalDuration: nil,
+                                evalCount: nil,
+                                evalDuration: nil
+                            )
+                            continuation.yield(chunk)
+                        }
+                        
+                        // 完了
+                        let finalChunk = ImageGenerationResponseChunk(
+                            model: model,
+                            createdAt: createdAtString,
+                            response: "",
+                            done: true,
+                            image: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", // 1x1 transparent png
+                            completed: steps,
+                            total: steps,
+                            totalDuration: 1000000000,  // 1秒
+                            loadDuration: nil,
+                            promptEvalCount: nil,
+                            promptEvalDuration: nil,
+                            evalCount: nil,
+                            evalDuration: nil
+                        )
+                        continuation.yield(finalChunk)
+                        continuation.finish()
+                    } else {
+                        try await Task.sleep(nanoseconds: 2_000_000_000)
+                        let finalChunk = ImageGenerationResponseChunk(
+                            model: model,
+                            createdAt: createdAtString,
+                            response: "",
+                            done: true,
+                            image: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+                            completed: steps,
+                            total: steps,
+                            totalDuration: 2000000000,
+                            loadDuration: nil,
+                            promptEvalCount: nil,
+                            promptEvalDuration: nil,
+                            evalCount: nil,
+                            evalDuration: nil
+                        )
+                        continuation.yield(finalChunk)
+                        continuation.finish()
+                    }
+                }
+            }
+        }
+        
+        return AsyncThrowingStream { continuation in
+            Task { @MainActor in
+                guard let apiBaseURL = self.apiBaseURL else {
+                    continuation.finish(throwing: URLError(.badURL))
+                    return
+                }
+                let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+                let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+                guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/generate") else {
+                    continuation.finish(throwing: URLError(.badURL))
+                    return
+                }
+                
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                
+                let generationRequest = ImageGenerationRequest(
+                    model: model,
+                    prompt: prompt,
+                    stream: stream,
+                    width: width,
+                    height: height,
+                    steps: steps,
+                    options: nil
+                )
+                
+                do {
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = .withoutEscapingSlashes
+                    request.httpBody = try encoder.encode(generationRequest)
+                    print("DEBUG: Image Generation Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+                } catch {
+                    continuation.finish(throwing: error)
+                    return
+                }
+                
+                let task = urlSession.dataTask(with: request)
+                self.imageContinuations[task] = (continuation: continuation, isStreaming: stream)
+                self.imageLineBuffers[task] = ""
+                self.currentImageTask = task
+                
+                task.resume()
+            }
+        }
+    }
+    
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         Task { @MainActor [weak self, completionHandler] in
             guard let self = self else {
                 completionHandler(.cancel)
                 return
             }
+            
+            // タスクの種類を確認（プルタスクかどうか）
+            let isPullTask = (dataTask == self.pullTask)
+            
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
-                if let url = dataTask.originalRequest?.url { print("/api/pull HTTP error: \(httpResponse.statusCode) on \(url)") }
-                let base = String(format: NSLocalizedString("Model pull error: HTTP Status Code %d", comment: "モデルプルエラー: HTTPステータスコード。"), httpResponse.statusCode)
-                self.output = base
-                if httpResponse.statusCode == 400 {
-                    self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nPlease make sure the model name is correct.", comment: "400 Bad Request: likely wrong model name")
-                } else {
-                    self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nUnknown error occurred.", comment: "Non-400 error fallback message")
+                // プルタスクの場合のみ、ここでエラー終了させる
+                if isPullTask {
+                    if let url = dataTask.originalRequest?.url { print("/api/pull HTTP error: \(httpResponse.statusCode) on \(url)") }
+                    let base = String(format: NSLocalizedString("Model pull error: HTTP Status Code %d", comment: "モデルプルエラー: HTTPステータスコード。"), httpResponse.statusCode)
+                    self.output = base
+                    if httpResponse.statusCode == 400 {
+                        self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nPlease make sure the model name is correct.", comment: "400 Bad Request: likely wrong model name")
+                    } else {
+                        self.pullHttpErrorMessage = NSLocalizedString("Model pull failed.\nUnknown error occurred.", comment: "Non-400 error fallback message")
+                    }
+                    self.pullHttpErrorTriggered = true
+                    self.pullHasError = true
+                    self.pullStatus = NSLocalizedString("Failed", comment: "失敗")
+                    self.isPullingErrorHold = true
+                    self.isPulling = false
+                    completionHandler(.cancel)
+                    return
                 }
-                self.pullHttpErrorTriggered = true
-                self.pullHasError = true
-                self.pullStatus = NSLocalizedString("Failed", comment: "失敗")
-                self.isPullingErrorHold = true
-                self.isPulling = false
-                completionHandler(.cancel)
-                return
+                // チャットや画像生成の場合は、後続の dataReceive でエラー詳細（JSON）を取得したいため、継続を許可する
             }
             self.pullLineBuffer = ""
             completionHandler(.allow)
@@ -1097,6 +1251,72 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         continuation.finish(throwing: error)
                     }
                 }
+            } else if let (continuation, isStreaming) = self.imageContinuations[dataTask] {
+                if let httpResponse = dataTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                    // HTTPエラーがある場合はJSONデコードを試みるが、失敗してもエラーを投げて終了させる
+                    if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let errorMessage = errorJson["error"] as? String {
+                        let error = NSError(domain: "OllamaAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        continuation.finish(throwing: error)
+                    } else {
+                        let error = NSError(domain: "OllamaAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned error \(httpResponse.statusCode)"])
+                        continuation.finish(throwing: error)
+                    }
+                    return
+                }
+                
+                if isStreaming {
+                    // ストリーミング画像生成の処理
+                    if let newString = String(data: data, encoding: .utf8) {
+                        self.imageLineBuffers[dataTask, default: ""].append(newString)
+                    } else {
+                        print("Error: Could not decode received data as UTF-8 string.")
+                        return
+                    }
+                    
+                    var lines = self.imageLineBuffers[dataTask, default: ""].split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+                    
+                    if !self.imageLineBuffers[dataTask, default: ""].hasSuffix("\n") && !lines.isEmpty {
+                        self.imageLineBuffers[dataTask] = lines.removeLast()
+                    } else {
+                        self.imageLineBuffers[dataTask] = ""
+                    }
+                    
+                    for line in lines {
+                        guard !line.isEmpty else { continue }
+                        guard let jsonData = line.data(using: .utf8) else {
+                            print("Error: Could not convert line to Data: \(line)")
+                            continue
+                        }
+                        
+                        do {
+                            let chunk = try JSONDecoder().decode(ImageGenerationResponseChunk.self, from: jsonData)
+                            continuation.yield(chunk)
+                        } catch {
+                            print("Image generation response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+                            // デコード失敗時に生のデータを表示（エラーメッセージ確認用）
+                            if let errorJson = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                               let errorMessage = errorJson["error"] as? String {
+                                print("Ollama API Error: \(errorMessage)")
+                            }
+                        }
+                    }
+                } else {
+                    // 非ストリーミング画像生成の処理
+                    do {
+                        let chunk = try JSONDecoder().decode(ImageGenerationResponseChunk.self, from: data)
+                        continuation.yield(chunk)
+                        continuation.finish()
+                    } catch {
+                        print("Non-streaming image generation response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+                        // エラーメッセージの抽出
+                        if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                           let errorMessage = errorJson["error"] as? String {
+                            print("Ollama API Error: \(errorMessage)")
+                        }
+                        continuation.finish(throwing: error)
+                    }
+                }
             }
         }
     }
@@ -1159,13 +1379,26 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 } else {
                     continuation.finish()
                 }
+            } else if let (continuation, _) = self.imageContinuations[task] {
+                // 画像生成タスクの完了を処理
+                if let error = error {
+                    continuation.finish(throwing: error)
+                } else {
+                    continuation.finish()
+                }
             }
             
             // 完了したタスクのリソースをクリーンアップ
             self.chatContinuations.removeValue(forKey: task)
             self.chatLineBuffers.removeValue(forKey: task)
+            self.imageContinuations.removeValue(forKey: task)
+            self.imageLineBuffers.removeValue(forKey: task)
+            
             if task == self.currentChatTask {
                 self.currentChatTask = nil
+            }
+            if task == self.currentImageTask {
+                self.currentImageTask = nil
             }
         }
     }

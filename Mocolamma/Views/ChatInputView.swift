@@ -4,12 +4,13 @@ struct ChatInputView: View {
     @Binding var inputText: String
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
+    var placeholder: String = "Type your message..."
     let selectedModel: OllamaModel?
     let sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
     
     var body: some View {
-        MessageInputView(inputText: $inputText, isStreaming: $isStreaming, showingInspector: $showingInspector, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
+        MessageInputView(inputText: $inputText, isStreaming: $isStreaming, showingInspector: $showingInspector, placeholder: placeholder, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
 #if os(iOS)
             .gesture(
                 DragGesture().onChanged { value in

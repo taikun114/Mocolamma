@@ -6,6 +6,7 @@ import CompactSlider
 struct InspectorContentView: View {
     @EnvironmentObject var commandExecutor: CommandExecutor
     @EnvironmentObject var chatSettings: ChatSettings
+    @EnvironmentObject var imageSettings: ImageGenerationSettings
     let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel]
@@ -15,6 +16,9 @@ struct InspectorContentView: View {
     
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @FocusState private var isSystemPromptFocused: Bool
+    @FocusState private var isCustomWidthFocused: Bool
+    @FocusState private var isCustomHeightFocused: Bool
+    @FocusState private var isCustomStepsFocused: Bool
     
     var body: some View {
         Group {
@@ -149,6 +153,150 @@ struct InspectorContentView: View {
 #if os(iOS)
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
+                }
+#endif
+            } else if selection == "image_generation" {
+                Form {
+                    Section("Image Generation Settings") {
+                        VStack(alignment: .leading) {
+                            Toggle("Stream Response", isOn: $imageSettings.isStreamingEnabled)
+                            Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Width")
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .secondary : .primary)
+                                Spacer()
+                                Text("\(Int(imageSettings.width)) px")
+                                    .font(.body.monospaced())
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+                            }
+                            CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
+#if os(iOS)
+                                .frame(height: 32)
+#else
+                                .frame(height: 16)
+#endif
+                                .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                            Text("Specifies the width of the image you want to generate.")
+                                .font(.caption)
+                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Height")
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .secondary : .primary)
+                                Spacer()
+                                Text("\(Int(imageSettings.height)) px")
+                                    .font(.body.monospaced())
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+                            }
+                            CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
+#if os(iOS)
+                                .frame(height: 32)
+#else
+                                .frame(height: 16)
+#endif
+                                .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                            Text("Specifies the height of the image you want to generate.")
+                                .font(.caption)
+                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Steps")
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .secondary : .primary)
+                                Spacer()
+                                Text("\(Int(imageSettings.steps))")
+                                    .font(.body.monospaced())
+                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+                            }
+                            CompactSlider(value: $imageSettings.steps, in: 1...100, step: 1)
+#if os(iOS)
+                                .frame(height: 32)
+#else
+                                .frame(height: 16)
+#endif
+                                .disabled(imageSettings.useCustomSettings && imageSettings.customStepsEnabled)
+                            Text("Specifies the number of image generation steps. Increasing the number of steps increases generation time but can improve detail.")
+                                .font(.caption)
+                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+                        }
+                    }
+                    
+                    Section("Custom Settings") {
+                        Toggle("Enable Custom Settings", isOn: $imageSettings.useCustomSettings)
+                        
+                        VStack(alignment: .leading) {
+                            Toggle(isOn: $imageSettings.customWidthEnabled) {
+                                Text("Custom Width")
+                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                            }
+                            TextField("Enter custom width", text: $imageSettings.customWidth)
+                                .focused($isCustomWidthFocused)
+                                .textFieldStyle(.roundedBorder)
+                                .labelsHidden()
+#if os(iOS)
+                                .keyboardType(.numberPad)
+#endif
+                                .disabled(!imageSettings.customWidthEnabled)
+                            Text("Enter the desired image width as a number to override the above setting and manually specify the size.")
+                                .font(.caption)
+                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                        }
+                        .disabled(!imageSettings.useCustomSettings)
+                        
+                        VStack(alignment: .leading) {
+                            Toggle(isOn: $imageSettings.customHeightEnabled) {
+                                Text("Custom Height")
+                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                            }
+                            TextField("Enter custom height", text: $imageSettings.customHeight)
+                                .focused($isCustomHeightFocused)
+                                .textFieldStyle(.roundedBorder)
+                                .labelsHidden()
+#if os(iOS)
+                                .keyboardType(.numberPad)
+#endif
+                                .disabled(!imageSettings.customHeightEnabled)
+                            Text("Enter the desired image height as a number to override the above setting and manually specify the size.")
+                                .font(.caption)
+                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                        }
+                        .disabled(!imageSettings.useCustomSettings)
+                        
+                        VStack(alignment: .leading) {
+                            Toggle(isOn: $imageSettings.customStepsEnabled) {
+                                Text("Custom Steps")
+                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                            }
+                            TextField("Enter custom steps", text: $imageSettings.customSteps)
+                                .focused($isCustomStepsFocused)
+                                .textFieldStyle(.roundedBorder)
+                                .labelsHidden()
+#if os(iOS)
+                                .keyboardType(.numberPad)
+#endif
+                                .disabled(!imageSettings.customStepsEnabled)
+                            Text("Enter the number of image generation steps as a number to override the above setting and manually specify the size.")
+                                .font(.caption)
+                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                        }
+                        .disabled(!imageSettings.useCustomSettings)
+                    }
+                }
+                .formStyle(.grouped)
+                .frame(minWidth: 200)
+#if os(iOS)
+                .onTapGesture {
+                    isCustomWidthFocused = false
+                    isCustomHeightFocused = false
+                    isCustomStepsFocused = false
                 }
 #endif
             } else {

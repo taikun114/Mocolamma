@@ -5,6 +5,7 @@ struct MessageInputView: View {
     @Binding var inputText: String
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
+    var placeholder: String = "Type your message..."
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
@@ -29,7 +30,7 @@ struct MessageInputView: View {
                         .cornerRadius(16)
                 }
 #endif
-                TextField("Type your message...", text: $inputText, axis: .vertical)
+                TextField(LocalizedStringKey(placeholder), text: $inputText, axis: .vertical)
                     .focused($isInputFocused)
                     .textFieldStyle(.plain)
                     .disabled(selectedModel == nil)

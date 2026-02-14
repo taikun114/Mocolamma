@@ -41,6 +41,13 @@ struct MainContentDetailView: View {
                 )
                 .environmentObject(executor)
                 .environmentObject(serverManager)
+            } else if sidebarSelection == "image_generation" {
+                ImageGenerationView(
+                    showingInspector: $showingInspector,
+                    onToggleInspector: { showingInspector.toggle() }
+                )
+                .environmentObject(executor)
+                .environmentObject(serverManager)
             } else if sidebarSelection == "settings" {
                 SettingsView()
             } else {

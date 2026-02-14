@@ -26,6 +26,7 @@ struct MocolammaApp: App {
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @StateObject private var imageSettings = ImageGenerationSettings()
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
     @State private var showingAddModelsSheet = false
@@ -37,6 +38,7 @@ struct MocolammaApp: App {
     
     // チャットクリア要求を伝える状態変数
     @State private var shouldClearChat: Bool = false
+    @State private var shouldClearGeneration: Bool = false
     
     // ダウンロード状態を伝える状態変数
     @State private var isPulling: Bool = false
@@ -44,7 +46,7 @@ struct MocolammaApp: App {
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
         switch selection {
-        case "server", "models", "chat": // サーバー、モデル、チャットのいずれかの画面が開いている場合は有効
+        case "server", "models", "chat", "image_generation": // サーバー、モデル、チャット、画像生成のいずれかの画面が開いている場合は有効
             return false
         default: // "settings" または nil (初期状態など) の場合は無効
             return true
@@ -67,12 +69,14 @@ struct MocolammaApp: App {
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingAddServerSheet: $showingAddServerSheet,
                 shouldClearChat: $shouldClearChat,
+                shouldClearGeneration: $shouldClearGeneration,
                 isPulling: $isPulling
             )
 #if os(macOS)
             .frame(minWidth: 1000, minHeight: 500)
 #endif
             .environmentObject(appRefreshTrigger)
+            .environmentObject(imageSettings)
             .onAppear {
                 localNetworkChecker.refresh()
             }
@@ -104,6 +108,9 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
+                    Label("Image Generation", systemImage: "photo.stack")
+                        .tag("image_generation" as String?)
+                        .keyboardShortcut("4", modifiers: .command)
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
@@ -145,6 +152,15 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
+
+                Button(action: {
+                    // 画像生成クリア要求を設定
+                    shouldClearGeneration = true
+                }) {
+                    Label(String(localized: "New Generation"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("r", modifiers: [.option, .command])
+                .disabled(selection != "image_generation")
             }
             
 #else
@@ -178,6 +194,9 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
+                    Label("Image Generation", systemImage: "photo.stack")
+                        .tag("image_generation" as String?)
+                        .keyboardShortcut("4", modifiers: .command)
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
@@ -220,6 +239,15 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
+
+                Button(action: {
+                    // 画像生成クリア要求を設定
+                    shouldClearGeneration = true
+                }) {
+                    Label(String(localized: "New Generation"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("r", modifiers: [.option, .command])
+                .disabled(selection != "image_generation")
             }
 #endif
         }

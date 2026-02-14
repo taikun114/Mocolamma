@@ -44,7 +44,7 @@ struct ContentView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, isPulling: Binding<Bool>) {
+    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
         self.serverManager = serverManager
         _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
         self._selection = selection
@@ -52,10 +52,12 @@ struct ContentView: View {
         self._showingAddModelsSheet = showingAddModelsSheet
         self._showingAddServerSheet = showingAddServerSheet
         self._shouldClearChat = shouldClearChat
+        self._shouldClearGeneration = shouldClearGeneration
         self._isPulling = isPulling
     }
     
     @Binding var shouldClearChat: Bool
+    @Binding var shouldClearGeneration: Bool
     @Binding var isPulling: Bool
     
     var body: some View {
@@ -204,6 +206,14 @@ struct ContentView: View {
                 shouldClearChat = false
             }
         }
+        .onChange(of: shouldClearGeneration) { oldValue, newValue in
+            if newValue {
+                // 画像生成クリアを実行
+                executor.clearImageGeneration()
+                // 状態をリセット
+                shouldClearGeneration = false
+            }
+        }
         .onChange(of: executor.isPulling) { oldValue, newValue in
             isPulling = newValue
         }
@@ -301,6 +311,13 @@ struct ContentView: View {
                 await executor.fetchOllamaModelsFromAPI()
             }
             
+        case "image_generation":
+            // 画像生成でもモデルリストを再取得
+            Task {
+                executor.clearModelInfoCache()
+                await executor.fetchOllamaModelsFromAPI()
+            }
+            
         default:
             break
         }
@@ -310,6 +327,6 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), isPulling: .constant(false))
+    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
         .environmentObject(RefreshTrigger())
 }

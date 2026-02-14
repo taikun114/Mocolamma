@@ -59,6 +59,17 @@ struct LegacyIPhoneTabView: View {
             .tag("chat")
             
             NavigationStack {
+                ImageGenerationView(
+                    showingInspector: $showingInspector,
+                    onToggleInspector: toggleInspector
+                )
+            }
+            .environmentObject(serverManager)
+            .environmentObject(executor)
+            .tabItem { Label("Image Generation", systemImage: "photo") }
+            .tag("image_generation")
+            
+            NavigationStack {
                 SettingsView()
             }
             .tabItem { Label("Settings", systemImage: "gear") }
