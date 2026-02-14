@@ -237,7 +237,7 @@ struct MessageView: View {
                     message.evalCount = message.finalEvalCount
                     message.evalDuration = message.finalEvalDuration
                     message.isStopped = message.finalIsStopped
-                    message.generatedImage = message.revisions.last?.generatedImage // 最新のリビジョンの画像を使用（適宜調整）
+                    message.generatedImage = message.latestGeneratedImage
                 }
                 message.fixedContent = message.content
                 message.pendingContent = ""

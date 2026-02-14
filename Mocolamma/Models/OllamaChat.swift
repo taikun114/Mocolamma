@@ -31,6 +31,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
     @Published var originalContent: String? // メッセージの最初の内容を保持
     @Published var latestContent: String? // メッセージの最新のやり直し結果を保持
+    @Published var latestGeneratedImage: String? // 最新の生成画像を保持
     @Published var finalThinking: String? // 最終的な思考内容を保持
     @Published var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
     @Published var finalCreatedAt: String? // 最終的な作成日時

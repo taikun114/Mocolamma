@@ -924,25 +924,35 @@ struct ImageGenerationView: View {
             guard index > 0 else { return }
             prompt = executor.imageMessages[index-1].content
             
-            // 現在のメッセージをリビジョンに保存
+            // 重要: 現在表示中のリビジョンではなく、常に「最新の完成版」をアーカイブする
+            let archiveContent = executor.imageMessages[index].latestContent ?? executor.imageMessages[index].content
+            let archiveImage = executor.imageMessages[index].latestGeneratedImage ?? executor.imageMessages[index].generatedImage
+            let archiveCreatedAt = executor.imageMessages[index].finalCreatedAt ?? executor.imageMessages[index].createdAt
+            let archiveTotalDuration = executor.imageMessages[index].finalTotalDuration ?? executor.imageMessages[index].totalDuration
+            
             let archived = ChatMessage(
                 role: "assistant",
-                content: executor.imageMessages[index].content,
-                createdAt: executor.imageMessages[index].createdAt,
-                totalDuration: executor.imageMessages[index].totalDuration,
+                content: archiveContent,
+                createdAt: archiveCreatedAt,
+                totalDuration: archiveTotalDuration,
                 isStreaming: false,
-                generatedImage: executor.imageMessages[index].generatedImage,
+                generatedImage: archiveImage,
                 isImageGeneration: true
             )
             executor.imageMessages[index].revisions.append(archived)
+            // 参照位置は常に最新（末尾の次 = 現在バージョン）にする
             executor.imageMessages[index].currentRevisionIndex = executor.imageMessages[index].revisions.count
             
             // 再初期化
             executor.imageMessages[index].generatedImage = nil
+            executor.imageMessages[index].latestGeneratedImage = nil
             executor.imageMessages[index].imageProgressCompleted = nil
             executor.imageMessages[index].imageProgressTotal = nil
             executor.imageMessages[index].isStreaming = true
             executor.imageMessages[index].isStopped = false
+            executor.imageMessages[index].totalDuration = nil
+            executor.imageMessages[index].finalTotalDuration = nil
+            executor.imageMessages[index].finalCreatedAt = nil
         }
         
         guard let model = currentSelectedModel else { return }
@@ -992,6 +1002,9 @@ struct ImageGenerationView: View {
                     if chunk.done {
                         executor.imageMessages[index].isStreaming = false
                         executor.imageMessages[index].totalDuration = chunk.totalDuration
+                        executor.imageMessages[index].finalTotalDuration = chunk.totalDuration
+                        executor.imageMessages[index].finalCreatedAt = executor.imageMessages[index].createdAt
+                        executor.imageMessages[index].latestGeneratedImage = executor.imageMessages[index].generatedImage
                     }
                 }
             }
