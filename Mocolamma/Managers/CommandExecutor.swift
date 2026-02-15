@@ -1029,9 +1029,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         // 完了：センタークロップした画像を送る
                         let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
                         let totalSimulatedDuration = Int(Double(steps) * 200_000_000) // 1ステップ0.2秒(200ms)
+                        
+                        // 完了時の時刻を取得
+                        let completionDate = Date()
+                        let finalCreatedAtString = formatter.string(from: completionDate)
+                        
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
-                            createdAt: createdAtString,
+                            createdAt: finalCreatedAtString,
                             response: "",
                             done: true,
                             image: finalImageString,
@@ -1051,9 +1056,14 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         try await Task.sleep(nanoseconds: 2_000_000_000)
                         let finalImageString = processDemoImage(targetWidth: CGFloat(width), targetHeight: CGFloat(height))
                         let totalSimulatedDuration = Int(Double(steps) * 200_000_000)
+                        
+                        // 完了時の時刻を取得
+                        let completionDate = Date()
+                        let finalCreatedAtString = formatter.string(from: completionDate)
+                        
                         let finalChunk = ImageGenerationResponseChunk(
                             model: model,
-                            createdAt: createdAtString,
+                            createdAt: finalCreatedAtString,
                             response: "",
                             done: true,
                             image: finalImageString,
