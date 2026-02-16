@@ -1,1 +1,2 @@
 NSLocalNetworkUsageDescription = "Es necesario para comunicarse con servidores Ollama que se encuentran en su red local.";
+NSPhotoLibraryAddUsageDescription = "Es necesario para guardar las imágenes generadas en su fototeca.";

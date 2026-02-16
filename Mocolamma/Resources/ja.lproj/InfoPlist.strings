@@ -1,1 +1,2 @@
 NSLocalNetworkUsageDescription = "ローカルネットワーク内に存在するOllamaサーバーと通信するために必要です。";
+NSPhotoLibraryAddUsageDescription = "生成した画像を写真ライブラリに保存するために必要です。";
