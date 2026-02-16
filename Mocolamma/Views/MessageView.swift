@@ -15,6 +15,7 @@ struct MessageView: View {
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     // 保存関連の状態
     @State private var showingSaveOptions = false
@@ -120,11 +121,7 @@ struct MessageView: View {
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-#if os(macOS)
-        .padding(message.role == "user" ? .leading : .trailing, 64)
-#else
-        .padding(message.role == "user" ? .leading : .trailing, 0)
-#endif
+        .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
         .contentShape(Rectangle())
 #if os(macOS)
         .onHover { isHovering = $0 }
