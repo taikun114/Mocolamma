@@ -27,6 +27,10 @@ struct MessageView: View {
         executor.successfullyDownloadedIDs.contains(message.id)
     }
     
+    private var isCopied: Bool {
+        executor.successfullyCopiedIDs.contains(message.id)
+    }
+    
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone]
@@ -286,15 +290,9 @@ struct MessageView: View {
         Button(action: {
             onRetry?(message.id, message)
         }) {
-            Group {
-                if #available(macOS 15.0, iOS 18.0, *) {
-                    Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
-                } else {
-                    Image(systemName: "arrow.circlepath")
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(5)
+            Image(systemName: SFSymbol.retry)
+                .contentShape(Rectangle())
+                .padding(5)
         }
 #if os(iOS)
         .font(.body)
@@ -355,9 +353,13 @@ struct MessageView: View {
     
     private func showSuccessFeedback() {
         Task { @MainActor in
-            _ = executor.successfullyDownloadedIDs.insert(message.id)
+            withAnimation(.spring()) {
+                _ = executor.successfullyDownloadedIDs.insert(message.id)
+            }
             try? await Task.sleep(nanoseconds: 3_000_000_000)
-            _ = executor.successfullyDownloadedIDs.remove(message.id)
+            withAnimation(.spring()) {
+                _ = executor.successfullyDownloadedIDs.remove(message.id)
+            }
         }
     }
     
@@ -461,16 +463,12 @@ struct MessageView: View {
             }
             UIPasteboard.general.string = contentToCopy
 #endif
+            showCopyFeedback()
         }) {
-            Group {
-                if #available(macOS 15.0, iOS 18.0, *) {
-                    Image(systemName: "document.on.document")
-                } else {
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(5)
+            Image(systemName: isCopied ? "checkmark" : SFSymbol.copy)
+                .contentShape(Rectangle())
+                .padding(5)
+                .contentTransition(.symbolEffect(.replace))
         }
 #if os(iOS)
         .font(.body)
@@ -480,6 +478,18 @@ struct MessageView: View {
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Copy")
+    }
+    
+    private func showCopyFeedback() {
+        Task { @MainActor in
+            withAnimation(.spring()) {
+                _ = executor.successfullyCopiedIDs.insert(message.id)
+            }
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            withAnimation(.spring()) {
+                _ = executor.successfullyCopiedIDs.remove(message.id)
+            }
+        }
     }
     
     @ViewBuilder

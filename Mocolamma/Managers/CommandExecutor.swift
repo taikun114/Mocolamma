@@ -17,6 +17,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     @Published var imageMessages: [ChatMessage] = []
     @Published var isImageStreaming: Bool = false
     @Published var successfullyDownloadedIDs: Set<UUID> = []
+    @Published var successfullyCopiedIDs: Set<UUID> = []
     
     // モデルプル時の進捗状況
     @Published var isPulling: Bool = false

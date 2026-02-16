@@ -37,6 +37,7 @@ Notes
   - When the inspector is displayed in sheet style (e.g., on iPhone or iPad in compact view), the `info.circle` icon is now shown. When displayed in sidebar style, it remains unchanged.
 - **Improve message bubble display on iOS when the display size is large**
   - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
+- **Improve to display a checkmark icon when message copying is successful**
 - **Support image model tag**
   - Image model tag is now correctly displayed in the model inspector.
 

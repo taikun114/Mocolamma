@@ -164,13 +164,7 @@ struct ModelListView: View {
     }
     
     var body: some View {
-        let copyIconName = {
-            if #available(macOS 15.0, iOS 18.0, *) {
-                return "document.on.document"
-            } else {
-                return "doc.on.doc"
-            }
-        }()
+        let copyIconName = SFSymbol.copy
         
         VStack {
 #if os(iOS)
