@@ -541,7 +541,7 @@ class ImageGenerationSettings: ObservableObject {
     @Published var height: Double = 512 {
         didSet { customHeight = Int(height) }
     }
-    @Published var steps: Double = 20 {
+    @Published var steps: Double = 8 {
         didSet { customSteps = Int(steps) }
     }
     
@@ -552,7 +552,7 @@ class ImageGenerationSettings: ObservableObject {
     @Published var customHeightEnabled: Bool = false
     @Published var customHeight: Int = 512
     @Published var customStepsEnabled: Bool = false
-    @Published var customSteps: Int = 20
+    @Published var customSteps: Int = 8
     
     // シード値設定
     @Published var isSeedEnabled: Bool = false

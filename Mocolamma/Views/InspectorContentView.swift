@@ -216,7 +216,7 @@ struct InspectorContentView: View {
                                     .font(.body.monospaced())
                                     .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
                             }
-                            CompactSlider(value: $imageSettings.steps, in: 1...100, step: 1)
+                            CompactSlider(value: $imageSettings.steps, in: 1...50, step: 1)
 #if os(iOS)
                                 .frame(height: 32)
 #else
