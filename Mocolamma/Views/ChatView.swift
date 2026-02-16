@@ -981,7 +981,8 @@ struct ImageGenerationView: View {
                 stream: imageSettings.isStreamingEnabled,
                 width: imageSettings.finalWidth,
                 height: imageSettings.finalHeight,
-                steps: imageSettings.finalSteps
+                steps: imageSettings.finalSteps,
+                seed: imageSettings.isSeedEnabled ? imageSettings.seed : nil
             ) {
                 guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { break }
                 

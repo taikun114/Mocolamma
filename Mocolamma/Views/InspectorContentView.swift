@@ -227,6 +227,29 @@ struct InspectorContentView: View {
                                 .font(.caption)
                                 .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
                         }
+                        
+                        VStack(alignment: .leading) {
+                            Toggle(isOn: $imageSettings.isSeedEnabled) {
+                                Text("Seed")
+                                    .foregroundStyle(imageSettings.isSeedEnabled ? .primary : .secondary)
+                            }
+                            HStack {
+                                TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
+                                    .textFieldStyle(.roundedBorder)
+                                    .labelsHidden()
+#if os(iOS)
+                                    .keyboardType(.numberPad)
+#endif
+                                    .disabled(!imageSettings.isSeedEnabled)
+                                
+                                Stepper("Adjust seed value", value: $imageSettings.seed)
+                                    .labelsHidden()
+                                    .disabled(!imageSettings.isSeedEnabled)
+                            }
+                            Text("Specifies the seed value used for image generation.")
+                                .font(.caption)
+                                .foregroundStyle(imageSettings.isSeedEnabled ? .secondary : .tertiary)
+                        }
                     }
                     
                     Section("Custom Settings") {

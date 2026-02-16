@@ -548,6 +548,10 @@ class ImageGenerationSettings: ObservableObject {
     @Published var customStepsEnabled: Bool = false
     @Published var customSteps: String = ""
     
+    // シード値設定
+    @Published var isSeedEnabled: Bool = false
+    @Published var seed: Int = 0
+    
     // 実際にAPIに送る値を取得するヘルパー
     var finalWidth: Int {
         if useCustomSettings && customWidthEnabled, let val = Int(customWidth) {

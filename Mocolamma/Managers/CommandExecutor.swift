@@ -993,8 +993,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     }
     
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
-    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
+    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
+            // ... (demo logic)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
                     let created_at = Date()
@@ -1100,6 +1101,12 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
+                // シード値が指定されている場合はオプションに追加
+                var options: ChatRequestOptions? = nil
+                if let seed = seed {
+                    options = ChatRequestOptions(seed: seed)
+                }
+                
                 let generationRequest = ImageGenerationRequest(
                     model: model,
                     prompt: prompt,
@@ -1107,7 +1114,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                     width: width,
                     height: height,
                     steps: steps,
-                    options: nil
+                    options: options
                 )
                 
                 do {
