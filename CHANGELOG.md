@@ -20,6 +20,24 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.2.0 (under development)
+### New Features
+- **Support for Ollama's image generation feature (beta)**
+  - As Ollama's image generation feature is currently in beta, future Ollama updates may introduce changes to its functionality (Ollama API), potentially causing the image generation feature to stop working in Mocolamma.
+  - A demo of the image generation feature is available. Select `demo-image:0b` as the image generation model and send any prompt. This will perform a simulation advancing 0.2 seconds per step, finally outputting a test image.
+
+### Bug Fixes and Improvements
+- **Fix to display image model details correctly**
+- **Improve to show an error when selecting an image-only model in the chat screen**
+- **Improve to prevent the add server and model sheet from closing when swiping down on iOS**
+- **Improve the style of the Add and Complete buttons on the add server and model sheet in iOS 26**
+  - The Complete button now uses the system native design, and the Add button now uses a design very close to the system native design.
+- **Improve to display an action sheet requesting confirmation on the New Chat button**
+- **Improve the Inspector button icon to display a more understandable one**
+  - When the inspector is displayed in sheet style (e.g., on iPhone or iPad in compact view), the `info.circle` icon is now shown. When displayed in sidebar style, it remains unchanged.
+- **Support image model tag**
+  - Image model tag is now correctly displayed in the model inspector.
+
 ## 1.1.0
 ### New Features
 - **Add German (`de`), Spanish (`es`) localization by generative AI**
