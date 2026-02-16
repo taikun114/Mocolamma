@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 import Photos
 
 struct MessageView: View {
+    @EnvironmentObject var executor: CommandExecutor
     @ObservedObject var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
@@ -21,6 +22,10 @@ struct MessageView: View {
     @State private var showingSaveOptions = false
     @State private var showingFileExporter = false
     @State private var imageDocument: ImageDocument?
+    
+    private var isDownloadSuccessful: Bool {
+        executor.successfullyDownloadedIDs.contains(message.id)
+    }
     
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -307,9 +312,11 @@ struct MessageView: View {
         Button(action: {
             showingSaveOptions = true
         }) {
-            Image(systemName: "arrow.down.to.line")
+            Image(systemName: isDownloadSuccessful ? "checkmark" : "arrow.down.to.line")
                 .contentShape(Rectangle())
                 .padding(5)
+                .symbolVariant(isDownloadSuccessful ? .none : .none) // 整合性のための指定
+                .contentTransition(.symbolEffect(.replace))
         }
 #if os(iOS)
         .font(.body)
@@ -339,9 +346,18 @@ struct MessageView: View {
             switch result {
             case .success(let url):
                 print("Image saved to: \(url.path)")
+                showSuccessFeedback()
             case .failure(let error):
                 print("Failed to save image: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func showSuccessFeedback() {
+        Task { @MainActor in
+            _ = executor.successfullyDownloadedIDs.insert(message.id)
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            _ = executor.successfullyDownloadedIDs.remove(message.id)
         }
     }
     
@@ -363,12 +379,15 @@ struct MessageView: View {
                 PHPhotoLibrary.shared().performChanges {
                     PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: tempURL)
                 } completionHandler: { success, error in
-                    if success {
-                        print("Successfully saved to Photos")
-                    } else {
-                        print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                    Task { @MainActor in
+                        if success {
+                            print("Successfully saved to Photos")
+                            showSuccessFeedback()
+                        } else {
+                            print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                        }
+                        try? FileManager.default.removeItem(at: tempURL)
                     }
-                    try? FileManager.default.removeItem(at: tempURL)
                 }
             } catch {
                 print("Failed to create temp file for Photos: \(error.localizedDescription)")
@@ -376,6 +395,9 @@ struct MessageView: View {
         }
 #else
         let imageSaver = ImageSaver()
+        imageSaver.onSuccess = {
+            showSuccessFeedback()
+        }
         imageSaver.writeToPhotoAlbum(image: image)
 #endif
     }
@@ -394,13 +416,23 @@ struct MessageView: View {
             if let window = NSApp.keyWindow {
                 savePanel.beginSheetModal(for: window) { response in
                     if response == .OK, let url = savePanel.url {
-                        try? data.write(to: url)
+                        do {
+                            try data.write(to: url)
+                            showSuccessFeedback()
+                        } catch {
+                            print("Failed to save file: \(error.localizedDescription)")
+                        }
                     }
                 }
             } else {
                 savePanel.begin { response in
                     if response == .OK, let url = savePanel.url {
-                        try? data.write(to: url)
+                        do {
+                            try data.write(to: url)
+                            showSuccessFeedback()
+                        } catch {
+                            print("Failed to save file: \(error.localizedDescription)")
+                        }
                     }
                 }
             }
@@ -814,6 +846,8 @@ extension Image {
 }
 
 class ImageSaver: NSObject {
+    var onSuccess: (() -> Void)?
+
     func writeToPhotoAlbum(image: UIImage) {
         UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
     }
@@ -823,6 +857,7 @@ class ImageSaver: NSObject {
             print("Error saving image: \(error.localizedDescription)")
         } else {
             print("Successfully saved image to photo album.")
+            onSuccess?()
         }
     }
 }
