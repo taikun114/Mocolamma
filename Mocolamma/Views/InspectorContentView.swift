@@ -260,14 +260,20 @@ struct InspectorContentView: View {
                                 Text("Custom Width")
                                     .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
                             }
-                            TextField("Enter custom width", text: $imageSettings.customWidth)
-                                .focused($isCustomWidthFocused)
-                                .textFieldStyle(.roundedBorder)
-                                .labelsHidden()
+                            HStack {
+                                TextField("Enter custom width", value: $imageSettings.customWidth, format: .number.grouping(.never))
+                                    .focused($isCustomWidthFocused)
+                                    .textFieldStyle(.roundedBorder)
+                                    .labelsHidden()
 #if os(iOS)
-                                .keyboardType(.numberPad)
+                                    .keyboardType(.numberPad)
 #endif
-                                .disabled(!imageSettings.customWidthEnabled)
+                                    .disabled(!imageSettings.customWidthEnabled)
+                                
+                                Stepper("Adjust custom width", value: $imageSettings.customWidth, in: 64...10000, step: 64)
+                                    .labelsHidden()
+                                    .disabled(!imageSettings.customWidthEnabled)
+                            }
                             Text("Enter the desired image width as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
                                 .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
@@ -279,14 +285,20 @@ struct InspectorContentView: View {
                                 Text("Custom Height")
                                     .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
                             }
-                            TextField("Enter custom height", text: $imageSettings.customHeight)
-                                .focused($isCustomHeightFocused)
-                                .textFieldStyle(.roundedBorder)
-                                .labelsHidden()
+                            HStack {
+                                TextField("Enter custom height", value: $imageSettings.customHeight, format: .number.grouping(.never))
+                                    .focused($isCustomHeightFocused)
+                                    .textFieldStyle(.roundedBorder)
+                                    .labelsHidden()
 #if os(iOS)
-                                .keyboardType(.numberPad)
+                                    .keyboardType(.numberPad)
 #endif
-                                .disabled(!imageSettings.customHeightEnabled)
+                                    .disabled(!imageSettings.customHeightEnabled)
+                                
+                                Stepper("Adjust custom height", value: $imageSettings.customHeight, in: 64...10000, step: 64)
+                                    .labelsHidden()
+                                    .disabled(!imageSettings.customHeightEnabled)
+                            }
                             Text("Enter the desired image height as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
                                 .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
@@ -298,14 +310,20 @@ struct InspectorContentView: View {
                                 Text("Custom Steps")
                                     .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
                             }
-                            TextField("Enter custom steps", text: $imageSettings.customSteps)
-                                .focused($isCustomStepsFocused)
-                                .textFieldStyle(.roundedBorder)
-                                .labelsHidden()
+                            HStack {
+                                TextField("Enter custom steps", value: $imageSettings.customSteps, format: .number.grouping(.never))
+                                    .focused($isCustomStepsFocused)
+                                    .textFieldStyle(.roundedBorder)
+                                    .labelsHidden()
 #if os(iOS)
-                                .keyboardType(.numberPad)
+                                    .keyboardType(.numberPad)
 #endif
-                                .disabled(!imageSettings.customStepsEnabled)
+                                    .disabled(!imageSettings.customStepsEnabled)
+                                
+                                Stepper("Adjust custom steps", value: $imageSettings.customSteps, in: 1...1000, step: 1)
+                                    .labelsHidden()
+                                    .disabled(!imageSettings.customStepsEnabled)
+                            }
                             Text("Enter the number of image generation steps as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
                                 .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)

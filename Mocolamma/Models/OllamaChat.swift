@@ -535,18 +535,24 @@ class ImageGenerationSettings: ObservableObject {
     @Published var isStreamingEnabled: Bool = true
     
     // 基本設定
-    @Published var width: Double = 512
-    @Published var height: Double = 512
-    @Published var steps: Double = 20
+    @Published var width: Double = 512 {
+        didSet { customWidth = Int(width) }
+    }
+    @Published var height: Double = 512 {
+        didSet { customHeight = Int(height) }
+    }
+    @Published var steps: Double = 20 {
+        didSet { customSteps = Int(steps) }
+    }
     
     // カスタム設定
     @Published var useCustomSettings: Bool = false
     @Published var customWidthEnabled: Bool = false
-    @Published var customWidth: String = ""
+    @Published var customWidth: Int = 512
     @Published var customHeightEnabled: Bool = false
-    @Published var customHeight: String = ""
+    @Published var customHeight: Int = 512
     @Published var customStepsEnabled: Bool = false
-    @Published var customSteps: String = ""
+    @Published var customSteps: Int = 20
     
     // シード値設定
     @Published var isSeedEnabled: Bool = false
@@ -554,22 +560,22 @@ class ImageGenerationSettings: ObservableObject {
     
     // 実際にAPIに送る値を取得するヘルパー
     var finalWidth: Int {
-        if useCustomSettings && customWidthEnabled, let val = Int(customWidth) {
-            return val
+        if useCustomSettings && customWidthEnabled {
+            return customWidth
         }
         return Int(width)
     }
     
     var finalHeight: Int {
-        if useCustomSettings && customHeightEnabled, let val = Int(customHeight) {
-            return val
+        if useCustomSettings && customHeightEnabled {
+            return customHeight
         }
         return Int(height)
     }
     
     var finalSteps: Int {
-        if useCustomSettings && customStepsEnabled, let val = Int(customSteps) {
-            return val
+        if useCustomSettings && customStepsEnabled {
+            return customSteps
         }
         return Int(steps)
     }
