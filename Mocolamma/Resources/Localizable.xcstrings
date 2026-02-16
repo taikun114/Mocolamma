@@ -58,6 +58,41 @@
       },
       "shouldTranslate" : false
     },
+    "*Cancelled*" : {
+      "comment" : "チャットや画像生成のメッセージバブルに表示される、ユーザによって処理が停止(キャンセル)されたときにイタリック体で表示されるMarkdownメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Abgebrochen*"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Cancelled*"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Cancelado*"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Annulé*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*キャンセルしました*"
+          }
+        }
+      }
+    },
     "*Could not connect*" : {
       "comment" : "チャットのメッセージバブルに表示される、Ollamaサーバーに接続できなかったときにイタリック体で表示されるMarkdownメッセージ。",
       "localizations" : {

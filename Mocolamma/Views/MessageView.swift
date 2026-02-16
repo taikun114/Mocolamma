@@ -200,7 +200,7 @@ struct MessageView: View {
                 message.isStopped = revision.isStopped
                 message.generatedImage = revision.generatedImage
                 
-                message.fixedContent = message.content
+                message.fixedContent = revision.fixedContent.isEmpty ? revision.content : revision.fixedContent
                 message.pendingContent = ""
                 message.fixedThinking = message.thinking ?? ""
                 message.pendingThinking = ""
@@ -238,6 +238,7 @@ struct MessageView: View {
                     message.evalDuration = revision.evalDuration
                     message.isStopped = revision.isStopped
                     message.generatedImage = revision.generatedImage
+                    message.fixedContent = revision.fixedContent.isEmpty ? revision.content : revision.fixedContent
                 } else {
                     message.content = message.latestContent ?? ""
                     message.thinking = message.finalThinking
@@ -248,8 +249,8 @@ struct MessageView: View {
                     message.evalDuration = message.finalEvalDuration
                     message.isStopped = message.finalIsStopped
                     message.generatedImage = message.latestGeneratedImage
+                    message.fixedContent = message.content
                 }
-                message.fixedContent = message.content
                 message.pendingContent = ""
                 message.fixedThinking = message.thinking ?? ""
                 message.pendingThinking = ""
@@ -521,6 +522,13 @@ struct MessageView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
+                } else if message.fixedContent == "*Cancelled*" {
+                    Text("*Cancelled*")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if !message.fixedContent.isEmpty {
+                    Markdown(message.fixedContent)
+                        .markdownTheme(Theme.simple(for: message))
                 } else {
                     Text("Failed to generate image.")
                         .foregroundColor(.red)

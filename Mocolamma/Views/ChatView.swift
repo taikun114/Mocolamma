@@ -925,10 +925,15 @@ struct ImageGenerationView: View {
             prompt = executor.imageMessages[index-1].content
             
             // 重要: 現在表示中のリビジョンではなく、常に「最新の完成版」をアーカイブする
-            let archiveContent = executor.imageMessages[index].latestContent ?? executor.imageMessages[index].content
+            let archiveContent: String = {
+                if let latest = executor.imageMessages[index].latestContent, !latest.isEmpty { return latest }
+                if !executor.imageMessages[index].content.isEmpty { return executor.imageMessages[index].content }
+                return executor.imageMessages[index].fixedContent
+            }()
             let archiveImage = executor.imageMessages[index].latestGeneratedImage ?? executor.imageMessages[index].generatedImage
             let archiveCreatedAt = executor.imageMessages[index].finalCreatedAt ?? executor.imageMessages[index].createdAt
             let archiveTotalDuration = executor.imageMessages[index].finalTotalDuration ?? executor.imageMessages[index].totalDuration
+            let archiveIsStopped = executor.imageMessages[index].finalIsStopped || executor.imageMessages[index].isStopped
             
             let archived = ChatMessage(
                 role: "assistant",
@@ -936,9 +941,11 @@ struct ImageGenerationView: View {
                 createdAt: archiveCreatedAt,
                 totalDuration: archiveTotalDuration,
                 isStreaming: false,
+                isStopped: archiveIsStopped,
                 generatedImage: archiveImage,
                 isImageGeneration: true
             )
+            archived.fixedContent = archiveContent
             executor.imageMessages[index].revisions.append(archived)
             // 参照位置は常に最新（末尾の次 = 現在バージョン）にする
             executor.imageMessages[index].currentRevisionIndex = executor.imageMessages[index].revisions.count
@@ -1014,12 +1021,22 @@ struct ImageGenerationView: View {
             if let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) {
                 await MainActor.run {
                     executor.imageMessages[index].isStreaming = false
-                    executor.imageMessages[index].isStopped = true
-                    // 500エラーなどの場合にメッセージを表示
-                    if executor.imageMessages[index].generatedImage == nil {
-                        executor.imageMessages[index].fixedContent = "Error: \(error.localizedDescription)"
+                    
+                    let isCancelled = (error as? URLError)?.code == .cancelled || 
+                                     (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
+                    
+                    if isCancelled {
+                        executor.imageMessages[index].isStopped = true
+                        if executor.imageMessages[index].generatedImage == nil {
+                            executor.imageMessages[index].fixedContent = "*Cancelled*"
+                        }
+                    } else {
+                        executor.imageMessages[index].isStopped = false
+                        if executor.imageMessages[index].generatedImage == nil {
+                            executor.imageMessages[index].fixedContent = "Error: \(error.localizedDescription)"
+                        }
+                        generalErrorMessage = "Image Generation Error: \(error.localizedDescription)"
                     }
-                    generalErrorMessage = "Image Generation Error: \(error.localizedDescription)"
                 }
             }
         }
