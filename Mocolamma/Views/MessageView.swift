@@ -1,5 +1,7 @@
 import SwiftUI
 import MarkdownUI
+import UniformTypeIdentifiers
+import Photos
 
 struct MessageView: View {
     @ObservedObject var message: ChatMessage
@@ -13,6 +15,11 @@ struct MessageView: View {
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
     @Environment(\.colorScheme) private var colorScheme
+    
+    // 保存関連の状態
+    @State private var showingSaveOptions = false
+    @State private var showingFileExporter = false
+    @State private var imageDocument: ImageDocument?
     
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -301,7 +308,7 @@ struct MessageView: View {
     @ViewBuilder
     private var downloadButton: some View {
         Button(action: {
-            saveImage()
+            showingSaveOptions = true
         }) {
             Image(systemName: "arrow.down.to.line")
                 .contentShape(Rectangle())
@@ -315,25 +322,95 @@ struct MessageView: View {
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Download Image")
+        .confirmationDialog(Text("Select Destination"), isPresented: $showingSaveOptions, titleVisibility: .visible) {
+            Button(String(localized: "Save to Photo Library")) {
+                saveToPhotoLibrary()
+            }
+            Button(String(localized: "Save as File...")) {
+                prepareForFileSave()
+            }
+            Button(String(localized: "Cancel"), role: .cancel) { }
+        } message: {
+            Text("Please select where to save this image.")
+        }
+        .fileExporter(
+            isPresented: $showingFileExporter,
+            document: imageDocument,
+            contentType: .png,
+            defaultFilename: "generated_image.png"
+        ) { result in
+            switch result {
+            case .success(let url):
+                print("Image saved to: \(url.path)")
+            case .failure(let error):
+                print("Failed to save image: \(error.localizedDescription)")
+            }
+        }
     }
     
-    private func saveImage() {
+    private func saveToPhotoLibrary() {
         guard let base64String = message.generatedImage,
               let data = Data(base64Encoded: base64String),
               let image = PlatformImage(data: data) else { return }
         
 #if os(macOS)
-        let savePanel = NSSavePanel()
-        savePanel.allowedContentTypes = [.png]
-        savePanel.nameFieldStringValue = "generated_image.png"
-        savePanel.begin { response in
-            if response == .OK, let url = savePanel.url {
-                try? data.write(to: url)
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            guard status == .authorized || status == .limited else {
+                print("Photos access denied: \(status)")
+                return
+            }
+            
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".png")
+            do {
+                try data.write(to: tempURL)
+                PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: tempURL)
+                } completionHandler: { success, error in
+                    if success {
+                        print("Successfully saved to Photos")
+                    } else {
+                        print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                    }
+                    try? FileManager.default.removeItem(at: tempURL)
+                }
+            } catch {
+                print("Failed to create temp file for Photos: \(error.localizedDescription)")
             }
         }
 #else
         let imageSaver = ImageSaver()
         imageSaver.writeToPhotoAlbum(image: image)
+#endif
+    }
+    
+    private func prepareForFileSave() {
+        guard let base64String = message.generatedImage,
+              let data = Data(base64Encoded: base64String) else { return }
+        
+#if os(macOS)
+        // アクションシートが閉じるのを待つための遅延
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let savePanel = NSSavePanel()
+            savePanel.allowedContentTypes = [.png]
+            savePanel.nameFieldStringValue = "generated_image.png"
+            
+            if let window = NSApp.keyWindow {
+                savePanel.beginSheetModal(for: window) { response in
+                    if response == .OK, let url = savePanel.url {
+                        try? data.write(to: url)
+                    }
+                }
+            } else {
+                savePanel.begin { response in
+                    if response == .OK, let url = savePanel.url {
+                        try? data.write(to: url)
+                    }
+                }
+            }
+        }
+#else
+        self.imageDocument = ImageDocument(image: data)
+        self.showingFileExporter = true
 #endif
     }
     
@@ -605,38 +682,6 @@ struct MessageView: View {
     }
 }
 
-// MARK: - Platform Compatibility
-
-#if os(macOS)
-typealias PlatformImage = NSImage
-extension Image {
-    init(platformImage: NSImage) {
-        self.init(nsImage: platformImage)
-    }
-}
-#else
-typealias PlatformImage = UIImage
-extension Image {
-    init(platformImage: UIImage) {
-        self.init(uiImage: platformImage)
-    }
-}
-
-class ImageSaver: NSObject {
-    func writeToPhotoAlbum(image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
-    }
-
-    @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
-            print("Error saving image: \(error.localizedDescription)")
-        } else {
-            print("Successfully saved image to photo album.")
-        }
-    }
-}
-#endif
-
 extension Theme {
     static func simple(for message: ChatMessage) -> Theme {
         Theme()
@@ -751,5 +796,58 @@ extension Theme {
                 configuration.label
                     .padding(.bottom, 8)
             }
+    }
+}
+
+// MARK: - Platform Compatibility & Document Support
+
+#if os(macOS)
+typealias PlatformImage = NSImage
+extension Image {
+    init(platformImage: NSImage) {
+        self.init(nsImage: platformImage)
+    }
+}
+#else
+typealias PlatformImage = UIImage
+extension Image {
+    init(platformImage: UIImage) {
+        self.init(uiImage: platformImage)
+    }
+}
+
+class ImageSaver: NSObject {
+    func writeToPhotoAlbum(image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
+    }
+
+    @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            print("Error saving image: \(error.localizedDescription)")
+        } else {
+            print("Successfully saved image to photo album.")
+        }
+    }
+}
+#endif
+
+struct ImageDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.png] }
+    var image: Data
+
+    init(image: Data) {
+        self.image = image
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        if let data = configuration.file.regularFileContents {
+            self.image = data
+        } else {
+            throw CocoaError(.fileReadUnknown)
+        }
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        return FileWrapper(regularFileWithContents: image)
     }
 }
