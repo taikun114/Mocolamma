@@ -242,7 +242,7 @@ struct InspectorContentView: View {
 #endif
                                     .disabled(!imageSettings.isSeedEnabled)
                                 
-                                Stepper("Adjust seed value", value: $imageSettings.seed)
+                                Stepper("Adjust seed value", value: $imageSettings.seed, in: -9007199254740991...9007199254740991)
                                     .labelsHidden()
                                     .disabled(!imageSettings.isSeedEnabled)
                             }

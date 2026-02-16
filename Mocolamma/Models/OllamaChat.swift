@@ -556,7 +556,13 @@ class ImageGenerationSettings: ObservableObject {
     
     // シード値設定
     @Published var isSeedEnabled: Bool = false
-    @Published var seed: Int = 0
+    @Published var seed: Int = 0 {
+        didSet {
+            let safeLimit = 9007199254740991
+            if seed > safeLimit { seed = safeLimit }
+            if seed < -safeLimit { seed = -safeLimit }
+        }
+    }
     
     // 実際にAPIに送る値を取得するヘルパー
     var finalWidth: Int {
