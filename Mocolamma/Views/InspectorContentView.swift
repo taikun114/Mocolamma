@@ -165,91 +165,10 @@ struct InspectorContentView: View {
                                 .foregroundColor(.secondary)
                         }
                         
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Width")
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .secondary : .primary)
-                                Spacer()
-                                Text("\(Int(imageSettings.width)) px")
-                                    .font(.body.monospaced())
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
-                            }
-                            CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
-#if os(iOS)
-                                .frame(height: 32)
-#else
-                                .frame(height: 16)
-#endif
-                                .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
-                            Text("Specifies the width of the image you want to generate.")
-                                .font(.caption)
-                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Height")
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .secondary : .primary)
-                                Spacer()
-                                Text("\(Int(imageSettings.height)) px")
-                                    .font(.body.monospaced())
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
-                            }
-                            CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
-#if os(iOS)
-                                .frame(height: 32)
-#else
-                                .frame(height: 16)
-#endif
-                                .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
-                            Text("Specifies the height of the image you want to generate.")
-                                .font(.caption)
-                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Steps")
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .secondary : .primary)
-                                Spacer()
-                                Text("\(Int(imageSettings.steps))")
-                                    .font(.body.monospaced())
-                                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
-                            }
-                            CompactSlider(value: $imageSettings.steps, in: 1...50, step: 1)
-#if os(iOS)
-                                .frame(height: 32)
-#else
-                                .frame(height: 16)
-#endif
-                                .disabled(imageSettings.useCustomSettings && imageSettings.customStepsEnabled)
-                            Text("Specifies the number of image generation steps. Increasing the number of steps increases generation time but can improve detail.")
-                                .font(.caption)
-                                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            Toggle(isOn: $imageSettings.isSeedEnabled) {
-                                Text("Seed")
-                                    .foregroundStyle(imageSettings.isSeedEnabled ? .primary : .secondary)
-                            }
-                            HStack {
-                                TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
-                                    .textFieldStyle(.roundedBorder)
-                                    .labelsHidden()
-#if os(iOS)
-                                    .keyboardType(.numberPad)
-#endif
-                                    .disabled(!imageSettings.isSeedEnabled)
-                                
-                                Stepper("Adjust seed value", value: $imageSettings.seed, in: -9007199254740991...9007199254740991)
-                                    .labelsHidden()
-                                    .disabled(!imageSettings.isSeedEnabled)
-                            }
-                            Text("Specifies the seed value used for image generation.")
-                                .font(.caption)
-                                .foregroundStyle(imageSettings.isSeedEnabled ? .secondary : .tertiary)
-                        }
+                        widthSettingsSection
+                        heightSettingsSection
+                        stepsSettingsSection
+                        seedSettingsSection
                     }
                     
                     Section("Custom Settings") {
@@ -359,5 +278,157 @@ struct InspectorContentView: View {
             .help("Toggle Inspector")
         }
 #endif
+    }
+    
+    @ViewBuilder
+    private var widthSettingsSection: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Width")
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .secondary : .primary)
+                Spacer()
+                Text("\(Int(imageSettings.width)) px")
+                    .font(.body.monospaced())
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+            }
+            CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
+#if os(iOS)
+                .frame(height: 32)
+#else
+                .frame(height: 16)
+#endif
+                .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+            
+            HStack {
+                ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
+                    if imageSettings.width == size {
+                        Button {
+                            imageSettings.width = size
+                        } label: {
+                            Text(String(format: "%.0f", size))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                    } else {
+                        Button {
+                            imageSettings.width = size
+                        } label: {
+                            Text(String(format: "%.0f", size))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                    }
+                }
+            }
+            
+            Text("Specifies the width of the image you want to generate.")
+                .font(.caption)
+                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private var heightSettingsSection: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Height")
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .secondary : .primary)
+                Spacer()
+                Text("\(Int(imageSettings.height)) px")
+                    .font(.body.monospaced())
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+            }
+            CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
+#if os(iOS)
+                .frame(height: 32)
+#else
+                .frame(height: 16)
+#endif
+                .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+            
+            HStack {
+                ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
+                    if imageSettings.height == size {
+                        Button {
+                            imageSettings.height = size
+                        } label: {
+                            Text(String(format: "%.0f", size))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                    } else {
+                        Button {
+                            imageSettings.height = size
+                        } label: {
+                            Text(String(format: "%.0f", size))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                    }
+                }
+            }
+            
+            Text("Specifies the height of the image you want to generate.")
+                .font(.caption)
+                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private var stepsSettingsSection: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Steps")
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .secondary : .primary)
+                Spacer()
+                Text("\(Int(imageSettings.steps))")
+                    .font(.body.monospaced())
+                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+            }
+            CompactSlider(value: $imageSettings.steps, in: 1...50, step: 1)
+#if os(iOS)
+                .frame(height: 32)
+#else
+                .frame(height: 16)
+#endif
+                .disabled(imageSettings.useCustomSettings && imageSettings.customStepsEnabled)
+            Text("Specifies the number of image generation steps. Increasing the number of steps increases generation time but can improve detail.")
+                .font(.caption)
+                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private var seedSettingsSection: some View {
+        VStack(alignment: .leading) {
+            Toggle(isOn: $imageSettings.isSeedEnabled) {
+                Text("Seed")
+                    .foregroundStyle(imageSettings.isSeedEnabled ? .primary : .secondary)
+            }
+            HStack {
+                TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
+                    .textFieldStyle(.roundedBorder)
+                    .labelsHidden()
+#if os(iOS)
+                    .keyboardType(.numberPad)
+#endif
+                    .disabled(!imageSettings.isSeedEnabled)
+                
+                Stepper("Adjust seed value", value: $imageSettings.seed, in: -9007199254740991...9007199254740991)
+                    .labelsHidden()
+                    .disabled(!imageSettings.isSeedEnabled)
+            }
+            Text("Specifies the seed value used for image generation.")
+                .font(.caption)
+                .foregroundStyle(imageSettings.isSeedEnabled ? .secondary : .tertiary)
+        }
     }
 }
