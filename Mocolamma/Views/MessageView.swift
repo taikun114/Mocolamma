@@ -637,6 +637,7 @@ struct MessageView: View {
                                 Label(String(localized: "Copy Image"), systemImage: SFSymbol.copy)
                             }
                         }
+                        .draggable(Image(platformImage: image))
                 } else if message.isStreaming {
                     VStack(spacing: 8) {
                         ProgressView()
