@@ -492,6 +492,17 @@ struct MessageView: View {
         }
     }
     
+    private func copyImageToClipboard(image: PlatformImage) {
+#if os(macOS)
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.writeObjects([image])
+#else
+        UIPasteboard.general.image = image
+#endif
+        showCopyFeedback()
+    }
+    
     @ViewBuilder
     private var editButton: some View {
         Group {
@@ -619,6 +630,13 @@ struct MessageView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(8)
+                        .contextMenu {
+                            Button {
+                                copyImageToClipboard(image: image)
+                            } label: {
+                                Label(String(localized: "Copy Image"), systemImage: SFSymbol.copy)
+                            }
+                        }
                 } else if message.isStreaming {
                     VStack(spacing: 8) {
                         ProgressView()
