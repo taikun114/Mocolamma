@@ -631,7 +631,12 @@ struct ChatView: View {
                             executor.chatMessages[index].fixedContent = ""
                             executor.chatMessages[index].content = ""
                         }
-                        generalErrorMessage = "Chat API Error: \(error.localizedDescription)"
+                        
+                        var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
+                        if (error as? URLError)?.code == .timedOut {
+                            fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
+                        }
+                        generalErrorMessage = fullErrorMessage
                     }
                 }
             }
@@ -1035,7 +1040,12 @@ struct ImageGenerationView: View {
                         if executor.imageMessages[index].generatedImage == nil {
                             executor.imageMessages[index].fixedContent = "Error: \(error.localizedDescription)"
                         }
-                        generalErrorMessage = "Image Generation Error: \(error.localizedDescription)"
+                        
+                        var fullErrorMessage = "Image Generation Error: \(error.localizedDescription)"
+                        if (error as? URLError)?.code == .timedOut {
+                            fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
+                        }
+                        generalErrorMessage = fullErrorMessage
                     }
                 }
             }

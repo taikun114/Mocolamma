@@ -54,7 +54,7 @@ struct SettingsView: View {
                     LoginItemManager.shared.setEnabled(newValue)
                 }
 #endif
-            HStack(alignment: .center) {
+            HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("API Timeout")
                     Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
@@ -62,7 +62,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Picker("", selection: $apiTimeoutSelection) {
+                Picker("API Timeout", selection: $apiTimeoutSelection) {
                     Text("30 sec").tag(APITimeoutOption.seconds30)
                     Text("1 min").tag(APITimeoutOption.minutes1)
                     Text("5 min").tag(APITimeoutOption.minutes5)
