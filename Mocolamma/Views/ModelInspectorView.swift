@@ -68,15 +68,29 @@ struct ModelInspectorView: View {
     
     
     private var licenseName: String {
-        let rawLicense = modelInfo?["general.license"]?.stringValue ?? String(localized: "Other License")
-        switch rawLicense.lowercased() {
-        case "mit":
-            return "MIT License"
-        case "apache-2.0":
-            return "Apache License 2.0"
-        default:
-            return rawLicense
+        // 1. modelInfoに明示的なライセンス名がある場合
+        if let rawLicense = modelInfo?["general.license"]?.stringValue {
+            switch rawLicense.lowercased() {
+            case "mit":
+                return "MIT License"
+            case "apache-2.0":
+                return "Apache License 2.0"
+            default:
+                return rawLicense
+            }
         }
+        
+        // 2. ライセンス名がないが本文がある場合、本文から推測
+        if let body = licenseBody {
+            if body.contains("MIT License") {
+                return "MIT License"
+            }
+            if body.contains("Apache License") && body.contains("Version 2.0") {
+                return "Apache License 2.0"
+            }
+        }
+        
+        return String(localized: "Other License")
     }
     
     // MARK: - ヘルパー関数
