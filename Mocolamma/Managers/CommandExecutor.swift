@@ -265,10 +265,8 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                         detailedModel.originalIndex = index
                         if let info = await self.fetchModelInfo(modelName: model.name) {
                             detailedModel.capabilities = info.capabilities
-                            // details内の情報も補完（一覧で欠落している場合があるため）
-                            if detailedModel.details == nil {
-                                detailedModel.details = info.details
-                            }
+                            // 詳細情報（/api/show）のdetailsの方が正確（画像モデルなど）なため、常に上書きする
+                            detailedModel.details = info.details
                         }
                         return (index, detailedModel)
                     }
