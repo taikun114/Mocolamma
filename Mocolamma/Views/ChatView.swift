@@ -1,5 +1,5 @@
 import SwiftUI
-import MarkdownUI
+import Textual
 
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
@@ -138,53 +138,11 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
-        .onChange(of: chatSettings.selectedModelID) { _, newID in
-            chatSettings.contextWindowValue = 2048.0
-            guard let model = currentSelectedModel else {
-                chatSettings.selectedModelContextLength = nil
-                chatSettings.selectedModelCapabilities = nil
-                return
-            }
-            Task {
-                if let response = await executor.fetchModelInfo(modelName: model.name) {
-                    let contextLength: Int?
-                    if let modelInfo = response.model_info,
-                       let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
-                       case .int(let length) = contextLengthValue {
-                        contextLength = length
-                    } else {
-                        contextLength = nil
-                    }
-                    let isUnsupportedModel = {
-                        let caps = response.capabilities ?? []
-                        let detFamilies = response.details?.families ?? []
-                        
-                        // 埋め込みモデルの判定
-                        let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
-                        let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
-                        
-                        // 画像生成モデルの判定（イメージのみの場合）
-                        let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
-                        
-                        return isEmbedding || isEmbeddingFamily || isImage
-                    }()
-                    
-                    if isUnsupportedModel {
-                        chatSettings.selectedModelID = nil
-                        showUnsupportedModelAlert = true
-                        return
-                    }
-                    chatSettings.selectedModelContextLength = contextLength
-                    chatSettings.selectedModelCapabilities = response.capabilities
-                } else {
-                    chatSettings.selectedModelContextLength = nil
-                    chatSettings.selectedModelCapabilities = nil
-                }
-            }
+        .onChange(of: chatSettings.selectedModelID) { _, _ in
+            handleModelSelectionChange()
         }
         .alert("This model cannot be used", isPresented: $showUnsupportedModelAlert) {
-            Button("OK") { showUnsupportedModelAlert = false }
-                .keyboardShortcut(.defaultAction)
+            unsupportedModelAlertContent
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
@@ -192,10 +150,66 @@ struct ChatView: View {
             get: { generalErrorMessage != nil },
             set: { if !$0 { generalErrorMessage = nil } }
         )) {
-            Button("OK") { generalErrorMessage = nil }
-                .keyboardShortcut(.defaultAction)
+            errorAlertContent
         } message: {
             Text(generalErrorMessage ?? "An unknown error occurred.")
+        }
+    }
+
+    @ViewBuilder
+    private var unsupportedModelAlertContent: some View {
+        Button("OK") { showUnsupportedModelAlert = false }
+            .keyboardShortcut(.defaultAction)
+    }
+
+    @ViewBuilder
+    private var errorAlertContent: some View {
+        Button("OK") { generalErrorMessage = nil }
+            .keyboardShortcut(.defaultAction)
+    }
+
+    private func handleModelSelectionChange() {
+        chatSettings.contextWindowValue = 2048.0
+        guard let model = currentSelectedModel else {
+            chatSettings.selectedModelContextLength = nil
+            chatSettings.selectedModelCapabilities = nil
+            return
+        }
+        Task {
+            if let response = await executor.fetchModelInfo(modelName: model.name) {
+                let contextLength: Int?
+                if let modelInfo = response.model_info,
+                   let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
+                   case .int(let length) = contextLengthValue {
+                    contextLength = length
+                } else {
+                    contextLength = nil
+                }
+                let isUnsupportedModel = {
+                    let caps = response.capabilities ?? []
+                    let detFamilies = response.details?.families ?? []
+                    
+                    // 埋め込みモデルの判定
+                    let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
+                    let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
+                    
+                    // 画像生成モデルの判定（イメージのみの場合）
+                    let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
+                    
+                    return isEmbedding || isEmbeddingFamily || isImage
+                }()
+                
+                if isUnsupportedModel {
+                    chatSettings.selectedModelID = nil
+                    showUnsupportedModelAlert = true
+                    return
+                }
+                chatSettings.selectedModelContextLength = contextLength
+                chatSettings.selectedModelCapabilities = response.capabilities
+            } else {
+                chatSettings.selectedModelContextLength = nil
+                chatSettings.selectedModelCapabilities = nil
+            }
         }
     }
     

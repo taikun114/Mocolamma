@@ -1,5 +1,5 @@
 import SwiftUI
-import MarkdownUI
+import Textual
 import UniformTypeIdentifiers
 import Photos
 
@@ -537,10 +537,11 @@ struct MessageView: View {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
 #if os(iOS)
                 .font(.body)
+                .bold()
 #else
                 .font(.caption2)
-#endif
                 .bold()
+#endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(Capsule().fill(Color.gray.opacity(0.2)))
@@ -562,10 +563,11 @@ struct MessageView: View {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
 #if os(iOS)
                 .font(.body)
+                .bold()
 #else
                 .font(.caption2)
-#endif
                 .bold()
+#endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(Capsule().fill(Color.accentColor.opacity(0.2)))
@@ -662,8 +664,9 @@ struct MessageView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if !message.fixedContent.isEmpty {
-                    Markdown(message.fixedContent)
-                        .markdownTheme(Theme.simple(for: message))
+                    StructuredText(markdown: message.fixedContent)
+                        .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                        .textual.structuredTextStyle(SimpleStyle(message: message))
                 } else {
                     Text("Failed to generate image.")
                         .foregroundColor(.red)
@@ -719,8 +722,9 @@ struct MessageView: View {
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 if !message.fixedContent.isEmpty {
-                    Markdown(message.fixedContent)
-                        .markdownTheme(Theme.simple(for: message))
+                    StructuredText(markdown: message.fixedContent)
+                        .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                        .textual.structuredTextStyle(SimpleStyle(message: message))
                 }
                 if !message.pendingContent.isEmpty {
                     Text(message.pendingContent)
@@ -740,122 +744,151 @@ struct MessageView: View {
     }
 }
 
-extension Theme {
-    static func simple(for message: ChatMessage) -> Theme {
-        Theme()
-            .text {
-                ForegroundColor(message.role == "user" ? .white : nil)
-            }
-            .strong {
-                FontWeight(.bold)
-            }
-            .emphasis {
-                FontStyle(.italic)
-            }
-            .link {
-                ForegroundColor(message.role == "user" ? .white : nil)
-                UnderlineStyle(.single)
-            }
-            .code {
-                FontFamilyVariant(.monospaced)
-                BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-            }
-        
-            .heading1 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(2.0))
-                        FontWeight(.bold)
+// MARK: - Textual Custom Style
+
+struct SimpleStyle: StructuredText.Style {
+    let message: ChatMessage
+
+    var inlineStyle: InlineStyle {
+        InlineStyle()
+            .strong(.bold)
+            .emphasis(.italic)
+            .link(
+                .foregroundColor(message.role == "user" ? Color.white : Color.accentColor),
+                .underlineStyle(.single)
+            )
+            .code(
+                .monospaced,
+                .backgroundColor(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2))
+            )
+    }
+
+    var headingStyle: some StructuredText.HeadingStyle {
+        SimpleHeadingStyle()
+    }
+
+    var paragraphStyle: some StructuredText.ParagraphStyle {
+        SimpleParagraphStyle()
+    }
+
+    var blockQuoteStyle: some StructuredText.BlockQuoteStyle {
+        SimpleBlockQuoteStyle(message: message)
+    }
+
+    var codeBlockStyle: some StructuredText.CodeBlockStyle {
+        SimpleCodeBlockStyle(message: message)
+    }
+
+    var listItemStyle: some StructuredText.ListItemStyle {
+        StructuredText.DefaultListItemStyle.default
+    }
+
+    var unorderedListMarker: some StructuredText.UnorderedListMarker {
+        StructuredText.SymbolListMarker.disc
+    }
+
+    var orderedListMarker: some StructuredText.OrderedListMarker {
+        StructuredText.DecimalListMarker.decimal
+    }
+
+    var tableStyle: some StructuredText.TableStyle {
+        SimpleTableStyle(message: message)
+    }
+
+    var tableCellStyle: some StructuredText.TableCellStyle {
+        SimpleTableCellStyle()
+    }
+
+    var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
+        StructuredText.DividerThematicBreakStyle.divider
+    }
+}
+
+struct SimpleTableStyle: StructuredText.TableStyle {
+    let message: ChatMessage
+    private static let borderWidth: CGFloat = 1
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
+            .textual.blockSpacing(.fontScaled(top: 1.6, bottom: 1.6))
+            .textual.tableOverlay { layout in
+                Canvas { context, _ in
+                    for divider in layout.dividers() {
+                        context.fill(
+                            Path(divider),
+                            with: .style(message.role == "user" ? Color.white.opacity(0.4) : Color.gray.opacity(0.4))
+                        )
                     }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading2 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.75))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading3 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.5))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading4 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.25))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading5 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.0))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading6 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(0.8))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .paragraph { configuration in
-                configuration.label
-                    .relativeLineSpacing(.em(0.3))
-                    .markdownMargin(top: .zero, bottom: .em(0.8))
-            }
-            .listItem { configuration in
-                configuration.label
-                    .markdownMargin(top: .em(0.3))
-            }
-            .blockquote { configuration in
-                configuration.label
-                    .padding()
-                    .overlay(alignment: .leading) {
-                        Rectangle()
-                            .fill(message.role == "user" ? .white : .gray)
-                            .frame(width: 4)
-                    }
-            }
-            .codeBlock { configuration in
-                ScrollView(.horizontal) {
-                    configuration.label
-                        .markdownTextStyle {
-                            FontFamilyVariant(.monospaced)
-                        }
-                        .markdownMargin(top: .em(0.3))
-                        .padding()
                 }
-                .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.vertical, 8)
             }
-            .tableCell { configuration in
-                configuration.label
-                    .padding(8)
-            }
-            .table { configuration in
-                configuration.label
-                    .padding(.bottom, 8)
+            .padding(Self.borderWidth)
+            .overlay {
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(message.role == "user" ? Color.white.opacity(0.4) : Color.gray.opacity(0.4), lineWidth: Self.borderWidth)
             }
     }
 }
+
+struct SimpleHeadingStyle: StructuredText.HeadingStyle {
+    private static let fontScales: [CGFloat] = [2.0, 1.75, 1.5, 1.25, 1.0, 0.8]
+
+    func makeBody(configuration: Configuration) -> some View {
+        let level = min(configuration.headingLevel, 6)
+        let fontScale = Self.fontScales[level - 1]
+
+        configuration.label
+            .textual.fontScale(fontScale)
+            .fontWeight(.bold)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+    }
+}
+
+struct SimpleParagraphStyle: StructuredText.ParagraphStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.lineSpacing(.fontScaled(0.3))
+            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+    }
+}
+
+struct SimpleBlockQuoteStyle: StructuredText.BlockQuoteStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding()
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(message.role == "user" ? Color.white : Color.gray)
+                    .frame(width: 4)
+            }
+    }
+}
+
+struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .monospaced()
+            .textual.lineSpacing(.fontScaled(0.39))
+            .padding()
+            .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.vertical, 8)
+            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+    }
+}
+
+struct SimpleTableCellStyle: StructuredText.TableCellStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(8)
+    }
+}
+
 
 // MARK: - Platform Compatibility & Document Support
 
@@ -912,3 +945,4 @@ struct ImageDocument: FileDocument {
         return FileWrapper(regularFileWithContents: image)
     }
 }
+
