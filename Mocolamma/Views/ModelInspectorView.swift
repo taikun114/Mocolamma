@@ -387,20 +387,24 @@ struct ModelInspectorView: View {
                 } else if modelInfo != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         
-                        VStack(alignment: .leading) {
-                            Text("License:") // ライセンス
-                            if licenseBody != nil {
-                                Button(action: {
-                                    showingLicenseSheet = true
-                                }) {
+                        // ライセンス情報がある場合のみ表示
+                        // modelInfoにlicenseキーがあるか、licenseBodyがある場合
+                        if modelInfo?["general.license"] != nil || licenseBody != nil {
+                            VStack(alignment: .leading) {
+                                Text("License:") // ライセンス
+                                if licenseBody != nil {
+                                    Button(action: {
+                                        showingLicenseSheet = true
+                                    }) {
+                                        Text(licenseName)
+                                            .font(.title3).bold()
+                                            .foregroundColor(.accentColor)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                } else {
                                     Text(licenseName)
                                         .font(.title3).bold()
-                                        .foregroundColor(.accentColor)
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                            } else {
-                                Text(licenseName)
-                                    .font(.title3).bold()
                             }
                         }
                         
@@ -459,8 +463,11 @@ struct ModelInspectorView: View {
                             }
                         }
                         
-                        // もし情報が一つもなければ
-                        if parameterCount == nil && contextLength == nil && embeddingLength == nil && licenseBody == nil {
+                        // 全ての詳細項目が空の場合のみ「モデル情報がありません」を表示
+                        let hasLicense = modelInfo?["general.license"] != nil || licenseBody != nil
+                        let hasAnyInfo = parameterCount != nil || contextLength != nil || embeddingLength != nil || hasLicense
+                        
+                        if !hasAnyInfo {
                             Text("No model information available.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
