@@ -40,14 +40,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var finalEvalDuration: Int? // 最終的な評価時間
     @Published var finalIsStopped: Bool = false // 最終的な停止状態
     
-    // ストリーミング表示最適化向けの分割バッファ
-    // fixed: 確定テキスト（Markdownで描画、ほとんど更新しない）
-    // pending: 差分テキスト（頻繁に更新、1行Textで軽量に表示）
-    @Published var fixedContent: String = ""
-    @Published var pendingContent: String = ""
-    @Published var fixedThinking: String = ""
-    @Published var pendingThinking: String = ""
-    
     enum CodingKeys: String, CodingKey {
         case role
         case content
@@ -77,12 +69,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
         self.generatedImage = try container.decodeIfPresent(String.self, forKey: .generatedImage)
         self.isImageGeneration = try container.decodeIfPresent(Bool.self, forKey: .isImageGeneration) ?? false
-        
-        // 復元時は固定領域に全体を入れておく
-        self.fixedContent = self.content
-        self.pendingContent = ""
-        self.fixedThinking = self.thinking ?? ""
-        self.pendingThinking = ""
     }
     
     func encode(to encoder: Encoder) throws {
@@ -118,11 +104,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.isThinkingCompleted = isThinkingCompleted
         self.generatedImage = generatedImage
         self.isImageGeneration = isImageGeneration
-        
-        self.fixedContent = content
-        self.pendingContent = ""
-        self.fixedThinking = thinking ?? ""
-        self.pendingThinking = ""
     }
     
     static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {

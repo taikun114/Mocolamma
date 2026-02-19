@@ -212,11 +212,6 @@ struct MessageView: View {
                 message.evalDuration = revision.evalDuration
                 message.isStopped = revision.isStopped
                 message.generatedImage = revision.generatedImage
-                
-                message.fixedContent = revision.fixedContent.isEmpty ? revision.content : revision.fixedContent
-                message.pendingContent = ""
-                message.fixedThinking = message.thinking ?? ""
-                message.pendingThinking = ""
             }) {
                 Image(systemName: "chevron.backward")
                     .contentShape(Rectangle())
@@ -251,7 +246,6 @@ struct MessageView: View {
                     message.evalDuration = revision.evalDuration
                     message.isStopped = revision.isStopped
                     message.generatedImage = revision.generatedImage
-                    message.fixedContent = revision.fixedContent.isEmpty ? revision.content : revision.fixedContent
                 } else {
                     message.content = message.latestContent ?? ""
                     message.thinking = message.finalThinking
@@ -262,11 +256,7 @@ struct MessageView: View {
                     message.evalDuration = message.finalEvalDuration
                     message.isStopped = message.finalIsStopped
                     message.generatedImage = message.latestGeneratedImage
-                    message.fixedContent = message.content
                 }
-                message.pendingContent = ""
-                message.fixedThinking = message.thinking ?? ""
-                message.pendingThinking = ""
             }) {
                 Image(systemName: "chevron.forward")
                     .contentShape(Rectangle())
@@ -532,7 +522,6 @@ struct MessageView: View {
     private var cancelButton: some View {
         Button(action: {
             isEditing = false
-            message.content = message.fixedContent
         }) {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
 #if os(iOS)
@@ -556,8 +545,6 @@ struct MessageView: View {
     private var doneButton: some View {
         Button(action: {
             isEditing = false
-            message.fixedContent = message.content
-            message.pendingContent = ""
             onRetry?(message.id, message)
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
@@ -604,8 +591,6 @@ struct MessageView: View {
                         if NSEvent.modifierFlags.contains(.command) {
                             Task { @MainActor in
                                 isEditing = false
-                                message.fixedContent = message.content
-                                message.pendingContent = ""
                                 onRetry?(message.id, message)
                             }
                             return .handled
@@ -659,12 +644,12 @@ struct MessageView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                } else if message.fixedContent == "*Cancelled*" {
+                } else if message.content == "*Cancelled*" {
                     Text("*Cancelled*")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                } else if !message.fixedContent.isEmpty {
-                    StructuredText(markdown: message.fixedContent)
+                } else if !message.content.isEmpty {
+                    StructuredText(markdown: message.content)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
                 } else {
@@ -672,23 +657,16 @@ struct MessageView: View {
                         .foregroundColor(.red)
                 }
             }
-        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+        } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
-                        if !message.fixedThinking.isEmpty {
-                            Text(message.fixedThinking)
+                        if let thinking = message.thinking, !thinking.isEmpty {
+                            Text(thinking)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
-                        }
-                        if !message.pendingThinking.isEmpty {
-                            Text(message.pendingThinking)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 } label: {
@@ -707,31 +685,23 @@ struct MessageView: View {
     
     @ViewBuilder
     private var streamingContentBody: some View {
-        if message.isStreaming && message.fixedContent.isEmpty && message.pendingContent.isEmpty {
+        if message.isStreaming && message.content.isEmpty {
             ProgressView()
                 .controlSize(.small)
                 .padding(2)
-        } else if message.isStopped && (message.fixedContent + message.pendingContent).isEmpty {
+        } else if message.isStopped && message.content.isEmpty {
             Text("*No message*")
                 .font(.caption)
                 .foregroundColor(.secondary)
-        } else if !message.isStreaming && (message.fixedContent + message.pendingContent).isEmpty {
+        } else if !message.isStreaming && message.content.isEmpty {
             Text("*Could not connect*")
                 .font(.caption)
                 .foregroundColor(.secondary)
         } else {
             VStack(alignment: .leading, spacing: 6) {
-                if !message.fixedContent.isEmpty {
-                    StructuredText(markdown: message.fixedContent)
-                        .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
-                        .textual.structuredTextStyle(SimpleStyle(message: message))
-                }
-                if !message.pendingContent.isEmpty {
-                    Text(message.pendingContent)
-                        .font(.body)
-                        .foregroundColor(message.role == "user" ? .white : .primary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                StructuredText(markdown: message.content)
+                    .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                    .textual.structuredTextStyle(SimpleStyle(message: message))
             }
         }
     }
