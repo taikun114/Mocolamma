@@ -546,7 +546,6 @@ class ImageGenerationSettings: ObservableObject {
     }
     
     // カスタム設定
-    @Published var useCustomSettings: Bool = false
     @Published var customWidthEnabled: Bool = false
     @Published var customWidth: Int = 512
     @Published var customHeightEnabled: Bool = false
@@ -566,21 +565,21 @@ class ImageGenerationSettings: ObservableObject {
     
     // 実際にAPIに送る値を取得するヘルパー
     var finalWidth: Int {
-        if useCustomSettings && customWidthEnabled {
+        if customWidthEnabled {
             return customWidth
         }
         return Int(width)
     }
     
     var finalHeight: Int {
-        if useCustomSettings && customHeightEnabled {
+        if customHeightEnabled {
             return customHeight
         }
         return Int(height)
     }
     
     var finalSteps: Int {
-        if useCustomSettings && customStepsEnabled {
+        if customStepsEnabled {
             return customSteps
         }
         return Int(steps)

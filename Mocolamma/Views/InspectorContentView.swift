@@ -51,28 +51,33 @@ struct InspectorContentView: View {
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
-                        VStack(alignment: .leading) {
-                            Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
+                        Toggle(isOn: $chatSettings.isStreamingEnabled) {
+                            Text("Stream Response")
                             Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                         
-                        VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                Text("Thinking")
+                                Text("Specifies whether to perform inference when using a reasoning model.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
                             Picker("Thinking", selection: $chatSettings.thinkingOption) {
                                 ForEach(ThinkingOption.allCases) { option in
                                     Text(option.localizedName).tag(option)
                                 }
                             }
+                            .labelsHidden()
                             .pickerStyle(.menu)
                             .disabled(!(chatSettings.selectedModelCapabilities?.contains("thinking") ?? false))
                             .onChange(of: chatSettings.selectedModelCapabilities) { _, caps in
                                 let hasThinking = caps?.contains("thinking") ?? false
                                 if !hasThinking { chatSettings.thinkingOption = .none }
                             }
-                            Text("Specifies whether to perform inference when using a reasoning model.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
                         }
                         
                         VStack {
@@ -158,8 +163,8 @@ struct InspectorContentView: View {
             } else if selection == "image_generation" {
                 Form {
                     Section("Image Generation Settings") {
-                        VStack(alignment: .leading) {
-                            Toggle("Stream Response", isOn: $imageSettings.isStreamingEnabled)
+                        Toggle(isOn: $imageSettings.isStreamingEnabled) {
+                            Text("Stream Response")
                             Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -172,12 +177,10 @@ struct InspectorContentView: View {
                     }
                     
                     Section("Custom Settings") {
-                        Toggle("Enable Custom Settings", isOn: $imageSettings.useCustomSettings)
-                        
                         VStack(alignment: .leading) {
                             Toggle(isOn: $imageSettings.customWidthEnabled) {
                                 Text("Custom Width")
-                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                                    .foregroundStyle(imageSettings.customWidthEnabled ? .primary : .secondary)
                             }
                             HStack {
                                 TextField("Enter custom width", value: $imageSettings.customWidth, format: .number.grouping(.never))
@@ -189,20 +192,19 @@ struct InspectorContentView: View {
 #endif
                                     .disabled(!imageSettings.customWidthEnabled)
                                 
-                                Stepper("Adjust custom width", value: $imageSettings.customWidth, in: 64...10000, step: 64)
+                                Stepper("Adjust custom width", value: $imageSettings.customWidth, in: 64...65536, step: 8)
                                     .labelsHidden()
                                     .disabled(!imageSettings.customWidthEnabled)
                             }
                             Text("Enter the desired image width as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                                .foregroundStyle(imageSettings.customWidthEnabled ? .secondary : .tertiary)
                         }
-                        .disabled(!imageSettings.useCustomSettings)
                         
                         VStack(alignment: .leading) {
                             Toggle(isOn: $imageSettings.customHeightEnabled) {
                                 Text("Custom Height")
-                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                                    .foregroundStyle(imageSettings.customHeightEnabled ? .primary : .secondary)
                             }
                             HStack {
                                 TextField("Enter custom height", value: $imageSettings.customHeight, format: .number.grouping(.never))
@@ -214,20 +216,19 @@ struct InspectorContentView: View {
 #endif
                                     .disabled(!imageSettings.customHeightEnabled)
                                 
-                                Stepper("Adjust custom height", value: $imageSettings.customHeight, in: 64...10000, step: 64)
+                                Stepper("Adjust custom height", value: $imageSettings.customHeight, in: 64...65536, step: 8)
                                     .labelsHidden()
                                     .disabled(!imageSettings.customHeightEnabled)
                             }
                             Text("Enter the desired image height as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                                .foregroundStyle(imageSettings.customHeightEnabled ? .secondary : .tertiary)
                         }
-                        .disabled(!imageSettings.useCustomSettings)
                         
                         VStack(alignment: .leading) {
                             Toggle(isOn: $imageSettings.customStepsEnabled) {
                                 Text("Custom Steps")
-                                    .foregroundStyle(imageSettings.useCustomSettings ? .primary : .secondary)
+                                    .foregroundStyle(imageSettings.customStepsEnabled ? .primary : .secondary)
                             }
                             HStack {
                                 TextField("Enter custom steps", value: $imageSettings.customSteps, format: .number.grouping(.never))
@@ -245,9 +246,8 @@ struct InspectorContentView: View {
                             }
                             Text("Enter the number of image generation steps as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.useCustomSettings ? .secondary : .tertiary)
+                                .foregroundStyle(imageSettings.customStepsEnabled ? .secondary : .tertiary)
                         }
-                        .disabled(!imageSettings.useCustomSettings)
                     }
                 }
                 .formStyle(.grouped)
@@ -285,11 +285,11 @@ struct InspectorContentView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Width")
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .secondary : .primary)
+                    .foregroundStyle(imageSettings.customWidthEnabled ? .secondary : .primary)
                 Spacer()
                 Text("\(Int(imageSettings.width)) px")
                     .font(.body.monospaced())
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+                    .foregroundStyle(imageSettings.customWidthEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
 #if os(iOS)
@@ -297,7 +297,7 @@ struct InspectorContentView: View {
 #else
                 .frame(height: 16)
 #endif
-                .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                .disabled(imageSettings.customWidthEnabled)
             
             HStack {
                 ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
@@ -310,7 +310,7 @@ struct InspectorContentView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
-                        .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                        .disabled(imageSettings.customWidthEnabled)
                     } else {
                         Button {
                             imageSettings.width = size
@@ -320,14 +320,14 @@ struct InspectorContentView: View {
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
-                        .disabled(imageSettings.useCustomSettings && imageSettings.customWidthEnabled)
+                        .disabled(imageSettings.customWidthEnabled)
                     }
                 }
             }
             
             Text("Specifies the width of the image you want to generate.")
                 .font(.caption)
-                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customWidthEnabled) ? .tertiary : .secondary)
+                .foregroundStyle(imageSettings.customWidthEnabled ? .tertiary : .secondary)
         }
     }
     
@@ -336,11 +336,11 @@ struct InspectorContentView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Height")
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .secondary : .primary)
+                    .foregroundStyle(imageSettings.customHeightEnabled ? .secondary : .primary)
                 Spacer()
                 Text("\(Int(imageSettings.height)) px")
                     .font(.body.monospaced())
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+                    .foregroundStyle(imageSettings.customHeightEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
 #if os(iOS)
@@ -348,7 +348,7 @@ struct InspectorContentView: View {
 #else
                 .frame(height: 16)
 #endif
-                .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                .disabled(imageSettings.customHeightEnabled)
             
             HStack {
                 ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
@@ -361,7 +361,7 @@ struct InspectorContentView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
-                        .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                        .disabled(imageSettings.customHeightEnabled)
                     } else {
                         Button {
                             imageSettings.height = size
@@ -371,14 +371,14 @@ struct InspectorContentView: View {
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
-                        .disabled(imageSettings.useCustomSettings && imageSettings.customHeightEnabled)
+                        .disabled(imageSettings.customHeightEnabled)
                     }
                 }
             }
             
             Text("Specifies the height of the image you want to generate.")
                 .font(.caption)
-                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customHeightEnabled) ? .tertiary : .secondary)
+                .foregroundStyle(imageSettings.customHeightEnabled ? .tertiary : .secondary)
         }
     }
     
@@ -387,22 +387,22 @@ struct InspectorContentView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Steps")
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .secondary : .primary)
+                    .foregroundStyle(imageSettings.customStepsEnabled ? .secondary : .primary)
                 Spacer()
                 Text("\(Int(imageSettings.steps))")
                     .font(.body.monospaced())
-                    .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+                    .foregroundStyle(imageSettings.customStepsEnabled ? .tertiary : .secondary)
             }
-            CompactSlider(value: $imageSettings.steps, in: 1...50, step: 1)
+            CompactSlider(value: $imageSettings.steps, in: 1...20, step: 1)
 #if os(iOS)
                 .frame(height: 32)
 #else
                 .frame(height: 16)
 #endif
-                .disabled(imageSettings.useCustomSettings && imageSettings.customStepsEnabled)
+                .disabled(imageSettings.customStepsEnabled)
             Text("Specifies the number of image generation steps. Increasing the number of steps increases generation time but can improve detail.")
                 .font(.caption)
-                .foregroundStyle((imageSettings.useCustomSettings && imageSettings.customStepsEnabled) ? .tertiary : .secondary)
+                .foregroundStyle(imageSettings.customStepsEnabled ? .tertiary : .secondary)
         }
     }
     
