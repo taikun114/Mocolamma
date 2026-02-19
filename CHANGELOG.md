@@ -40,6 +40,8 @@ Notes
 - **Improve message bubble display on iOS when the display size is large**
   - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
 - **Improve to display a checkmark icon when message copying is successful**
+- **Improve the model inspector to display a specific license when a license title is missing but the license body exists**
+  - If the license body contains `MIT License`, it will display `MIT License` as the license title. If the license body contains both `Apache License` and `Version 2.0`, it will display `Apache License 2.0` as the license title.
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0
