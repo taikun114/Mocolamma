@@ -100,13 +100,18 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         if let caps = capabilities, caps.contains(where: { $0.lowercased() == "image" }) {
             return true
         }
-        // familiesに"image"が含まれているか
-        if let families = details?.families, families.contains(where: { $0.lowercased() == "image" }) {
-            return true
+        return false
+    }
+    
+    /// チャット（Completion）に対応しているモデルかどうかを判定します。
+    var supportsCompletion: Bool {
+        // capabilitiesがあればそれを尊重
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "completion" })
         }
-        // モデル名に"image"や"stable-diffusion"などが含まれている場合も考慮（ヒューリスティック）
-        let lowerName = name.lowercased()
-        return lowerName.contains("image") || lowerName.contains("diffusion") || lowerName.contains("flux")
+        
+        // capabilitiesがまだ取得できていない状態などは、確実な判定ができないためfalseを返す
+        return false
     }
 }
 

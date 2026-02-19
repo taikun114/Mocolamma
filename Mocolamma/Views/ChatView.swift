@@ -213,10 +213,10 @@ struct ChatView: View {
             Menu {
                 Picker("Select Model", selection: $chatSettings.selectedModelID) {
                     Text("Select Model").tag(nil as OllamaModel.ID?)
-                    ForEach(executor.models) { model in
+                    ForEach(executor.models.filter { $0.supportsCompletion }) { model in
                         Text(model.name).tag(model.id as OllamaModel.ID?)
                     }
-                    if executor.models.isEmpty {
+                    if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                         Divider()
                         Text(LocalizedStringKey("No models available"))
                             .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる
@@ -241,10 +241,10 @@ struct ChatView: View {
             Picker("Select Model", selection: $chatSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
-                ForEach(executor.models) { model in
+                ForEach(executor.models.filter { $0.supportsCompletion }) { model in
                     Text(model.name).tag(model.id as OllamaModel.ID?)
                 }
-                if executor.models.isEmpty {
+                if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Divider()
                     Text(LocalizedStringKey("No models available"))
                         .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる

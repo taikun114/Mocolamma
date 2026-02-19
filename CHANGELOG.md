@@ -25,6 +25,8 @@ Notes
 - **Support for Ollama's image generation feature (beta)**
   - As Ollama's image generation feature is currently in beta, future Ollama updates may introduce changes to its functionality (Ollama API), potentially causing the image generation feature to stop working in Mocolamma.
   - A demo of the image generation feature is available. Select `demo-image:0b` as the image generation model and send any prompt. This will perform a simulation advancing 0.2 seconds per step, finally outputting a test image.
+- **Support image model tag**
+  - Image model tag is now correctly displayed in the model inspector.
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
@@ -38,8 +40,7 @@ Notes
 - **Improve message bubble display on iOS when the display size is large**
   - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
 - **Improve to display a checkmark icon when message copying is successful**
-- **Support image model tag**
-  - Image model tag is now correctly displayed in the model inspector.
+- **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0
 ### New Features

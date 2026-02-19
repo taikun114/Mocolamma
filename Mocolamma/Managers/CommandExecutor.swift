@@ -255,11 +255,33 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
             print("Attempting to decode. Data size: \(data.count) bytes. First 10 bytes: \(data.prefix(10).map { String(format: "%02x", $0) }.joined())...")
             
             let apiResponse = try JSONDecoder().decode(OllamaAPIModelsResponse.self, from: data)
-            self.models = apiResponse.models.enumerated().map { (index, model) in
-                var mutableModel = model
-                mutableModel.originalIndex = index
-                return mutableModel
+            let initialModels = apiResponse.models
+            
+            // 各モデルの詳細情報（capabilitiesなど）を並列で取得
+            self.models = await withTaskGroup(of: (Int, OllamaModel).self) { group in
+                for (index, model) in initialModels.enumerated() {
+                    group.addTask {
+                        var detailedModel = model
+                        detailedModel.originalIndex = index
+                        if let info = await self.fetchModelInfo(modelName: model.name) {
+                            detailedModel.capabilities = info.capabilities
+                            // details内の情報も補完（一覧で欠落している場合があるため）
+                            if detailedModel.details == nil {
+                                detailedModel.details = info.details
+                            }
+                        }
+                        return (index, detailedModel)
+                    }
+                }
+                
+                var updatedModels: [(Int, OllamaModel)] = []
+                for await result in group {
+                    updatedModels.append(result)
+                }
+                // 元の順序を維持してソート
+                return updatedModels.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
             }
+            
             let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "Ollamaサーバー上からモデル情報を取得することができた場合のメッセージ。合計モデル数。"), self.models.count)
             self.output = successMessage
             print("Successfully retrieved models. Total: \(self.models.count)")
