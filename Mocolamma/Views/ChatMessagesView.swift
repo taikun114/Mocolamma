@@ -55,7 +55,8 @@ struct ChatMessagesScrollView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
+                // LazyVStackからVStackに変更してレイアウトの安定性を確保
+                VStack(alignment: .leading, spacing: 10) {
                     ForEach(messages) { message in
                         MessageViewWrapper(
                             message: message,
@@ -75,14 +76,26 @@ struct ChatMessagesScrollView: View {
             }
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
             .onChange(of: messages.count) { oldCount, newCount in
-                if newCount > oldCount, let lastMessage = messages.last, lastMessage.role == "assistant" {
-                    Task {
-                        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒待機
-                        withAnimation(reduceMotionEnabled ? .none : .default) {
-                            proxy.scrollTo("bottom-spacer", anchor: .bottom)
-                        }
-                    }
+                if newCount > oldCount {
+                    // 新しいメッセージが追加されたときのみスクロール
+                    scrollBottom(proxy: proxy)
                 }
+            }
+            // 最後のメッセージの内容（ストリーミング）が更新された時も追従したい場合
+            .onChange(of: isOverallStreaming) { _, newValue in
+                if newValue {
+                    scrollBottom(proxy: proxy)
+                }
+            }
+        }
+    }
+    
+    private func scrollBottom(proxy: ScrollViewProxy) {
+        Task {
+            // レイアウト確定を待つための最小限の遅延
+            try? await Task.sleep(nanoseconds: 50_000_000) 
+            withAnimation(reduceMotionEnabled ? .none : .default) {
+                proxy.scrollTo("bottom-spacer", anchor: .bottom)
             }
         }
     }
