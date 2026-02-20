@@ -649,7 +649,10 @@ struct MessageView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if !message.content.isEmpty {
-                    StructuredText(markdown: message.content)
+                    let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
+                        ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
+                        : message.content
+                    StructuredText(markdown: displayContent)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
                         .compositingGroup() // 描画を最適化しつつインタラクションを維持
@@ -700,7 +703,10 @@ struct MessageView: View {
                 .foregroundColor(.secondary)
         } else {
             VStack(alignment: .leading, spacing: 6) {
-                StructuredText(markdown: message.content)
+                let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
+                    ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
+                    : message.content
+                StructuredText(markdown: displayContent)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
                     .compositingGroup() // 描画を最適化
