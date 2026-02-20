@@ -655,6 +655,7 @@ struct MessageView: View {
                     StructuredText(markdown: displayContent)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
+                        .textual.textSelection(.enabled)
                         .compositingGroup() // 描画を最適化しつつインタラクションを維持
                 } else {
                     Text("Failed to generate image.")
@@ -709,6 +710,7 @@ struct MessageView: View {
                 StructuredText(markdown: displayContent)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
+                    .textual.textSelection(.enabled)
                     .compositingGroup() // 描画を最適化
             }
         }
