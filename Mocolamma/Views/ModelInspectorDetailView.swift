@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - モデルインスペクター詳細ビューヘルパー
 struct ModelInspectorDetailView: View {
     let model: OllamaModel
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     
     @State private var modelInfo: [String: JSONValue]?
     @State private var licenseBody: String?

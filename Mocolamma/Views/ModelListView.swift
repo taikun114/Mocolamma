@@ -29,7 +29,7 @@ enum SortOrder: String, CaseIterable, Identifiable {
 /// モデルリストに関連するUIとロジックをカプセル化したビューです。
 /// ContentViewから必要なデータとバインディングを受け取って表示を更新します。
 struct ModelListView: View {
-    @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
+    var executor: CommandExecutor // @ObservedObjectを削除
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
@@ -91,14 +91,6 @@ struct ModelListView: View {
         }
         if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
         return nil
-    }
-    
-    private func deleteModel(at offsets: IndexSet) {
-        let modelsToDelete = offsets.map { sortedModels[$0] }
-        if let model = modelsToDelete.first {
-            modelToDelete = model
-            showingDeleteConfirmation = true
-        }
     }
     
     @ToolbarContentBuilder
@@ -166,170 +158,20 @@ struct ModelListView: View {
     var body: some View {
         let copyIconName = SFSymbol.copy
         
-        VStack {
-#if os(iOS)
-            List(selection: $selectedModel) {
-                ForEach(sortedModels) { model in
-                    HStack(alignment: .center, spacing: 16) {
-                        Text("\(model.originalIndex + 1)")
-                            .foregroundColor(.secondary)
-                            .frame(minWidth: 20, alignment: .center)
-                            .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
-                        
-                        VStack(alignment: .leading) {
-                            Text(model.name)
-                                .fontWeight(.bold)
-                                .lineLimit(1)
-                                .help(model.name)
-                            Text("\(model.formattedSize), \(model.formattedModifiedAt)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .tag(model.id)
-                    .contextMenu {
-                        Button {
-#if os(iOS)
-                            UIPasteboard.general.string = model.name
-#else
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(model.name, forType: .string)
-#endif
-                        } label: {
-                            Label("Copy Model Name", systemImage: copyIconName)
-                        }
-                        
-                        Button(role: .destructive) {
-                            modelToDelete = model
-                            showingDeleteConfirmation = true
-                        } label: {
-                            Label("Delete...", systemImage: "trash")
-                        }
-                    }
-                }
-                .onDelete(perform: deleteModel)
-            }
-            .refreshable {
-                appRefreshTrigger.send()
-            }
-#else
-            Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
-                TableColumn("No.", value: \.originalIndex) { model in // テーブル列ヘッダー：番号。
-                    Text("\(model.originalIndex + 1)")
-                        .help("No. \(model.originalIndex + 1)") // 番号のヘルプテキスト
-                }
-                .width(min: 30, ideal: 50, max: .infinity)
-                
-                TableColumn("Name", value: \.name) { model in // テーブル列ヘッダー：名前。
-                    Text(model.name)
-                        .help(model.name)
-                }
-                .width(min: 100, ideal: 200, max: .infinity)
-                
-                TableColumn("Size", value: \.comparableSize) { model in // テーブル列ヘッダー：サイズ。
-                    Text(model.formattedSize) // formattedSizeを使用します
-                        .help("\(model.formattedSize), \(model.size) B") // サイズのヘルプテキスト
-                }
-                .width(min: 50, ideal: 100, max: .infinity)
-                
-                TableColumn("Modified At", value: \.comparableModifiedDate) { model in // テーブル列ヘッダー：変更日。
-                    Text(model.formattedModifiedAt) // formattedModifiedAtを使用します
-                        .help(model.formattedModifiedAt) // 変更日のヘルプテキスト
-                }
-                .width(min: 100, ideal: 150, max: .infinity)
-            }
-            // Tableレベルでコンテキストメニューを設定
-            .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
-                if let selectedID = selectedIDs.first,
-                   let model = sortedModels.first(where: { $0.id == selectedID }) {
-                    Button("Copy Model Name", systemImage: copyIconName) {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(model.name, forType: .string)
-                    }
-                    
-                    
-                    Button("Delete...", systemImage: "trash", role: .destructive) {
-                        modelToDelete = model
-                        showingDeleteConfirmation = true
-                    }
-                    
-                }
-            }
-#endif
-            // プログレスバーとステータステキスト
-            if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
-                VStack(alignment: .center, spacing: 8) {
-                    ProgressView(value: executor.pullProgress) {
-                        HStack(alignment: .bottom) {
-                            Text(executor.pullStatus)
-                            Spacer()
-                            if executor.isPullingErrorHold && executor.pullHasError {
-                                Button(action: {
-                                    if !executor.lastPulledModelName.isEmpty {
-                                        executor.pullModel(modelName: executor.lastPulledModelName)
-                                    }
-                                }) {
-                                    Image(systemName: "arrow.clockwise")
-                                        .help("Retry")
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.top, 4)
-                                .padding(.bottom, 2)
-                                .contentShape(Rectangle())
-                            }
-                        }
-                    } currentValueLabel: {
-                        Group {
-                            if horizontalSizeClass == .compact {
-                                VStack(alignment: .leading) {
-                                    Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                                                executor.pullProgress * 100 as CVarArg,
-                                                ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                                ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    if executor.pullSpeedBytesPerSec > 0 {
-                                        let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                        let eta = Int(executor.pullETARemaining)
-                                        let etaMin = eta / 60
-                                        let etaSec = eta % 60
-                                        Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
-                                            .foregroundStyle(.secondary)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                }
-                            } else {
-                                HStack {
-                                    Text(String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                                                executor.pullProgress * 100 as CVarArg,
-                                                ByteCountFormatter().string(fromByteCount: executor.pullCompleted) as CVarArg,
-                                                ByteCountFormatter().string(fromByteCount: executor.pullTotal) as CVarArg))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    Spacer()
-                                    if executor.pullSpeedBytesPerSec > 0 {
-                                        let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
-                                        let eta = Int(executor.pullETARemaining)
-                                        let etaMin = eta / 60
-                                        let etaSec = eta % 60
-                                        Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
-                                            .foregroundStyle(.secondary)
-                                            .frame(maxWidth: .infinity, alignment: .trailing)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .progressViewStyle(.linear)
-                    if let errorText = parseError(from: executor.output) {
-                        MarqueeText(text: errorText)
-                            .foregroundColor(.red)
-                            .padding(.top, 2)
-                            .frame(maxWidth: .infinity, minHeight: 14)
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
-                .padding(.bottom, 12)
-            }
+        VStack(spacing: 0) {
+            // モデルリスト本体を独立したビューに委譲。
+            // sortedModelsを直接渡すことで、進捗更新（pullProgressなど）による再描画を回避します。
+            ModelListContentView(
+                sortedModels: sortedModels,
+                selectedModel: $selectedModel,
+                sortOrder: $sortOrder,
+                modelToDelete: $modelToDelete,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                copyIconName: copyIconName
+            )
+            
+            // プログレスバーとステータステキストを独立したビューに切り出し
+            PullProgressView(executor: executor, isSelected: isSelected)
         }
         .overlay(alignment: .center) {
             if serverManager.selectedServer == nil {
@@ -369,6 +211,212 @@ struct ModelListView: View {
                 appRefreshTrigger.send()
             }
         }
+    }
+}
+
+// MARK: - モデルリスト表示本体のサブビュー
+
+/// リストおよびテーブルの表示を担うビュー。
+/// 進捗更新などの頻繁な変更から隔離するため、表示に必要な最小限のデータのみを受け取ります。
+struct ModelListContentView: View {
+    let sortedModels: [OllamaModel]
+    @Binding var selectedModel: OllamaModel.ID?
+    @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var modelToDelete: OllamaModel?
+    @Binding var showingDeleteConfirmation: Bool
+    let copyIconName: String
+    
+    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    
+    var body: some View {
+#if os(iOS)
+        List(selection: $selectedModel) {
+            ForEach(sortedModels) { model in
+                HStack(alignment: .center, spacing: 16) {
+                    Text("\(model.originalIndex + 1)")
+                        .foregroundColor(.secondary)
+                        .frame(minWidth: 20, alignment: .center)
+                        .help("No. \(model.originalIndex + 1)")
+                    
+                    VStack(alignment: .leading) {
+                        Text(model.name)
+                            .fontWeight(.bold)
+                            .lineLimit(1)
+                            .help(model.name)
+                        Text("\(model.formattedSize), \(model.formattedModifiedAt)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .tag(model.id)
+                .contextMenu {
+                    Button {
+                        UIPasteboard.general.string = model.name
+                    } label: {
+                        Label("Copy Model Name", systemImage: copyIconName)
+                    }
+                    
+                    Button(role: .destructive) {
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    } label: {
+                        Label("Delete...", systemImage: "trash")
+                    }
+                }
+            }
+            .onDelete { offsets in
+                let modelsToDelete = offsets.map { sortedModels[$0] }
+                if let model = modelsToDelete.first {
+                    modelToDelete = model
+                    showingDeleteConfirmation = true
+                }
+            }
+        }
+        .refreshable {
+            appRefreshTrigger.send()
+        }
+#else
+        Table(sortedModels, selection: $selectedModel, sortOrder: $sortOrder) {
+            TableColumn("No.", value: \.originalIndex) { model in
+                Text("\(model.originalIndex + 1)")
+                    .help("No. \(model.originalIndex + 1)")
+            }
+            .width(min: 30, ideal: 50, max: .infinity)
+            
+            TableColumn("Name", value: \.name) { model in
+                Text(model.name)
+                    .help(model.name)
+            }
+            .width(min: 100, ideal: 200, max: .infinity)
+            
+            TableColumn("Size", value: \.comparableSize) { model in
+                Text(model.formattedSize)
+                    .help("\(model.formattedSize), \(model.size) B")
+            }
+            .width(min: 50, ideal: 100, max: .infinity)
+            
+            TableColumn("Modified At", value: \.comparableModifiedDate) { model in
+                Text(model.formattedModifiedAt)
+                    .help(model.formattedModifiedAt)
+            }
+            .width(min: 100, ideal: 150, max: .infinity)
+        }
+        .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
+            if let selectedID = selectedIDs.first,
+               let model = sortedModels.first(where: { $0.id == selectedID }) {
+                Button("Copy Model Name", systemImage: copyIconName) {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(model.name, forType: .string)
+                }
+                
+                Button("Delete...", systemImage: "trash", role: .destructive) {
+                    modelToDelete = model
+                    showingDeleteConfirmation = true
+                }
+            }
+        }
+#endif
+    }
+}
+
+// MARK: - 進捗表示用のサブビュー
+
+/// モデルのプル進捗を表示するための独立したビュー。
+/// CommandExecutorを独自に監視することで、進捗更新時の描画負荷をこのビュー内に限定します。
+struct PullProgressView: View {
+    var executor: CommandExecutor
+    let isSelected: Bool
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    var body: some View {
+        if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
+            VStack(alignment: .center, spacing: 8) {
+                ProgressView(value: executor.pullProgress) {
+                    HStack(alignment: .bottom) {
+                        Text(executor.pullStatus)
+                        Spacer()
+                        if executor.isPullingErrorHold && executor.pullHasError {
+                            Button(action: {
+                                if !executor.lastPulledModelName.isEmpty {
+                                    executor.pullModel(modelName: executor.lastPulledModelName)
+                                }
+                            }) {
+                                Image(systemName: "arrow.clockwise")
+                                    .help("Retry")
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 4)
+                            .padding(.bottom, 2)
+                            .contentShape(Rectangle())
+                        }
+                    }
+                } currentValueLabel: {
+                    progressLabels
+                }
+                .progressViewStyle(.linear)
+                .animation(.default, value: executor.pullProgress) // アニメーションを追加
+                
+                if let errorText = parseError(from: executor.output) {
+                    MarqueeText(text: errorText)
+                        .foregroundColor(.red)
+                        .padding(.top, 2)
+                        .frame(maxWidth: .infinity, minHeight: 14)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
+            .padding(.bottom, 12)
+        }
+    }
+    
+    @ViewBuilder
+    private var progressLabels: some View {
+        let completed = ByteCountFormatter().string(fromByteCount: executor.pullCompleted)
+        let total = ByteCountFormatter().string(fromByteCount: executor.pullTotal)
+        let percent = executor.pullProgress * 100
+        
+        let progressString = String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
+                                    percent as CVarArg, completed as CVarArg, total as CVarArg)
+        
+        if horizontalSizeClass == .compact {
+            VStack(alignment: .leading) {
+                Text(progressString)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if executor.pullSpeedBytesPerSec > 0 {
+                    speedAndETASection
+                }
+            }
+        } else {
+            HStack {
+                Text(progressString)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer()
+                if executor.pullSpeedBytesPerSec > 0 {
+                    speedAndETASection
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var speedAndETASection: some View {
+        let speedString = ByteCountFormatter.string(fromByteCount: Int64(executor.pullSpeedBytesPerSec), countStyle: .file)
+        let eta = Int(executor.pullETARemaining)
+        let etaMin = eta / 60
+        let etaSec = eta % 60
+        Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: horizontalSizeClass == .compact ? .leading : .trailing)
+    }
+    
+    private func parseError(from output: String) -> String? {
+        if let data = output.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let err = obj["error"] as? String {
+            return err.replacingOccurrences(of: "\n", with: " ")
+        }
+        if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
+        return nil
     }
 }
 

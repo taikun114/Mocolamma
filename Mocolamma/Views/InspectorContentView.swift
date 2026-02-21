@@ -4,7 +4,7 @@ import CompactSlider
 
 // MARK: - インスペクターコンテンツヘルパービュー
 struct InspectorContentView: View {
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     @EnvironmentObject var chatSettings: ChatSettings
     @EnvironmentObject var imageSettings: ImageGenerationSettings
     let selection: String?

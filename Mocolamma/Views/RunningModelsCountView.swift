@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RunningModelsCountView: View {
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     let host: String
     let connectionStatus: ServerConnectionStatus?
     @State private var runningModels: [OllamaRunningModel] = []
@@ -98,7 +98,7 @@ struct RunningModelsCountView: View {
 
 #Preview {
     RunningModelsCountView(host: "localhost:11434", connectionStatus: .connected)
-        .environmentObject(CommandExecutor(serverManager: ServerManager()))
+        .environment(CommandExecutor(serverManager: ServerManager()))
         .frame(width: 200)
         .padding()
 }

@@ -49,6 +49,7 @@ Notes
 - **Improve API timeout alert messages**
   - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
 - **Improve to display the language above the code block**
+- **Improve download progress display performance on the model screen**
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0

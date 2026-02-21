@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 import Photos
 
 struct MessageView: View {
-    @EnvironmentObject var executor: CommandExecutor
+    @Environment(CommandExecutor.self) var executor
     @ObservedObject var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool

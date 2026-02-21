@@ -8,7 +8,7 @@ struct ServerFormView: View {
     @Environment(\.dismiss) var dismiss // シートを閉じるための環境変数
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @ObservedObject var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
-    @ObservedObject var executor: CommandExecutor // 接続確認のためにCommandExecutorのインスタンスを受け取ります
+    var executor: CommandExecutor // @ObservedObjectを削除
     
     @State private var serverNameInput: String
     @State private var serverHostInput: String

@@ -2,7 +2,7 @@ import SwiftUI
 import Textual
 
 struct ChatView: View {
-    @EnvironmentObject var executor: CommandExecutor
+    @Environment(CommandExecutor.self) var executor
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @EnvironmentObject var chatSettings: ChatSettings
@@ -33,6 +33,7 @@ struct ChatView: View {
     
     @ViewBuilder
     private var chatContent: some View {
+        @Bindable var executor = executor
         ZStack {
             if serverManager.selectedServer == nil {
                 ContentUnavailableView(
@@ -65,6 +66,7 @@ struct ChatView: View {
     
     @ViewBuilder
     private func makeSafeAreaBarContent() -> some View {
+        @Bindable var executor = executor
         ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
             sendMessage()
         } stopMessage: {
@@ -80,6 +82,7 @@ struct ChatView: View {
     }
     
     var body: some View {
+        @Bindable var executor = executor
         Group {
             if #available(iOS 26.0, macOS 26.0, *) {
                 chatContent
@@ -617,7 +620,7 @@ struct ChatView: View {
 }
 
 struct ImageGenerationView: View {
-    @EnvironmentObject var executor: CommandExecutor
+    @Environment(CommandExecutor.self) var executor
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @EnvironmentObject var imageSettings: ImageGenerationSettings
@@ -629,8 +632,6 @@ struct ImageGenerationView: View {
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    
-    @State private var imageInputText: String = ""
     
     private var currentSelectedModel: OllamaModel? {
         if let id = imageSettings.selectedModelID {
@@ -649,6 +650,7 @@ struct ImageGenerationView: View {
     
     @ViewBuilder
     private var content: some View {
+        @Bindable var executor = executor
         ZStack {
             if serverManager.selectedServer == nil {
                 ContentUnavailableView(
@@ -686,8 +688,9 @@ struct ImageGenerationView: View {
     
     @ViewBuilder
     private func makeInputArea() -> some View {
+        @Bindable var executor = executor
         ChatInputView(
-            inputText: $imageInputText,
+            inputText: $executor.chatInputText,
             isStreaming: $executor.isImageStreaming,
             showingInspector: $showingInspector,
             placeholder: "Enter a prompt...",
@@ -706,6 +709,7 @@ struct ImageGenerationView: View {
     }
     
     var body: some View {
+        @Bindable var executor = executor
         Group {
             if #available(iOS 26.0, macOS 26.0, *) {
                 content
@@ -841,7 +845,7 @@ struct ImageGenerationView: View {
             ) {
                 Button(String(localized: "Clear History"), role: .destructive) {
                     executor.clearImageGeneration()
-                    imageInputText = ""
+                    executor.chatInputText = ""
                 }
                 Button(String(localized: "Cancel"), role: .cancel) { }
             }
@@ -864,10 +868,10 @@ struct ImageGenerationView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !imageInputText.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty else { return }
         
-        let prompt = imageInputText
-        imageInputText = ""
+        let prompt = executor.chatInputText
+        executor.chatInputText = ""
         executor.isImageStreaming = true
         
         let userMessage = ChatMessage(role: "user", content: prompt, createdAt: MessageView.iso8601Formatter.string(from: Date()))

@@ -5,7 +5,7 @@ import SwiftUI
 /// 新しいモデルの追加（プル）を行うためのシートビューです。ユーザーがモデル名を入力し、ダウンロードを開始するためのUIを提供します。
 struct AddModelsSheet: View {
     @Binding var showingAddSheet: Bool // シートの表示/非表示を制御するバインディング
-    @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
+    var executor: CommandExecutor // @ObservedObjectを削除
     
     @State private var modelNameInput: String = "" // モデル名入力
     @State private var showHttpErrorAlert: Bool = false
@@ -90,7 +90,7 @@ struct AddModelsSheet: View {
 #if os(macOS)
         .frame(width: 400, height: 250) // シートの固定サイズ
 #endif
-        .onReceive(executor.$pullHttpErrorTriggered) { triggered in
+        .onChange(of: executor.pullHttpErrorTriggered) { _, triggered in
             if triggered && !pullErrorTriggeredSeen {
                 httpErrorMessage = executor.pullHttpErrorMessage
                 showHttpErrorAlert = true

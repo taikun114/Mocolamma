@@ -6,7 +6,7 @@ import CompactSlider
 struct MainTabView: View {
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
-    @ObservedObject var executor: CommandExecutor
+    var executor: CommandExecutor
     @ObservedObject var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
@@ -44,7 +44,7 @@ struct MainTabView: View {
                 )
             }
             .environmentObject(serverManager)
-            .environmentObject(executor)
+            .environment(executor)
             .tabItem { Label("Models", systemImage: "tray.full") }
             .tag("models")
             
@@ -55,7 +55,7 @@ struct MainTabView: View {
                 )
             }
             .environmentObject(serverManager)
-            .environmentObject(executor)
+            .environment(executor)
             .tabItem { Label("Chat", systemImage: "message") }
             .tag("chat")
             
@@ -66,7 +66,7 @@ struct MainTabView: View {
                 )
             }
             .environmentObject(serverManager)
-            .environmentObject(executor)
+            .environment(executor)
             .tabItem { Label("Image Generation", systemImage: "photo") }
             .tag("image_generation")
             

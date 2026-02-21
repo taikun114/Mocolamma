@@ -4,7 +4,7 @@ import AppKit
 #endif
 
 struct ServerInspectorView: View {
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus? // チェック中にnilになる可能性あり
@@ -199,7 +199,7 @@ struct ServerInspectorView: View {
                         Text("Running Models:")
                             .font(.subheadline)
                         RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
-                            .environmentObject(commandExecutor)
+                            .environment(commandExecutor)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

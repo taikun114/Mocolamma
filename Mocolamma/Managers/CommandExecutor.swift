@@ -1,35 +1,36 @@
 import Foundation
 import SwiftUI
 import Combine
+import Observation
 
-@preconcurrency @MainActor
-class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessionDataDelegate {
-    @Published var output: String = ""
-    @Published var isRunning: Bool = false
-    @Published var pullHttpErrorTriggered: Bool = false
-    @Published var pullHttpErrorMessage: String = ""
-    @Published var models: [OllamaModel] = []
-    @Published var apiConnectionError: Bool = false
-    @Published var specificConnectionErrorMessage: String?
-    @Published var chatMessages: [ChatMessage] = []
-    @Published var chatInputText: String = ""
-    @Published var isChatStreaming: Bool = false
-    @Published var imageMessages: [ChatMessage] = []
-    @Published var isImageStreaming: Bool = false
-    @Published var successfullyDownloadedIDs: Set<UUID> = []
-    @Published var successfullyCopiedIDs: Set<UUID> = []
+@Observable @preconcurrency @MainActor
+class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
+    var output: String = ""
+    var isRunning: Bool = false
+    var pullHttpErrorTriggered: Bool = false
+    var pullHttpErrorMessage: String = ""
+    var models: [OllamaModel] = []
+    var apiConnectionError: Bool = false
+    var specificConnectionErrorMessage: String?
+    var chatMessages: [ChatMessage] = []
+    var chatInputText: String = ""
+    var isChatStreaming: Bool = false
+    var imageMessages: [ChatMessage] = []
+    var isImageStreaming: Bool = false
+    var successfullyDownloadedIDs: Set<UUID> = []
+    var successfullyCopiedIDs: Set<UUID> = []
     
     // モデルプル時の進捗状況
-    @Published var isPulling: Bool = false
-    @Published var isPullingErrorHold: Bool = false
-    @Published var pullHasError: Bool = false
-    @Published var pullStatus: String = "Preparing..." // プルステータス: 準備中。
-    @Published var pullProgress: Double = 0.0 // 0.0 から 1.0
-    @Published var pullTotal: Int64 = 0 // 合計バイト数
-    @Published var pullCompleted: Int64 = 0 // 完了したバイト数
-    @Published var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度 (B/s)
-    @Published var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
-    @Published var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
+    var isPulling: Bool = false
+    var isPullingErrorHold: Bool = false
+    var pullHasError: Bool = false
+    var pullStatus: String = "Preparing..." // プルステータス: 準備中。
+    var pullProgress: Double = 0.0 // 0.0 から 1.0
+    var pullTotal: Int64 = 0 // 合計バイト数
+    var pullCompleted: Int64 = 0 // 完了したバイト数
+    var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度 (B/s)
+    var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
+    var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
     private var urlSession: URLSession!
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
@@ -41,7 +42,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var pendingPullTotal: Int64 = 0 // 更新待機中の合計バイト数
     private var pendingPullCompleted: Int64 = 0 // 更新待機中の完了バイト数
     private var pendingPullProgress: Double = 0.0 // 更新待機中の進捗
-    private let pullStatusUpdateInterval: TimeInterval = 0.5 // プルステータスの更新間隔（秒）
+    private let pullStatusUpdateInterval: TimeInterval = 0.033 // プルステータスの更新間隔（秒）: 約30fps
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var imageContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ImageGenerationResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
@@ -50,7 +51,7 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
     private var currentImageTask: URLSessionDataTask? // 現在の画像生成タスクを保持
     
     // Ollama APIのベースURL
-    @Published var apiBaseURL: String?
+    var apiBaseURL: String?
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -90,14 +91,15 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
         serverManager.$servers
             .map { servers in
                 // serversリストが変更された場合、selectedServerIDに基づき新しいcurrentServerHostを計算
-                // selectedServerIDがない場合や、対応するサーバーがserversにない場合を考慮
                 if let selectedID = serverManager.selectedServerID,
                    let selectedServer = servers.first(where: { $0.id == selectedID }) {
                     return selectedServer.host
                 }
                 return nil
             }
-            .assign(to: \.apiBaseURL, on: self)
+            .sink { [weak self] host in
+                self?.apiBaseURL = host
+            }
             .store(in: &cancellables)
         
         serverManager.$selectedServerID
@@ -105,7 +107,9 @@ class CommandExecutor: NSObject, ObservableObject, URLSessionDelegate, URLSessio
                 // selectedIDが変更された場合、対応するサーバーのホストを返す
                 serverManager.servers.first(where: { $0.id == selectedID })?.host
             }
-            .assign(to: \.apiBaseURL, on: self)
+            .sink { [weak self] host in
+                self?.apiBaseURL = host
+            }
             .store(in: &cancellables)
         
         NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in

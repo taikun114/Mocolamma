@@ -11,7 +11,7 @@ struct ContentView: View {
     // ServerManagerのインスタンスをAppStateに保持し、ライフサイクル全体で利用可能にする
     @ObservedObject var serverManager: ServerManager
     // CommandExecutorはServerManagerに依存するため、後から初期化
-    @StateObject var executor: CommandExecutor
+    @State var executor: CommandExecutor
     
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     // サイドバー/タブの選択状態をAppレベルから受け取ります
@@ -46,7 +46,7 @@ struct ContentView: View {
     // ContentViewの初期化子を更新
     init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
         self.serverManager = serverManager
-        _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
+        self.executor = CommandExecutor(serverManager: serverManager)
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
@@ -62,9 +62,8 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-#if os(macOS)
-            MainNavigationView(
-                sidebarSelection: $selection,
+            MainTabView(
+                selection: $selection,
                 selectedModel: $selectedModel,
                 executor: executor,
                 serverManager: serverManager,
@@ -74,74 +73,10 @@ struct ContentView: View {
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
-                columnVisibility: $columnVisibility,
                 sortedModels: sortedModels
             )
-#elseif os(iOS)
-            if #available(iOS 18.0, *) {
-                MainTabView(
-                    selection: $selection,
-                    selectedModel: $selectedModel,
-                    executor: executor,
-                    serverManager: serverManager,
-                    selectedServerForInspector: $selectedServerForInspector,
-                    showingInspector: $showingInspector,
-                    sortOrder: $sortOrder,
-                    showingAddModelsSheet: $showingAddModelsSheet,
-                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                    modelToDelete: $modelToDelete,
-                    sortedModels: sortedModels
-                )
-            } else {
-                if UIDevice.current.userInterfaceIdiom == .phone {
-                    LegacyIPhoneTabView(
-                        selection: $selection,
-                        selectedModel: $selectedModel,
-                        executor: executor,
-                        serverManager: serverManager,
-                        selectedServerForInspector: $selectedServerForInspector,
-                        showingInspector: $showingInspector,
-                        sortOrder: $sortOrder,
-                        showingAddModelsSheet: $showingAddModelsSheet,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        modelToDelete: $modelToDelete,
-                        sortedModels: sortedModels
-                    )
-                } else {
-                    MainNavigationView(
-                        sidebarSelection: $selection,
-                        selectedModel: $selectedModel,
-                        executor: executor,
-                        serverManager: serverManager,
-                        selectedServerForInspector: $selectedServerForInspector,
-                        showingInspector: $showingInspector,
-                        sortOrder: $sortOrder,
-                        showingAddModelsSheet: $showingAddModelsSheet,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        modelToDelete: $modelToDelete,
-                        columnVisibility: $columnVisibility,
-                        sortedModels: sortedModels
-                    )
-                }
-            }
-#else
-            MainNavigationView(
-                sidebarSelection: $selection,
-                selectedModel: $selectedModel,
-                executor: executor,
-                serverManager: serverManager,
-                selectedServerForInspector: $selectedServerForInspector,
-                showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
-                showingAddModelsSheet: $showingAddModelsSheet,
-                showingDeleteConfirmation: $showingDeleteConfirmation,
-                modelToDelete: $modelToDelete,
-                columnVisibility: $columnVisibility,
-                sortedModels: sortedModels
-            )
-#endif
         }
-        .environmentObject(executor)
+        .environment(executor)
         .environmentObject(chatSettings)
         .sheet(isPresented: $showingAddModelsSheet) {
             NavigationStack {

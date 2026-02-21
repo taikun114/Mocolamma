@@ -6,7 +6,7 @@ import SwiftUI
 /// サーバーのリストを表示し、新しいサーバーの追加、既存サーバーの編集を管理します。
 struct ServerView: View {
     @ObservedObject var serverManager: ServerManager
-    @ObservedObject var executor: CommandExecutor
+    var executor: CommandExecutor
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     @State private var showingAddServerSheet = false
@@ -167,7 +167,7 @@ struct ServerView: View {
 
 private struct ServerListViewContent: View {
     @ObservedObject var serverManager: ServerManager
-    @ObservedObject var executor: CommandExecutor
+    var executor: CommandExecutor
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool

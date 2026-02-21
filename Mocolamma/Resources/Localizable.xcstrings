@@ -6383,41 +6383,6 @@
       },
       "shouldTranslate" : false
     },
-    "Menu" : {
-      "comment" : "この画面がメニューであることを表すヘッドラインテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menü"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menu"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menú"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menu"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニュー"
-          }
-        }
-      }
-    },
     "Mocolamma" : {
       "localizations" : {
         "de" : {
@@ -9269,41 +9234,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択"
-          }
-        }
-      }
-    },
-    "Select a menu." : {
-      "comment" : "メニューを選択するよう促すテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wählen Sie ein Menü aus."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a menu."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona un menú."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionnez un menu."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューを選択してください"
           }
         }
       }
