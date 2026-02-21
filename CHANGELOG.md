@@ -22,6 +22,9 @@ Notes
 
 ## 1.2.0 (under development)
 ### New Features
+- **Revamping the Markdown rendering engine**
+  - The Markdown rendering engine for chat has been updated from [**MarkdownUI**](https://github.com/gonzalezreal/swift-markdown-ui) to [**Textual**](https://github.com/gonzalezreal/textual), incorporating improvements such as enhanced performance and syntax highlighting for code blocks, resulting in a more user-friendly experience.
+  - As a result, Mocolamma now requires **iOS / iPadOS 18.0 or later, macOS 15.0 or later, visionOS 2.0 or later**. Please note that users on older operating systems will need to perform a software update.
 - **Support for Ollama's image generation feature (beta)**
   - As Ollama's image generation feature is currently in beta, future Ollama updates may introduce changes to its functionality (Ollama API), potentially causing the image generation feature to stop working in Mocolamma.
   - A demo of the image generation feature is available. Select `demo-image:0b` as the image generation model and send any prompt. This will perform a simulation advancing 0.2 seconds per step, finally outputting a test image.
@@ -30,6 +33,7 @@ Notes
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
+- **Fix issue where the chat screen would freeze while scrolling**
 - **Improve to show an error when selecting an image-only model in the chat screen**
 - **Improve to prevent the add server and model sheet from closing when swiping down on iOS**
 - **Improve the style of the Add and Complete buttons on the add server and model sheet in iOS 26**
@@ -44,6 +48,7 @@ Notes
   - If the license body contains `MIT License`, it will display `MIT License` as the license title. If the license body contains both `Apache License` and `Version 2.0`, it will display `Apache License 2.0` as the license title.
 - **Improve API timeout alert messages**
   - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
+- **Improve to display the language above the code block**
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0

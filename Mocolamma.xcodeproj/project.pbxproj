@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6D6AF25D2E37C253008E569D /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6D6AF25C2E37C253008E569D /* MarkdownUI */; };
 		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
+		6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6D80A9482F4725EF00B2D5A4 /* Textual */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D6AF25D2E37C253008E569D /* MarkdownUI in Frameworks */,
+				6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */,
 				6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -135,8 +135,8 @@
 			);
 			name = Mocolamma;
 			packageProductDependencies = (
-				6D6AF25C2E37C253008E569D /* MarkdownUI */,
 				6D7D84A02E3B68FA006EDB4D /* CompactSlider */,
+				6D80A9482F4725EF00B2D5A4 /* Textual */,
 			);
 			productName = Mocolamma;
 			productReference = 6DC81A322E3236B3005F2E03 /* Mocolamma.app */;
@@ -225,8 +225,8 @@
 			mainGroup = 6DC81A292E3236B3005F2E03;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				6D6AF25B2E37C253008E569D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */,
+				6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DC81A332E3236B3005F2E03 /* Products */;
@@ -441,7 +441,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -468,12 +468,12 @@
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This is required to communicate with Ollama servers existing within the local network.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This is required to save generated images to your photo library.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = design.taikun.Mocolamma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -506,7 +506,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -533,12 +533,12 @@
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This is required to communicate with Ollama servers existing within the local network.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This is required to save generated images to your photo library.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = design.taikun.Mocolamma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -565,7 +565,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -584,7 +584,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -602,7 +602,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -619,7 +619,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2869;
+				CURRENT_PROJECT_VERSION = 2957;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -674,14 +674,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6D6AF25B2E37C253008E569D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
-			requirement = {
-				kind = exactVersion;
-				version = 2.4.1;
-			};
-		};
 		6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/buh/CompactSlider";
@@ -690,18 +682,26 @@
 				version = 2.0.9;
 			};
 		};
+		6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/textual";
+			requirement = {
+				kind = exactVersion;
+				version = 0.3.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6D6AF25C2E37C253008E569D /* MarkdownUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6D6AF25B2E37C253008E569D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
-			productName = MarkdownUI;
-		};
 		6D7D84A02E3B68FA006EDB4D /* CompactSlider */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */;
 			productName = CompactSlider;
+		};
+		6D80A9482F4725EF00B2D5A4 /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,5 +1,5 @@
 import SwiftUI
-import MarkdownUI
+import Textual
 
 struct ChatView: View {
     @EnvironmentObject var executor: CommandExecutor
@@ -138,53 +138,11 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
-        .onChange(of: chatSettings.selectedModelID) { _, newID in
-            chatSettings.contextWindowValue = 2048.0
-            guard let model = currentSelectedModel else {
-                chatSettings.selectedModelContextLength = nil
-                chatSettings.selectedModelCapabilities = nil
-                return
-            }
-            Task {
-                if let response = await executor.fetchModelInfo(modelName: model.name) {
-                    let contextLength: Int?
-                    if let modelInfo = response.model_info,
-                       let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
-                       case .int(let length) = contextLengthValue {
-                        contextLength = length
-                    } else {
-                        contextLength = nil
-                    }
-                    let isUnsupportedModel = {
-                        let caps = response.capabilities ?? []
-                        let detFamilies = response.details?.families ?? []
-                        
-                        // 埋め込みモデルの判定
-                        let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
-                        let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
-                        
-                        // 画像生成モデルの判定（イメージのみの場合）
-                        let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
-                        
-                        return isEmbedding || isEmbeddingFamily || isImage
-                    }()
-                    
-                    if isUnsupportedModel {
-                        chatSettings.selectedModelID = nil
-                        showUnsupportedModelAlert = true
-                        return
-                    }
-                    chatSettings.selectedModelContextLength = contextLength
-                    chatSettings.selectedModelCapabilities = response.capabilities
-                } else {
-                    chatSettings.selectedModelContextLength = nil
-                    chatSettings.selectedModelCapabilities = nil
-                }
-            }
+        .onChange(of: chatSettings.selectedModelID) { _, _ in
+            handleModelSelectionChange()
         }
         .alert("This model cannot be used", isPresented: $showUnsupportedModelAlert) {
-            Button("OK") { showUnsupportedModelAlert = false }
-                .keyboardShortcut(.defaultAction)
+            unsupportedModelAlertContent
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
@@ -192,10 +150,66 @@ struct ChatView: View {
             get: { generalErrorMessage != nil },
             set: { if !$0 { generalErrorMessage = nil } }
         )) {
-            Button("OK") { generalErrorMessage = nil }
-                .keyboardShortcut(.defaultAction)
+            errorAlertContent
         } message: {
             Text(generalErrorMessage ?? "An unknown error occurred.")
+        }
+    }
+
+    @ViewBuilder
+    private var unsupportedModelAlertContent: some View {
+        Button("OK") { showUnsupportedModelAlert = false }
+            .keyboardShortcut(.defaultAction)
+    }
+
+    @ViewBuilder
+    private var errorAlertContent: some View {
+        Button("OK") { generalErrorMessage = nil }
+            .keyboardShortcut(.defaultAction)
+    }
+
+    private func handleModelSelectionChange() {
+        chatSettings.contextWindowValue = 2048.0
+        guard let model = currentSelectedModel else {
+            chatSettings.selectedModelContextLength = nil
+            chatSettings.selectedModelCapabilities = nil
+            return
+        }
+        Task {
+            if let response = await executor.fetchModelInfo(modelName: model.name) {
+                let contextLength: Int?
+                if let modelInfo = response.model_info,
+                   let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
+                   case .int(let length) = contextLengthValue {
+                    contextLength = length
+                } else {
+                    contextLength = nil
+                }
+                let isUnsupportedModel = {
+                    let caps = response.capabilities ?? []
+                    let detFamilies = response.details?.families ?? []
+                    
+                    // 埋め込みモデルの判定
+                    let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
+                    let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
+                    
+                    // 画像生成モデルの判定（イメージのみの場合）
+                    let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
+                    
+                    return isEmbedding || isEmbeddingFamily || isImage
+                }()
+                
+                if isUnsupportedModel {
+                    chatSettings.selectedModelID = nil
+                    showUnsupportedModelAlert = true
+                    return
+                }
+                chatSettings.selectedModelContextLength = contextLength
+                chatSettings.selectedModelCapabilities = response.capabilities
+            } else {
+                chatSettings.selectedModelContextLength = nil
+                chatSettings.selectedModelCapabilities = nil
+            }
         }
     }
     
@@ -320,10 +334,6 @@ struct ChatView: View {
         placeholderMessage.currentRevisionIndex = 0
         placeholderMessage.originalContent = ""
         placeholderMessage.latestContent = ""
-        placeholderMessage.fixedContent = ""
-        placeholderMessage.pendingContent = ""
-        placeholderMessage.fixedThinking = ""
-        placeholderMessage.pendingThinking = ""
         executor.chatMessages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
         
@@ -363,10 +373,6 @@ struct ChatView: View {
             placeholderMessage.currentRevisionIndex = 0
             placeholderMessage.originalContent = ""
             placeholderMessage.latestContent = ""
-            placeholderMessage.fixedContent = ""
-            placeholderMessage.pendingContent = ""
-            placeholderMessage.fixedThinking = ""
-            placeholderMessage.pendingThinking = ""
             executor.chatMessages.append(placeholderMessage)
             let assistantMessageId = placeholderMessage.id
             
@@ -395,24 +401,20 @@ struct ChatView: View {
             let userMessageIndex = indexToRetry - 1
             
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
-            // 本文は latestContent > content > fixed+pending の順
+            // 本文は latestContent > content の順
             let latestCandidate = executor.chatMessages[indexToRetry].latestContent ?? ""
             let contentCandidate = executor.chatMessages[indexToRetry].content
-            let bufferedCandidate = executor.chatMessages[indexToRetry].fixedContent + executor.chatMessages[indexToRetry].pendingContent
             let archiveContent: String = {
                 if !latestCandidate.isEmpty { return latestCandidate }
-                if !contentCandidate.isEmpty { return contentCandidate }
-                return bufferedCandidate
+                return contentCandidate
             }()
             
-            // Thinking は finalThinking > thinking > fixed+pending > nil
+            // Thinking は finalThinking > thinking > nil
             let finalThinkingCandidate = executor.chatMessages[indexToRetry].finalThinking
             let liveThinkingCandidate = executor.chatMessages[indexToRetry].thinking
-            let bufferedThinkingCandidate = executor.chatMessages[indexToRetry].fixedThinking + executor.chatMessages[indexToRetry].pendingThinking
             let archiveThinking: String? = {
                 if let v = finalThinkingCandidate, !v.isEmpty { return v }
                 if let v = liveThinkingCandidate, !v.isEmpty { return v }
-                if !bufferedThinkingCandidate.isEmpty { return bufferedThinkingCandidate }
                 return nil
             }()
             
@@ -448,13 +450,9 @@ struct ChatView: View {
             // 参照位置は常に最新（末尾の次 = 現在バージョン）
             executor.chatMessages[indexToRetry].currentRevisionIndex = executor.chatMessages[indexToRetry].revisions.count
             
-            // 3) 再実行準備（表示バッファも初期化）
+            // 3) 再実行準備
             executor.chatMessages[indexToRetry].content = ""
             executor.chatMessages[indexToRetry].thinking = nil
-            executor.chatMessages[indexToRetry].fixedContent = ""
-            executor.chatMessages[indexToRetry].pendingContent = ""
-            executor.chatMessages[indexToRetry].fixedThinking = ""
-            executor.chatMessages[indexToRetry].pendingThinking = ""
             executor.chatMessages[indexToRetry].isStreaming = true
             executor.chatMessages[indexToRetry].isStopped = false
             executor.chatMessages[indexToRetry].isThinkingCompleted = false
@@ -480,40 +478,15 @@ struct ChatView: View {
         }
     }
     
-    /// ストリーミング応答を処理し、UIをバッファリングしながら更新（固定Markdown + 差分折り返しテキスト）
+    /// ストリーミング応答を処理し、UIをバッファリングしながら更新
     private func streamAssistantResponse(for messageId: UUID, with apiMessages: [ChatMessage], model: OllamaModel) async {
         var lastUIUpdateTime = Date()
-        let throttleInterval = 0.08
+        let throttleInterval = 0.03 // 約30fpsで更新
         var isFirstChunk = true
         var isInsideThinkingBlock = false
         
-        var pendingMain = ""
-        var pendingThinking = ""
-        
-        let flushCharThreshold = 300
-        let flushNewlinePreferred = true
-        
-        func flushPendingToFixed(index: Int, force: Bool = false) async {
-            guard executor.chatMessages.indices.contains(index) else { return }
-            if force || pendingMain.count >= flushCharThreshold || (flushNewlinePreferred && pendingMain.contains("\n")) {
-                let toAppend = pendingMain
-                pendingMain.removeAll(keepingCapacity: true)
-                let base = executor.chatMessages[index].fixedContent
-                let newFixed = base + toAppend
-                await MainActor.run {
-                    if executor.chatMessages.indices.contains(index) { executor.chatMessages[index].fixedContent = newFixed }
-                }
-            }
-            if force || pendingThinking.count >= flushCharThreshold || (flushNewlinePreferred && pendingThinking.contains("\n")) {
-                let toAppend = pendingThinking
-                pendingThinking.removeAll(keepingCapacity: true)
-                let base = executor.chatMessages[index].fixedThinking
-                let newFixed = base + toAppend
-                await MainActor.run {
-                    if executor.chatMessages.indices.contains(index) { executor.chatMessages[index].fixedThinking = newFixed }
-                }
-            }
-        }
+        var fullContent = ""
+        var fullThinking = ""
         
         do {
             for try await chunk in executor.chat(
@@ -534,28 +507,28 @@ struct ChatView: View {
                 
                 if let messageChunk = chunk.message {
                     if chatSettings.thinkingOption == .on {
-                        if let apiThinking = messageChunk.thinking { pendingThinking += apiThinking }
-                        pendingMain += messageChunk.content
+                        if let apiThinking = messageChunk.thinking { fullThinking += apiThinking }
+                        fullContent += messageChunk.content
                     } else {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
                             isInsideThinkingBlock = true
-                            pendingMain += String(current[..<start.lowerBound])
+                            fullContent += String(current[..<start.lowerBound])
                             current = String(current[start.upperBound...])
                         }
                         if let end = current.range(of: "</think>") {
                             isInsideThinkingBlock = false
-                            pendingThinking += String(current[..<end.lowerBound])
-                            pendingMain += String(current[end.upperBound...])
+                            fullThinking += String(current[..<end.lowerBound])
+                            fullContent += String(current[end.upperBound...])
                             await MainActor.run {
                                 if executor.chatMessages.indices.contains(assistantMessageIndex) {
                                     executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
                                 }
                             }
                         } else if isInsideThinkingBlock {
-                            pendingThinking += current
+                            fullThinking += current
                         } else {
-                            pendingMain += current
+                            fullContent += current
                         }
                     }
                     
@@ -568,19 +541,19 @@ struct ChatView: View {
                         isFirstChunk = false
                     }
                     
-                    await flushPendingToFixed(index: assistantMessageIndex, force: false)
-                    
                     let now = Date()
                     if now.timeIntervalSince(lastUIUpdateTime) > throttleInterval || chunk.done {
                         await MainActor.run {
                             if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                executor.chatMessages[assistantMessageIndex].pendingContent = pendingMain
-                                executor.chatMessages[assistantMessageIndex].pendingThinking = pendingThinking
-                                executor.chatMessages[assistantMessageIndex].latestContent = executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent
+                                // プロパティを直接更新して即座にMarkdownに反映
+                                executor.chatMessages[assistantMessageIndex].content = fullContent
+                                executor.chatMessages[assistantMessageIndex].thinking = fullThinking.isEmpty ? nil : fullThinking
+                                
+                                executor.chatMessages[assistantMessageIndex].latestContent = fullContent
                                 
                                 if chatSettings.thinkingOption == .on &&
-                                    !(executor.chatMessages[assistantMessageIndex].fixedThinking + executor.chatMessages[assistantMessageIndex].pendingThinking).isEmpty &&
-                                    !(executor.chatMessages[assistantMessageIndex].fixedContent + executor.chatMessages[assistantMessageIndex].pendingContent).isEmpty &&
+                                    !fullThinking.isEmpty &&
+                                    !fullContent.isEmpty &&
                                     !executor.chatMessages[assistantMessageIndex].isThinkingCompleted {
                                     executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
                                 }
@@ -592,20 +565,19 @@ struct ChatView: View {
                 
                 if chunk.done {
                     if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
-                        await flushPendingToFixed(index: index, force: true)
                         await MainActor.run {
                             if executor.chatMessages.indices.contains(index) {
-                                executor.chatMessages[index].content = executor.chatMessages[index].fixedContent
-                                executor.chatMessages[index].thinking = executor.chatMessages[index].fixedThinking.isEmpty ? nil : executor.chatMessages[index].fixedThinking
-                                executor.chatMessages[index].pendingContent = ""
-                                executor.chatMessages[index].pendingThinking = ""
+                                executor.chatMessages[index].content = fullContent
+                                executor.chatMessages[index].thinking = fullThinking.isEmpty ? nil : fullThinking
                                 executor.chatMessages[index].totalDuration = chunk.totalDuration
                                 executor.chatMessages[index].evalCount = chunk.evalCount
                                 executor.chatMessages[index].evalDuration = chunk.evalDuration
                                 executor.chatMessages[index].isStreaming = false
+                                
                                 if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
                                     executor.chatMessages[index].isThinkingCompleted = true
                                 }
+                                
                                 executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
                                 executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
                                 executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
@@ -627,8 +599,7 @@ struct ChatView: View {
                         executor.chatMessages[index].isStopped = true
                     } else {
                         executor.chatMessages[index].isStopped = false
-                        if (executor.chatMessages[index].fixedContent + executor.chatMessages[index].pendingContent).isEmpty {
-                            executor.chatMessages[index].fixedContent = ""
+                        if executor.chatMessages[index].content.isEmpty {
                             executor.chatMessages[index].content = ""
                         }
                         
@@ -932,8 +903,7 @@ struct ImageGenerationView: View {
             // 重要: 現在表示中のリビジョンではなく、常に「最新の完成版」をアーカイブする
             let archiveContent: String = {
                 if let latest = executor.imageMessages[index].latestContent, !latest.isEmpty { return latest }
-                if !executor.imageMessages[index].content.isEmpty { return executor.imageMessages[index].content }
-                return executor.imageMessages[index].fixedContent
+                return executor.imageMessages[index].content
             }()
             let archiveImage = executor.imageMessages[index].latestGeneratedImage ?? executor.imageMessages[index].generatedImage
             let archiveCreatedAt = executor.imageMessages[index].finalCreatedAt ?? executor.imageMessages[index].createdAt
@@ -950,7 +920,6 @@ struct ImageGenerationView: View {
                 generatedImage: archiveImage,
                 isImageGeneration: true
             )
-            archived.fixedContent = archiveContent
             executor.imageMessages[index].revisions.append(archived)
             // 参照位置は常に最新（末尾の次 = 現在バージョン）にする
             executor.imageMessages[index].currentRevisionIndex = executor.imageMessages[index].revisions.count
@@ -1033,12 +1002,12 @@ struct ImageGenerationView: View {
                     if isCancelled {
                         executor.imageMessages[index].isStopped = true
                         if executor.imageMessages[index].generatedImage == nil {
-                            executor.imageMessages[index].fixedContent = "*Cancelled*"
+                            executor.imageMessages[index].content = "*Cancelled*"
                         }
                     } else {
                         executor.imageMessages[index].isStopped = false
                         if executor.imageMessages[index].generatedImage == nil {
-                            executor.imageMessages[index].fixedContent = "Error: \(error.localizedDescription)"
+                            executor.imageMessages[index].content = "Error: \(error.localizedDescription)"
                         }
                         
                         var fullErrorMessage = "Image Generation Error: \(error.localizedDescription)"
