@@ -48,6 +48,7 @@ Notes
   - If the license body contains `MIT License`, it will display `MIT License` as the license title. If the license body contains both `Apache License` and `Version 2.0`, it will display `Apache License 2.0` as the license title.
 - **Improve API timeout alert messages**
   - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
+- **Improve to display the language above the code block**
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0

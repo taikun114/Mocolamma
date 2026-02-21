@@ -44,7 +44,6 @@ struct MessageView: View {
                 .background(message.role == "user" ? Color.accentColor : Color.gray.opacity(0.1))
                 .cornerRadius(16)
                 .lineSpacing(4)
-                .textSelection(.enabled)
             
             HStack {
                 EmptyView()
@@ -656,7 +655,7 @@ struct MessageView: View {
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
                         .textual.textSelection(.enabled)
-                        .compositingGroup() // 描画を最適化しつつインタラクションを維持
+                        .compositingGroup() // 描画を最適化
                 } else {
                     Text("Failed to generate image.")
                         .foregroundColor(.red)
@@ -760,7 +759,7 @@ struct SimpleStyle: StructuredText.Style {
     }
 
     var listItemStyle: some StructuredText.ListItemStyle {
-        StructuredText.DefaultListItemStyle.default
+        SimpleListItemStyle()
     }
 
     var unorderedListMarker: some StructuredText.UnorderedListMarker {
@@ -781,6 +780,12 @@ struct SimpleStyle: StructuredText.Style {
 
     var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
         StructuredText.DividerThematicBreakStyle.divider
+    }
+}
+
+struct SimpleListItemStyle: StructuredText.ListItemStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.block
     }
 }
 
@@ -851,14 +856,70 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
     let message: ChatMessage
 
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .monospaced()
-            .textual.lineSpacing(.fontScaled(0.39))
-            .padding()
-            .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .padding(.vertical, 8)
-            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+        VStack(alignment: .leading, spacing: 0) {
+            // ヘッダー: 言語名
+            HStack {
+                Text(formatLanguageName(configuration.languageHint))
+                    .font(.caption2.monospaced())
+                    .fontWeight(.bold)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.gray.opacity(0.05))
+
+            Divider()
+                .opacity(0.5)
+
+            // コード本体
+            configuration.label
+                .monospaced()
+                .textual.lineSpacing(.fontScaled(0.39))
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.vertical, 8)
+        .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+    }
+
+    private func formatLanguageName(_ hint: String?) -> String {
+        guard let hint = hint?.lowercased() else {
+            return String(localized: "Code")
+        }
+
+        // 特定の言語名の正式な表記マッピング（途中に大文字が入るものや記号を含むもの）
+        let specialCases: [String: String] = [
+            "javascript": "JavaScript",
+            "typescript": "TypeScript",
+            "csharp": "C#",
+            "php": "PHP",
+            "sql": "SQL",
+            "json": "JSON",
+            "html": "HTML",
+            "css": "CSS",
+            "xml": "XML",
+            "yaml": "YAML",
+            "csv": "CSV",
+            "cpp": "C++",
+            "cplusplus": "C++",
+            "objectivec": "Objective-C"
+        ]
+
+        if let specialName = specialCases[hint] {
+            return specialName
+        }
+
+        // 1文字の場合は大文字にする (例: "r" -> "R")
+        if hint.count == 1 {
+            return hint.uppercased()
+        }
+
+        // それ以外は先頭を大文字にする (例: "swift" -> "Swift", "markdown" -> "Markdown")
+        return hint.prefix(1).uppercased() + hint.dropFirst()
     }
 }
 
@@ -866,6 +927,7 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(8)
+            .textual.textSelection(.enabled)
     }
 }
 

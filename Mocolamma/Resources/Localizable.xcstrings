@@ -2581,6 +2581,41 @@
         }
       }
     },
+    "Code" : {
+      "comment" : "コードブロックのヘッダーに表示されるデフォルトのテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コード"
+          }
+        }
+      }
+    },
     "Community" : {
       "comment" : "コミュニティーページにアクセスするためのコミュニティーボタン。",
       "localizations" : {
