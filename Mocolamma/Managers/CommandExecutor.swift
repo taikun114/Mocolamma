@@ -134,11 +134,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.isRunning = true
             defer { self.isRunning = false }
             
-            // 5分前、3分前、10分前、1分前の日付をISO 8601形式で計算
+            // 1分前、3分前、5分前、7分前の日付をISO 8601形式で計算
             let oneMinuteAgo = Date().addingTimeInterval(-60) // 1分前
-            let fiveMinutesAgo = Date().addingTimeInterval(-300) // 5分前
             let threeMinutesAgo = Date().addingTimeInterval(-180) // 3分前
-            let tenMinutesAgo = Date().addingTimeInterval(-600) // 10分前
+            let fiveMinutesAgo = Date().addingTimeInterval(-300) // 5分前
+            let sevenMinutesAgo = Date().addingTimeInterval(-420) // 7分前
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             
@@ -184,7 +184,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let demoModel1 = OllamaModel(
                 name: "demo:0b",
                 model: "demo:0b",
-                modifiedAt: formatter.string(from: fiveMinutesAgo),
+                modifiedAt: formatter.string(from: threeMinutesAgo),
                 size: 0,
                 digest: "000000000000",
                 details: demoModelDetails,
@@ -194,7 +194,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let demoModel2 = OllamaModel(
                 name: "demo2:0b",
                 model: "demo2:0b",
-                modifiedAt: formatter.string(from: threeMinutesAgo),
+                modifiedAt: formatter.string(from: fiveMinutesAgo),
                 size: 0,
                 digest: "000000000001",
                 details: demoModelDetails,
@@ -204,7 +204,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let demoModel3 = OllamaModel(
                 name: "demo-image:0b",
                 model: "demo-image:0b",
-                modifiedAt: formatter.string(from: tenMinutesAgo),
+                modifiedAt: formatter.string(from: sevenMinutesAgo),
                 size: 0,
                 digest: "000000000002",
                 details: demoImageDetails,
@@ -542,11 +542,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             print("Fetching model \(modelName) details from demo server.")
             
             // モデル名に基づいて異なるデータを返す
-            let isDemoModel1 = modelName == "demo:0b"
-            let isDemoModel2 = modelName == "demo2:0b"
+            let isStandardDemo = modelName == "demo:0b" || modelName == "demo2:0b" || modelName == "demo-dl:0b"
             let isDemoImage = modelName == "demo-image:0b"
             
-            if isDemoModel1 || isDemoModel2 || isDemoImage {
+            if isStandardDemo || isDemoImage {
                 // デモモデルの情報を生成
                 let modelDetails: OllamaModelDetails
                 let modelInfo: [String: JSONValue]
