@@ -30,6 +30,8 @@ Notes
   - A demo of the image generation feature is available. Select `demo-image:0b` as the image generation model and send any prompt. This will perform a simulation advancing 0.2 seconds per step, finally outputting a test image.
 - **Support image model tag**
   - Image model tag is now correctly displayed in the model inspector.
+- **Add model download simulation in demo mode**
+  - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**

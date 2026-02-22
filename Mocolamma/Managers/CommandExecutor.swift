@@ -55,6 +55,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     private var cancellables = Set<AnyCancellable>()
     
+    // MARK: - デモモード用
+    private var hasDownloadedDemoModel: Bool = false
+    
     // MARK: - モデル情報キャッシュ
     private var modelInfoCache: [String: OllamaShowResponse] = [:]
     
@@ -131,7 +134,8 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.isRunning = true
             defer { self.isRunning = false }
             
-            // 5分前、3分前、10分前の日付をISO 8601形式で計算
+            // 5分前、3分前、10分前、1分前の日付をISO 8601形式で計算
+            let oneMinuteAgo = Date().addingTimeInterval(-60) // 1分前
             let fiveMinutesAgo = Date().addingTimeInterval(-300) // 5分前
             let threeMinutesAgo = Date().addingTimeInterval(-180) // 3分前
             let tenMinutesAgo = Date().addingTimeInterval(-600) // 10分前
@@ -159,12 +163,30 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 context_length: nil
             )
             
+            var demoModels: [OllamaModel] = []
+            
+            // ダウンロードシミュレーションが完了している場合、リストに追加
+            if hasDownloadedDemoModel {
+                let downloadedDemoModel = OllamaModel(
+                    name: "demo-dl:0b",
+                    model: "demo-dl:0b",
+                    modifiedAt: formatter.string(from: oneMinuteAgo),
+                    size: 0,
+                    digest: "0000000000dl",
+                    details: demoModelDetails,
+                    capabilities: ["completion", "tools", "thinking", "vision"],
+                    originalIndex: 0
+                )
+                demoModels.append(downloadedDemoModel)
+                hasDownloadedDemoModel = false // 一度表示したらフラグをリセット
+            }
+            
             let demoModel1 = OllamaModel(
                 name: "demo:0b",
                 model: "demo:0b",
                 modifiedAt: formatter.string(from: fiveMinutesAgo),
                 size: 0,
-                digest: "000000000000", // ダイジェストは固定
+                digest: "000000000000",
                 details: demoModelDetails,
                 capabilities: nil,
                 originalIndex: 0
@@ -174,7 +196,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 model: "demo2:0b",
                 modifiedAt: formatter.string(from: threeMinutesAgo),
                 size: 0,
-                digest: "000000000001", // ダイジェストは固定
+                digest: "000000000001",
                 details: demoModelDetails,
                 capabilities: nil,
                 originalIndex: 1
@@ -190,11 +212,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 originalIndex: 2
             )
             
-            self.models = [
-                demoModel1,
-                demoModel2,
-                demoModel3
-            ].enumerated().map { (index, model) in
+            demoModels.append(contentsOf: [demoModel1, demoModel2, demoModel3])
+            
+            self.models = demoModels.enumerated().map { (index, model) in
                 var mutableModel = model
                 mutableModel.originalIndex = index
                 return mutableModel
@@ -328,6 +348,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.isPulling = false
             return
         }
+        
+        // デモモードでのダウンロードシミュレーション
+        if isDemoServer() && (modelName == "demo-dl" || modelName == "demo-dl:0b") {
+            simulateDemoDownload(modelName: "demo-dl:0b")
+            return
+        }
+        
         print("Attempting to pull model \(modelName) from \(apiBaseURL)")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "Ollamaサーバー上でモデルをダウンロード中に表示されるメッセージ。モデル名 from サーバーURL"), modelName, apiBaseURL)
@@ -376,6 +403,69 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         pullTask?.resume()
     }
     
+    /// デモモード用のダウンロードシミュレーションを実行します
+    private func simulateDemoDownload(modelName: String) {
+        Task {
+            self.isPulling = true
+            self.isPullingErrorHold = false
+            self.pullHasError = false
+            self.lastPulledModelName = modelName
+            let totalSize: Int64 = 708439456
+            
+            // 1. Preparing (1s) - ログに基づき 488/488 バイトで開始
+            self.pullStatus = NSLocalizedString("Preparing...", comment: "準備中")
+            self.pullTotal = 488
+            self.pullCompleted = 488
+            self.pullProgress = 1.0
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            
+            // 2. Pulling manifest (1s) - 488 / 合計サイズ
+            self.pullStatus = "pulling manifest"
+            self.pullTotal = totalSize
+            self.pullCompleted = 488
+            self.pullProgress = 0.0
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            
+            // 3. Main Model File: pulling c0ffee10aded (45s)
+            self.pullStatus = "pulling c0ffee10aded"
+            let startTime = Date()
+            let duration: TimeInterval = 45.0
+            
+            while Date().timeIntervalSince(startTime) < duration {
+                let elapsed = Date().timeIntervalSince(startTime)
+                let progress = elapsed / duration
+                self.pullProgress = progress
+                self.pullCompleted = Int64(Double(totalSize) * progress)
+                self.pullSpeedBytesPerSec = Double(totalSize) / duration
+                self.pullETARemaining = duration - elapsed
+                
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1sごとに更新
+            }
+            
+            // 4. pulling c0ffeef11100 (2s)
+            self.pullStatus = "pulling c0ffeef11100"
+            self.pullProgress = 1.0
+            self.pullCompleted = totalSize
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            // 5. pulling c0ffeef11101 (2s)
+            self.pullStatus = "pulling c0ffeef11101"
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            // 6. verifying sha256 digest (10s)
+            self.pullStatus = "verifying sha256 digest"
+            try? await Task.sleep(nanoseconds: 10_000_000_000)
+            
+            // 完了処理
+            self.hasDownloadedDemoModel = true
+            self.pullProgress = 1.0
+            self.pullStatus = NSLocalizedString("Completed", comment: "完了")
+            self.isPulling = false
+            
+            await fetchOllamaModelsFromAPI()
+        }
+    }
+    
     /// モデルを削除します
     func deleteModel(modelName: String) async {
         guard let apiBaseURL = self.apiBaseURL else {
@@ -383,6 +473,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "Ollamaサーバーからモデルを削除しようとした際にモデルが選択されていなかった場合に表示されるイランメッセージ。")
             return
         }
+        
+        // デモモードでの削除（再ダウンロードを可能にするためにリストを更新するだけ）
+        if isDemoServer() && modelName == "demo-dl:0b" {
+            await self.fetchOllamaModelsFromAPI()
+            return
+        }
+        
         print("Attempting to delete model \(modelName) from \(apiBaseURL)")
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "Ollamaサーバーからモデルを削除しているときに表示されるメッセージ。モデル名 from サーバーURL。"), modelName, apiBaseURL)

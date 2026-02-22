@@ -2698,7 +2698,7 @@
       }
     },
     "Completed" : {
-      "comment" : "Ollamaサーバー上でモデルのダウンロードに成功したときの完了メッセージ。",
+      "comment" : "Ollamaサーバー上でモデルのダウンロードに成功したときの完了メッセージ。\n完了",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8735,7 +8735,7 @@
       }
     },
     "Preparing..." : {
-      "comment" : "Ollamaサーバー上でモデルダウンロードを開始したときの準備中に表示されるメッセージ。\nプルステータス: 準備中。",
+      "comment" : "Ollamaサーバー上でモデルダウンロードを開始したときの準備中に表示されるメッセージ。\nプルステータス: 準備中。\n準備中",
       "localizations" : {
         "de" : {
           "stringUnit" : {
