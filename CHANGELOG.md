@@ -35,13 +35,13 @@ Notes
 - **Fix to display image model details correctly**
 - **Fix issue where the chat screen would freeze while scrolling**
 - **Improve to show an error when selecting an image-only model in the chat screen**
-- **Improve to prevent the add server and model sheet from closing when swiping down on iOS**
-- **Improve the style of the Add and Complete buttons on the add server and model sheet in iOS 26**
+- **Improve to prevent the add server and model sheet from closing when swiping down on iOS / iPadOS**
+- **Improve the style of the Add and Complete buttons on the add server and model sheet on iOS / iPadOS 26**
   - The Complete button now uses the system native design, and the Add button now uses a design very close to the system native design.
 - **Improve to display an action sheet requesting confirmation on the New Chat button**
 - **Improve the Inspector button icon to display a more understandable one**
   - When the inspector is displayed in sheet style (e.g., on iPhone or iPad in compact view), the `info.circle` icon is now shown. When displayed in sidebar style, it remains unchanged.
-- **Improve message bubble display on iOS when the display size is large**
+- **Improve message bubble display on iOS / iPadOS when the display size is large**
   - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
 - **Improve to display a checkmark icon when message copying is successful**
 - **Improve the model inspector to display a specific license when a license title is missing but the license body exists**
@@ -50,6 +50,8 @@ Notes
   - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
 - **Improve to display the language above the code block**
 - **Improve download progress display performance on the model screen**
+- **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
+  - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0

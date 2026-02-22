@@ -158,20 +158,51 @@ struct ModelListView: View {
     var body: some View {
         let copyIconName = SFSymbol.copy
         
-        VStack(spacing: 0) {
-            // モデルリスト本体を独立したビューに委譲。
-            // sortedModelsを直接渡すことで、進捗更新（pullProgressなど）による再描画を回避します。
-            ModelListContentView(
-                sortedModels: sortedModels,
-                selectedModel: $selectedModel,
-                sortOrder: $sortOrder,
-                modelToDelete: $modelToDelete,
-                showingDeleteConfirmation: $showingDeleteConfirmation,
-                copyIconName: copyIconName
-            )
-            
-            // プログレスバーとステータステキストを独立したビューに切り出し
-            PullProgressView(executor: executor, isSelected: isSelected)
+        Group {
+#if os(iOS)
+            if #available(iOS 26.0, *) {
+                // iOS 26.0以降：safeAreaBarを使用して進捗を表示（ボケ効果が正常に機能する）
+                ModelListContentView(
+                    sortedModels: sortedModels,
+                    selectedModel: $selectedModel,
+                    sortOrder: $sortOrder,
+                    modelToDelete: $modelToDelete,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    copyIconName: copyIconName
+                )
+                .safeAreaBar(edge: .bottom) {
+                    PullProgressView(executor: executor, isSelected: isSelected)
+                }
+            } else {
+                // iOS 26.0未満：VStack内に配置
+                VStack(spacing: 0) {
+                    ModelListContentView(
+                        sortedModels: sortedModels,
+                        selectedModel: $selectedModel,
+                        sortOrder: $sortOrder,
+                        modelToDelete: $modelToDelete,
+                        showingDeleteConfirmation: $showingDeleteConfirmation,
+                        copyIconName: copyIconName
+                    )
+                    
+                    PullProgressView(executor: executor, isSelected: isSelected)
+                }
+            }
+#else
+            // macOS：常にVStack内に配置（TableではsafeAreaBarのボケが機能しないため）
+            VStack(spacing: 0) {
+                ModelListContentView(
+                    sortedModels: sortedModels,
+                    selectedModel: $selectedModel,
+                    sortOrder: $sortOrder,
+                    modelToDelete: $modelToDelete,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    copyIconName: copyIconName
+                )
+                
+                PullProgressView(executor: executor, isSelected: isSelected)
+            }
+#endif
         }
         .overlay(alignment: .center) {
             if serverManager.selectedServer == nil {
