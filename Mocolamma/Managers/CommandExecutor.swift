@@ -188,7 +188,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 size: 0,
                 digest: "000000000000",
                 details: demoModelDetails,
-                capabilities: nil,
+                capabilities: ["completion"],
                 originalIndex: 0
             )
             let demoModel2 = OllamaModel(
@@ -198,7 +198,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 size: 0,
                 digest: "000000000001",
                 details: demoModelDetails,
-                capabilities: nil,
+                capabilities: ["completion"],
                 originalIndex: 1
             )
             let demoModel3 = OllamaModel(
