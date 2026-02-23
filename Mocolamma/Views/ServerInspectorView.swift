@@ -171,7 +171,7 @@ struct ServerInspectorView: View {
                                 UIPasteboard.general.string = server.host
 #endif
                             }
-                        }                
+                        }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -193,7 +193,7 @@ struct ServerInspectorView: View {
                                     UIPasteboard.general.string = ollamaVersion ?? "-"
 #endif
                                 }
-                            }                    
+                            }
                     }
                     VStack(alignment: .leading) {
                         Text("Running Models:")

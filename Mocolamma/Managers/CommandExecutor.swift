@@ -1445,9 +1445,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                                 self.pullHasError = true
                                 self.pullStatus = NSLocalizedString("Error", comment: "エラー")
                                 self.isPullingErrorHold = true
-                            }                        } else {
-                                print("Pull stream JSON decode error: \(error.localizedDescription) - Line data unreadable.")
                             }
+                        } else {
+                            print("Pull stream JSON decode error: \(error.localizedDescription) - Line data unreadable.")
+                        }
                     }
                 }
             } else if let (continuation, isStreaming) = self.chatContinuations[dataTask] {

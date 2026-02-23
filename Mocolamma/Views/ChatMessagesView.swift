@@ -12,6 +12,11 @@ struct ChatMessagesView: View {
     let isModelSelected: Bool
     let isUsingSafeAreaBar: Bool
     
+    // 空の状態の表示をカスタマイズするための引数を追加
+    let emptyStateTitle: LocalizedStringKey
+    let emptyStateDescription: LocalizedStringKey
+    let emptyStateImage: String
+    
     private var reduceMotionEnabled: Bool {
 #if os(iOS)
         return UIAccessibility.isReduceMotionEnabled
@@ -31,15 +36,26 @@ struct ChatMessagesView: View {
     }
     
     var body: some View {
-        ChatMessagesScrollView(
-            messages: $messages,
-            onRetry: onRetry,
-            isOverallStreaming: $isOverallStreaming,
-            isModelSelected: isModelSelected,
-            supportsEffects: supportsEffects,
-            reduceMotionEnabled: reduceMotionEnabled,
-            isUsingSafeAreaBar: isUsingSafeAreaBar
-        )
+        ZStack {
+            ChatMessagesScrollView(
+                messages: $messages,
+                onRetry: onRetry,
+                isOverallStreaming: $isOverallStreaming,
+                isModelSelected: isModelSelected,
+                supportsEffects: supportsEffects,
+                reduceMotionEnabled: reduceMotionEnabled,
+                isUsingSafeAreaBar: isUsingSafeAreaBar
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            if messages.isEmpty {
+                ContentUnavailableView {
+                    Label(emptyStateTitle, systemImage: emptyStateImage)
+                } description: {
+                    Text(emptyStateDescription)
+                }
+            }
+        }
     }
 }
 

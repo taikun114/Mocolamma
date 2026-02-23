@@ -5,13 +5,13 @@ struct SoftEdgeIfAvailable: ViewModifier {
     func body(content: Content) -> some View {
 #if os(iOS)
         if #available(iOS 26, *) {
-            return enabled ? AnyView(content.scrollEdgeEffectStyle(.soft, for: .bottom)) : AnyView(content)
+            return enabled ? AnyView(content.scrollEdgeEffectStyle(.soft, for: .all)) : AnyView(content)
         } else {
             return AnyView(content)
         }
 #else
         if #available(macOS 26, *) {
-            return enabled ? AnyView(content.scrollEdgeEffectStyle(.soft, for: .bottom)) : AnyView(content)
+            return enabled ? AnyView(content.scrollEdgeEffectStyle(.soft, for: .all)) : AnyView(content)
         } else {
             return AnyView(content)
         }

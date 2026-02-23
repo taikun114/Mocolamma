@@ -47,20 +47,15 @@ struct ChatView: View {
                     systemImage: "network.slash",
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
-            } else if executor.chatMessages.isEmpty {
-                ContentUnavailableView {
-                    Label("Chat", systemImage: "message.fill")
-                } description: {
-                    Text("Here you can perform a simple chat to check the model.")
-                }
             } else {
                 // OSバージョン26以降かどうかの条件分岐
                 if #available(iOS 26.0, macOS 26.0, *) {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true)
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
                 } else {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false)
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
                 }
-            }        }
+            }
+        }
         .frame(maxHeight: .infinity) // Make sure it fills the available height
     }
     
@@ -664,12 +659,6 @@ struct ImageGenerationView: View {
                     systemImage: "network.slash",
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
-            } else if executor.imageMessages.isEmpty {
-                ContentUnavailableView {
-                    Label("Image Generation", systemImage: "photo.stack.fill")
-                } description: {
-                    Text("Here you can generate images using models that support image generation.")
-                }
             } else {
                 ChatMessagesView(
                     messages: $executor.imageMessages,
@@ -679,7 +668,10 @@ struct ImageGenerationView: View {
                     isUsingSafeAreaBar: {
                         if #available(iOS 26.0, macOS 26.0, *) { return true }
                         return false
-                    }()
+                    }(),
+                    emptyStateTitle: "Image Generation",
+                    emptyStateDescription: "Here you can generate images using models that support image generation.",
+                    emptyStateImage: "photo.stack.fill"
                 )
             }
         }

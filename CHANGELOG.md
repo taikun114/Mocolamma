@@ -36,6 +36,8 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
 - **Fix issue where the chat screen would freeze while scrolling**
+- **Fix issue where the scroll edge effect might not display correctly in Chat and Image Generation screens on macOS**
+  - Fixed an issue where, on macOS 26.0 or later, the scroll edge effect on the toolbar would display incorrectly (appearing as a hard style instead of a soft style) when showing the Chat or Image Generation screen, until the Inspector was opened/closed or the window size was changed. The beautiful blur effect now displays correctly.
 - **Improve to show an error when selecting an image-only model in the chat screen**
 - **Improve to prevent the add server and model sheet from closing when swiping down on iOS / iPadOS**
 - **Improve the style of the Add and Complete buttons on the add server and model sheet on iOS / iPadOS 26**
