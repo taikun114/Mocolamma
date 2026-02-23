@@ -19,6 +19,17 @@ struct InspectorContentView: View {
     @FocusState private var isCustomWidthFocused: Bool
     @FocusState private var isCustomHeightFocused: Bool
     @FocusState private var isCustomStepsFocused: Bool
+    @State private var inspectorWidth: CGFloat = 0 // インスペクターの幅を保持
+    
+    private var isCompactLayout: Bool {
+#if os(iOS)
+        // iOS（iPad含む）で幅が320未満の場合にコンパクトレイアウト（2x2）を適用
+        return inspectorWidth > 0 && inspectorWidth < 320
+#else
+        // macOSでは常に通常のレイアウト（1x4）
+        return false
+#endif
+    }
     
     var body: some View {
         Group {
@@ -252,6 +263,17 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                inspectorWidth = geometry.size.width
+                            }
+                            .onChange(of: geometry.size.width) { _, newWidth in
+                                inspectorWidth = newWidth
+                            }
+                    }
+                )
 #if os(iOS)
                 .onTapGesture {
                     isCustomWidthFocused = false
@@ -299,28 +321,21 @@ struct InspectorContentView: View {
 #endif
                 .disabled(imageSettings.customWidthEnabled)
             
-            HStack {
-                ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
-                    if imageSettings.width == size {
-                        Button {
-                            imageSettings.width = size
-                        } label: {
-                            Text(String(format: "%.0f", size))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
-                        .disabled(imageSettings.customWidthEnabled)
-                    } else {
-                        Button {
-                            imageSettings.width = size
-                        } label: {
-                            Text(String(format: "%.0f", size))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .disabled(imageSettings.customWidthEnabled)
+            if isCompactLayout {
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        widthButton(for: 384.0)
+                        widthButton(for: 512.0)
+                    }
+                    HStack(spacing: 8) {
+                        widthButton(for: 768.0)
+                        widthButton(for: 1024.0)
+                    }
+                }
+            } else {
+                HStack {
+                    ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
+                        widthButton(for: size)
                     }
                 }
             }
@@ -350,28 +365,21 @@ struct InspectorContentView: View {
 #endif
                 .disabled(imageSettings.customHeightEnabled)
             
-            HStack {
-                ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
-                    if imageSettings.height == size {
-                        Button {
-                            imageSettings.height = size
-                        } label: {
-                            Text(String(format: "%.0f", size))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
-                        .disabled(imageSettings.customHeightEnabled)
-                    } else {
-                        Button {
-                            imageSettings.height = size
-                        } label: {
-                            Text(String(format: "%.0f", size))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        .disabled(imageSettings.customHeightEnabled)
+            if isCompactLayout {
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        heightButton(for: 384.0)
+                        heightButton(for: 512.0)
+                    }
+                    HStack(spacing: 8) {
+                        heightButton(for: 768.0)
+                        heightButton(for: 1024.0)
+                    }
+                }
+            } else {
+                HStack {
+                    ForEach([384.0, 512.0, 768.0, 1024.0], id: \.self) { size in
+                        heightButton(for: size)
                     }
                 }
             }
@@ -379,6 +387,56 @@ struct InspectorContentView: View {
             Text("Specifies the height of the image you want to generate.")
                 .font(.caption)
                 .foregroundStyle(imageSettings.customHeightEnabled ? .tertiary : .secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private func widthButton(for size: Double) -> some View {
+        if imageSettings.width == size {
+            Button {
+                imageSettings.width = size
+            } label: {
+                Text(String(format: "%.0f", size))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+            .disabled(imageSettings.customWidthEnabled)
+        } else {
+            Button {
+                imageSettings.width = size
+            } label: {
+                Text(String(format: "%.0f", size))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .disabled(imageSettings.customWidthEnabled)
+        }
+    }
+    
+    @ViewBuilder
+    private func heightButton(for size: Double) -> some View {
+        if imageSettings.height == size {
+            Button {
+                imageSettings.height = size
+            } label: {
+                Text(String(format: "%.0f", size))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+            .disabled(imageSettings.customHeightEnabled)
+        } else {
+            Button {
+                imageSettings.height = size
+            } label: {
+                Text(String(format: "%.0f", size))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .disabled(imageSettings.customHeightEnabled)
         }
     }
     
