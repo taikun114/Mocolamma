@@ -18,8 +18,8 @@ struct LicenseInfoModalView: View {
     @State private var showingQwenCodeLinkAlert = false
     @State private var isQwenCodeLinkHovered: Bool = false
     
-    @State private var showingMarkdownUILinkAlert = false
-    @State private var isMarkdownUILinkHovered: Bool = false
+    @State private var showingTextualLinkAlert = false
+    @State private var isTextualLinkHovered: Bool = false
     
     @State private var showingOpenCodeLinkAlert = false
     @State private var isOpenCodeLinkHovered: Bool = false
@@ -36,7 +36,7 @@ struct LicenseInfoModalView: View {
     }
     
     private let compactSliderVersionString: String = "2.0.9"
-    private let markdownUIVersionString: String = "2.4.1"
+    private let textualVersionString: String = "0.3.1"
     private let geminiCLIVersionString: String = "0.29.5"
     private let qwenCodeVersionString: String = "0.3.0"
     private let createDmgVersionString: String = "1.2.2"
@@ -212,28 +212,28 @@ struct LicenseInfoModalView: View {
                     .padding(.vertical, 1)
                     .fixedSize(horizontal: !isTextWrapped, vertical: false)
                 
-                // MARK: MarkdownUI
+                // MARK: Textual
                 VStack(alignment: .leading) {
-                    Button(action: { showingMarkdownUILinkAlert = true }) {
-                        Text("MarkdownUI by Guillermo Gonzalez")
+                    Button(action: { showingTextualLinkAlert = true }) {
+                        Text("Textual by Guillermo Gonzalez")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.accentColor)
-                            .underline(isMarkdownUILinkHovered)
+                            .underline(isTextualLinkHovered)
                     }
                     .buttonStyle(.plain)
-                    .help("Open link to the MarkdownUI GitHub page.")
+                    .help("Open link to the Textual GitHub page.")
                     .padding(.bottom, 1)
-                    .onHover { hovered in isMarkdownUILinkHovered = hovered }
-                    .alert("Open Link?", isPresented: $showingMarkdownUILinkAlert) {
+                    .onHover { hovered in isTextualLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingTextualLinkAlert) {
                         Button("Open") {
-                            if let url = URL(string: "https://github.com/gonzalezreal/swift-markdown-ui/tree/main") { openURL(url) }
+                            if let url = URL(string: "https://github.com/gonzalezreal/textual") { openURL(url) }
                         }
                         .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
-                    } message: { Text("Are you sure you want to open the MarkdownUI GitHub page?") }
+                    } message: { Text("Are you sure you want to open the Textual GitHub page?") }
                     
-                    Text("Version: \(markdownUIVersionString)")
+                    Text("Version: \(textualVersionString)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 1)
@@ -245,7 +245,7 @@ struct LicenseInfoModalView: View {
                 .padding(.top, 10)
                 .padding(.horizontal)
                 
-                Text(verbatim: "The MIT License (MIT)\n\nCopyright (c) 2020 Guillermo Gonzalez\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                Text(verbatim: "MIT License\n\nCopyright (c) 2024 Guille Gonzalez\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)

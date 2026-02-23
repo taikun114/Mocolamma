@@ -1883,41 +1883,6 @@
         }
       }
     },
-    "Are you sure you want to open the MarkdownUI GitHub page?" : {
-      "comment" : "ユーザに、MarkdownUIのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Möchten Sie die MarkdownUI GitHub Seite wirklich öffnen?"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to open the MarkdownUI GitHub page?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Seguro que quieres abrir la página de GitHub de MarkdownUI?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voulez-vous vraiment ouvrir la page GitHub de MarkdownUI ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MarkdownUIのGitHubページを開いてもよろしいですか？"
-          }
-        }
-      }
-    },
     "Are you sure you want to open the Ollama GitHub page?" : {
       "comment" : "ユーザに、OllamaのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
@@ -2159,6 +2124,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to open the Textual GitHub page?" : {
+      "comment" : "ユーザに、TextualのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Textual GitHub Seite wirklich öffnen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Textual GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de Textual?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de Textual ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TextualのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -6372,17 +6372,6 @@
         }
       }
     },
-    "MarkdownUI by Guillermo Gonzalez" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MarkdownUI by Guillermo Gonzalez"
-          }
-        }
-      },
-      "shouldTranslate" : false
-    },
     "Menu" : {
       "localizations" : {
         "de" : {
@@ -8058,41 +8047,6 @@
         }
       }
     },
-    "Open link to the MarkdownUI GitHub page." : {
-      "comment" : "MarkdownUIのGitHubページへのリンクを開くボタンのツールチップテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link zur MarkdownUI GitHub Seite öffnen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open link to the MarkdownUI GitHub page."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir enlace a la página de GitHub de MarkdownUI."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir le lien vers la page GitHub de MarkdownUI."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MarkdownUIのGitHubページへのリンクを開きます。"
-          }
-        }
-      }
-    },
     "Open link to the Ollama GitHub page." : {
       "comment" : "OllamaのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
@@ -8229,6 +8183,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Open link to the Textual GitHub page." : {
+      "comment" : "TextualのGitHubページへのリンクを開くボタンのツールチップテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Textual GitHub Seite öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the Textual GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Textual."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de Textual."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TextualのGitHubページへのリンクを開きます。"
           }
         }
       }
@@ -10417,6 +10406,9 @@
           }
         }
       }
+    },
+    "Textual by Guillermo Gonzalez" : {
+      "shouldTranslate" : false
     },
     "Thinking" : {
       "comment" : "モデルの思考を有効化するかどうかを切り替えるとグルスイッチ。",
