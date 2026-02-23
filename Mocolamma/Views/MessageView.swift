@@ -655,6 +655,7 @@ struct MessageView: View {
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
                         .textual.textSelection(.enabled)
+                        .textual.overflowMode(.scroll)
                         .compositingGroup() // 描画を最適化
                 } else {
                     Text("Failed to generate image.")
@@ -710,6 +711,7 @@ struct MessageView: View {
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
                     .textual.textSelection(.enabled)
+                    .textual.overflowMode(.scroll)
                     .compositingGroup() // 描画を最適化
             }
         }
@@ -874,11 +876,12 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
                 .opacity(0.5)
 
             // コード本体
-            configuration.label
-                .monospaced()
-                .textual.lineSpacing(.fontScaled(0.39))
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Overflow {
+                configuration.label
+                    .monospaced()
+                    .textual.lineSpacing(.fontScaled(0.39))
+                    .padding()
+            }
         }
         .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 8))
