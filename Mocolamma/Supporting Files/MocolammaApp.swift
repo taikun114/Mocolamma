@@ -108,7 +108,7 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
-                    Label("Image Generation", systemImage: "photo.stack")
+                    Label("Image Generation", systemImage: "photo")
                         .tag("image_generation" as String?)
                         .keyboardShortcut("4", modifiers: .command)
                 }
@@ -194,7 +194,7 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
-                    Label("Image Generation", systemImage: "photo.stack")
+                    Label("Image Generation", systemImage: "photo")
                         .tag("image_generation" as String?)
                         .keyboardShortcut("4", modifiers: .command)
                 }
