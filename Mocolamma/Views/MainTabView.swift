@@ -70,13 +70,11 @@ struct MainTabView: View {
             .tabItem { Label("Image Generation", systemImage: "photo") }
             .tag("image_generation")
             
-#if os(iOS)
             NavigationStack {
                 SettingsView()
             }
             .tabItem { Label("Settings", systemImage: "gear") }
             .tag("settings")
-#endif
         }
         .tabViewStyle(.sidebarAdaptable)
         .inspector(isPresented: isiOSAppOnVision ? .constant(false) : $showingInspector) {

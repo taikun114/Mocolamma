@@ -62,6 +62,22 @@ struct ContentView: View {
     
     var body: some View {
         Group {
+#if os(macOS)
+            MainNavigationView(
+                selection: $selection,
+                selectedModel: $selectedModel,
+                executor: executor,
+                serverManager: serverManager,
+                selectedServerForInspector: $selectedServerForInspector,
+                showingInspector: $showingInspector,
+                sortOrder: $sortOrder,
+                showingAddModelsSheet: $showingAddModelsSheet,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                modelToDelete: $modelToDelete,
+                columnVisibility: $columnVisibility,
+                sortedModels: sortedModels
+            )
+#else
             MainTabView(
                 selection: $selection,
                 selectedModel: $selectedModel,
@@ -75,6 +91,7 @@ struct ContentView: View {
                 modelToDelete: $modelToDelete,
                 sortedModels: sortedModels
             )
+#endif
         }
         .environment(executor)
         .environmentObject(chatSettings)
