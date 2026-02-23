@@ -204,6 +204,9 @@ struct ContentView: View {
             }
             
         case "models":
+            // ダウンロード中はリフレッシュを実行しない
+            guard !executor.isPulling else { return }
+            
             try? await Task.sleep(nanoseconds: 100_000_000)
             // モデルリストを再取得
             Task {

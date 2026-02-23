@@ -250,6 +250,7 @@ struct ModelListView: View {
 /// リストおよびテーブルの表示を担うビュー。
 /// 進捗更新などの頻繁な変更から隔離するため、表示に必要な最小限のデータのみを受け取ります。
 struct ModelListContentView: View {
+    @Environment(CommandExecutor.self) var executor
     let sortedModels: [OllamaModel]
     @Binding var selectedModel: OllamaModel.ID?
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
@@ -304,6 +305,7 @@ struct ModelListContentView: View {
             }
         }
         .refreshable {
+            guard !executor.isPulling else { return }
             appRefreshTrigger.send()
         }
 #else
