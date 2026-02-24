@@ -428,6 +428,7 @@ struct ModelInspectorView: View {
                                 Text("Parameter Count:") // パラメーターカウント
                                 Text(count.formatted)
                                     .font(.title3).bold()
+                                    .help(String(count.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
@@ -446,6 +447,7 @@ struct ModelInspectorView: View {
                                 Text("Context Length:") // コンテキスト長
                                 Text(length.formatted)
                                     .font(.title3).bold()
+                                    .help(String(length.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
@@ -464,6 +466,7 @@ struct ModelInspectorView: View {
                                 Text("Embedding Length:") // エンベディング長
                                 Text(length.formatted)
                                     .font(.title3).bold()
+                                    .help(String(length.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)

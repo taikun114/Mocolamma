@@ -49,6 +49,7 @@ struct RunningModelsCountView: View {
                                     .font(.subheadline)
                                     .bold()
                                     .foregroundColor(.primary)
+                                    .help(model.name)
                                 
                                 if let formattedVRAMSize = model.formattedVRAMSize {
                                     Text("VRAM Size: \(formattedVRAMSize)")
