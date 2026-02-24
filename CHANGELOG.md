@@ -61,6 +61,7 @@ Notes
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
+- **Add an icon to the refresh button in the context menu for the number of running models in the server inspector**
 
 ## 1.1.0
 ### New Features

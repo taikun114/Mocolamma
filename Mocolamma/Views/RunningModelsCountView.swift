@@ -89,8 +89,10 @@ struct RunningModelsCountView: View {
             await refresh()
         }
         .contextMenu {
-            Button("Refresh") {
+            Button(action: {
                 Task { await refresh() }
+            }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("InspectorRefreshRequested"))) { _ in
