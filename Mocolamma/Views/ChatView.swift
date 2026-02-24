@@ -144,7 +144,7 @@ struct ChatView: View {
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
-        .alert("Error", isPresented: Binding<Bool>(
+        .alert(Text("Error Occurred"), isPresented: Binding<Bool>(
             get: { generalErrorMessage != nil },
             set: { if !$0 { generalErrorMessage = nil } }
         )) {
@@ -324,6 +324,7 @@ struct ChatView: View {
     }
     
     private func sendMessage() {
+        generalErrorMessage = nil
         guard let model = currentSelectedModel else {
             generalErrorMessage = "Please select a model first."
             return
@@ -356,6 +357,7 @@ struct ChatView: View {
     
     // 過去リビジョン参照中でも、最新の完成版だけをアーカイブしてリトライ開始する
     private func retryMessage(for messageId: UUID, with messageToRetry: ChatMessage) {
+        generalErrorMessage = nil
         guard let indexToRetry = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else {
             print("Retry failed: Message with ID \(messageId) not found.")
             return
@@ -612,18 +614,24 @@ struct ChatView: View {
             if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
                 await MainActor.run {
                     executor.chatMessages[index].isStreaming = false
-                    if let urlError = error as? URLError, urlError.code == .cancelled {
+                    
+                    let isCancelled = (error as? URLError)?.code == .cancelled || 
+                                     (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
+                    
+                    if isCancelled {
                         executor.chatMessages[index].isStopped = true
                     } else {
                         executor.chatMessages[index].isStopped = false
-                        if executor.chatMessages[index].content.isEmpty {
-                            executor.chatMessages[index].content = ""
-                        }
                         
                         var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
                         if (error as? URLError)?.code == .timedOut {
                             fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
                         }
+                        
+                        if executor.chatMessages[index].content.isEmpty {
+                            executor.chatMessages[index].content = fullErrorMessage
+                        }
+                        
                         generalErrorMessage = fullErrorMessage
                     }
                 }

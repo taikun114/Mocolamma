@@ -1520,6 +1520,19 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     }
                 }
             } else if let (continuation, isStreaming) = self.chatContinuations[dataTask] {
+                if let httpResponse = dataTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                    // HTTPエラーがある場合はJSONデコードを試みるが、失敗してもエラーを投げて終了させる
+                    if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let errorMessage = errorJson["error"] as? String {
+                        let error = NSError(domain: "OllamaAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        continuation.finish(throwing: error)
+                    } else {
+                        let error = NSError(domain: "OllamaAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned error \(httpResponse.statusCode)"])
+                        continuation.finish(throwing: error)
+                    }
+                    return
+                }
+                
                 if isStreaming {
                     // ストリーミングチャットの処理
                     if let newString = String(data: data, encoding: .utf8) {
