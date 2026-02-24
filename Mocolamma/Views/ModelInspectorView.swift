@@ -147,14 +147,14 @@ struct ModelInspectorView: View {
                 
                 // 機能セクション
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
+                    ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
                                 tagView(for: capability)
                             }
                         }
-                        
                     }
+                    .scrollClipDisabled() // クリッピングを無効化
                 }
                 
                 Divider()
