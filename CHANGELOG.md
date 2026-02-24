@@ -36,7 +36,7 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
 - **Fix issue where the chat screen would freeze while scrolling**
-- **Fix issue where the scroll edge effect might not display correctly in Chat and Image Generation screens on macOS**
+- **Fix issue where the scroll edge effect might not display correctly in chat and image generation screens on macOS**
   - Fixed an issue where, on macOS 26.0 or later, the scroll edge effect on the toolbar would display incorrectly (appearing as a hard style instead of a soft style) when showing the Chat or Image Generation screen, until the Inspector was opened/closed or the window size was changed. The beautiful blur effect now displays correctly.
 - **Fix issue where model screen could be refreshed during model download**
 - **Improve to show an error when selecting an image-only model in the chat screen**
@@ -57,6 +57,7 @@ Notes
 - **Improve download progress display performance on the model screen**
 - **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
+- **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0

@@ -226,7 +226,14 @@ struct ChatView: View {
                 Picker("Select Model", selection: $chatSettings.selectedModelID) {
                     Text("Select Model").tag(nil as OllamaModel.ID?)
                     ForEach(executor.models.filter { $0.supportsCompletion }) { model in
-                        Text(model.name).tag(model.id as OllamaModel.ID?)
+                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                        HStack {
+                            Text(model.name)
+                            if isRunning {
+                                Image(systemName: "tray.and.arrow.down")
+                            }
+                        }
+                        .tag(model.id as OllamaModel.ID?)
                     }
                     if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                         Divider()
@@ -254,7 +261,14 @@ struct ChatView: View {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
                 ForEach(executor.models.filter { $0.supportsCompletion }) { model in
-                    Text(model.name).tag(model.id as OllamaModel.ID?)
+                    let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                    HStack {
+                        Text(model.name)
+                        if isRunning {
+                            Image(systemName: "tray.and.arrow.down")
+                        }
+                    }
+                    .tag(model.id as OllamaModel.ID?)
                 }
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Divider()
@@ -536,6 +550,10 @@ struct ChatView: View {
                                 executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
                             }
                         }
+                        // 最初のレスポンスが来た = モデルがメモリにロードされたので実行中リストを更新
+                        Task {
+                            await executor.fetchRunningModels()
+                        }
                         isFirstChunk = false
                     }
                     
@@ -773,7 +791,14 @@ struct ImageGenerationView: View {
                 Picker("Select Model", selection: $imageSettings.selectedModelID) {
                     Text("Select Model").tag(nil as OllamaModel.ID?)
                     ForEach(executor.models.filter { $0.isImageModel }) { model in
-                        Text(model.name).tag(model.id as OllamaModel.ID?)
+                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                        HStack {
+                            Text(model.name)
+                            if isRunning {
+                                Image(systemName: "tray.and.arrow.down")
+                            }
+                        }
+                        .tag(model.id as OllamaModel.ID?)
                     }
                     if executor.models.filter({ $0.isImageModel }).isEmpty {
                         Divider()
@@ -801,7 +826,14 @@ struct ImageGenerationView: View {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
                 ForEach(executor.models.filter { $0.isImageModel }) { model in
-                    Text(model.name).tag(model.id as OllamaModel.ID?)
+                    let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                    HStack {
+                        Text(model.name)
+                        if isRunning {
+                            Image(systemName: "tray.and.arrow.down")
+                        }
+                    }
+                    .tag(model.id as OllamaModel.ID?)
                 }
                 if executor.models.filter({ $0.isImageModel }).isEmpty {
                     Divider()
@@ -962,6 +994,13 @@ struct ImageGenerationView: View {
                 seed: imageSettings.isSeedEnabled ? imageSettings.seed : nil
             ) {
                 guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { break }
+                
+                // 最初のチャンク処理（またはループ開始時）に実行中モデルリストを更新
+                if chunk.completed == 1 || chunk.completed == nil {
+                    Task {
+                        await executor.fetchRunningModels()
+                    }
+                }
                 
                 await MainActor.run {
                     if let completed = chunk.completed {

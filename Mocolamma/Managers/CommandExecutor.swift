@@ -19,6 +19,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var isImageStreaming: Bool = false
     var successfullyDownloadedIDs: Set<UUID> = []
     var successfullyCopiedIDs: Set<UUID> = []
+    var runningModels: [OllamaRunningModel] = []
     
     // モデルプル時の進捗状況
     var isPulling: Bool = false
@@ -308,6 +309,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.output = successMessage
             print("Successfully retrieved models. Total: \(self.models.count)")
             self.apiConnectionError = false // 成功時はエラーなし
+            
+            // 実行中のモデルリストも更新
+            _ = await self.fetchRunningModels()
             
         } catch let decodingError as DecodingError {
             self.output = NSLocalizedString("API Decode Error: ", comment: "APIデコードエラーのプレフィックスメッセージ。") + decodingError.localizedDescription
@@ -866,11 +870,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         if base == "demo-mode" {
             // デモサーバーの場合は固定の実行中モデルを返す
             let fiveMinutesLater = Date().addingTimeInterval(300) // 5分後
-            return [OllamaRunningModel(
+            let demoRunningModels = [OllamaRunningModel(
                 name: "demo:0b",
                 expires_at: fiveMinutesLater,
                 size_vram: 0 // 0バイト
             )]
+            self.runningModels = demoRunningModels
+            return demoRunningModels
         }
         
         guard let base = base else { return nil }
@@ -881,6 +887,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
+            self.runningModels = ps.models
             return ps.models
         } catch {
             print("Failed to retrieve /api/ps: \(error.localizedDescription)")
