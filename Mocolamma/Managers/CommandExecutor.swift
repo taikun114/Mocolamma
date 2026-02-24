@@ -958,7 +958,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: String? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
@@ -1182,7 +1182,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     }
     
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
-    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: String? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
+    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
             // ... (demo logic)
             return AsyncThrowingStream { continuation in

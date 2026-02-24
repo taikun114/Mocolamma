@@ -128,7 +128,7 @@ struct ChatRequest: Codable {
     let messages: [ChatMessage]
     let stream: Bool
     let think: Bool?
-    let keepAlive: String?
+    let keepAlive: JSONValue?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
     
@@ -187,21 +187,21 @@ enum KeepAliveOption: String, CaseIterable, Identifiable {
         LocalizedStringKey(rawValue)
     }
     
-    /// APIに送信するための文字列表現を返します。
-    func apiValue(customValue: Int, customUnit: KeepAliveUnit) -> String? {
+    /// APIに送信するための値を返します。
+    func apiValue(customValue: Int, customUnit: KeepAliveUnit) -> JSONValue? {
         switch self {
         case .default: return nil
-        case .immediate: return "0"
-        case .m1: return "1m"
-        case .m3: return "3m"
-        case .m5: return "5m"
-        case .m10: return "10m"
-        case .m15: return "15m"
-        case .m30: return "30m"
-        case .h1: return "1h"
-        case .indefinite: return "-1"
+        case .immediate: return .int(0)
+        case .m1: return .string("1m")
+        case .m3: return .string("3m")
+        case .m5: return .string("5m")
+        case .m10: return .string("10m")
+        case .m15: return .string("15m")
+        case .m30: return .string("30m")
+        case .h1: return .string("1h")
+        case .indefinite: return .int(-1)
         case .custom:
-            return "\(customValue)\(customUnit.rawValue)"
+            return .string("\(customValue)\(customUnit.rawValue)")
         }
     }
 }
@@ -509,7 +509,7 @@ class ChatSettings: ObservableObject {
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
     
-    var finalKeepAlive: String? {
+    var finalKeepAlive: JSONValue? {
         keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
     }
 }
@@ -521,7 +521,7 @@ struct ImageGenerationRequest: Codable {
     let model: String
     let prompt: String
     let stream: Bool
-    let keepAlive: String?
+    let keepAlive: JSONValue?
     let width: Int?
     let height: Int?
     let steps: Int?
@@ -633,7 +633,7 @@ class ImageGenerationSettings: ObservableObject {
         return Int(steps)
     }
     
-    var finalKeepAlive: String? {
+    var finalKeepAlive: JSONValue? {
         keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
     }
 }
