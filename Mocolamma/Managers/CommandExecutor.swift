@@ -539,6 +539,66 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
     }
     
+    /// モデルをメモリからアンロードします。
+    /// - Returns: 成功した場合はtrue。
+    @discardableResult
+    func unloadModel(modelName: String, host: String? = nil) async -> Bool {
+        guard let apiBaseURL = host ?? self.apiBaseURL else {
+            print("Ollama API base URL is not set. Skipping model unload.")
+            return false
+        }
+        
+        // デモモードでのアンロード（リストを空にするだけ）
+        if isDemoServer() || host == "demo-mode" {
+            self.runningModels = []
+            return true
+        }
+        
+        print("Attempting to unload model \(modelName) from \(apiBaseURL)")
+        
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/generate") else {
+            print("Error: Invalid API URL for unload.")
+            return false
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // keep_aliveを0に設定してアンロードを実行
+        let body: [String: Any] = ["model": modelName, "keep_alive": 0]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            print("Error: Failed to serialize unload request body: \(error.localizedDescription)")
+            return false
+        }
+        
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                print("Unload Error: HTTP status code \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+                return false
+            }
+            
+            print("Successfully requested to unload model '\(modelName)'.")
+            // 少し待機してから更新（サーバー側での処理時間を考慮）
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+            // 実行中のモデルリストを更新
+            _ = await self.fetchRunningModels(host: host)
+            // 通知を送ってUIをリフレッシュさせる
+            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+            return true
+            
+        } catch {
+            print("Model unload request failed: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
     /// モデルの詳細情報を取得します
     func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
         if isDemoServer() {

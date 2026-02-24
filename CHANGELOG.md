@@ -32,6 +32,8 @@ Notes
   - Image model tag is now correctly displayed in the model inspector.
 - **Add model download simulation in demo mode**
   - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
+- **Add an unload model button to the server screen inspector**
+  - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**

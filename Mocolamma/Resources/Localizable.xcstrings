@@ -10938,6 +10938,40 @@
         }
       }
     },
+    "Unload this model from memory." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell aus dem Speicher entladen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unload this model from memory."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar este modelo de la memoria."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décharger ce modèle de la mémoire."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルをメモリからアンロードします。"
+          }
+        }
+      }
+    },
     "Update" : {
       "comment" : "サーバー編集画面でサーバー設定を更新して保存するボタン。",
       "localizations" : {

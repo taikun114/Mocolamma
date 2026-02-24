@@ -42,24 +42,43 @@ struct RunningModelsCountView: View {
             
             if runningModels.count > 0 {
                 VStack(alignment: .leading, spacing: 4) {
-                    ForEach(runningModels, id: \.name) { model in
-                        VStack(alignment: .leading) {
-                            Text(model.name)
-                                .font(.subheadline)
-                                .bold()
-                                .foregroundColor(.primary)
-                            
-                            if let formattedVRAMSize = model.formattedVRAMSize {
-                                Text("VRAM Size: \(formattedVRAMSize)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                    ForEach(Array(runningModels.enumerated()), id: \.element.name) { index, model in
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                Text(model.name)
+                                    .font(.subheadline)
+                                    .bold()
+                                    .foregroundColor(.primary)
+                                
+                                if let formattedVRAMSize = model.formattedVRAMSize {
+                                    Text("VRAM Size: \(formattedVRAMSize)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                if let expiresAt = model.expires_at {
+                                    Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                             
-                            if let expiresAt = model.expires_at {
-                                Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            Spacer()
+                            
+                            Button(action: {
+                                Task {
+                                    await commandExecutor.unloadModel(modelName: model.name, host: host)
+                                }
+                            }) {
+                                Image(systemName: "tray.and.arrow.up")
+                                    .foregroundStyle(Color.accentColor)
                             }
+                            .buttonStyle(.plain)
+                            .help("Unload this model from memory.")
+                        }
+                        
+                        if index < runningModels.count - 1 {
+                            Divider()
                         }
                     }
                 }
