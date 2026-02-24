@@ -513,7 +513,8 @@ struct ChatView: View {
                 isSystemPromptEnabled: chatSettings.isSystemPromptEnabled,
                 systemPrompt: chatSettings.systemPrompt,
                 thinkingOption: chatSettings.thinkingOption,
-                tools: nil
+                tools: nil,
+                keepAlive: chatSettings.finalKeepAlive
             ) {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
                 
@@ -991,7 +992,8 @@ struct ImageGenerationView: View {
                 width: imageSettings.finalWidth,
                 height: imageSettings.finalHeight,
                 steps: imageSettings.finalSteps,
-                seed: imageSettings.isSeedEnabled ? imageSettings.seed : nil
+                seed: imageSettings.isSeedEnabled ? imageSettings.seed : nil,
+                keepAlive: imageSettings.finalKeepAlive
             ) {
                 guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { break }
                 

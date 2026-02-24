@@ -128,6 +128,7 @@ struct ChatRequest: Codable {
     let messages: [ChatMessage]
     let stream: Bool
     let think: Bool?
+    let keepAlive: String?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
     
@@ -136,6 +137,7 @@ struct ChatRequest: Codable {
         case messages
         case stream
         case think
+        case keepAlive = "keep_alive"
         case options
         case tools
     }
@@ -146,6 +148,7 @@ struct ChatRequest: Codable {
         try container.encode(messages, forKey: .messages)
         try container.encode(stream, forKey: .stream)
         try container.encodeIfPresent(think, forKey: .think)
+        try container.encodeIfPresent(keepAlive, forKey: .keepAlive)
         try container.encodeIfPresent(options, forKey: .options)
         try container.encodeIfPresent(tools, forKey: .tools)
     }
@@ -161,6 +164,62 @@ enum ThinkingOption: String, CaseIterable, Identifiable {
     
     var localizedName: LocalizedStringKey {
         LocalizedStringKey(rawValue)
+    }
+}
+
+/// モデルの保持（Keep Alive）オプションを表します。
+enum KeepAliveOption: String, CaseIterable, Identifiable {
+    case `default` = "KeepAlive_Default"
+    case immediate = "KeepAlive_Immediate"
+    case m1 = "KeepAlive_1m"
+    case m3 = "KeepAlive_3m"
+    case m5 = "KeepAlive_5m"
+    case m10 = "KeepAlive_10m"
+    case m15 = "KeepAlive_15m"
+    case m30 = "KeepAlive_30m"
+    case h1 = "KeepAlive_1h"
+    case indefinite = "KeepAlive_Indefinite"
+    case custom = "KeepAlive_Custom"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+    
+    /// APIに送信するための文字列表現を返します。
+    func apiValue(customValue: Int, customUnit: KeepAliveUnit) -> String? {
+        switch self {
+        case .default: return nil
+        case .immediate: return "0"
+        case .m1: return "1m"
+        case .m3: return "3m"
+        case .m5: return "5m"
+        case .m10: return "10m"
+        case .m15: return "15m"
+        case .m30: return "30m"
+        case .h1: return "1h"
+        case .indefinite: return "-1"
+        case .custom:
+            return "\(customValue)\(customUnit.rawValue)"
+        }
+    }
+}
+
+/// Keep Aliveのカスタム単位を表します。
+enum KeepAliveUnit: String, CaseIterable, Identifiable {
+    case seconds = "s"
+    case minutes = "m"
+    case hours = "h"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        switch self {
+        case .seconds: return "Seconds"
+        case .minutes: return "Minutes"
+        case .hours: return "Hours"
+        }
     }
 }
 
@@ -220,7 +279,6 @@ struct ChatRequestOptions: Codable {
     let mainGpu: Int?
     let useMmap: Bool?
     let numThread: Int?
-    let keepAlive: String?
     
     enum CodingKeys: String, CodingKey {
         case numKeep = "num_keep"
@@ -244,7 +302,6 @@ struct ChatRequestOptions: Codable {
         case mainGpu = "main_gpu"
         case useMmap = "use_mmap"
         case numThread = "num_thread"
-        case keepAlive = "keep_alive"
     }
     
     init(
@@ -268,8 +325,7 @@ struct ChatRequestOptions: Codable {
         numGpu: Int? = nil,
         mainGpu: Int? = nil,
         useMmap: Bool? = nil,
-        numThread: Int? = nil,
-        keepAlive: String? = nil
+        numThread: Int? = nil
     ) {
         self.numKeep = numKeep
         self.seed = seed
@@ -292,7 +348,6 @@ struct ChatRequestOptions: Codable {
         self.mainGpu = mainGpu
         self.useMmap = useMmap
         self.numThread = numThread
-        self.keepAlive = keepAlive
     }
 }
 
@@ -442,6 +497,9 @@ class ChatSettings: ObservableObject {
     @Published var selectedModelContextLength: Int?
     @Published var selectedModelCapabilities: [String]?
     @Published var isStreamingEnabled: Bool = true
+    @Published var keepAliveOption: KeepAliveOption = .default
+    @Published var customKeepAliveValue: Int = 5
+    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
     @Published var useCustomChatSettings: Bool = false
     @Published var chatTemperature: Double = 0.8
     @Published var isTemperatureEnabled: Bool = false
@@ -450,6 +508,10 @@ class ChatSettings: ObservableObject {
     @Published var isSystemPromptEnabled: Bool = false
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
+    
+    var finalKeepAlive: String? {
+        keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
+    }
 }
 
 // MARK: - 画像生成API リクエスト/レスポンス モデル
@@ -459,6 +521,7 @@ struct ImageGenerationRequest: Codable {
     let model: String
     let prompt: String
     let stream: Bool
+    let keepAlive: String?
     let width: Int?
     let height: Int?
     let steps: Int?
@@ -468,6 +531,7 @@ struct ImageGenerationRequest: Codable {
         case model
         case prompt
         case stream
+        case keepAlive = "keep_alive"
         case width
         case height
         case steps
@@ -514,6 +578,9 @@ struct ImageGenerationResponseChunk: Codable {
 class ImageGenerationSettings: ObservableObject {
     @Published var selectedModelID: OllamaModel.ID?
     @Published var isStreamingEnabled: Bool = true
+    @Published var keepAliveOption: KeepAliveOption = .default
+    @Published var customKeepAliveValue: Int = 5
+    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
     
     // 基本設定
     @Published var width: Double = 512 {
@@ -564,5 +631,9 @@ class ImageGenerationSettings: ObservableObject {
             return customSteps
         }
         return Int(steps)
+    }
+    
+    var finalKeepAlive: String? {
+        keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
     }
 }

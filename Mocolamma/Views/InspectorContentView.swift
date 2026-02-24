@@ -19,6 +19,7 @@ struct InspectorContentView: View {
     @FocusState private var isCustomWidthFocused: Bool
     @FocusState private var isCustomHeightFocused: Bool
     @FocusState private var isCustomStepsFocused: Bool
+    @FocusState private var isCustomKeepAliveFocused: Bool
     @State private var inspectorWidth: CGFloat = 0 // インスペクターの幅を保持
     
     private var isCompactLayout: Bool {
@@ -68,6 +69,8 @@ struct InspectorContentView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
+                        
+                        keepAlivePicker(option: $chatSettings.keepAliveOption, customValue: $chatSettings.customKeepAliveValue, customUnit: $chatSettings.customKeepAliveUnit)
                         
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {
@@ -169,6 +172,7 @@ struct InspectorContentView: View {
 #if os(iOS)
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
+                    isCustomKeepAliveFocused = false
                 }
 #endif
             } else if selection == "image_generation" {
@@ -180,6 +184,8 @@ struct InspectorContentView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
+                        
+                        keepAlivePicker(option: $imageSettings.keepAliveOption, customValue: $imageSettings.customKeepAliveValue, customUnit: $imageSettings.customKeepAliveUnit)
                         
                         widthSettingsSection
                         heightSettingsSection
@@ -193,7 +199,7 @@ struct InspectorContentView: View {
                                 Text("Custom Width")
                                     .foregroundStyle(imageSettings.customWidthEnabled ? .primary : .secondary)
                             }
-                            HStack {
+                            HStack(alignment: .center) {
                                 TextField("Enter custom width", value: $imageSettings.customWidth, format: .number.grouping(.never))
                                     .focused($isCustomWidthFocused)
                                     .textFieldStyle(.roundedBorder)
@@ -217,7 +223,7 @@ struct InspectorContentView: View {
                                 Text("Custom Height")
                                     .foregroundStyle(imageSettings.customHeightEnabled ? .primary : .secondary)
                             }
-                            HStack {
+                            HStack(alignment: .center) {
                                 TextField("Enter custom height", value: $imageSettings.customHeight, format: .number.grouping(.never))
                                     .focused($isCustomHeightFocused)
                                     .textFieldStyle(.roundedBorder)
@@ -241,7 +247,7 @@ struct InspectorContentView: View {
                                 Text("Custom Steps")
                                     .foregroundStyle(imageSettings.customStepsEnabled ? .primary : .secondary)
                             }
-                            HStack {
+                            HStack(alignment: .center) {
                                 TextField("Enter custom steps", value: $imageSettings.customSteps, format: .number.grouping(.never))
                                     .focused($isCustomStepsFocused)
                                     .textFieldStyle(.roundedBorder)
@@ -279,6 +285,7 @@ struct InspectorContentView: View {
                     isCustomWidthFocused = false
                     isCustomHeightFocused = false
                     isCustomStepsFocused = false
+                    isCustomKeepAliveFocused = false
                 }
 #endif
             } else {
@@ -471,7 +478,7 @@ struct InspectorContentView: View {
                 Text("Seed")
                     .foregroundStyle(imageSettings.isSeedEnabled ? .primary : .secondary)
             }
-            HStack {
+            HStack(alignment: .center) {
                 TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
                     .textFieldStyle(.roundedBorder)
                     .labelsHidden()
@@ -487,6 +494,52 @@ struct InspectorContentView: View {
             Text("Specifies the seed value used for image generation.")
                 .font(.caption)
                 .foregroundStyle(imageSettings.isSeedEnabled ? .secondary : .tertiary)
+        }
+    }
+    
+    @ViewBuilder
+    private func keepAlivePicker(option: Binding<KeepAliveOption>, customValue: Binding<Int>, customUnit: Binding<KeepAliveUnit>) -> some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Keep Alive")
+                Spacer()
+                Picker("Keep Alive", selection: option) {
+                    ForEach(KeepAliveOption.allCases) { opt in
+                        Text(opt.localizedName).tag(opt)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+            }
+            
+            if option.wrappedValue == .custom {
+                HStack(alignment: .center) {
+                    TextField("Enter Keep Alive Time", value: customValue, format: .number.grouping(.never))
+                        .focused($isCustomKeepAliveFocused)
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+#if os(iOS)
+                        .keyboardType(.numberPad)
+#endif
+                        .frame(maxWidth: .infinity)
+                    
+                    Stepper("Adjust Keep Alive Time", value: customValue, in: 1...3600, step: 1)
+                        .labelsHidden()
+                    
+                    Picker("Unit", selection: customUnit) {
+                        ForEach(KeepAliveUnit.allCases) { unit in
+                            Text(unit.localizedName).tag(unit)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .fixedSize()
+                }
+            }
+            
+            Text("Sets the time a model is kept in the Ollama server's memory.")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
     }
 }

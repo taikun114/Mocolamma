@@ -958,7 +958,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: String? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
@@ -1126,11 +1126,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     let chatRequest: ChatRequest
                     switch thinkingOption {
                     case .none:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: nil, options: chatOptions, tools: tools)
+                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: nil, keepAlive: keepAlive, options: chatOptions, tools: tools)
                     case .on:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: true, options: chatOptions, tools: tools)
+                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: true, keepAlive: keepAlive, options: chatOptions, tools: tools)
                     case .off:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: false, options: chatOptions, tools: tools)
+                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: false, keepAlive: keepAlive, options: chatOptions, tools: tools)
                     }
                     
                     let encoder = JSONEncoder()
@@ -1182,7 +1182,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     }
     
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
-    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
+    func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: String? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
             // ... (demo logic)
             return AsyncThrowingStream { continuation in
@@ -1290,16 +1290,17 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
-                // シード値が指定されている場合はオプションに追加
+                // オプション設定
                 var options: ChatRequestOptions? = nil
-                if let seed = seed {
-                    options = ChatRequestOptions(seed: seed)
+                if let seedValue = seed {
+                    options = ChatRequestOptions(seed: seedValue)
                 }
                 
                 let generationRequest = ImageGenerationRequest(
                     model: model,
                     prompt: prompt,
                     stream: stream,
+                    keepAlive: keepAlive,
                     width: width,
                     height: height,
                     steps: steps,
