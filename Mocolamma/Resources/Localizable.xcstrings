@@ -51,6 +51,12 @@
             "value" : "%1$.1f%% 완료 (%2$@ / %3$@)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% завершено (%2$@ / %3$@)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -121,6 +127,12 @@
             "value" : "*취소됨*"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Отменено*"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -180,6 +192,12 @@
             "value" : "*연결할 수 없음*"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Не удалось подключиться*"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -237,6 +255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*메시지 없음*"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Нет сообщений*"
           }
         },
         "zh-Hans" : {
@@ -368,6 +392,12 @@
             "value" : "%1$@/s, 남은 시간: %2$02d:%3$02d"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/с, осталось: %2$02d:%3$02d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -425,6 +455,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d시간"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d ч"
           }
         },
         "zh-Hans" : {
@@ -486,6 +522,12 @@
             "value" : "%d분"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d мин"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -543,6 +585,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d초"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d с"
           }
         },
         "zh-Hans" : {
@@ -610,6 +658,12 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld / %2$lld"
@@ -769,6 +823,36 @@
             }
           }
         },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токена"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токенов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токен"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токенов"
+                }
+              }
+            }
+          }
+        },
         "zh-Hans" : {
           "variations" : {
             "plural" : {
@@ -863,6 +947,12 @@
             "value" : "1분"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 мин"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -920,6 +1010,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "5분"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 мин"
           }
         },
         "zh-Hans" : {
@@ -981,6 +1077,12 @@
             "value" : "30초"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 сек"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1038,6 +1140,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mocolamma 정보"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О Mocolamma"
           }
         },
         "zh-Hans" : {
@@ -1099,6 +1207,12 @@
             "value" : "Mocolamma 정보…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О Mocolamma…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1156,6 +1270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "감사의 말"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Благодарности"
           }
         },
         "zh-Hans" : {
@@ -1217,6 +1337,12 @@
             "value" : "추가"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1274,6 +1400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "그대로 추가"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить всё равно"
           }
         },
         "zh-Hans" : {
@@ -1335,6 +1467,12 @@
             "value" : "모델 추가"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить модель"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1392,6 +1530,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 추가…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить модель…"
           }
         },
         "zh-Hans" : {
@@ -1453,6 +1597,12 @@
             "value" : "새로 추가"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить новый"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1510,6 +1660,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "서버 추가"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить сервер"
           }
         },
         "zh-Hans" : {
@@ -1571,6 +1727,12 @@
             "value" : "서버 추가…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить сервер…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1628,6 +1790,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용자 지정 높이 조절"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить высоту"
           }
         },
         "zh-Hans" : {
@@ -1689,6 +1857,12 @@
             "value" : "사용자 지정 단계 조절"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить шаги"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1746,6 +1920,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용자 지정 너비 조절"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить ширину"
           }
         },
         "zh-Hans" : {
@@ -1808,6 +1988,12 @@
             "value" : "유지 시간 조절"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить время удержания"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1868,6 +2054,12 @@
             "value" : "시드 값 조절"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроить сид"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1925,6 +2117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "허용됨"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешено"
           }
         },
         "zh-Hans" : {
@@ -1987,6 +2185,12 @@
             "value" : "알 수 없는 오류가 발생했습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла неизвестная ошибка."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2044,6 +2248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API 디코딩 오류: "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка декодирования API: "
           }
         },
         "zh-Hans" : {
@@ -2105,6 +2315,12 @@
             "value" : "API 오류: HTTP 상태 코드 %d"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка API: код состояния HTTP %d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2162,6 +2378,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API 오류: 알 수 없는 응답 유형입니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка API: неизвестный тип ответа."
           }
         },
         "zh-Hans" : {
@@ -2223,6 +2445,12 @@
             "value" : "API 요청 오류: "
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка запроса API: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2282,6 +2510,12 @@
             "value" : "API 타임아웃"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тайм-аут API"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2339,6 +2573,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "채팅 기록을 삭제하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите очистить историю чата?"
           }
         },
         "zh-Hans" : {
@@ -2401,6 +2641,12 @@
             "value" : "생성 기록을 삭제하시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите очистить историю генерации?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2458,6 +2704,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 \"%@\"을(를) 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить модель \"%@\"?\nЭто действие нельзя отменить."
           }
         },
         "zh-Hans" : {
@@ -2519,6 +2771,12 @@
             "value" : "선택한 모델을 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить выбранную модель?\nЭто действие нельзя отменить."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2576,6 +2834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "선택한 서버를 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить выбранный сервер?\nЭто действие нельзя отменить."
           }
         },
         "zh-Hans" : {
@@ -2637,6 +2901,12 @@
             "value" : "서버 \"%@\"을(를) 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить сервер \"%@\"?\nЭто действие нельзя отменить."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2694,6 +2964,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Me a Coffee 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу Buy Me a Coffee?"
           }
         },
         "zh-Hans" : {
@@ -2755,6 +3031,12 @@
             "value" : "CompactSlider GitHub 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу CompactSlider на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2812,6 +3094,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "create-dmg GitHub 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу create-dmg на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -2873,6 +3161,12 @@
             "value" : "GitHub 토론 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу обсуждений на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2930,6 +3224,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemini CLI GitHub 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу Gemini CLI на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -2991,6 +3291,12 @@
             "value" : "GitHub 기여자 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу участников на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3048,6 +3354,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub 저장소 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу репозитория на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3109,6 +3421,12 @@
             "value" : "GitHub 이슈 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу ошибок на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3166,6 +3484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama GitHub 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу Ollama на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3227,6 +3551,12 @@
             "value" : "Ollama 모델 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу моделей Ollama?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3284,6 +3614,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OpenCode GitHub 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу OpenCode на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3345,6 +3681,12 @@
             "value" : "라이선스 정보 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу с информацией о лицензии?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3402,6 +3744,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PayPal.Me 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу PayPal.Me?"
           }
         },
         "zh-Hans" : {
@@ -3463,6 +3811,12 @@
             "value" : "Qwen Code GitHub 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу Qwen Code на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3520,6 +3874,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "피드백 이메일 작성 창을 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть окно отправки отзыва по электронной почте?"
           }
         },
         "zh-Hans" : {
@@ -3581,6 +3941,12 @@
             "value" : "Textual GitHub 페이지를 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу Textual на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3638,6 +4004,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오름차순"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возрастанию"
           }
         },
         "zh-Hans" : {
@@ -3699,6 +4071,12 @@
             "value" : "질문하고 의견을 나누세요"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Задавайте вопросы и делитесь мнениями"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3756,6 +4134,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "녹차 한 잔 후원하기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Угостить зеленым чаем"
           }
         },
         "zh-Hans" : {
@@ -3817,6 +4201,12 @@
             "value" : "녹차 한 잔 후원하기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Купить мне зеленый чай"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3874,6 +4264,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "취소"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
           }
         },
         "zh-Hans" : {
@@ -3935,6 +4331,12 @@
             "value" : "편집 취소."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить редактирование."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3992,6 +4394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "채팅"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чат"
           }
         },
         "zh-Hans" : {
@@ -4053,6 +4461,12 @@
             "value" : "채팅 설정"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки чата"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4112,6 +4526,12 @@
             "value" : "확인 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4169,6 +4589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "채팅 기록 삭제"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить историю чата"
           }
         },
         "zh-Hans" : {
@@ -4231,6 +4657,12 @@
             "value" : "기록 삭제"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить историю"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4288,6 +4720,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "닫기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
           }
         },
         "zh-Hans" : {
@@ -4349,6 +4787,12 @@
             "value" : "코드"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Код"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4406,6 +4850,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "커뮤니티"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщество"
           }
         },
         "zh-Hans" : {
@@ -4478,6 +4928,12 @@
             "value" : "편집 완료 후 다시 시도."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершить редактирование и повторить."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4535,6 +4991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "완료됨"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершено"
           }
         },
         "zh-Hans" : {
@@ -4596,6 +5058,12 @@
             "value" : "완성"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4653,6 +5121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연결됨"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подключено"
           }
         },
         "zh-Hans" : {
@@ -4714,6 +5188,12 @@
             "value" : "연결 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подключение..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4771,6 +5251,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연결 실패"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка подключения"
           }
         },
         "zh-Hans" : {
@@ -4832,6 +5318,12 @@
             "value" : "API에 연결할 수 없습니다.\n호스트가 올바르고 Ollama 서버가 실행 중인지 확인하세요."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось подключиться к API.\nУбедитесь, что хост указан верно и сервер Ollama запущен."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4889,6 +5381,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연결 오류"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка подключения"
           }
         },
         "zh-Hans" : {
@@ -4950,6 +5448,12 @@
             "value" : "컨텍스트 길이:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Длина контекста:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5007,6 +5511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "컨텍스트 창"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Окно контекста"
           }
         },
         "zh-Hans" : {
@@ -5068,6 +5578,12 @@
             "value" : "기여자"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Участники"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5127,6 +5643,12 @@
             "value" : "개발에 참여한 기여자들"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Участники, участвовавшие в разработке"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5184,6 +5706,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "복사"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать"
           }
         },
         "zh-Hans" : {
@@ -5246,6 +5774,12 @@
             "value" : "이미지 복사"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать изображение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5305,6 +5839,12 @@
             "value" : "모델 이름 복사"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать название модели"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5359,6 +5899,12 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2026 Taiga Imaura"
@@ -5423,6 +5969,12 @@
             "value" : "API에 연결할 수 없습니다.\nTLS 오류가 발생하여 보안 연결을 설정할 수 없습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось подключиться к API.\nПроизошла ошибка TLS, невозможно установить безопасное соединение."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5480,6 +6032,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 정보를 불러올 수 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить информацию о модели."
           }
         },
         "zh-Hans" : {
@@ -5552,6 +6110,12 @@
             "value" : "사용자 지정 높이"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высота"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5609,6 +6173,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용자 지정 설정"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свои настройки"
           }
         },
         "zh-Hans" : {
@@ -5670,6 +6240,12 @@
             "value" : "사용자 지정 단계"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шаги"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5727,6 +6303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용자 지정 너비"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ширина"
           }
         },
         "zh-Hans" : {
@@ -5788,6 +6370,12 @@
             "value" : "날짜"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5845,6 +6433,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "삭제"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
           }
         },
         "zh-Hans" : {
@@ -5906,6 +6500,12 @@
             "value" : "삭제 오류: HTTP 상태 코드 %1$d - %2$@ (%3$@)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка удаления: HTTP %1$d - %2$@ на %3$@ "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5963,6 +6563,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "삭제 오류: %2에서 모델 '%1'을(를) 찾을 수 없습니다 (404 Not Found)."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка удаления: модель '%1' не найдена (404 Not Found) на %2."
           }
         },
         "zh-Hans" : {
@@ -6024,6 +6630,12 @@
             "value" : "삭제 오류: 알 수 없는 응답 유형입니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка удаления: неизвестный тип ответа."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6081,6 +6693,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 삭제"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить модель"
           }
         },
         "zh-Hans" : {
@@ -6142,6 +6760,12 @@
             "value" : "서버 삭제"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить сервер"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6199,6 +6823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "삭제…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить..."
           }
         },
         "zh-Hans" : {
@@ -6260,6 +6890,12 @@
             "value" : "%2에서 모델 '%1'을(를) 삭제하는 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удаление модели '%1' с %2..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6317,6 +6953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "내림차순"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По убыванию"
           }
         },
         "zh-Hans" : {
@@ -6378,6 +7020,12 @@
             "value" : "상세 정보:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробная информация:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6435,6 +7083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "생성형 AI로 개발됨"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разработано с помощью ИИ"
           }
         },
         "zh-Hans" : {
@@ -6496,6 +7150,12 @@
             "value" : "다이제스트:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дайджест:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6555,6 +7215,12 @@
             "value" : "PayPal로 후원"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожертвовать через PayPal"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6612,6 +7278,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "완료"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
           }
         },
         "zh-Hans" : {
@@ -6674,6 +7346,12 @@
             "value" : "이미지 다운로드"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скачать изображение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6731,6 +7409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%2에서 모델 '%1'을(를) 다운로드하는 중…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка модели '%1' с %2..."
           }
         },
         "zh-Hans" : {
@@ -6792,6 +7476,12 @@
             "value" : "예: gemma3:4b, phi4:latest 등"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "например, gemma3:4b, phi4:latest"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6849,6 +7539,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "예: localhost:11434 또는 192.168.1.50:11434 등"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "например, localhost:11434 или 192.168.1.50:11434"
           }
         },
         "zh-Hans" : {
@@ -6910,6 +7606,12 @@
             "value" : "예: Ollama 서버"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "например, Сервер Ollama"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6967,6 +7669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "편집"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Правка"
           }
         },
         "zh-Hans" : {
@@ -7028,6 +7736,12 @@
             "value" : "서버 편집"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить сервер"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7085,6 +7799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "편집…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить..."
           }
         },
         "zh-Hans" : {
@@ -7146,6 +7866,12 @@
             "value" : "임베딩"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Векторное представление"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7203,6 +7929,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "임베딩 길이:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Длина эмбеддинга:"
           }
         },
         "zh-Hans" : {
@@ -7264,6 +7996,12 @@
             "value" : "사용자 지정 설정 활성화"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить свои настройки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7321,6 +8059,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "프롬프트를 입력하세요…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите запрос..."
           }
         },
         "zh-Hans" : {
@@ -7382,6 +8126,12 @@
             "value" : "사용자 지정 높이 입력"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите высоту"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7441,6 +8191,12 @@
             "value" : "사용자 지정 단계 입력"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите количество шагов"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7498,6 +8254,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용자 지정 너비 입력"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите ширину"
           }
         },
         "zh-Hans" : {
@@ -7560,6 +8322,12 @@
             "value" : "유지 시간 입력"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите время удержания"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7618,6 +8386,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "시드 값 입력"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите сид"
           }
         },
         "zh-Hans" : {
@@ -7679,6 +8453,12 @@
             "value" : "원하는 이미지 높이를 숫자로 입력하면 위의 설정을 무시하고 크기를 수동으로 지정할 수 있습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите желаемую высоту изображения числом, чтобы переопределить настройки выше."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7736,6 +8516,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "원하는 이미지 너비를 숫자로 입력하면 위의 설정을 무시하고 크기를 수동으로 지정할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите желаемую ширину изображения числом, чтобы переопределить настройки выше."
           }
         },
         "zh-Hans" : {
@@ -7797,6 +8583,12 @@
             "value" : "추가할 모델 이름을 입력하세요"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите название модели, которую хотите добавить"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7854,6 +8646,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지 생성 단계를 숫자로 입력하면 위의 설정을 무시하고 단계를 수동으로 지정할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите количество шагов генерации числом, чтобы переопределить настройки выше."
           }
         },
         "zh-Hans" : {
@@ -7915,6 +8713,12 @@
             "value" : "오류"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7972,6 +8776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오류 (상태 코드: %lld)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка (код состояния: %lld)"
           }
         },
         "zh-Hans" : {
@@ -8033,6 +8843,12 @@
             "value" : "오류 발생"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8090,6 +8906,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오류: 풀 요청 본문 직렬화 실패: "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: не удалось сериализовать тело запроса pull: "
           }
         },
         "zh-Hans" : {
@@ -8151,6 +8973,12 @@
             "value" : "오류: 요청 본문 직렬화 실패: "
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: не удалось сериализовать тело запроса: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8208,6 +9036,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오류: 삭제를 위한 API URL이 유효하지 않습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: неверный URL API для удаления."
           }
         },
         "zh-Hans" : {
@@ -8269,6 +9103,12 @@
             "value" : "오류: 풀을 위한 API URL이 유효하지 않습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: неверный URL API для pull."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8326,6 +9166,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오류: API URL이 유효하지 않습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: неверный URL API."
           }
         },
         "zh-Hans" : {
@@ -8387,6 +9233,12 @@
             "value" : "오류: 선택된 Ollama 서버가 없습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка: не выбран сервер Ollama."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8444,6 +9296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "만료 예정: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Истекает: %@"
           }
         },
         "zh-Hans" : {
@@ -8505,6 +9363,12 @@
             "value" : "실패"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8562,6 +9426,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ollama API 연결에 실패했습니다. 네트워크 연결이나 서버 설정을 확인하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось подключиться к API Ollama. Проверьте сетевое соединение или настройки сервера."
           }
         },
         "zh-Hans" : {
@@ -8624,6 +9494,12 @@
             "value" : "이미지 생성에 실패했습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось сгенерировать изображение."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8681,6 +9557,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "제품군:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Семейства:"
           }
         },
         "zh-Hans" : {
@@ -8742,6 +9624,12 @@
             "value" : "제품군:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Семейство:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8799,6 +9687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API(%@)에서 모델을 가져오는 중…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Получение моделей из API (%@)..."
           }
         },
         "zh-Hans" : {
@@ -8860,6 +9754,12 @@
             "value" : "데모 서버에서 모델을 가져오는 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Получение моделей с демо-сервера..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8917,6 +9817,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 찾기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найти модели"
           }
         },
         "zh-Hans" : {
@@ -8978,6 +9884,12 @@
             "value" : "형식:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Формат:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9035,6 +9947,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "버그를 발견하셨나요?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нашли ошибку?"
           }
         },
         "zh-Hans" : {
@@ -9107,6 +10025,12 @@
             "value" : "일반"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основные"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9165,6 +10089,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지 생성 중…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерация изображения..."
           }
         },
         "zh-Hans" : {
@@ -9226,6 +10156,12 @@
             "value" : "별점 주기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставить звезду"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9285,6 +10221,12 @@
             "value" : "GitHub 저장소에 별점 주기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставить звезду репозиторию на GitHub"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9342,6 +10284,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "아이디어가 있으신가요?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Есть идея?"
           }
         },
         "zh-Hans" : {
@@ -9404,6 +10352,12 @@
             "value" : "높이"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высота"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9462,6 +10416,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지 생성을 지원하는 모델을 사용하여 이미지를 생성할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь вы можете генерировать изображения, используя модели с поддержкой генерации."
           }
         },
         "zh-Hans" : {
@@ -9523,6 +10483,12 @@
             "value" : "모델 확인을 위해 간단한 채팅을 할 수 있습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Здесь вы можете запустить простой чат для проверки модели."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9580,6 +10546,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "인스펙터 숨기기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть инспектор"
           }
         },
         "zh-Hans" : {
@@ -9641,6 +10613,12 @@
             "value" : "호스트"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9698,6 +10676,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "호스트:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост:"
           }
         },
         "zh-Hans" : {
@@ -9760,6 +10744,12 @@
             "value" : "시간"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ч"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9817,6 +10807,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정 방법"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструкция по настройке"
           }
         },
         "zh-Hans" : {
@@ -9878,6 +10874,12 @@
             "value" : "로컬 네트워크 권한 설정 방법."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как настроить доступ к локальной сети."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9935,6 +10937,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저장소에 별을 눌러주시면 큰 힘이 됩니다!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Я буду очень рад, если вы поставите звезду репозиторию!"
           }
         },
         "zh-Hans" : {
@@ -9996,6 +11004,12 @@
             "value" : "대형 모델을 불러오는 데 시간이 걸리는 경우, Mocolamma 설정에서 API 타임아웃을 늘리거나 무제한으로 변경하면 도움이 될 수 있습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если загрузка больших моделей занимает много времени, попробуйте увеличить тайм-аут API в настройках Mocolamma или установите его на «Без ограничений»."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10053,6 +11067,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "대형 모델 로드 등 응답이 오래 걸리는 경우 타임아웃을 늘리면 도움이 될 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если ответы приходят долго, например при загрузке больших моделей, увеличение тайм-аута может помочь."
           }
         },
         "zh-Hans" : {
@@ -10114,6 +11134,12 @@
             "value" : "스트림 응답을 끄는 경우, 설정에서 API 타임아웃을 무제한으로 설정하는 것을 권장합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При отключении потоковых ответов рекомендуется установить тайм-аут API на «Без ограничений» в настройках."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10171,6 +11197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무엇을 입력해야 할지 모르겠다면 Ollama 웹사이트에서 모델을 찾을 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если вы не знаете, что вводить, вы можете найти модели на сайте Ollama."
           }
         },
         "zh-Hans" : {
@@ -10232,6 +11264,12 @@
             "value" : "이미지"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изображение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10289,6 +11327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지 생성"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерация изображений"
           }
         },
         "zh-Hans" : {
@@ -10350,6 +11394,12 @@
             "value" : "이미지 생성 설정"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки генерации изображений"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10407,6 +11457,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "인스펙터"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инспектор"
           }
         },
         "zh-Hans" : {
@@ -10469,6 +11525,12 @@
             "value" : "유지 시간"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удержание"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10526,6 +11588,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1시간"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 час"
           }
         },
         "zh-Hans" : {
@@ -10587,6 +11655,12 @@
             "value" : "1분"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 минута"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10644,6 +11718,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3분"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 минуты"
           }
         },
         "zh-Hans" : {
@@ -10705,6 +11785,12 @@
             "value" : "5분"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 минут"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10762,6 +11848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10분"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 минут"
           }
         },
         "zh-Hans" : {
@@ -10823,6 +11915,12 @@
             "value" : "15분"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 минут"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10880,6 +11978,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "30분"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 минут"
           }
         },
         "zh-Hans" : {
@@ -10941,6 +12045,12 @@
             "value" : "사용자 지정"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свой вариант"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10998,6 +12108,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "기본값"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По умолчанию"
           }
         },
         "zh-Hans" : {
@@ -11059,6 +12175,12 @@
             "value" : "즉시 해제"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сразу"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11116,6 +12238,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무기한"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бессрочно"
           }
         },
         "zh-Hans" : {
@@ -11177,6 +12305,12 @@
             "value" : "로그인 시 실행"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск при входе"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11234,6 +12368,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "라이선스"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензия"
           }
         },
         "zh-Hans" : {
@@ -11295,6 +12435,12 @@
             "value" : "라이선스 정보"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Информация о лицензии"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11352,6 +12498,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "라이선스:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензия:"
           }
         },
         "zh-Hans" : {
@@ -11413,6 +12565,12 @@
             "value" : "모델 정보 로드 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка информации о модели..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11472,6 +12630,12 @@
             "value" : "로컬 네트워크 액세스"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступ к локальной сети"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11529,6 +12693,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로컬 네트워크 권한이 허용되었습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступ к локальной сети разрешен."
           }
         },
         "zh-Hans" : {
@@ -11591,6 +12761,12 @@
             "value" : "메뉴"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меню"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11649,6 +12825,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "분"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "мин"
           }
         },
         "zh-Hans" : {
@@ -11721,6 +12903,12 @@
             "value" : "Mocolamma는 오픈 소스 애플리케이션입니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma — приложение с открытым исходным кодом."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11778,6 +12966,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 삭제 실패: "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка удаления модели: "
           }
         },
         "zh-Hans" : {
@@ -11839,6 +13033,12 @@
             "value" : "모델 상세 정보"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробности модели"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11896,6 +13096,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 정보:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Информация о модели:"
           }
         },
         "zh-Hans" : {
@@ -11957,6 +13163,12 @@
             "value" : "모델 이름:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название модели:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12014,6 +13226,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 풀 완료: "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pull модели завершен: "
           }
         },
         "zh-Hans" : {
@@ -12075,6 +13293,12 @@
             "value" : "모델 풀 오류"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка pull модели"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12132,6 +13356,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 풀 오류: HTTP 상태 코드 %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка pull модели: код состояния HTTP %d"
           }
         },
         "zh-Hans" : {
@@ -12193,6 +13423,12 @@
             "value" : "모델 풀 실패: "
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка pull модели: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12250,6 +13486,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 풀에 실패했습니다.\n모델 이름이 정확한지 확인하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить модель.\nУбедитесь, что название модели указано верно."
           }
         },
         "zh-Hans" : {
@@ -12311,6 +13553,12 @@
             "value" : "모델 풀에 실패했습니다.\n알 수 없는 오류가 발생했습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить модель.\nПроизошла неизвестная ошибка."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12368,6 +13616,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модели"
           }
         },
         "zh-Hans" : {
@@ -12429,6 +13683,12 @@
             "value" : "수정일"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменено"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12486,6 +13746,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "수정일:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменено:"
           }
         },
         "zh-Hans" : {
@@ -12547,6 +13813,12 @@
             "value" : "이름"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12604,6 +13876,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "새 채팅"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый чат"
           }
         },
         "zh-Hans" : {
@@ -12665,6 +13943,12 @@
             "value" : "새 생성"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая генерация"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12722,6 +14006,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다음 리비전"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Следующая версия"
           }
         },
         "zh-Hans" : {
@@ -12783,6 +14073,12 @@
             "value" : "데이터 없음"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данные отсутствуют"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12840,6 +14136,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "상세 정보 없음."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробности отсутствуют."
           }
         },
         "zh-Hans" : {
@@ -12901,6 +14203,12 @@
             "value" : "모델 정보 없음."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Информация о модели отсутствует."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12958,6 +14266,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설치된 모델이 없습니다. '+'를 클릭하거나 탭하여 새 모델을 추가하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модели не установлены. Нажмите «+», чтобы добавить новую модель."
           }
         },
         "zh-Hans" : {
@@ -13019,6 +14333,12 @@
             "value" : "사용 가능한 모델 없음"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет доступных моделей"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13076,6 +14396,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사용 가능한 모델 없음"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модели отсутствуют"
           }
         },
         "zh-Hans" : {
@@ -13137,6 +14463,12 @@
             "value" : "선택된 서버 없음"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер не выбран"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13194,6 +14526,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정된 서버が 없습니다. '+'를 클릭하거나 탭하여 새 서버를 추가하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серверы не настроены. Нажмите «+», чтобы добавить новый сервер."
           }
         },
         "zh-Hans" : {
@@ -13255,6 +14593,12 @@
             "value" : "사용 가능한 서버 없음"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серверы отсутствуют"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13312,6 +14656,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "번호"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "№"
           }
         },
         "zh-Hans" : {
@@ -13373,6 +14723,12 @@
             "value" : "번호: %lld"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "№ %lld"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13430,6 +14786,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연결되지 않음 (상태 코드: %lld)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подключения (код состояния: %lld)"
           }
         },
         "zh-Hans" : {
@@ -13491,6 +14853,12 @@
             "value" : "연결되지 않음 (타임아웃)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подключения (тайм-аут)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13548,6 +14916,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "연결되지 않음 (알 수 없는 호스트)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подключения (неизвестный хост)"
           }
         },
         "zh-Hans" : {
@@ -13609,6 +14983,12 @@
             "value" : "표시할 내용이 없습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нечего отображать."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13666,6 +15046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "숫자"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Число"
           }
         },
         "zh-Hans" : {
@@ -13749,6 +15135,12 @@
             "value" : "Ollama 버전:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия Ollama:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13806,6 +15198,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "열기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть"
           }
         },
         "zh-Hans" : {
@@ -13867,6 +15265,12 @@
             "value" : "라이선스 페이지 열기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть страницу лицензии"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13924,6 +15328,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "라이선스 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть страницу лицензии?"
           }
         },
         "zh-Hans" : {
@@ -13985,6 +15395,12 @@
             "value" : "토론 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу обсуждений."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14042,6 +15458,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "알려진 버그 목록 및 보고 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на список известных ошибок и страницу отчета."
           }
         },
         "zh-Hans" : {
@@ -14103,6 +15525,12 @@
             "value" : "Buy Me a Coffee 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу Buy Me a Coffee."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14160,6 +15588,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CompactSlider GitHub 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу CompactSlider на GitHub."
           }
         },
         "zh-Hans" : {
@@ -14221,6 +15655,12 @@
             "value" : "create-dmg GitHub 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу create-dmg на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14278,6 +15718,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemini CLI GitHub 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу Gemini CLI на GitHub."
           }
         },
         "zh-Hans" : {
@@ -14339,6 +15785,12 @@
             "value" : "GitHub 기여자 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу участников на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14396,6 +15848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub 저장소 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на репозиторий на GitHub."
           }
         },
         "zh-Hans" : {
@@ -14457,6 +15915,12 @@
             "value" : "Ollama GitHub 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу Ollama на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14514,6 +15978,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OpenCode GitHub 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу OpenCode на GitHub."
           }
         },
         "zh-Hans" : {
@@ -14575,6 +16045,12 @@
             "value" : "PayPal.Me 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на PayPal.Me."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14632,6 +16108,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qwen Code GitHub 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу Qwen Code на GitHub."
           }
         },
         "zh-Hans" : {
@@ -14693,6 +16175,12 @@
             "value" : "Textual GitHub 페이지 링크를 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу Textual на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14750,6 +16238,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "링크를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку?"
           }
         },
         "zh-Hans" : {
@@ -14811,6 +16305,12 @@
             "value" : "설정 열기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14868,6 +16368,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오픈 소스 라이선스"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лицензия с открытым исходным кодом"
           }
         },
         "zh-Hans" : {
@@ -14929,6 +16435,12 @@
             "value" : "이메일 작성 창을 여시겠습니까?"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть окно отправки письма?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14988,6 +16500,12 @@
             "value" : "피드백 이메일 작성 창을 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть окно для отправки отзыва."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15045,6 +16563,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "웹사이트 열기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть сайт"
           }
         },
         "zh-Hans" : {
@@ -15117,6 +16641,12 @@
             "value" : "순서"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Порядок"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15174,6 +16704,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "기타 라이선스"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другая лицензия"
           }
         },
         "zh-Hans" : {
@@ -15235,6 +16771,12 @@
             "value" : "파라미터 수:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Количество параметров:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15292,6 +16834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "파라미터 크기:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер параметров:"
           }
         },
         "zh-Hans" : {
@@ -15353,6 +16901,12 @@
             "value" : "부모 모델:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Родительская модель:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15410,6 +16964,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "동일 네트워크상의 Ollama 서버に 연결하려면 권한이 필요합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для подключения к серверам Ollama в той же сети требуется разрешение."
           }
         },
         "zh-Hans" : {
@@ -15471,6 +17031,12 @@
             "value" : "권한"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешения"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15528,6 +17094,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "서버 탭에서 서버를 선택하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, выберите сервер во вкладке «Сервер»."
           }
         },
         "zh-Hans" : {
@@ -15590,6 +17162,12 @@
             "value" : "사이드바에서 항목을 선택하세요."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, выберите пункт в боковой панели."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15648,6 +17226,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지를 저장할 위치를 선택하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожалуйста, выберите место для сохранения изображения."
           }
         },
         "zh-Hans" : {
@@ -15709,6 +17293,12 @@
             "value" : "준비 중…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подготовка..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15768,6 +17358,12 @@
             "value" : "이전 리비전"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предыдущая версия"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15825,6 +17421,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "양자화 레벨:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уровень квантования:"
           }
         },
         "zh-Hans" : {
@@ -15903,6 +17505,12 @@
             "value" : "새로고침"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15960,6 +17568,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "상태 새로고침"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить статус"
           }
         },
         "zh-Hans" : {
@@ -16021,6 +17635,12 @@
             "value" : "버그 보고"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщить об ошибке"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16078,6 +17698,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "다시 시도"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить"
           }
         },
         "zh-Hans" : {
@@ -16139,6 +17765,12 @@
             "value" : "실행 중"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "запущено"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16198,6 +17830,12 @@
             "value" : "실행 중인 모델 수:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запущенные модели:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16255,6 +17893,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "저장"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
           }
         },
         "zh-Hans" : {
@@ -16317,6 +17961,12 @@
             "value" : "파일로 저장…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить как файл..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16375,6 +18025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "사진 앱에 저장"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить в Фото"
           }
         },
         "zh-Hans" : {
@@ -16437,6 +18093,12 @@
             "value" : "초"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "с"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16496,6 +18158,12 @@
             "value" : "시드 값"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сид"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16553,6 +18221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "선택"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать"
           }
         },
         "zh-Hans" : {
@@ -16615,6 +18289,12 @@
             "value" : "메뉴 선택"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите меню"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16674,6 +18354,12 @@
             "value" : "상세 정보를 보려면 모델을 선택하세요."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите модель, чтобы увидеть подробности."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16731,6 +18417,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "상세 정보를 보려면 서버를 선택하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите сервер, чтобы увидеть подробности."
           }
         },
         "zh-Hans" : {
@@ -16793,6 +18485,12 @@
             "value" : "저장 위치 선택"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите место сохранения"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16850,6 +18548,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델 선택"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать модель"
           }
         },
         "zh-Hans" : {
@@ -16911,6 +18615,12 @@
             "value" : "피드백 보내기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить отзыв"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16968,6 +18678,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "서버"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер"
           }
         },
         "zh-Hans" : {
@@ -17029,6 +18745,12 @@
             "value" : "서버 상세 정보"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробности сервера"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17086,6 +18808,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "서버"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серверы"
           }
         },
         "zh-Hans" : {
@@ -17148,6 +18876,12 @@
             "value" : "Ollama 서버의 메모리에 모델이 유지되는 시간을 설정합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Устанавливает время, в течение которого модель остается в памяти сервера Ollama."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17205,6 +18939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
           }
         },
         "zh-Hans" : {
@@ -17266,6 +19006,12 @@
             "value" : "설정…"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17323,6 +19069,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "인스펙터 표시"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать инспектор"
           }
         },
         "zh-Hans" : {
@@ -17384,6 +19136,12 @@
             "value" : "이 애플리케이션과 사용된 라이브러리의 라이선스 정보를 표시합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать информацию о лицензии для этого приложения и используемых библиотек."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17441,6 +19199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "크기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер"
           }
         },
         "zh-Hans" : {
@@ -17502,6 +19266,12 @@
             "value" : "크기:"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17561,6 +19331,12 @@
             "value" : "정렬"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17618,6 +19394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "정렬 기준"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировать по"
           }
         },
         "zh-Hans" : {
@@ -17680,6 +19462,12 @@
             "value" : "생성할 이미지의 높이를 지정합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает высоту изображения, которое вы хотите сгенерировать."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17738,6 +19526,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이미지 생성 단계를 지정합니다. 단계를 늘리면 생성 시간은 길어지지만 디테일은 향상될 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает количество шагов генерации. Увеличение числа шагов увеличивает время генерации, но может улучшить детализацию."
           }
         },
         "zh-Hans" : {
@@ -17799,6 +19593,12 @@
             "value" : "이미지 생성에 사용할 시드 값을 지정합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает сид (начальное значение), используемый для генерации изображения."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17858,6 +19658,12 @@
             "value" : "생성할 이미지의 너비를 지정합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает ширину изображения, которое вы хотите сгенерировать."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17915,6 +19721,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "추론 모델을 사용할 때 추론(Reasoning)을 수행할지 여부를 지정합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает, следует ли выполнять рассуждение при использовании модели рассуждения."
           }
         },
         "zh-Hans" : {
@@ -17977,6 +19789,12 @@
             "value" : "단계"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шаги"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18034,6 +19852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "중지됨"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Остановлено"
           }
         },
         "zh-Hans" : {
@@ -18095,6 +19919,12 @@
             "value" : "스트림 응답"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потоковый ответ"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18152,6 +19982,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%2$@에서 모델 '%1$@'을(를) 삭제했습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель \"%1$@\" успешно удалена с %2$@."
           }
         },
         "zh-Hans" : {
@@ -18213,6 +20049,12 @@
             "value" : "데모 서버에서 모델을 성공적으로 가져왔습니다. 합계: %d"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модели успешно получены с демо-сервера. Всего: %d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18270,6 +20112,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "모델을 성공적으로 가져왔습니다. 합계: %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модели успешно получены. Всего: %d"
           }
         },
         "zh-Hans" : {
@@ -18331,6 +20179,12 @@
             "value" : "지원 및 피드백"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поддержка и отзывы"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18388,6 +20242,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "개발자 후원"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поддержать разработчика"
           }
         },
         "zh-Hans" : {
@@ -18449,6 +20309,12 @@
             "value" : "시스템 프롬프트"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системный запрос"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18506,6 +20372,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "온도"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Температура"
           }
         },
         "zh-Hans" : {
@@ -18570,6 +20442,12 @@
             "value" : "추론(Thinking)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рассуждение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18629,6 +20507,12 @@
             "value" : "추론 완료"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рассуждение завершено"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18686,6 +20570,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "추론 중..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рассуждение..."
           }
         },
         "zh-Hans" : {
@@ -18748,6 +20638,12 @@
             "value" : "지정 안 함"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не указано"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18806,6 +20702,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "끄기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выкл"
           }
         },
         "zh-Hans" : {
@@ -18868,6 +20770,12 @@
             "value" : "켜기"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вкл"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18925,6 +20833,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이 모델은 사용할 수 없습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эту модель нельзя использовать"
           }
         },
         "zh-Hans" : {
@@ -18986,6 +20900,12 @@
             "value" : "이 모델은 채팅을 지원하지 않습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта модель не поддерживает чат."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19043,6 +20963,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로컬 네트워크 액세스를 허용하려면 설정 → 개인정보 보호 및 보안 → 로컬 네트워크로 이동하여 \"Mocolamma\"를 켜세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы разрешить доступ к локальной сети, перейдите в «Настройки» → «Конфиденциальность и безопасность» → «Локальная сеть» и включите «Mocolamma»."
           }
         },
         "zh-Hans" : {
@@ -19104,6 +21030,12 @@
             "value" : "로컬 네트워크 액세스를 허용하려면 시스템 설정 → 개인정보 보호 및 보안 → 로컬 네트워크로 이동하여 \"Mocolamma\"를 켜세요.\n\n\"확인\"을 클릭하거나 탭하여 개인정보 보호 및 보안 설정을 엽니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы разрешить доступ к локальной сети, перейдите в «Системные настройки» → «Конфиденциальность и безопасность» → «Локальная сеть» и включите «Mocolamma».\n\nНажмите «ОК», чтобы открыть настройки конфиденциальности и безопасности."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19161,6 +21093,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "인스펙터 전환"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключить инспектор"
           }
         },
         "zh-Hans" : {
@@ -19222,6 +21160,12 @@
             "value" : "텍스트 줄 바꿈 전환"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключить перенос текста"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19281,6 +21225,12 @@
             "value" : "도구"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструменты"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19338,6 +21288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "메시지를 입력하세요…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите сообщение..."
           }
         },
         "zh-Hans" : {
@@ -19400,6 +21356,12 @@
             "value" : "단위"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Единица"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19457,6 +21419,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무제한"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без ограничений"
           }
         },
         "zh-Hans" : {
@@ -19519,6 +21487,12 @@
             "value" : "이 모델을 메모리에서 해제합니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выгрузить эту модель из памяти."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19576,6 +21550,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "업데이트"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить"
           }
         },
         "zh-Hans" : {
@@ -19637,6 +21617,12 @@
             "value" : "그대로 업데이트"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить всё равно"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19694,6 +21680,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "버전: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия: %@"
           }
         },
         "zh-Hans" : {
@@ -19755,6 +21747,12 @@
             "value" : "버전: %1$@ (%2$@)"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия: %1$@ (%2$@)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19812,6 +21810,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "보기"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вид"
           }
         },
         "zh-Hans" : {
@@ -19873,6 +21877,12 @@
             "value" : "비전"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зрение"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19930,6 +21940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VRAM 크기: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер VRAM: %@"
           }
         },
         "zh-Hans" : {
@@ -19992,6 +22008,12 @@
             "value" : "너비"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ширина"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20051,6 +22073,12 @@
             "value" : "PayPal을 통해 직접 후원하실 수도 있습니다."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы также можете сделать пожертвование напрямую через PayPal."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20108,6 +22136,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Me a Coffee에서 녹차 한 잔 가격으로 개발자를 후원하실 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы можете поддержать меня на Buy Me a Coffee по цене чашки зеленого чая."
           }
         },
         "zh-Hans" : {
