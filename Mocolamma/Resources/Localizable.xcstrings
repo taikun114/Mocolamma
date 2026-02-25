@@ -1016,6 +1016,7 @@
       }
     },
     "Adjust custom height" : {
+      "comment" : "画像生成設定などで、カスタムの高さを調整するためのコントロールのアクセシビリティラベル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1050,6 +1051,7 @@
       }
     },
     "Adjust custom steps" : {
+      "comment" : "画像生成設定などで、カスタムのステップ数を調整するためのコントロールのアクセシビリティラベル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1084,6 +1086,7 @@
       }
     },
     "Adjust custom width" : {
+      "comment" : "画像生成設定などで、カスタムの幅を調整するためのコントロールのアクセシビリティラベル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2207,6 +2210,7 @@
       }
     },
     "Ascending" : {
+      "comment" : "リストやデータを昇順で並び替えるための選択肢。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3350,6 +3354,7 @@
       "shouldTranslate" : false
     },
     "Custom Height" : {
+      "comment" : "画像生成などの設定における、カスタムの高さの項目名。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3419,6 +3424,7 @@
       }
     },
     "Custom Steps" : {
+      "comment" : "画像生成などの設定における、カスタムのステップ数の項目名。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3453,6 +3459,7 @@
       }
     },
     "Custom Width" : {
+      "comment" : "画像生成などの設定における、カスタムの幅の項目名。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3487,6 +3494,7 @@
       }
     },
     "Date" : {
+      "comment" : "日付を表すラベル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3801,6 +3809,7 @@
       }
     },
     "Descending" : {
+      "comment" : "リストやデータを降順で並び替えるための選択肢。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4431,6 +4440,7 @@
       }
     },
     "Enter custom height" : {
+      "comment" : "カスタムの高さを数値で入力するためのテキストフィールドのプレースホルダー。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4465,6 +4475,7 @@
       }
     },
     "Enter custom steps" : {
+      "comment" : "カスタムのステップ数を数値で入力するためのテキストフィールドのプレースホルダー。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4499,6 +4510,7 @@
       }
     },
     "Enter custom width" : {
+      "comment" : "カスタムの幅を数値で入力するためのテキストフィールドのプレースホルダー。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4605,6 +4617,7 @@
       }
     },
     "Enter the desired image height as a number to override the above setting and manually specify the size." : {
+      "comment" : "画像生成設定で、手動で数値を入力して高さを上書きする場合の説明テキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4639,6 +4652,7 @@
       }
     },
     "Enter the desired image width as a number to override the above setting and manually specify the size." : {
+      "comment" : "画像生成設定で、手動で数値を入力して幅を上書きする場合の説明テキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4708,6 +4722,7 @@
       }
     },
     "Enter the number of image generation steps as a number to override the above setting and manually specify the size." : {
+      "comment" : "画像生成設定で、手動で数値を入力してステップ数を上書きする場合の説明テキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4812,6 +4827,7 @@
       }
     },
     "Error Occurred" : {
+      "comment" : "エラーが発生した際に表示されるタイトルのテキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5982,6 +5998,7 @@
       }
     },
     "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help." : {
+      "comment" : "タイムアウトが発生した際などに表示される、設定変更を促すアドバイスメッセージ。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6156,6 +6173,7 @@
       }
     },
     "Image Generation" : {
+      "comment" : "「画像生成」機能のタイトルやタブ名。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6190,6 +6208,7 @@
       }
     },
     "Image Generation Settings" : {
+      "comment" : "画像生成に関する設定セクションのタイトル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6295,6 +6314,7 @@
       }
     },
     "KeepAlive_1h" : {
+      "comment" : "キープアライブ設定：1時間。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6329,6 +6349,7 @@
       }
     },
     "KeepAlive_1m" : {
+      "comment" : "キープアライブ設定：1分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6363,6 +6384,7 @@
       }
     },
     "KeepAlive_3m" : {
+      "comment" : "キープアライブ設定：3分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6397,6 +6419,7 @@
       }
     },
     "KeepAlive_5m" : {
+      "comment" : "キープアライブ設定：5分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6431,6 +6454,7 @@
       }
     },
     "KeepAlive_10m" : {
+      "comment" : "キープアライブ設定：10分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6465,6 +6489,7 @@
       }
     },
     "KeepAlive_15m" : {
+      "comment" : "キープアライブ設定：15分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6499,6 +6524,7 @@
       }
     },
     "KeepAlive_30m" : {
+      "comment" : "キープアライブ設定：30分。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6533,6 +6559,7 @@
       }
     },
     "KeepAlive_Custom" : {
+      "comment" : "キープアライブ設定：カスタム（手動入力）。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6567,6 +6594,7 @@
       }
     },
     "KeepAlive_Default" : {
+      "comment" : "キープアライブ設定：デフォルト（Ollamaの標準設定）。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6601,6 +6629,7 @@
       }
     },
     "KeepAlive_Immediate" : {
+      "comment" : "キープアライブ設定：即時（すぐにアンロード）。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6635,6 +6664,7 @@
       }
     },
     "KeepAlive_Indefinite" : {
+      "comment" : "キープアライブ設定：無期限（常に保持）。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7557,6 +7587,7 @@
       }
     },
     "New Generation" : {
+      "comment" : "新しい画像生成を開始するためのボタンテキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8151,6 +8182,7 @@
       }
     },
     "Number" : {
+      "comment" : "「数値」を表すラベル。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9850,6 +9882,7 @@
       }
     },
     "Seed" : {
+      "comment" : "画像生成のランダム性を決定する「シード値」の項目名。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10061,6 +10094,7 @@
       }
     },
     "Select Model" : {
+      "comment" : "モデルを選択するように促すプレースホルダーやボタンのテキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10623,6 +10657,7 @@
       }
     },
     "Specifies the seed value used for image generation." : {
+      "comment" : "シード値に関する説明テキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10657,6 +10692,7 @@
       }
     },
     "Specifies the width of the image you want to generate." : {
+      "comment" : "生成する画像の幅に関する説明テキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
