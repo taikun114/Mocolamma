@@ -1,0 +1,2 @@
+NSLocalNetworkUsageDescription = "هذا مطلوب للتواصل مع خوادم Ollama الموجودة داخل الشبكة المحلية.";
+NSPhotoLibraryAddUsageDescription = "هذا مطلوب لحفظ الصور المولدة في مكتبة الصور الخاصة بك.";
