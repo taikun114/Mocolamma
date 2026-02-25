@@ -57,6 +57,12 @@
             "value" : "%1$.1f%% завершено (%2$@ / %3$@)"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% завершено (%2$@ / %3$@)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -133,6 +139,12 @@
             "value" : "*Отменено*"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Скасовано*"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -198,6 +210,12 @@
             "value" : "*Не удалось подключиться*"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Не вдалося підключитися*"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -261,6 +279,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*Нет сообщений*"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*Немає повідомлень*"
           }
         },
         "zh-Hans" : {
@@ -398,6 +422,12 @@
             "value" : "%1$@/с, осталось: %2$02d:%3$02d"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/с, залишилося: %2$02d:%3$02d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -461,6 +491,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d ч"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d год"
           }
         },
         "zh-Hans" : {
@@ -528,6 +564,12 @@
             "value" : "%d мин"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d хв"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -588,6 +630,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d с"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d с"
@@ -664,6 +712,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld / %2$lld"
@@ -853,6 +907,36 @@
             }
           }
         },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токени"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токенів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токен"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld токенів"
+                }
+              }
+            }
+          }
+        },
         "zh-Hans" : {
           "variations" : {
             "plural" : {
@@ -953,6 +1037,12 @@
             "value" : "1 мин"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 хв"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1018,6 +1108,12 @@
             "value" : "5 мин"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 хв"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1078,6 +1174,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 сек"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 сек"
@@ -1148,6 +1250,12 @@
             "value" : "О Mocolamma"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Про Mocolamma"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1211,6 +1319,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "О Mocolamma…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Про Mocolamma…"
           }
         },
         "zh-Hans" : {
@@ -1278,6 +1392,12 @@
             "value" : "Благодарности"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подяки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1341,6 +1461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати"
           }
         },
         "zh-Hans" : {
@@ -1408,6 +1534,12 @@
             "value" : "Добавить всё равно"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати все одно"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1471,6 +1603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить модель"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати модель"
           }
         },
         "zh-Hans" : {
@@ -1538,6 +1676,12 @@
             "value" : "Добавить модель…"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати модель…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1601,6 +1745,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить новый"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати новий"
           }
         },
         "zh-Hans" : {
@@ -1668,6 +1818,12 @@
             "value" : "Добавить сервер"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати сервер"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1731,6 +1887,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить сервер…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додати сервер…"
           }
         },
         "zh-Hans" : {
@@ -1798,6 +1960,12 @@
             "value" : "Настроить высоту"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштувати висоту"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1863,6 +2031,12 @@
             "value" : "Настроить шаги"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштувати кроки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1926,6 +2100,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настроить ширину"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштувати ширину"
           }
         },
         "zh-Hans" : {
@@ -1994,6 +2174,12 @@
             "value" : "Настроить время удержания"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштувати час утримання"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2060,6 +2246,12 @@
             "value" : "Настроить сид"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштувати сид"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2123,6 +2315,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Разрешено"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дозволено"
           }
         },
         "zh-Hans" : {
@@ -2191,6 +2389,12 @@
             "value" : "Произошла неизвестная ошибка."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сталася невідома помилка."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2254,6 +2458,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка декодирования API: "
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка декодування API: "
           }
         },
         "zh-Hans" : {
@@ -2321,6 +2531,12 @@
             "value" : "Ошибка API: код состояния HTTP %d"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка API: код стану HTTP %d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2384,6 +2600,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка API: неизвестный тип ответа."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка API: невідомий тип відповіді."
           }
         },
         "zh-Hans" : {
@@ -2451,6 +2673,12 @@
             "value" : "Ошибка запроса API: "
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка запиту API: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2511,6 +2739,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тайм-аут API"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тайм-аут API"
@@ -2581,6 +2815,12 @@
             "value" : "Вы уверены, что хотите очистить историю чата?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете очистити історію чату?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2645,6 +2885,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите очистить историю генерации?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете очистити історію генерації?"
           }
         },
         "zh-Hans" : {
@@ -2712,6 +2958,12 @@
             "value" : "Вы уверены, что хотите удалить модель \"%@\"?\nЭто действие нельзя отменить."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете видалити модель \"%@\"?\nЦю дію неможливо скасувати."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2775,6 +3027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите удалить выбранную модель?\nЭто действие нельзя отменить."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете видалити вибрану модель?\nЦю дію неможливо скасувати."
           }
         },
         "zh-Hans" : {
@@ -2842,6 +3100,12 @@
             "value" : "Вы уверены, что хотите удалить выбранный сервер?\nЭто действие нельзя отменить."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете видалити вибраний сервер?\nЦю дію неможливо скасувати."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2905,6 +3169,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите удалить сервер \"%@\"?\nЭто действие нельзя отменить."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете видалити сервер \"%@\"?\nЦю дію неможливо скасувати."
           }
         },
         "zh-Hans" : {
@@ -2972,6 +3242,12 @@
             "value" : "Вы уверены, что хотите открыть страницу Buy Me a Coffee?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку Buy Me a Coffee?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3035,6 +3311,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу CompactSlider на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку CompactSlider на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3102,6 +3384,12 @@
             "value" : "Вы уверены, что хотите открыть страницу create-dmg на GitHub?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку create-dmg на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3165,6 +3453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу обсуждений на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку обговорень на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3232,6 +3526,12 @@
             "value" : "Вы уверены, что хотите открыть страницу Gemini CLI на GitHub?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку Gemini CLI на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3295,6 +3595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу участников на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку учасників на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3362,6 +3668,12 @@
             "value" : "Вы уверены, что хотите открыть страницу репозитория на GitHub?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку репозиторію на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3425,6 +3737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу ошибок на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку помилок на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3492,6 +3810,12 @@
             "value" : "Вы уверены, что хотите открыть страницу Ollama на GitHub?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку Ollama на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3555,6 +3879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу моделей Ollama?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку моделей Ollama?"
           }
         },
         "zh-Hans" : {
@@ -3622,6 +3952,12 @@
             "value" : "Вы уверены, что хотите открыть страницу OpenCode на GitHub?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку OpenCode на GitHub?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3685,6 +4021,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу с информацией о лицензии?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку з інформацією про ліцензію?"
           }
         },
         "zh-Hans" : {
@@ -3752,6 +4094,12 @@
             "value" : "Вы уверены, что хотите открыть страницу PayPal.Me?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку PayPal.Me?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3815,6 +4163,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу Qwen Code на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку Qwen Code на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -3882,6 +4236,12 @@
             "value" : "Вы уверены, что хотите открыть окно отправки отзыва по электронной почте?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити вікно надсилання відгуку електронною поштою?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3945,6 +4305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы уверены, что хотите открыть страницу Textual на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку Textual на GitHub?"
           }
         },
         "zh-Hans" : {
@@ -4012,6 +4378,12 @@
             "value" : "По возрастанию"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За зростанням"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4075,6 +4447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Задавайте вопросы и делитесь мнениями"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Задавайте питання та діліться думками"
           }
         },
         "zh-Hans" : {
@@ -4142,6 +4520,12 @@
             "value" : "Угостить зеленым чаем"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пригостити зеленим чаєм"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4205,6 +4589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Купить мне зеленый чай"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Купити мені зелений чай"
           }
         },
         "zh-Hans" : {
@@ -4272,6 +4662,12 @@
             "value" : "Отмена"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скасувати"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4337,6 +4733,12 @@
             "value" : "Отменить редактирование."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скасувати редагування."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4397,6 +4799,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чат"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Чат"
@@ -4467,6 +4875,12 @@
             "value" : "Настройки чата"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування чату"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4532,6 +4946,12 @@
             "value" : "Проверка..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірка..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4595,6 +5015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистить историю чата"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити історію чату"
           }
         },
         "zh-Hans" : {
@@ -4663,6 +5089,12 @@
             "value" : "Очистить историю"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити історію"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4728,6 +5160,12 @@
             "value" : "Закрыть"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрити"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4788,6 +5226,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Код"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Код"
@@ -4856,6 +5300,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сообщество"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спільнота"
           }
         },
         "zh-Hans" : {
@@ -4934,6 +5384,12 @@
             "value" : "Завершить редактирование и повторить."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершити редагування та повторити."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4994,6 +5450,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершено"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Завершено"
@@ -5064,6 +5526,12 @@
             "value" : "Завершение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершення"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5127,6 +5595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подключено"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підключено"
           }
         },
         "zh-Hans" : {
@@ -5194,6 +5668,12 @@
             "value" : "Подключение..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підключення..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5257,6 +5737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка подключения"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка підключення"
           }
         },
         "zh-Hans" : {
@@ -5324,6 +5810,12 @@
             "value" : "Не удалось подключиться к API.\nУбедитесь, что хост указан верно и сервер Ollama запущен."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося підключитися до API.\nПереконайтеся, що хост вказано правильно і сервер Ollama запущено."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5387,6 +5879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка подключения"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка підключення"
           }
         },
         "zh-Hans" : {
@@ -5454,6 +5952,12 @@
             "value" : "Длина контекста:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Довжина контексту:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5517,6 +6021,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Окно контекста"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вікно контексту"
           }
         },
         "zh-Hans" : {
@@ -5584,6 +6094,12 @@
             "value" : "Участники"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учасники"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5649,6 +6165,12 @@
             "value" : "Участники, участвовавшие в разработке"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Учасники, що брали участь у розробці"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5712,6 +6234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Копировать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копіювати"
           }
         },
         "zh-Hans" : {
@@ -5780,6 +6308,12 @@
             "value" : "Копировать изображение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копіювати зображення"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5845,6 +6379,12 @@
             "value" : "Копировать название модели"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копіювати назву моделі"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5905,6 +6445,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2026 Taiga Imaura"
@@ -5975,6 +6521,12 @@
             "value" : "Не удалось подключиться к API.\nПроизошла ошибка TLS, невозможно установить безопасное соединение."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося підключитися до API.\nСталася помилка TLS, неможливо встановити безпечне з'єднання."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6038,6 +6590,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось загрузить информацию о модели."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося завантажити інформацію про модель."
           }
         },
         "zh-Hans" : {
@@ -6116,6 +6674,12 @@
             "value" : "Высота"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Висота"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6179,6 +6743,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Свои настройки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свої налаштування"
           }
         },
         "zh-Hans" : {
@@ -6246,6 +6816,12 @@
             "value" : "Шаги"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кроки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6306,6 +6882,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ширина"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ширина"
@@ -6376,6 +6958,12 @@
             "value" : "Дата"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6439,6 +7027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити"
           }
         },
         "zh-Hans" : {
@@ -6506,6 +7100,12 @@
             "value" : "Ошибка удаления: HTTP %1$d - %2$@ на %3$@ "
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка видалення: HTTP %1$d - %2$@ на %3$@ "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6569,6 +7169,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка удаления: модель '%1' не найдена (404 Not Found) на %2."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка видалення: модель '%1' не знайдена (404 Not Found) на %2."
           }
         },
         "zh-Hans" : {
@@ -6636,6 +7242,12 @@
             "value" : "Ошибка удаления: неизвестный тип ответа."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка видалення: невідомий тип відповіді."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6699,6 +7311,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить модель"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити модель"
           }
         },
         "zh-Hans" : {
@@ -6766,6 +7384,12 @@
             "value" : "Удалить сервер"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити сервер"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6829,6 +7453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити..."
           }
         },
         "zh-Hans" : {
@@ -6896,6 +7526,12 @@
             "value" : "Удаление модели '%1' с %2..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалення моделі '%1' з %2..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6959,6 +7595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "По убыванию"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За спаданням"
           }
         },
         "zh-Hans" : {
@@ -7026,6 +7668,12 @@
             "value" : "Подробная информация:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Детальна інформація:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7091,6 +7739,12 @@
             "value" : "Разработано с помощью ИИ"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розроблено за допомогою ШІ"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7151,6 +7805,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дайджест:"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Дайджест:"
@@ -7221,6 +7881,12 @@
             "value" : "Пожертвовать через PayPal"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожертвувати через PayPal"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7281,6 +7947,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Готово"
@@ -7352,6 +8024,12 @@
             "value" : "Скачать изображение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантажити зображення"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7415,6 +8093,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загрузка модели '%1' с %2..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантаження моделі '%1' з %2..."
           }
         },
         "zh-Hans" : {
@@ -7482,6 +8166,12 @@
             "value" : "например, gemma3:4b, phi4:latest"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "наприклад, gemma3:4b, phi4:latest"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7545,6 +8235,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "например, localhost:11434 или 192.168.1.50:11434"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "наприклад, localhost:11434 або 192.168.1.50:11434"
           }
         },
         "zh-Hans" : {
@@ -7612,6 +8308,12 @@
             "value" : "например, Сервер Ollama"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "наприклад, Сервер Ollama"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7675,6 +8377,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Правка"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редагувати"
           }
         },
         "zh-Hans" : {
@@ -7742,6 +8450,12 @@
             "value" : "Изменить сервер"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити сервер"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7805,6 +8519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изменить..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити..."
           }
         },
         "zh-Hans" : {
@@ -7872,6 +8592,12 @@
             "value" : "Векторное представление"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Векторне представлення"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7935,6 +8661,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Длина эмбеддинга:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Довжина ембеддингу:"
           }
         },
         "zh-Hans" : {
@@ -8002,6 +8734,12 @@
             "value" : "Включить свои настройки"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкнути свої налаштування"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8065,6 +8803,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите запрос..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть запит..."
           }
         },
         "zh-Hans" : {
@@ -8132,6 +8876,12 @@
             "value" : "Введите высоту"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть висоту"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8197,6 +8947,12 @@
             "value" : "Введите количество шагов"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть кількість кроків"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8260,6 +9016,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите ширину"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть ширину"
           }
         },
         "zh-Hans" : {
@@ -8328,6 +9090,12 @@
             "value" : "Введите время удержания"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть час утримання"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8392,6 +9160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите сид"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть сид"
           }
         },
         "zh-Hans" : {
@@ -8459,6 +9233,12 @@
             "value" : "Введите желаемую высоту изображения числом, чтобы переопределить настройки выше."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть бажану висоту зображення числом, щоб перевизначити налаштування вище."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8522,6 +9302,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите желаемую ширину изображения числом, чтобы переопределить настройки выше."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть бажану ширину зображення числом, щоб перевизначити налаштування вище."
           }
         },
         "zh-Hans" : {
@@ -8589,6 +9375,12 @@
             "value" : "Введите название модели, которую хотите добавить"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть назву моделі, яку хочете додати"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8652,6 +9444,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите количество шагов генерации числом, чтобы переопределить настройки выше."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть кількість кроків генерації числом, щоб перевизначити налаштування вище."
           }
         },
         "zh-Hans" : {
@@ -8719,6 +9517,12 @@
             "value" : "Ошибка"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8782,6 +9586,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка (код состояния: %lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка (код стану: %lld)"
           }
         },
         "zh-Hans" : {
@@ -8849,6 +9659,12 @@
             "value" : "Произошла ошибка"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сталася помилка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8912,6 +9728,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка: не удалось сериализовать тело запроса pull: "
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: не вдалося серіалізувати тіло запиту pull: "
           }
         },
         "zh-Hans" : {
@@ -8979,6 +9801,12 @@
             "value" : "Ошибка: не удалось сериализовать тело запроса: "
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: не вдалося серіалізувати тіло запиту: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9042,6 +9870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка: неверный URL API для удаления."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: неправильний URL API для видалення."
           }
         },
         "zh-Hans" : {
@@ -9109,6 +9943,12 @@
             "value" : "Ошибка: неверный URL API для pull."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: неправильний URL API для pull."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9172,6 +10012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка: неверный URL API."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: неправильний URL API."
           }
         },
         "zh-Hans" : {
@@ -9239,6 +10085,12 @@
             "value" : "Ошибка: не выбран сервер Ollama."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка: не вибрано сервер Ollama."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9302,6 +10154,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Истекает: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершується: %@"
           }
         },
         "zh-Hans" : {
@@ -9369,6 +10227,12 @@
             "value" : "Ошибка"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9432,6 +10296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось подключиться к API Ollama. Проверьте сетевое соединение или настройки сервера."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося підключитися до API Ollama. Перевірте мережеве з'єднання або налаштування сервера."
           }
         },
         "zh-Hans" : {
@@ -9500,6 +10370,12 @@
             "value" : "Не удалось сгенерировать изображение."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося згенерувати зображення."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9563,6 +10439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Семейства:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сімейства:"
           }
         },
         "zh-Hans" : {
@@ -9630,6 +10512,12 @@
             "value" : "Семейство:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сімейство:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9693,6 +10581,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Получение моделей из API (%@)..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отримання моделей з API (%@)..."
           }
         },
         "zh-Hans" : {
@@ -9760,6 +10654,12 @@
             "value" : "Получение моделей с демо-сервера..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отримання моделей з демо-сервера..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9825,6 +10725,12 @@
             "value" : "Найти модели"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знайти моделі"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9885,6 +10791,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Формат:"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Формат:"
@@ -9953,6 +10865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нашли ошибку?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знайшли помилку?"
           }
         },
         "zh-Hans" : {
@@ -10031,6 +10949,12 @@
             "value" : "Основные"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основні"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10095,6 +11019,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Генерация изображения..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерація зображення..."
           }
         },
         "zh-Hans" : {
@@ -10162,6 +11092,12 @@
             "value" : "Поставить звезду"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставити зірку"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10227,6 +11163,12 @@
             "value" : "Поставить звезду репозиторию на GitHub"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставити зірку репозиторію на GitHub"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10290,6 +11232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Есть идея?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Маєте ідею?"
           }
         },
         "zh-Hans" : {
@@ -10358,6 +11306,12 @@
             "value" : "Высота"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Висота"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10422,6 +11376,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Здесь вы можете генерировать изображения, используя модели с поддержкой генерации."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тут ви можете генерувати зображення, використовуючи моделі з підтримкою генерації."
           }
         },
         "zh-Hans" : {
@@ -10489,6 +11449,12 @@
             "value" : "Здесь вы можете запустить простой чат для проверки модели."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тут ви можете запустити простий чат для перевірки моделі."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10552,6 +11518,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть инспектор"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Приховати інспектор"
           }
         },
         "zh-Hans" : {
@@ -10619,6 +11591,12 @@
             "value" : "Хост"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10679,6 +11657,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост:"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хост:"
@@ -10750,6 +11734,12 @@
             "value" : "ч"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "год"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10813,6 +11803,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Инструкция по настройке"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інструкція з налаштування"
           }
         },
         "zh-Hans" : {
@@ -10880,6 +11876,12 @@
             "value" : "Как настроить доступ к локальной сети."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як налаштувати доступ до локальної мережі."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10943,6 +11945,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Я буду очень рад, если вы поставите звезду репозиторию!"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Я буду дуже радий, якщо ви поставите зірку репозиторію!"
           }
         },
         "zh-Hans" : {
@@ -11010,6 +12018,12 @@
             "value" : "Если загрузка больших моделей занимает много времени, попробуйте увеличить тайм-аут API в настройках Mocolamma или установите его на «Без ограничений»."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо завантаження великих моделей займає багато часу, спробуйте збільшити тайм-аут API в налаштуваннях Mocolamma або встановіть його на «Без обмежень»."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11073,6 +12087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если ответы приходят долго, например при загрузке больших моделей, увеличение тайм-аута может помочь."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо відповіді приходять довго, наприклад при завантаженні великих моделей, збільшення тайм-ауту може допомогти."
           }
         },
         "zh-Hans" : {
@@ -11140,6 +12160,12 @@
             "value" : "При отключении потоковых ответов рекомендуется установить тайм-аут API на «Без ограничений» в настройках."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При відключенні потокових відповідей рекомендується встановити тайм-аут API на «Без обмежень» у налаштуваннях."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11203,6 +12229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если вы не знаете, что вводить, вы можете найти модели на сайте Ollama."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Якщо ви не впевнені, що вводити, ви можете знайти моделі на сайті Ollama."
           }
         },
         "zh-Hans" : {
@@ -11270,6 +12302,12 @@
             "value" : "Изображение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зображення"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11333,6 +12371,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Генерация изображений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерація зображень"
           }
         },
         "zh-Hans" : {
@@ -11400,6 +12444,12 @@
             "value" : "Настройки генерации изображений"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування генерації зображень"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11463,6 +12513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Инспектор"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інспектор"
           }
         },
         "zh-Hans" : {
@@ -11531,6 +12587,12 @@
             "value" : "Удержание"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Утримання"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11594,6 +12656,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 час"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 година"
           }
         },
         "zh-Hans" : {
@@ -11661,6 +12729,12 @@
             "value" : "1 минута"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 хвилина"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11724,6 +12798,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 минуты"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 хвилини"
           }
         },
         "zh-Hans" : {
@@ -11791,6 +12871,12 @@
             "value" : "5 минут"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 хвилин"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11854,6 +12940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10 минут"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 хвилин"
           }
         },
         "zh-Hans" : {
@@ -11921,6 +13013,12 @@
             "value" : "15 минут"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 хвилин"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11984,6 +13082,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 минут"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 хвилин"
           }
         },
         "zh-Hans" : {
@@ -12051,6 +13155,12 @@
             "value" : "Свой вариант"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свій варіант"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12114,6 +13224,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "По умолчанию"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "За замовчуванням"
           }
         },
         "zh-Hans" : {
@@ -12181,6 +13297,12 @@
             "value" : "Сразу"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одразу"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12244,6 +13366,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Бессрочно"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Безстроково"
           }
         },
         "zh-Hans" : {
@@ -12311,6 +13439,12 @@
             "value" : "Запуск при входе"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск при вході"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12374,6 +13508,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Лицензия"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ліцензія"
           }
         },
         "zh-Hans" : {
@@ -12441,6 +13581,12 @@
             "value" : "Информация о лицензии"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інформація про ліцензію"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12504,6 +13650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Лицензия:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ліцензія:"
           }
         },
         "zh-Hans" : {
@@ -12571,6 +13723,12 @@
             "value" : "Загрузка информации о модели..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантаження інформації про модель..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12634,6 +13792,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Доступ к локальной сети"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступ до локальної мережі"
           }
         },
         "zh-Hans" : {
@@ -12701,6 +13865,12 @@
             "value" : "Доступ к локальной сети разрешен."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступ до локальної мережі дозволено."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12762,6 +13932,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меню"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Меню"
@@ -12831,6 +14007,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "мин"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "хв"
           }
         },
         "zh-Hans" : {
@@ -12909,6 +14091,12 @@
             "value" : "Mocolamma — приложение с открытым исходным кодом."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma — додаток з відкритим вихідним кодом."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12972,6 +14160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка удаления модели: "
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка видалення моделі: "
           }
         },
         "zh-Hans" : {
@@ -13039,6 +14233,12 @@
             "value" : "Подробности модели"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробиці моделі"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13102,6 +14302,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Информация о модели:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інформація про модель:"
           }
         },
         "zh-Hans" : {
@@ -13169,6 +14375,12 @@
             "value" : "Название модели:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назва моделі:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13232,6 +14444,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pull модели завершен: "
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pull моделі завершено: "
           }
         },
         "zh-Hans" : {
@@ -13299,6 +14517,12 @@
             "value" : "Ошибка pull модели"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка pull моделі"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13362,6 +14586,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка pull модели: код состояния HTTP %d"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка pull моделі: код стану HTTP %d"
           }
         },
         "zh-Hans" : {
@@ -13429,6 +14659,12 @@
             "value" : "Ошибка pull модели: "
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка pull моделі: "
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13492,6 +14728,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось загрузить модель.\nУбедитесь, что название модели указано верно."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося завантажити модель.\nПереконайтеся, що назва моделі вказана правильно."
           }
         },
         "zh-Hans" : {
@@ -13559,6 +14801,12 @@
             "value" : "Не удалось загрузить модель.\nПроизошла неизвестная ошибка."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося завантажити модель.\nСталася невідома помилка."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13622,6 +14870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Модели"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі"
           }
         },
         "zh-Hans" : {
@@ -13689,6 +14943,12 @@
             "value" : "Изменено"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінено"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13752,6 +15012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изменено:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінено:"
           }
         },
         "zh-Hans" : {
@@ -13819,6 +15085,12 @@
             "value" : "Название"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назва"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13882,6 +15154,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Новый чат"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новий чат"
           }
         },
         "zh-Hans" : {
@@ -13949,6 +15227,12 @@
             "value" : "Новая генерация"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нова генерація"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14012,6 +15296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Следующая версия"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наступна версія"
           }
         },
         "zh-Hans" : {
@@ -14079,6 +15369,12 @@
             "value" : "Данные отсутствуют"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дані відсутні"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14142,6 +15438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подробности отсутствуют."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробиці відсутні."
           }
         },
         "zh-Hans" : {
@@ -14209,6 +15511,12 @@
             "value" : "Информация о модели отсутствует."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інформація про модель відсутня."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14272,6 +15580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Модели не установлены. Нажмите «+», чтобы добавить новую модель."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі не встановлені. Натисніть «+», щоб додати нову модель."
           }
         },
         "zh-Hans" : {
@@ -14339,6 +15653,12 @@
             "value" : "Нет доступных моделей"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає доступних моделей"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14402,6 +15722,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Модели отсутствуют"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі відсутні"
           }
         },
         "zh-Hans" : {
@@ -14469,6 +15795,12 @@
             "value" : "Сервер не выбран"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер не вибрано"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14532,6 +15864,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Серверы не настроены. Нажмите «+», чтобы добавить новый сервер."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервери не налаштовані. Натисніть «+», щоб додати новий сервер."
           }
         },
         "zh-Hans" : {
@@ -14599,6 +15937,12 @@
             "value" : "Серверы отсутствуют"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервери відсутні"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14659,6 +16003,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "№"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "№"
@@ -14729,6 +16079,12 @@
             "value" : "№ %lld"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "№ %lld"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14792,6 +16148,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет подключения (код состояния: %lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає підключення (код стану: %lld)"
           }
         },
         "zh-Hans" : {
@@ -14859,6 +16221,12 @@
             "value" : "Нет подключения (тайм-аут)"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає підключення (тайм-аут)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14922,6 +16290,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет подключения (неизвестный хост)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає підключення (невідомий хост)"
           }
         },
         "zh-Hans" : {
@@ -14989,6 +16363,12 @@
             "value" : "Нечего отображать."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нічого відображати."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15049,6 +16429,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Число"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Число"
@@ -15141,6 +16527,12 @@
             "value" : "Версия Ollama:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версія Ollama:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15204,6 +16596,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити"
           }
         },
         "zh-Hans" : {
@@ -15271,6 +16669,12 @@
             "value" : "Открыть страницу лицензии"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити сторінку ліцензії"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15334,6 +16738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть страницу лицензии?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити сторінку ліцензії?"
           }
         },
         "zh-Hans" : {
@@ -15401,6 +16811,12 @@
             "value" : "Открыть ссылку на страницу обсуждений."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку обговорень."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15464,6 +16880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на список известных ошибок и страницу отчета."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на список відомих помилок та сторінку звіту."
           }
         },
         "zh-Hans" : {
@@ -15531,6 +16953,12 @@
             "value" : "Открыть ссылку на страницу Buy Me a Coffee."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку Buy Me a Coffee."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15594,6 +17022,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на страницу CompactSlider на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку CompactSlider на GitHub."
           }
         },
         "zh-Hans" : {
@@ -15661,6 +17095,12 @@
             "value" : "Открыть ссылку на страницу create-dmg на GitHub."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку create-dmg на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15724,6 +17164,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на страницу Gemini CLI на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку Gemini CLI на GitHub."
           }
         },
         "zh-Hans" : {
@@ -15791,6 +17237,12 @@
             "value" : "Открыть ссылку на страницу участников на GitHub."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку учасників на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15854,6 +17306,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на репозиторий на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на репозиторій на GitHub."
           }
         },
         "zh-Hans" : {
@@ -15921,6 +17379,12 @@
             "value" : "Открыть ссылку на страницу Ollama на GitHub."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку Ollama на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15984,6 +17448,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на страницу OpenCode на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку OpenCode на GitHub."
           }
         },
         "zh-Hans" : {
@@ -16051,6 +17521,12 @@
             "value" : "Открыть ссылку на PayPal.Me."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на PayPal.Me."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16114,6 +17590,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку на страницу Qwen Code на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку Qwen Code на GitHub."
           }
         },
         "zh-Hans" : {
@@ -16181,6 +17663,12 @@
             "value" : "Открыть ссылку на страницу Textual на GitHub."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку Textual на GitHub."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16244,6 +17732,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть ссылку?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання?"
           }
         },
         "zh-Hans" : {
@@ -16311,6 +17805,12 @@
             "value" : "Открыть настройки"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити налаштування"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16374,6 +17874,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Лицензия с открытым исходным кодом"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ліцензія з відкритим вихідним кодом"
           }
         },
         "zh-Hans" : {
@@ -16441,6 +17947,12 @@
             "value" : "Открыть окно отправки письма?"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити вікно надсилання листа?"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16506,6 +18018,12 @@
             "value" : "Открыть окно для отправки отзыва."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити вікно для надсилання відгуку."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16569,6 +18087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть сайт"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити сайт"
           }
         },
         "zh-Hans" : {
@@ -16647,6 +18171,12 @@
             "value" : "Порядок"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Порядок"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16710,6 +18240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Другая лицензия"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інша ліцензія"
           }
         },
         "zh-Hans" : {
@@ -16777,6 +18313,12 @@
             "value" : "Количество параметров:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кількість параметрів:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16840,6 +18382,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Размер параметров:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розмір параметрів:"
           }
         },
         "zh-Hans" : {
@@ -16907,6 +18455,12 @@
             "value" : "Родительская модель:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Батьківська модель:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16970,6 +18524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Для подключения к серверам Ollama в той же сети требуется разрешение."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для підключення до серверів Ollama в тій же мережі потрібен дозвіл."
           }
         },
         "zh-Hans" : {
@@ -17037,6 +18597,12 @@
             "value" : "Разрешения"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дозволи"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17100,6 +18666,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пожалуйста, выберите сервер во вкладке «Сервер»."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будь ласка, виберіть сервер у вкладці «Сервер»."
           }
         },
         "zh-Hans" : {
@@ -17168,6 +18740,12 @@
             "value" : "Пожалуйста, выберите пункт в боковой панели."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будь ласка, виберіть пункт у бічній панелі."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17232,6 +18810,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пожалуйста, выберите место для сохранения изображения."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будь ласка, виберіть місце для збереження зображення."
           }
         },
         "zh-Hans" : {
@@ -17299,6 +18883,12 @@
             "value" : "Подготовка..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підготовка..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17364,6 +18954,12 @@
             "value" : "Предыдущая версия"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередня версія"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17427,6 +19023,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уровень квантования:"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рівень квантування:"
           }
         },
         "zh-Hans" : {
@@ -17511,6 +19113,12 @@
             "value" : "Обновить"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновити"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17574,6 +19182,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновить статус"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновити статус"
           }
         },
         "zh-Hans" : {
@@ -17641,6 +19255,12 @@
             "value" : "Сообщить об ошибке"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повідомити про помилку"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17706,6 +19326,12 @@
             "value" : "Повторить"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторити"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17766,6 +19392,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "запущено"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "запущено"
@@ -17836,6 +19468,12 @@
             "value" : "Запущенные модели:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запущені моделі:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17899,6 +19537,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберегти"
           }
         },
         "zh-Hans" : {
@@ -17967,6 +19611,12 @@
             "value" : "Сохранить как файл..."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберегти як файл..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18033,6 +19683,12 @@
             "value" : "Сохранить в Фото"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберегти у Фото"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18094,6 +19750,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "с"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "с"
@@ -18164,6 +19826,12 @@
             "value" : "Сид"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сид"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18227,6 +19895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрати"
           }
         },
         "zh-Hans" : {
@@ -18295,6 +19969,12 @@
             "value" : "Выберите меню"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть меню"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18360,6 +20040,12 @@
             "value" : "Выберите модель, чтобы увидеть подробности."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть модель, щоб побачити подробиці."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18423,6 +20109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите сервер, чтобы увидеть подробности."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть сервер, щоб побачити подробиці."
           }
         },
         "zh-Hans" : {
@@ -18491,6 +20183,12 @@
             "value" : "Выберите место сохранения"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть місце збереження"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18554,6 +20252,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать модель"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрати модель"
           }
         },
         "zh-Hans" : {
@@ -18621,6 +20325,12 @@
             "value" : "Отправить отзыв"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслати відгук"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18681,6 +20391,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сервер"
@@ -18751,6 +20467,12 @@
             "value" : "Подробности сервера"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробиці сервера"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18814,6 +20536,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Серверы"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервери"
           }
         },
         "zh-Hans" : {
@@ -18882,6 +20610,12 @@
             "value" : "Устанавливает время, в течение которого модель остается в памяти сервера Ollama."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встановлює час, протягом якого модель залишається в пам'яті сервера Ollama."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18945,6 +20679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування"
           }
         },
         "zh-Hans" : {
@@ -19012,6 +20752,12 @@
             "value" : "Настройки…"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування…"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19075,6 +20821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать инспектор"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показати інспектор"
           }
         },
         "zh-Hans" : {
@@ -19142,6 +20894,12 @@
             "value" : "Показать информацию о лицензии для этого приложения и используемых библиотек."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показати інформацію про ліцензію для цього додатка та використовуваних бібліотек."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19205,6 +20963,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Размер"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розмір"
           }
         },
         "zh-Hans" : {
@@ -19272,6 +21036,12 @@
             "value" : "Размер:"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розмір:"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19337,6 +21107,12 @@
             "value" : "Сортировка"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортування"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19400,6 +21176,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сортировать по"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортувати за"
           }
         },
         "zh-Hans" : {
@@ -19468,6 +21250,12 @@
             "value" : "Указывает высоту изображения, которое вы хотите сгенерировать."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує висоту зображення, яке ви хочете згенерувати."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19532,6 +21320,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Указывает количество шагов генерации. Увеличение числа шагов увеличивает время генерации, но может улучшить детализацию."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує кількість кроків генерації. Збільшення числа кроків збільшує час генерації, але може покращити деталізацію."
           }
         },
         "zh-Hans" : {
@@ -19599,6 +21393,12 @@
             "value" : "Указывает сид (начальное значение), используемый для генерации изображения."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує сид (початкове значення), що використовується для генерації зображення."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19664,6 +21464,12 @@
             "value" : "Указывает ширину изображения, которое вы хотите сгенерировать."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує ширину зображення, яке ви хочете згенерувати."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19727,6 +21533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Указывает, следует ли выполнять рассуждение при использовании модели рассуждения."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує, чи слід виконувати міркування при використанні моделі міркування."
           }
         },
         "zh-Hans" : {
@@ -19795,6 +21607,12 @@
             "value" : "Шаги"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кроки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19858,6 +21676,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Остановлено"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зупинено"
           }
         },
         "zh-Hans" : {
@@ -19925,6 +21749,12 @@
             "value" : "Потоковый ответ"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Потокова відповідь"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19988,6 +21818,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Модель \"%1$@\" успешно удалена с %2$@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Модель \"%1$@\" успішно видалена з %2$@."
           }
         },
         "zh-Hans" : {
@@ -20055,6 +21891,12 @@
             "value" : "Модели успешно получены с демо-сервера. Всего: %d"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі успішно отримані з демо-сервера. Всього: %d"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20118,6 +21960,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Модели успешно получены. Всего: %d"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моделі успішно отримані. Всього: %d"
           }
         },
         "zh-Hans" : {
@@ -20185,6 +22033,12 @@
             "value" : "Поддержка и отзывы"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підтримка та відгуки"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20248,6 +22102,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поддержать разработчика"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підтримати розробника"
           }
         },
         "zh-Hans" : {
@@ -20315,6 +22175,12 @@
             "value" : "Системный запрос"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системний запит"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20375,6 +22241,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Температура"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Температура"
@@ -20448,6 +22320,12 @@
             "value" : "Рассуждение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Міркування"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20513,6 +22391,12 @@
             "value" : "Рассуждение завершено"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Міркування завершено"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20576,6 +22460,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Рассуждение..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Міркування..."
           }
         },
         "zh-Hans" : {
@@ -20644,6 +22534,12 @@
             "value" : "Не указано"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вказано"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20708,6 +22604,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выкл"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вимк"
           }
         },
         "zh-Hans" : {
@@ -20776,6 +22678,12 @@
             "value" : "Вкл"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімк"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20839,6 +22747,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Эту модель нельзя использовать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цю модель неможливо використовувати"
           }
         },
         "zh-Hans" : {
@@ -20906,6 +22820,12 @@
             "value" : "Эта модель не поддерживает чат."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ця модель не підтримує чат."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -20969,6 +22889,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Чтобы разрешить доступ к локальной сети, перейдите в «Настройки» → «Конфиденциальность и безопасность» → «Локальная сеть» и включите «Mocolamma»."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб дозволити доступ до локальної мережі, перейдіть у «Налаштування» → «Конфіденційність та безпека» → «Локальна мережа» та увімкніть «Mocolamma»."
           }
         },
         "zh-Hans" : {
@@ -21036,6 +22962,12 @@
             "value" : "Чтобы разрешить доступ к локальной сети, перейдите в «Системные настройки» → «Конфиденциальность и безопасность» → «Локальная сеть» и включите «Mocolamma».\n\nНажмите «ОК», чтобы открыть настройки конфиденциальности и безопасности."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щоб дозволити доступ до локальної мережі, перейдіть у «Системні налаштування» → «Конфіденційність та безпека» → «Локальна мережа» та увімкніть «Mocolamma».\n\nНатисніть «ОК», щоб відкрити налаштування конфіденційності та безпеки."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21099,6 +23031,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Переключить инспектор"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключити інспектор"
           }
         },
         "zh-Hans" : {
@@ -21166,6 +23104,12 @@
             "value" : "Переключить перенос текста"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключити перенос текста"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21231,6 +23175,12 @@
             "value" : "Инструменты"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інструменти"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21294,6 +23244,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите сообщение..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введіть повідомлення..."
           }
         },
         "zh-Hans" : {
@@ -21362,6 +23318,12 @@
             "value" : "Единица"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одиниця"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21425,6 +23387,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Без ограничений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без обмежень"
           }
         },
         "zh-Hans" : {
@@ -21493,6 +23461,12 @@
             "value" : "Выгрузить эту модель из памяти."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вивантажити цю модель з пам'яті."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21556,6 +23530,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обновить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновити"
           }
         },
         "zh-Hans" : {
@@ -21623,6 +23603,12 @@
             "value" : "Обновить всё равно"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оновити все одно"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21686,6 +23672,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версия: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версія: %@"
           }
         },
         "zh-Hans" : {
@@ -21753,6 +23745,12 @@
             "value" : "Версия: %1$@ (%2$@)"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версія: %1$@ (%2$@)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21816,6 +23814,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вид"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вигляд"
           }
         },
         "zh-Hans" : {
@@ -21883,6 +23887,12 @@
             "value" : "Зрение"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зір"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21948,6 +23958,12 @@
             "value" : "Размер VRAM: %@"
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розмір VRAM: %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22009,6 +24025,12 @@
           }
         },
         "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ширина"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ширина"
@@ -22079,6 +24101,12 @@
             "value" : "Вы также можете сделать пожертвование напрямую через PayPal."
           }
         },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви також можете зробити пожертву прямо через PayPal."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -22142,6 +24170,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы можете поддержать меня на Buy Me a Coffee по цене чашки зеленого чая."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви можете підтримати мене на Buy Me a Coffee за ціною чашки зеленого чаю."
           }
         },
         "zh-Hans" : {
