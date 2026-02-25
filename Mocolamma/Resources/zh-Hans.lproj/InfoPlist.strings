@@ -1,0 +1,2 @@
+NSLocalNetworkUsageDescription = "需要此权限以与本地网络中的 Ollama 服务器进行通信。";
+NSPhotoLibraryAddUsageDescription = "需要此权限以将生成的图像保存到您的照片库。";

@@ -36,6 +36,8 @@ Notes
   - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
 - **Add a Keep Alive option to the chat and image generation screen inspectors**
   - This allows you to specify how long the model is kept in memory on the Ollama server.
+- **Add Simplified Chinese (`zh-Hans`) localization by generative AI**
+  - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
