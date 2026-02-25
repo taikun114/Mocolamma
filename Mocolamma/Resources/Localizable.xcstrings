@@ -50,6 +50,12 @@
             "state" : "translated",
             "value" : "%1$.1f%% 已完成 (%2$@ / %3$@)"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$.1f%% 已完成 (%2$@ / %3$@)"
+          }
         }
       }
     },
@@ -102,6 +108,12 @@
             "state" : "translated",
             "value" : "*已取消*"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*已取消*"
+          }
         }
       }
     },
@@ -143,6 +155,12 @@
             "state" : "translated",
             "value" : "*无法连接*"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*無法連線*"
+          }
         }
       }
     },
@@ -183,6 +201,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*没有消息*"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*沒有訊息*"
           }
         }
       }
@@ -295,6 +319,12 @@
             "state" : "translated",
             "value" : "%1$@/s，剩余时间：%2$02d:%3$02d"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@/s，剩餘時間：%2$02d:%3$02d"
+          }
         }
       }
     },
@@ -335,6 +365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d小时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d小時"
           }
         }
       }
@@ -377,6 +413,12 @@
             "state" : "translated",
             "value" : "%d分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d分鐘"
+          }
         }
       }
     },
@@ -414,6 +456,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d秒"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d秒"
@@ -466,6 +514,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld / %2$lld"
@@ -606,6 +660,18 @@
               }
             }
           }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Token"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -664,6 +730,12 @@
             "state" : "translated",
             "value" : "1 分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 分鐘"
+          }
         }
       }
     },
@@ -705,6 +777,12 @@
             "state" : "translated",
             "value" : "5 分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 分鐘"
+          }
         }
       }
     },
@@ -742,6 +820,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 秒"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 秒"
@@ -787,6 +871,12 @@
             "state" : "translated",
             "value" : "关于 Mocolamma"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於 Mocolamma"
+          }
         }
       }
     },
@@ -827,6 +917,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关于 Mocolamma…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於 Mocolamma…"
           }
         }
       }
@@ -869,6 +965,12 @@
             "state" : "translated",
             "value" : "致谢"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "謝辞"
+          }
         }
       }
     },
@@ -909,6 +1011,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增"
           }
         }
       }
@@ -951,6 +1059,12 @@
             "state" : "translated",
             "value" : "仍然添加"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然新增"
+          }
         }
       }
     },
@@ -991,6 +1105,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加模型"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增模型"
           }
         }
       }
@@ -1033,6 +1153,12 @@
             "state" : "translated",
             "value" : "添加模型…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增模型…"
+          }
         }
       }
     },
@@ -1073,6 +1199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新增"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增項目"
           }
         }
       }
@@ -1115,6 +1247,12 @@
             "state" : "translated",
             "value" : "添加服务器"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增伺服器"
+          }
         }
       }
     },
@@ -1155,6 +1293,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加服务器…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增伺服器…"
           }
         }
       }
@@ -1197,6 +1341,12 @@
             "state" : "translated",
             "value" : "调整自定义高度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整自定義高度"
+          }
         }
       }
     },
@@ -1238,6 +1388,12 @@
             "state" : "translated",
             "value" : "调整自定义步数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整自定義步數"
+          }
         }
       }
     },
@@ -1278,6 +1434,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "调整自定义宽度"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整自定義寬度"
           }
         }
       }
@@ -1321,6 +1483,12 @@
             "state" : "translated",
             "value" : "调整保持活动时间"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整保持活動時間"
+          }
         }
       }
     },
@@ -1363,6 +1531,12 @@
             "state" : "translated",
             "value" : "调整种子值"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整種子值"
+          }
         }
       }
     },
@@ -1403,6 +1577,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已允许"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已允許"
           }
         }
       }
@@ -1446,6 +1626,12 @@
             "state" : "translated",
             "value" : "发生未知错误。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生未知錯誤。"
+          }
         }
       }
     },
@@ -1486,6 +1672,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API 解码错误："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 解碼錯誤："
           }
         }
       }
@@ -1528,6 +1720,12 @@
             "state" : "translated",
             "value" : "API 错误：HTTP 状态码 %d"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 錯誤：HTTP 狀態碼 %d"
+          }
         }
       }
     },
@@ -1568,6 +1766,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API 错误：响应类型未知。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 錯誤：未知回應類型。"
           }
         }
       }
@@ -1610,6 +1814,12 @@
             "state" : "translated",
             "value" : "API 请求错误："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 請求錯誤："
+          }
         }
       }
     },
@@ -1651,6 +1861,12 @@
             "state" : "translated",
             "value" : "API 超时"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 超時"
+          }
         }
       }
     },
@@ -1691,6 +1907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要清除聊天记录吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要清除聊天記錄嗎？"
           }
         }
       }
@@ -1734,6 +1956,12 @@
             "state" : "translated",
             "value" : "您确定要清除生成历史记录吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要清除生成歷史記錄嗎？"
+          }
         }
       }
     },
@@ -1774,6 +2002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要删除模型“%@”吗？\n此操作无法撤销。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要刪除模型「%@」嗎？\n此操作無法撤銷。"
           }
         }
       }
@@ -1816,6 +2050,12 @@
             "state" : "translated",
             "value" : "您确定要删除所选模型吗？\n此操作无法撤销。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要刪除所選模型嗎？\n此操作無法撤銷。"
+          }
         }
       }
     },
@@ -1856,6 +2096,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要删除所选服务器吗？\n此操作无法撤销。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要刪除所選伺服器嗎？\n此操作無法撤銷。"
           }
         }
       }
@@ -1898,6 +2144,12 @@
             "state" : "translated",
             "value" : "您确定要删除服务器“%@”吗？\n此操作无法撤销。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要刪除伺服器「%@」嗎？\n此操作無法撤銷。"
+          }
         }
       }
     },
@@ -1938,6 +2190,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 Buy Me a Coffee 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Buy Me a Coffee 頁面嗎？"
           }
         }
       }
@@ -1980,6 +2238,12 @@
             "state" : "translated",
             "value" : "您确定要打开 CompactSlider 的 GitHub 页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 CompactSlider 的 GitHub 頁面嗎？"
+          }
         }
       }
     },
@@ -2020,6 +2284,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 create-dmg 的 GitHub 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 create-dmg 的 GitHub 頁面嗎？"
           }
         }
       }
@@ -2062,6 +2332,12 @@
             "state" : "translated",
             "value" : "您确定要打开 GitHub 上的讨论页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 GitHub 上的討論頁面嗎？"
+          }
         }
       }
     },
@@ -2102,6 +2378,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 Gemini CLI 的 GitHub 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Gemini CLI 的 GitHub 頁面嗎？"
           }
         }
       }
@@ -2144,6 +2426,12 @@
             "state" : "translated",
             "value" : "您确定要打开 GitHub 贡献者页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 GitHub 貢獻者頁面嗎？"
+          }
         }
       }
     },
@@ -2184,6 +2472,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 GitHub 仓库页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 GitHub 倉庫頁面嗎？"
           }
         }
       }
@@ -2226,6 +2520,12 @@
             "state" : "translated",
             "value" : "您确定要打开 GitHub 上的 Issue 页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 GitHub 上的 Issue 頁面嗎？"
+          }
         }
       }
     },
@@ -2266,6 +2566,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 Ollama 的 GitHub 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Ollama 的 GitHub 頁面嗎？"
           }
         }
       }
@@ -2308,6 +2614,12 @@
             "state" : "translated",
             "value" : "您确定要打开 Ollama 模型页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Ollama 模型頁面嗎？"
+          }
         }
       }
     },
@@ -2348,6 +2660,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 OpenCode 的 GitHub 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 OpenCode 的 GitHub 頁面嗎？"
           }
         }
       }
@@ -2390,6 +2708,12 @@
             "state" : "translated",
             "value" : "您确定要打开包含许可证信息的页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟包含授權資訊的頁面嗎？"
+          }
         }
       }
     },
@@ -2430,6 +2754,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开 PayPal.Me 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 PayPal.Me 頁面嗎？"
           }
         }
       }
@@ -2472,6 +2802,12 @@
             "state" : "translated",
             "value" : "您确定要打开 Qwen Code 的 GitHub 页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Qwen Code 的 GitHub 頁面嗎？"
+          }
         }
       }
     },
@@ -2512,6 +2848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您确定要打开发送反馈邮件的窗口吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟發送回饋郵件的視窗吗？"
           }
         }
       }
@@ -2554,6 +2896,12 @@
             "state" : "translated",
             "value" : "您确定要打开 Textual 的 GitHub 页面吗？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 Textual 的 GitHub 頁面嗎？"
+          }
         }
       }
     },
@@ -2591,6 +2939,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升序"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "升序"
@@ -2636,6 +2990,12 @@
             "state" : "translated",
             "value" : "提问并分享您的意见"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提問並分享您的意見"
+          }
         }
       }
     },
@@ -2676,6 +3036,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请喝绿茶"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請喝綠茶"
           }
         }
       }
@@ -2718,6 +3084,12 @@
             "state" : "translated",
             "value" : "请我喝绿茶"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請我喝綠茶"
+          }
         }
       }
     },
@@ -2755,6 +3127,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "取消"
@@ -2800,6 +3178,12 @@
             "state" : "translated",
             "value" : "取消编辑。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消編輯。"
+          }
         }
       }
     },
@@ -2837,6 +3221,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "聊天"
@@ -2882,6 +3272,12 @@
             "state" : "translated",
             "value" : "聊天设置"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天設定"
+          }
         }
       }
     },
@@ -2923,6 +3319,12 @@
             "state" : "translated",
             "value" : "检查中…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檢查中…"
+          }
         }
       }
     },
@@ -2963,6 +3365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除聊天记录"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除聊天記錄"
           }
         }
       }
@@ -3006,6 +3414,12 @@
             "state" : "translated",
             "value" : "清除历史记录"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除歷史記錄"
+          }
         }
       }
     },
@@ -3046,6 +3460,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关闭"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉"
           }
         }
       }
@@ -3088,6 +3508,12 @@
             "state" : "translated",
             "value" : "代码"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "程式碼"
+          }
         }
       }
     },
@@ -3128,6 +3554,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "社区"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "社區"
           }
         }
       }
@@ -3181,6 +3613,12 @@
             "state" : "translated",
             "value" : "完成编辑并重试。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成編輯並重試。"
+          }
         }
       }
     },
@@ -3218,6 +3656,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已完成"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "已完成"
@@ -3263,6 +3707,12 @@
             "state" : "translated",
             "value" : "补全"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "補全"
+          }
         }
       }
     },
@@ -3303,6 +3753,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已连接"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已連線"
           }
         }
       }
@@ -3345,6 +3801,12 @@
             "state" : "translated",
             "value" : "正在连接…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線中…"
+          }
         }
       }
     },
@@ -3385,6 +3847,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "连接失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線失敗"
           }
         }
       }
@@ -3427,6 +3895,12 @@
             "state" : "translated",
             "value" : "无法连接到 API。\n请确保主机名正确且 Ollama 服务器正在运行。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法連線至 API。\n請確保主機名稱正確且 Ollama 伺服器正在執行。"
+          }
         }
       }
     },
@@ -3467,6 +3941,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "连接错误"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線錯誤"
           }
         }
       }
@@ -3509,6 +3989,12 @@
             "state" : "translated",
             "value" : "上下文长度："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下文長度："
+          }
         }
       }
     },
@@ -3549,6 +4035,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上下文窗口"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下文視窗"
           }
         }
       }
@@ -3591,6 +4083,12 @@
             "state" : "translated",
             "value" : "贡献者"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貢獻者"
+          }
         }
       }
     },
@@ -3632,6 +4130,12 @@
             "state" : "translated",
             "value" : "参与开发的贡献者"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "參與開發的貢獻者"
+          }
         }
       }
     },
@@ -3672,6 +4176,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "复制"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製"
           }
         }
       }
@@ -3715,6 +4225,12 @@
             "state" : "translated",
             "value" : "复制图像"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製圖片"
+          }
         }
       }
     },
@@ -3756,6 +4272,12 @@
             "state" : "translated",
             "value" : "复制模型名称"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製模型名稱"
+          }
         }
       }
     },
@@ -3793,6 +4315,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2026 今浦大雅"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2026 今浦大雅"
@@ -3838,6 +4366,12 @@
             "state" : "translated",
             "value" : "无法连接到 API。\n由于 TLS 错误，无法建立安全连接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法連線至 API。\n由於 TLS 錯誤，無法建立安全連線。"
+          }
         }
       }
     },
@@ -3878,6 +4412,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法加载模型信息。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法載入模型資訊。"
           }
         }
       }
@@ -3931,6 +4471,12 @@
             "state" : "translated",
             "value" : "自定义高度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定義高度"
+          }
         }
       }
     },
@@ -3971,6 +4517,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自定义设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定義設定"
           }
         }
       }
@@ -4013,6 +4565,12 @@
             "state" : "translated",
             "value" : "自定义步数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定義步數"
+          }
         }
       }
     },
@@ -4054,6 +4612,12 @@
             "state" : "translated",
             "value" : "自定义宽度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定義寬度"
+          }
         }
       }
     },
@@ -4091,6 +4655,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "日期"
@@ -4136,6 +4706,12 @@
             "state" : "translated",
             "value" : "删除"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
         }
       }
     },
@@ -4176,6 +4752,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "删除错误：HTTP 状态码 %1$d - %2$@（在 %3$@ 上）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除錯誤：HTTP 狀態碼 %1$d - %2$@（在 %3$@ 上）"
           }
         }
       }
@@ -4218,6 +4800,12 @@
             "state" : "translated",
             "value" : "删除错误：在 %2$@ 上未找到模型“%1$@”（404 Not Found）。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除錯誤：在 %2$@ 上找不到模型「%1$@」（404 Not Found）。"
+          }
         }
       }
     },
@@ -4258,6 +4846,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "删除错误：响应类型未知。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除錯誤：回應類型未知。"
           }
         }
       }
@@ -4300,6 +4894,12 @@
             "state" : "translated",
             "value" : "删除模型"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除模型"
+          }
         }
       }
     },
@@ -4340,6 +4940,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "删除服务器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除伺服器"
           }
         }
       }
@@ -4382,6 +4988,12 @@
             "state" : "translated",
             "value" : "删除…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除…"
+          }
         }
       }
     },
@@ -4423,6 +5035,12 @@
             "state" : "translated",
             "value" : "正在从 %2$@ 删除模型“%1$@”…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從 %2$@ 刪除模型「%1$@」…"
+          }
         }
       }
     },
@@ -4460,6 +5078,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "降序"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "降序"
@@ -4505,6 +5129,12 @@
             "state" : "translated",
             "value" : "详细信息："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細資訊："
+          }
         }
       }
     },
@@ -4546,6 +5176,12 @@
             "state" : "translated",
             "value" : "使用生成式 AI 开发"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用生成式 AI 開發"
+          }
         }
       }
     },
@@ -4583,6 +5219,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "摘要："
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "摘要："
@@ -4628,6 +5270,12 @@
             "state" : "translated",
             "value" : "通过 PayPal 捐赠"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "透過 PayPal 捐助"
+          }
         }
       }
     },
@@ -4665,6 +5313,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "完成"
@@ -4711,6 +5365,12 @@
             "state" : "translated",
             "value" : "下载图像"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下載圖片"
+          }
         }
       }
     },
@@ -4752,6 +5412,12 @@
             "state" : "translated",
             "value" : "正在从 %2$@ 下载模型“%1$@”…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從 %2$@ 下載模型「%1$@」…"
+          }
         }
       }
     },
@@ -4789,6 +5455,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例如：gemma3:4b、phi4:latest 等"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "例如：gemma3:4b、phi4:latest 等"
@@ -4834,6 +5506,12 @@
             "state" : "translated",
             "value" : "例如：localhost:11434 或 192.168.1.50:11434 等"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例如：localhost:11434 或 192.168.1.50:11434 等"
+          }
         }
       }
     },
@@ -4874,6 +5552,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "例如：Ollama 服务器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "例如：Ollama 伺服器"
           }
         }
       }
@@ -4916,6 +5600,12 @@
             "state" : "translated",
             "value" : "编辑"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯"
+          }
         }
       }
     },
@@ -4956,6 +5646,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "编辑服务器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯伺服器"
           }
         }
       }
@@ -4998,6 +5694,12 @@
             "state" : "translated",
             "value" : "编辑…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯…"
+          }
         }
       }
     },
@@ -5035,6 +5737,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嵌入"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "嵌入"
@@ -5080,6 +5788,12 @@
             "state" : "translated",
             "value" : "嵌入长度："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嵌入長度："
+          }
         }
       }
     },
@@ -5120,6 +5834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "启用自定义设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "啟用自定義設定"
           }
         }
       }
@@ -5162,6 +5882,12 @@
             "state" : "translated",
             "value" : "输入提示词…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入提示詞…"
+          }
         }
       }
     },
@@ -5202,6 +5928,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "输入自定义高度"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入自定義高度"
           }
         }
       }
@@ -5244,6 +5976,12 @@
             "state" : "translated",
             "value" : "输入自定义步数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入自定義步數"
+          }
         }
       }
     },
@@ -5284,6 +6022,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "输入自定义宽度"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入自定義寬度"
           }
         }
       }
@@ -5327,6 +6071,12 @@
             "state" : "translated",
             "value" : "输入保持活动时间"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入保持活動時間"
+          }
         }
       }
     },
@@ -5369,6 +6119,12 @@
             "state" : "translated",
             "value" : "输入种子值"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入種子值"
+          }
         }
       }
     },
@@ -5409,6 +6165,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以数字形式输入所需的图像高度，以覆盖上述设置并手动指定尺寸。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以数字形式输入所需的圖片高度，以覆蓋上述設定並手動指定尺寸。"
           }
         }
       }
@@ -5451,6 +6213,12 @@
             "state" : "translated",
             "value" : "以数字形式输入所需的图像宽度，以覆盖上述设置并手动指定尺寸。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以数字形式输入所需的圖片寬度，以覆蓋上述設定並手動指定尺寸。"
+          }
         }
       }
     },
@@ -5491,6 +6259,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "输入您要添加的模型名称"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入您要新增的模型名稱"
           }
         }
       }
@@ -5533,6 +6307,12 @@
             "state" : "translated",
             "value" : "以数字形式输入图像生成步数，以覆盖上述设置并手动指定尺寸。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以数字形式输入圖片生成步數，以覆蓋上述設定並手動指定尺寸。"
+          }
         }
       }
     },
@@ -5573,6 +6353,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤"
           }
         }
       }
@@ -5615,6 +6401,12 @@
             "state" : "translated",
             "value" : "错误（状态码：%lld）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤（狀態碼：%lld）"
+          }
         }
       }
     },
@@ -5655,6 +6447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发生错误"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生錯誤"
           }
         }
       }
@@ -5697,6 +6495,12 @@
             "state" : "translated",
             "value" : "错误：无法序列化拉取请求体："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：無法序列化拉取請求體："
+          }
         }
       }
     },
@@ -5737,6 +6541,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误：无法序列化请求体："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：無法序列化請求體："
           }
         }
       }
@@ -5779,6 +6589,12 @@
             "state" : "translated",
             "value" : "错误：删除操作的 API URL 无效。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：刪除操作の API URL 無効。"
+          }
         }
       }
     },
@@ -5819,6 +6635,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误：拉取操作的 API URL 无效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：拉取操作の API URL 無効。"
           }
         }
       }
@@ -5861,6 +6683,12 @@
             "state" : "translated",
             "value" : "错误：API URL 无效。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：API URL 無効。"
+          }
         }
       }
     },
@@ -5901,6 +6729,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误：未选择 Ollama 服务器。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "錯誤：未選擇 Ollama 伺服器。"
           }
         }
       }
@@ -5943,6 +6777,12 @@
             "state" : "translated",
             "value" : "过期时间：%@ "
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過期時間：%@ "
+          }
         }
       }
     },
@@ -5984,6 +6824,12 @@
             "state" : "translated",
             "value" : "失败"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失敗"
+          }
         }
       }
     },
@@ -6024,6 +6870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "连接到 Ollama API 失败。请检查您的网络连接或服务器设置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線至 Ollama API 失敗。請檢查您的網路連線或伺服器設定。"
           }
         }
       }
@@ -6067,6 +6919,12 @@
             "state" : "translated",
             "value" : "生成图像失败。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片生成失敗。"
+          }
         }
       }
     },
@@ -6104,6 +6962,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "家族："
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "家族："
@@ -6149,6 +7013,12 @@
             "state" : "translated",
             "value" : "家族："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "家族："
+          }
         }
       }
     },
@@ -6189,6 +7059,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在从 API (%@) 获取模型…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從 API (%@) 取得模型…"
           }
         }
       }
@@ -6231,6 +7107,12 @@
             "state" : "translated",
             "value" : "正在从演示服务器获取模型…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在從演示伺服器取得模型…"
+          }
         }
       }
     },
@@ -6272,6 +7154,12 @@
             "state" : "translated",
             "value" : "寻找模型"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尋找模型"
+          }
         }
       }
     },
@@ -6309,6 +7197,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "格式："
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "格式："
@@ -6353,6 +7247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发现了错误？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發現了錯誤？"
           }
         }
       }
@@ -6406,6 +7306,12 @@
             "state" : "translated",
             "value" : "常规"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
+          }
         }
       }
     },
@@ -6448,6 +7354,12 @@
             "state" : "translated",
             "value" : "正在生成图像…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在生成圖片…"
+          }
         }
       }
     },
@@ -6488,6 +7400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点亮星标"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "點亮星標"
           }
         }
       }
@@ -6530,6 +7448,12 @@
             "state" : "translated",
             "value" : "为 GitHub 仓库点亮星标"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "為 GitHub 倉庫點亮星標"
+          }
         }
       }
     },
@@ -6571,6 +7495,12 @@
             "state" : "translated",
             "value" : "有主意了？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有主意嗎？"
+          }
         }
       }
     },
@@ -6609,6 +7539,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "高度"
@@ -6655,6 +7591,12 @@
             "state" : "translated",
             "value" : "您可以在此处使用支持图像生成的模型来生成图像。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您可以在此處使用支援圖片生成的模型來生成圖片。"
+          }
         }
       }
     },
@@ -6695,6 +7637,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您可以在此处进行简单聊天以检查模型。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您可以在此處進行簡單聊天以檢查模型。"
           }
         }
       }
@@ -6737,6 +7685,12 @@
             "state" : "translated",
             "value" : "隐藏检查器"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏檢查器"
+          }
         }
       }
     },
@@ -6778,6 +7732,12 @@
             "state" : "translated",
             "value" : "主机"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主機"
+          }
         }
       }
     },
@@ -6818,6 +7778,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "主机："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主機："
           }
         }
       }
@@ -6861,6 +7827,12 @@
             "state" : "translated",
             "value" : "小时"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小時"
+          }
         }
       }
     },
@@ -6901,6 +7873,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如何设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如何設定"
           }
         }
       }
@@ -6943,6 +7921,12 @@
             "state" : "translated",
             "value" : "如何设置本地网络权限。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如何設定區域網路權限。"
+          }
         }
       }
     },
@@ -6983,6 +7967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果您能为仓库点亮星标，我将不胜感激！"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果您能為倉庫點亮星標，我將不勝感激！"
           }
         }
       }
@@ -7025,6 +8015,12 @@
             "state" : "translated",
             "value" : "如果加载大型模型需要较长时间，增加 Mocolamma 设置中的 API 超时时间或将其更改为“无限制”可能会有所帮助。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果載入大型模型需要較長時間，增加 Mocolamma 設定中的 API 超時時間或將其更改為「無限制」可能會有幫助。"
+          }
         }
       }
     },
@@ -7065,6 +8061,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果响应时间较长（例如加载大型模型时），增加超时时间可能会有所帮助。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果回應時間較長（例如載入大型模型時），增加超時時間可能會有幫助。"
           }
         }
       }
@@ -7107,6 +8109,12 @@
             "state" : "translated",
             "value" : "如果您关闭流式响应，建议在设置中将 API 超时时间设置为“无限制”。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果您關閉串流回應，建議在設定中将 API 超時時間設定為「無限制」。"
+          }
         }
       }
     },
@@ -7147,6 +8155,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果您不确定要输入什么，可以在 Ollama 网站上寻找模型。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果您不確定要輸入什麼，可以在 Ollama 網站上尋找模型。"
           }
         }
       }
@@ -7189,6 +8203,12 @@
             "state" : "translated",
             "value" : "图像"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片"
+          }
         }
       }
     },
@@ -7229,6 +8249,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "图像生成"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片生成"
           }
         }
       }
@@ -7271,6 +8297,12 @@
             "state" : "translated",
             "value" : "图像生成设置"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片生成設定"
+          }
         }
       }
     },
@@ -7311,6 +8343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "检查器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檢查器"
           }
         }
       }
@@ -7354,6 +8392,12 @@
             "state" : "translated",
             "value" : "保持活动"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保持活動"
+          }
         }
       }
     },
@@ -7394,6 +8438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 小时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 小時"
           }
         }
       }
@@ -7436,6 +8486,12 @@
             "state" : "translated",
             "value" : "1 分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 分鐘"
+          }
         }
       }
     },
@@ -7476,6 +8532,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 分鐘"
           }
         }
       }
@@ -7518,6 +8580,12 @@
             "state" : "translated",
             "value" : "5 分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 分鐘"
+          }
         }
       }
     },
@@ -7558,6 +8626,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10 分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 分鐘"
           }
         }
       }
@@ -7600,6 +8674,12 @@
             "state" : "translated",
             "value" : "15 分钟"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 分鐘"
+          }
         }
       }
     },
@@ -7640,6 +8720,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "30 分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 分鐘"
           }
         }
       }
@@ -7682,6 +8768,12 @@
             "state" : "translated",
             "value" : "自定义"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定義"
+          }
         }
       }
     },
@@ -7722,6 +8814,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "默认"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默認"
           }
         }
       }
@@ -7764,6 +8862,12 @@
             "state" : "translated",
             "value" : "立即释放"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即釋放"
+          }
         }
       }
     },
@@ -7804,6 +8908,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无限期"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無限期"
           }
         }
       }
@@ -7846,6 +8956,12 @@
             "state" : "translated",
             "value" : "登录时启动"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入時啟動"
+          }
         }
       }
     },
@@ -7886,6 +9002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "许可证"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授權"
           }
         }
       }
@@ -7928,6 +9050,12 @@
             "state" : "translated",
             "value" : "许可证信息"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授權資訊"
+          }
         }
       }
     },
@@ -7968,6 +9096,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "许可证："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授權："
           }
         }
       }
@@ -8010,6 +9144,12 @@
             "state" : "translated",
             "value" : "正在加载模型信息…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在載入模型資訊…"
+          }
         }
       }
     },
@@ -8051,6 +9191,12 @@
             "state" : "translated",
             "value" : "本地网络访问"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "區域網路存取"
+          }
         }
       }
     },
@@ -8091,6 +9237,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "本地网络权限已授予。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "區域網路權限已授予。"
           }
         }
       }
@@ -8134,6 +9286,12 @@
             "state" : "translated",
             "value" : "菜单"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選單"
+          }
         }
       }
     },
@@ -8175,6 +9333,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分鐘"
           }
         }
       }
@@ -8228,6 +9392,12 @@
             "state" : "translated",
             "value" : "Mocolamma 是一款开源应用程序。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mocolamma 是一款開源應用程式。"
+          }
         }
       }
     },
@@ -8268,6 +9438,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型删除失败："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型刪除失敗："
           }
         }
       }
@@ -8310,6 +9486,12 @@
             "state" : "translated",
             "value" : "模型详情"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型詳情"
+          }
         }
       }
     },
@@ -8350,6 +9532,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型信息："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型資訊："
           }
         }
       }
@@ -8392,6 +9580,12 @@
             "state" : "translated",
             "value" : "模型名称："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型名稱："
+          }
         }
       }
     },
@@ -8429,6 +9623,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取完成："
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型拉取完成："
@@ -8474,6 +9674,12 @@
             "state" : "translated",
             "value" : "模型拉取错误"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取錯誤"
+          }
         }
       }
     },
@@ -8514,6 +9720,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型拉取错误：HTTP 状态码 %d"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取錯誤：HTTP 狀態碼 %d"
           }
         }
       }
@@ -8556,6 +9768,12 @@
             "state" : "translated",
             "value" : "模型拉取失败："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取失敗："
+          }
         }
       }
     },
@@ -8596,6 +9814,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型拉取失败。\n请确保模型名称正确。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取失敗。\n請確保模型名稱正確。"
           }
         }
       }
@@ -8638,6 +9862,12 @@
             "state" : "translated",
             "value" : "模型拉取失败。\n发生未知错误。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型拉取失敗。\n發生未知錯誤。"
+          }
         }
       }
     },
@@ -8675,6 +9905,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "模型"
@@ -8720,6 +9956,12 @@
             "state" : "translated",
             "value" : "修改时间"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改時間"
+          }
         }
       }
     },
@@ -8760,6 +10002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "修改时间："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改時間："
           }
         }
       }
@@ -8802,6 +10050,12 @@
             "state" : "translated",
             "value" : "名称"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名稱"
+          }
         }
       }
     },
@@ -8839,6 +10093,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新聊天"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "新聊天"
@@ -8884,6 +10144,12 @@
             "state" : "translated",
             "value" : "新生成"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新生成"
+          }
         }
       }
     },
@@ -8921,6 +10187,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一版本"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "下一版本"
@@ -8966,6 +10238,12 @@
             "state" : "translated",
             "value" : "无可用数据"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用數據"
+          }
         }
       }
     },
@@ -9006,6 +10284,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无可用详情。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用詳情。"
           }
         }
       }
@@ -9048,6 +10332,12 @@
             "state" : "translated",
             "value" : "无可用模型信息。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用模型資訊。"
+          }
         }
       }
     },
@@ -9088,6 +10378,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "当前未安装任何模型。单击或点击“+”添加新模型。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前未安裝任何模型。按一下或點擊「+」新增模型。"
           }
         }
       }
@@ -9130,6 +10426,12 @@
             "state" : "translated",
             "value" : "无可用模型"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用模型"
+          }
         }
       }
     },
@@ -9170,6 +10472,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无可用模型"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用模型"
           }
         }
       }
@@ -9212,6 +10520,12 @@
             "state" : "translated",
             "value" : "未选择服务器"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未選擇伺服器"
+          }
         }
       }
     },
@@ -9252,6 +10566,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "当前未配置任何服务器。单击或点击“+”添加新服务器。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前未設定任何伺服器。按一下或點擊「+」新增伺服器。"
           }
         }
       }
@@ -9294,6 +10614,12 @@
             "state" : "translated",
             "value" : "无可用服务器"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無可用伺服器"
+          }
         }
       }
     },
@@ -9334,6 +10660,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "编号"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編號"
           }
         }
       }
@@ -9376,6 +10708,12 @@
             "state" : "translated",
             "value" : "编号：%lld"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編號：%lld"
+          }
         }
       }
     },
@@ -9416,6 +10754,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未连接（状态码：%lld）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未連線（狀態碼：%lld）"
           }
         }
       }
@@ -9458,6 +10802,12 @@
             "state" : "translated",
             "value" : "未连接（超时）"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未連線（超時）"
+          }
         }
       }
     },
@@ -9498,6 +10848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未连接（未知主机）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未連線（未知主機）"
           }
         }
       }
@@ -9540,6 +10896,12 @@
             "state" : "translated",
             "value" : "无内容可显示。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無內容可顯示。"
+          }
         }
       }
     },
@@ -9580,6 +10942,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "数字"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "數字"
           }
         }
       }
@@ -9644,6 +11012,12 @@
             "state" : "translated",
             "value" : "Ollama 版本："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ollama 版本："
+          }
         }
       }
     },
@@ -9684,6 +11058,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟"
           }
         }
       }
@@ -9726,6 +11106,12 @@
             "state" : "translated",
             "value" : "打开许可证页面"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟授權頁面"
+          }
         }
       }
     },
@@ -9766,6 +11152,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "是否打开许可证页面？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "是否開啟授權頁面？"
           }
         }
       }
@@ -9808,6 +11200,12 @@
             "state" : "translated",
             "value" : "打开讨论页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟討論頁面的連結。"
+          }
         }
       }
     },
@@ -9848,6 +11246,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开已知错误列表和报告页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟已知錯誤列表和回報頁面的連結。"
           }
         }
       }
@@ -9890,6 +11294,12 @@
             "state" : "translated",
             "value" : "打开 Buy Me a Coffee 页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 Buy Me a Coffee 頁面的連結。"
+          }
         }
       }
     },
@@ -9930,6 +11340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 CompactSlider GitHub 页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 CompactSlider GitHub 頁面的連結。"
           }
         }
       }
@@ -9972,6 +11388,12 @@
             "state" : "translated",
             "value" : "打开 create-dmg GitHub 页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 create-dmg GitHub 頁面的連結。"
+          }
         }
       }
     },
@@ -10012,6 +11434,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 Gemini CLI GitHub 页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 Gemini CLI GitHub 頁面的連結。"
           }
         }
       }
@@ -10054,6 +11482,12 @@
             "state" : "translated",
             "value" : "打开 GitHub 贡献者页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 GitHub 貢獻者頁面的連結。"
+          }
         }
       }
     },
@@ -10094,6 +11528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 GitHub 仓库页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 GitHub 倉庫頁面的連結。"
           }
         }
       }
@@ -10136,6 +11576,12 @@
             "state" : "translated",
             "value" : "打开 Ollama GitHub 页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 Ollama GitHub 頁面的連結。"
+          }
         }
       }
     },
@@ -10176,6 +11622,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 OpenCode GitHub 页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 OpenCode GitHub 頁面的連結。"
           }
         }
       }
@@ -10218,6 +11670,12 @@
             "state" : "translated",
             "value" : "打开 PayPal.Me 的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 PayPal.Me 的連結。"
+          }
         }
       }
     },
@@ -10258,6 +11716,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 Qwen Code GitHub 页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 Qwen Code GitHub 頁面的連結。"
           }
         }
       }
@@ -10300,6 +11764,12 @@
             "state" : "translated",
             "value" : "打开 Textual GitHub 页面的链接。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 Textual GitHub 頁面的連結。"
+          }
         }
       }
     },
@@ -10340,6 +11810,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "是否打开链接？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "是否開啟連結？"
           }
         }
       }
@@ -10382,6 +11858,12 @@
             "state" : "translated",
             "value" : "打开设置"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟設定"
+          }
         }
       }
     },
@@ -10422,6 +11904,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开源许可证"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開源授權"
           }
         }
       }
@@ -10464,6 +11952,12 @@
             "state" : "translated",
             "value" : "是否打开发送邮件窗口？"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "是否開啟發送郵件視窗？"
+          }
         }
       }
     },
@@ -10505,6 +11999,12 @@
             "state" : "translated",
             "value" : "打开发送反馈邮件窗口。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟發送回饋郵件視窗。"
+          }
         }
       }
     },
@@ -10545,6 +12045,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开网站"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟網站"
           }
         }
       }
@@ -10598,6 +12104,12 @@
             "state" : "translated",
             "value" : "顺序"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "順序"
+          }
         }
       }
     },
@@ -10638,6 +12150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "其他许可证"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他授權"
           }
         }
       }
@@ -10680,6 +12198,12 @@
             "state" : "translated",
             "value" : "参数数量："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "參數數量："
+          }
         }
       }
     },
@@ -10721,6 +12245,12 @@
             "state" : "translated",
             "value" : "参数尺寸："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "參數尺寸："
+          }
         }
       }
     },
@@ -10758,6 +12288,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "父模型："
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "父模型："
@@ -10803,6 +12339,12 @@
             "state" : "translated",
             "value" : "连接到同一网络上的 Ollama 服务器需要权限。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線至同一區域網路上的 Ollama 伺服器需要權限。"
+          }
         }
       }
     },
@@ -10844,6 +12386,12 @@
             "state" : "translated",
             "value" : "权限"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "權限"
+          }
         }
       }
     },
@@ -10884,6 +12432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请在“服务器”选项卡中选择一个服务器。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在「伺服器」分頁中選擇伺服器。"
           }
         }
       }
@@ -10927,6 +12481,12 @@
             "state" : "translated",
             "value" : "请从侧边栏选择一个项目。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請從側邊欄選擇項目。"
+          }
         }
       }
     },
@@ -10969,6 +12529,12 @@
             "state" : "translated",
             "value" : "请选择保存此图像的位置。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇儲存此圖片的位置。"
+          }
         }
       }
     },
@@ -11010,6 +12576,12 @@
             "state" : "translated",
             "value" : "准备中…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備中…"
+          }
         }
       }
     },
@@ -11047,6 +12619,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前一版本"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "前一版本"
@@ -11091,6 +12669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "量化级别："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "量化級別："
           }
         }
       }
@@ -11150,6 +12734,12 @@
             "state" : "translated",
             "value" : "刷新"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新整理"
+          }
         }
       }
     },
@@ -11190,6 +12780,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刷新状态"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新狀態"
           }
         }
       }
@@ -11232,6 +12828,12 @@
             "state" : "translated",
             "value" : "报告错误"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回報錯誤"
+          }
         }
       }
     },
@@ -11272,6 +12874,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重试"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重試"
           }
         }
       }
@@ -11314,6 +12922,12 @@
             "state" : "translated",
             "value" : "运行中"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "執行中"
+          }
         }
       }
     },
@@ -11355,6 +12969,12 @@
             "state" : "translated",
             "value" : "运行中的模型数："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "執行中的模型數："
+          }
         }
       }
     },
@@ -11395,6 +13015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
           }
         }
       }
@@ -11438,6 +13064,12 @@
             "state" : "translated",
             "value" : "保存为文件…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存為檔案…"
+          }
         }
       }
     },
@@ -11480,6 +13112,12 @@
             "state" : "translated",
             "value" : "保存到照片库"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存至相片圖庫"
+          }
         }
       }
     },
@@ -11518,6 +13156,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "秒"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "秒"
@@ -11563,6 +13207,12 @@
             "state" : "translated",
             "value" : "种子值"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "種子值"
+          }
         }
       }
     },
@@ -11603,6 +13253,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇"
           }
         }
       }
@@ -11646,6 +13302,12 @@
             "state" : "translated",
             "value" : "选择菜单"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇選單"
+          }
         }
       }
     },
@@ -11687,6 +13349,12 @@
             "state" : "translated",
             "value" : "选择模型以查看详情。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇模型以查看詳情。"
+          }
         }
       }
     },
@@ -11727,6 +13395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择服务器以查看详情。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇伺服器以查看詳情。"
           }
         }
       }
@@ -11770,6 +13444,12 @@
             "state" : "translated",
             "value" : "选择保存位置"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇儲存位置"
+          }
         }
       }
     },
@@ -11810,6 +13490,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择模型"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇模型"
           }
         }
       }
@@ -11852,6 +13538,12 @@
             "state" : "translated",
             "value" : "发送反馈"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發送回饋"
+          }
         }
       }
     },
@@ -11892,6 +13584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "服务器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器"
           }
         }
       }
@@ -11934,6 +13632,12 @@
             "state" : "translated",
             "value" : "服务器详情"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器詳情"
+          }
         }
       }
     },
@@ -11974,6 +13678,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "服务器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器"
           }
         }
       }
@@ -12017,6 +13727,12 @@
             "state" : "translated",
             "value" : "设置模型在 Ollama 服务器内存中保留的时间。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定模型在 Ollama 伺服器記憶體中保留的時間。"
+          }
         }
       }
     },
@@ -12057,6 +13773,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
@@ -12099,6 +13821,12 @@
             "state" : "translated",
             "value" : "设置…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
+          }
         }
       }
     },
@@ -12139,6 +13867,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示检查器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示檢查器"
           }
         }
       }
@@ -12181,6 +13915,12 @@
             "state" : "translated",
             "value" : "显示此应用程序及所用库的许可证信息。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示此應用程式及所用程式庫的授權資訊。"
+          }
         }
       }
     },
@@ -12218,6 +13958,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大小"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "大小"
@@ -12263,6 +14009,12 @@
             "state" : "translated",
             "value" : "大小："
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大小："
+          }
         }
       }
     },
@@ -12300,6 +14052,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排序"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "排序"
@@ -12345,6 +14103,12 @@
             "state" : "translated",
             "value" : "排序依据"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排序方式"
+          }
         }
       }
     },
@@ -12386,6 +14150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指定您要生成的图像高度。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定您要生成的圖片高度。"
           }
         }
       }
@@ -12429,6 +14199,12 @@
             "state" : "translated",
             "value" : "指定图像生成的步数。增加步数会增加生成时间，但可以提高细节。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定圖片生成的步數。增加步數會增加生成時間，但可以提高細節。"
+          }
         }
       }
     },
@@ -12469,6 +14245,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指定用于图像生成的种子值。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定用於圖片生成的種子值。"
           }
         }
       }
@@ -12511,6 +14293,12 @@
             "state" : "translated",
             "value" : "指定您要生成的图像宽度。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定您要生成的圖片寬度。"
+          }
         }
       }
     },
@@ -12551,6 +14339,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指定在使用推理模型时是否进行推理。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定在使用推理模型時是否進行推理。"
           }
         }
       }
@@ -12594,6 +14388,12 @@
             "state" : "translated",
             "value" : "步数"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "步數"
+          }
         }
       }
     },
@@ -12631,6 +14431,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已停止"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "已停止"
@@ -12676,6 +14482,12 @@
             "state" : "translated",
             "value" : "流式响应"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "串流回應"
+          }
         }
       }
     },
@@ -12716,6 +14528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已成功从 %2$@ 删除模型“%1$@”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已成功從 %2$@ 刪除模型「%1$@」。"
           }
         }
       }
@@ -12758,6 +14576,12 @@
             "state" : "translated",
             "value" : "已成功从演示服务器获取模型。总数：%d"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已成功從演示伺服器取得模型。總數：%d"
+          }
         }
       }
     },
@@ -12798,6 +14622,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已成功获取模型。总数：%d"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已成功取得模型。總數：%d"
           }
         }
       }
@@ -12840,6 +14670,12 @@
             "state" : "translated",
             "value" : "支持与反馈"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支援與回饋"
+          }
         }
       }
     },
@@ -12880,6 +14716,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "支持开发者"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持開發者"
           }
         }
       }
@@ -12922,6 +14764,12 @@
             "state" : "translated",
             "value" : "系统提示词"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系統提示詞"
+          }
         }
       }
     },
@@ -12962,6 +14810,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "温度"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "溫度"
           }
         }
       }
@@ -13007,6 +14861,12 @@
             "state" : "translated",
             "value" : "思考"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考"
+          }
         }
       }
     },
@@ -13048,6 +14908,12 @@
             "state" : "translated",
             "value" : "思考完成"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考完成"
+          }
         }
       }
     },
@@ -13085,6 +14951,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考中..."
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "思考中..."
@@ -13131,6 +15003,12 @@
             "state" : "translated",
             "value" : "未指定"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未指定"
+          }
         }
       }
     },
@@ -13172,6 +15050,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关闭"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉"
           }
         }
       }
@@ -13215,6 +15099,12 @@
             "state" : "translated",
             "value" : "开启"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟"
+          }
         }
       }
     },
@@ -13255,6 +15145,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此模型无法使用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型無法使用"
           }
         }
       }
@@ -13297,6 +15193,12 @@
             "state" : "translated",
             "value" : "此模型不支持聊天。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援聊天。"
+          }
         }
       }
     },
@@ -13337,6 +15239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "要允许本地网络访问，请前往“设置”→“隐私与安全”→“本地网络”，然后开启“Mocolamma”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允許區域網路存取，請前往「設定」→「隱私權與安全性」→「區域網路」，然後開啟「Mocolamma」。"
           }
         }
       }
@@ -13379,6 +15287,12 @@
             "state" : "translated",
             "value" : "要允许本地网络访问，请前往“系统设置”→“隐私与安全”→“本地网络”，然后开启“Mocolamma”。\n\n点击“确定”以打开“隐私与安全”设置。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允許區域網路存取，請前往「系統設定」→「隱私權與安全性」→「區域網路」，然後開啟「Mocolamma」。\n\n按一下「確定」以開啟「隱私權與安全性」設定。"
+          }
         }
       }
     },
@@ -13419,6 +15333,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切换检查器"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換檢查器"
           }
         }
       }
@@ -13461,6 +15381,12 @@
             "state" : "translated",
             "value" : "切换文本换行"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換自動換行"
+          }
         }
       }
     },
@@ -13498,6 +15424,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "工具"
@@ -13543,6 +15475,12 @@
             "state" : "translated",
             "value" : "输入您的消息…"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入您的訊息…"
+          }
         }
       }
     },
@@ -13585,6 +15523,12 @@
             "state" : "translated",
             "value" : "单位"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "單位"
+          }
         }
       }
     },
@@ -13625,6 +15569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无限制"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無限制"
           }
         }
       }
@@ -13668,6 +15618,12 @@
             "state" : "translated",
             "value" : "从内存中卸载此模型。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從記憶體中卸載此模型。"
+          }
         }
       }
     },
@@ -13705,6 +15661,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "更新"
@@ -13750,6 +15712,12 @@
             "state" : "translated",
             "value" : "仍然更新"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然更新"
+          }
         }
       }
     },
@@ -13787,6 +15755,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本：%@ "
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "版本：%@ "
@@ -13832,6 +15806,12 @@
             "state" : "translated",
             "value" : "版本：%1$@ (%2$@)"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本：%1$@ (%2$@)"
+          }
         }
       }
     },
@@ -13872,6 +15852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示"
           }
         }
       }
@@ -13914,6 +15900,12 @@
             "state" : "translated",
             "value" : "视觉"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "視覺"
+          }
         }
       }
     },
@@ -13951,6 +15943,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VRAM 大小：%@ "
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "VRAM 大小：%@ "
@@ -13997,6 +15995,12 @@
             "state" : "translated",
             "value" : "宽度"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寬度"
+          }
         }
       }
     },
@@ -14038,6 +16042,12 @@
             "state" : "translated",
             "value" : "您也可以直接通过 PayPal 进行捐赠。"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您也可以直接透過 PayPal 進行捐助。"
+          }
         }
       }
     },
@@ -14078,6 +16088,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您可以在 Buy Me a Coffee 上支持我，金额仅需一杯绿茶的价格。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您可以在 Buy Me a Coffee 上支持我，金額僅需一小杯綠茶的價格。"
           }
         }
       }
