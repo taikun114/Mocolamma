@@ -1,35 +1,58 @@
-import json
-import os
-import sys
+#!/usr/bin/env python3
+# Copyright © 2026 Taiga Imaura, under the MIT License
 
-# プロジェクト構造に合わせたLocalizable.xcstringsへの相対パス
-# Utilitiesディレクトリから実行されることを想定
-FILE_PATH = os.path.join(os.path.dirname(__file__), '../Mocolamma/Resources/Localizable.xcstrings')
+import json
+import sys
+import os
+import argparse
+
+def find_localizable_file():
+    """Recursively search for Localizable.xcstrings in the current directory."""
+    for root, dirs, files in os.walk("."):
+        if "Localizable.xcstrings" in files:
+            return os.path.join(root, "Localizable.xcstrings")
+    return None
 
 def find_missing_comments():
-    if not os.path.exists(FILE_PATH):
-        print(f"Error: Localizable.xcstrings not found at {FILE_PATH}")
-        sys.exit(1)
+    file_path = find_localizable_file()
+    
+    if not file_path:
+        print("Error: Localizable.xcstrings not found in the current directory or its subdirectories.")
+        return
 
-    with open(FILE_PATH, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    
-    strings = data.get('strings', {})
-    missing_comments = []
-    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"Error reading JSON: {e}")
+        return
+
+    strings = data.get("strings", {})
+    missing_items = []
+
     for key, value in strings.items():
-        # コメントがない、または空のものをチェック
-        if 'comment' not in value or not value['comment']:
-            # shouldTranslateがfalseの場合は除外（翻訳不要なもの）
-            if value.get('shouldTranslate') is False:
+        # Check if comment is missing or empty
+        if "comment" not in value or not value["comment"]:
+            # Skip if shouldTranslate is explicitly set to false
+            if value.get("shouldTranslate") is False:
                 continue
-            missing_comments.append(key)
-    
-    if missing_comments:
-        print(f"Found {len(missing_comments)} items missing comments:")
-        print(json.dumps(missing_comments, ensure_ascii=False, indent=2))
+            missing_items.append(key)
+
+    if not missing_items:
+        print("All items have developer comments!")
     else:
-        print("All items have comments!")
+        print(f"Found {len(missing_items)} items missing developer comments:\n")
+        for key in missing_items:
+            print(f"Key: {key}")
+            print("-" * 40)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Find items missing developer comments in String Catalog.",
+        epilog="Copyright © 2026 Taiga Imaura, under the MIT License"
+    )
+    parser.add_argument("-v", "--version", action="version", version="1.0.0")
+    
+    args = parser.parse_args()
+    
     find_missing_comments()
