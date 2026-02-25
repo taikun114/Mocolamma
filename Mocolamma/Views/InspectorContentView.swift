@@ -22,6 +22,14 @@ struct InspectorContentView: View {
     @FocusState private var isCustomKeepAliveFocused: Bool
     @State private var inspectorWidth: CGFloat = 0 // インスペクターの幅を保持
     
+    private var vStackSpacing: CGFloat {
+#if os(macOS)
+        return 8
+#else
+        return 16
+#endif
+    }
+    
     private var isCompactLayout: Bool {
 #if os(iOS)
         // iOS（iPad含む）で幅が320未満の場合にコンパクトレイアウト（2x2）を適用
@@ -63,8 +71,9 @@ struct InspectorContentView: View {
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {
-                        Toggle(isOn: $chatSettings.isStreamingEnabled) {
-                            Text("Stream Response")
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
+                            Toggle("Stream Response", isOn: $chatSettings.isStreamingEnabled)
+                            
                             Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -72,26 +81,22 @@ struct InspectorContentView: View {
                         
                         keepAlivePicker(option: $chatSettings.keepAliveOption, customValue: $chatSettings.customKeepAliveValue, customUnit: $chatSettings.customKeepAliveUnit)
                         
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading) {
-                                Text("Thinking")
-                                Text("Specifies whether to perform inference when using a reasoning model.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
                             Picker("Thinking", selection: $chatSettings.thinkingOption) {
                                 ForEach(ThinkingOption.allCases) { option in
                                     Text(option.localizedName).tag(option)
                                 }
                             }
-                            .labelsHidden()
                             .pickerStyle(.menu)
                             .disabled(!(chatSettings.selectedModelCapabilities?.contains("thinking") ?? false))
                             .onChange(of: chatSettings.selectedModelCapabilities) { _, caps in
                                 let hasThinking = caps?.contains("thinking") ?? false
                                 if !hasThinking { chatSettings.thinkingOption = .none }
                             }
+                            
+                            Text("Specifies whether to perform inference when using a reasoning model.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         
                         VStack {
@@ -178,8 +183,9 @@ struct InspectorContentView: View {
             } else if selection == "image_generation" {
                 Form {
                     Section("Image Generation Settings") {
-                        Toggle(isOn: $imageSettings.isStreamingEnabled) {
-                            Text("Stream Response")
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
+                            Toggle("Stream Response", isOn: $imageSettings.isStreamingEnabled)
+                            
                             Text("If you turn off stream response, it is recommended to set the API timeout to unlimited in the settings.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -194,10 +200,10 @@ struct InspectorContentView: View {
                     }
                     
                     Section("Custom Settings") {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
                             Toggle(isOn: $imageSettings.customWidthEnabled) {
                                 Text("Custom Width")
-                                    .foregroundStyle(imageSettings.customWidthEnabled ? .primary : .secondary)
+                                    .foregroundStyle(.primary)
                             }
                             HStack(alignment: .center) {
                                 TextField("Enter custom width", value: $imageSettings.customWidth, format: .number.grouping(.never))
@@ -215,13 +221,13 @@ struct InspectorContentView: View {
                             }
                             Text("Enter the desired image width as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.customWidthEnabled ? .secondary : .tertiary)
+                                .foregroundStyle(.secondary)
                         }
                         
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
                             Toggle(isOn: $imageSettings.customHeightEnabled) {
                                 Text("Custom Height")
-                                    .foregroundStyle(imageSettings.customHeightEnabled ? .primary : .secondary)
+                                    .foregroundStyle(.primary)
                             }
                             HStack(alignment: .center) {
                                 TextField("Enter custom height", value: $imageSettings.customHeight, format: .number.grouping(.never))
@@ -239,13 +245,13 @@ struct InspectorContentView: View {
                             }
                             Text("Enter the desired image height as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.customHeightEnabled ? .secondary : .tertiary)
+                                .foregroundStyle(.secondary)
                         }
                         
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
                             Toggle(isOn: $imageSettings.customStepsEnabled) {
                                 Text("Custom Steps")
-                                    .foregroundStyle(imageSettings.customStepsEnabled ? .primary : .secondary)
+                                    .foregroundStyle(.primary)
                             }
                             HStack(alignment: .center) {
                                 TextField("Enter custom steps", value: $imageSettings.customSteps, format: .number.grouping(.never))
@@ -263,7 +269,7 @@ struct InspectorContentView: View {
                             }
                             Text("Enter the number of image generation steps as a number to override the above setting and manually specify the size.")
                                 .font(.caption)
-                                .foregroundStyle(imageSettings.customStepsEnabled ? .secondary : .tertiary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -311,7 +317,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var widthSettingsSection: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Width")
                     .foregroundStyle(imageSettings.customWidthEnabled ? .secondary : .primary)
@@ -355,7 +361,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var heightSettingsSection: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Height")
                     .foregroundStyle(imageSettings.customHeightEnabled ? .secondary : .primary)
@@ -449,7 +455,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var stepsSettingsSection: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Steps")
                     .foregroundStyle(imageSettings.customStepsEnabled ? .secondary : .primary)
@@ -473,10 +479,10 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var seedSettingsSection: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
             Toggle(isOn: $imageSettings.isSeedEnabled) {
                 Text("Seed")
-                    .foregroundStyle(imageSettings.isSeedEnabled ? .primary : .secondary)
+                    .foregroundStyle(.primary)
             }
             HStack(alignment: .center) {
                 TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
@@ -493,24 +499,19 @@ struct InspectorContentView: View {
             }
             Text("Specifies the seed value used for image generation.")
                 .font(.caption)
-                .foregroundStyle(imageSettings.isSeedEnabled ? .secondary : .tertiary)
+                .foregroundStyle(.secondary)
         }
     }
     
     @ViewBuilder
     private func keepAlivePicker(option: Binding<KeepAliveOption>, customValue: Binding<Int>, customUnit: Binding<KeepAliveUnit>) -> some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("Keep Alive")
-                Spacer()
-                Picker("Keep Alive", selection: option) {
-                    ForEach(KeepAliveOption.allCases) { opt in
-                        Text(opt.localizedName).tag(opt)
-                    }
+        VStack(alignment: .leading, spacing: vStackSpacing) {
+            Picker("Keep Alive", selection: option) {
+                ForEach(KeepAliveOption.allCases) { opt in
+                    Text(opt.localizedName).tag(opt)
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
             }
+            .pickerStyle(.menu)
             
             if option.wrappedValue == .custom {
                 HStack(alignment: .center) {
