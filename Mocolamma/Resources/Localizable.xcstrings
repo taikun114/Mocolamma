@@ -332,7 +332,14 @@
       }
     },
     "%@, %@" : {
+      "comment" : "モデルのサイズと更新日を表示するためのフォーマット。第1引数はサイズ、第2引数は更新日。",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@، %2$@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -362,12 +369,54 @@
             "state" : "translated",
             "value" : "%1$@、%2$@"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "%@, %lld B" : {
+      "comment" : "ファイルサイズ。人間が読みやすいサイズ（例: 1 GB）と、正確なバイト数（B）を併記する形式。",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@، %2$lld بايت"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -395,11 +444,46 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "%1$@、%2$lld B"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld Б"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld Б"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld B"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@, %2$lld B"
           }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "%@/s, Time Remaining: %02d:%02d" : {
       "comment" : "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数",
@@ -798,7 +882,14 @@
       }
     },
     "%lld px" : {
+      "comment" : "ピクセル単位（px）の値。",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld بكسل"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -828,9 +919,44 @@
             "state" : "translated",
             "value" : "%lld px"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld px"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld пикс."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld пікс."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld px"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 像素"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 像素"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "%lld Tokens" : {
       "comment" : "AIモデルからの応答に使われたトークン数",
@@ -9814,6 +9940,82 @@
         }
       }
     },
+    "Enables advanced options to adjust the model's behavior." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمكين الخيارات المتقدمة لضبط سلوك النموذج."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviert erweiterte Optionen zur Anpassung des Verhaltens des Modells."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enables advanced options to adjust the model's behavior."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilita opciones avanzadas para ajustar el comportamiento del modelo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active les options avancées pour ajuster le comportement du modèle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの動作を調整するための上級者オプションを有効化します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모델의 동작을 조정하기 위한 고급 옵션을 활성화합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включает расширенные параметры для настройки поведения модели."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вмикає розширені параметри для налаштування поведінки моделі."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用高级选项以调整模型的行为。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "啟用高級選項以調整模型的行為。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "啟用高級選項以調整模型的行為。"
+          }
+        }
+      }
+    },
     "Enter a prompt..." : {
       "comment" : "画像生成画面のメッセージ入力欄に表示されるサンプルテキスト。",
       "localizations" : {
@@ -18698,15 +18900,81 @@
       }
     },
     "OK" : {
+      "comment" : "確認ボタンのラベル。",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "موافق"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Ollama" : {
       "localizations" : {
@@ -24751,6 +25019,158 @@
         }
       }
     },
+    "Specifies the maximum number of tokens the model can remember (reference) during a session." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدد الحد الأقصى لعدد الرموز التي يمكن للنموذج تذكرها (الرجوع إليها) خلال جلسة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt die maximale Anzahl von Token fest, die sich das Modell während einer Sitzung merken (auf die es sich beziehen) kann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies the maximum number of tokens the model can remember (reference) during a session."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica el número máximo de tokens que el modelo puede recordar (referenciar) durante una sesión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie le nombre maximum de jetons que le modèle peut mémoriser (référencer) au cours d'une session."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルがセッション中に記憶できる（参照できる）最大トークン数を指定します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세션 동안 모델이 기억할 수 있는(참조할 수 있는) 최대 토큰 수를 지정합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает максимальное количество токенов, которые модель может запомнить (использовать в качестве ссылки) во время сеанса."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує максимальну кількість токенів, які модель може запам'ятати (використовувати як посилання) під час сеансу."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型在会话期间可以记住（参考）的最大标记数量。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型在會話期間可以記住（參考）的最大標記數量。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型在會話期間可以記住（參考）的最大標記數量。"
+          }
+        }
+      }
+    },
+    "Specifies the model temperature. Increasing the temperature makes the response more creative, while decreasing it makes it more accurate." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدد درجة حرارة النموذج. زيادة درجة الحرارة تجعل الاستجابة أكثر إبداعًا، بينما تقليلها يجعلها أكثر دقة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt die Modelltemperatur fest. Eine Erhöhung der Temperatur macht die Antwort kreativer, während eine Verringerung sie genauer macht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies the model temperature. Increasing the temperature makes the response more creative, while decreasing it makes it more accurate."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica la temperatura del modelo. Aumentar la temperatura hace que la respuesta sea más creativa, mientras que disminuirla la hace más precisa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie la température du modèle. L'augmentation de la température rend la réponse plus créative, tandis que sa diminution la rend plus précise."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルの温度を指定します。温度を上げると回答がより創造的になり、温度を下げるとより正確的になります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모델 온도를 지정합니다. 온도를 높이면 응답이 더 창의적이 되고, 낮추면 더 정확해집니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает температуру модели. Увеличение температуры делает ответ более творческим, а уменьшение — более точным."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує температуру моделі. Збільшення температури робить відповідь більш творчою, а зменшення — більш точною."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型温度。提高温度使响应更具创造性，降低温度使响应更准确。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型溫度。提高溫度使響應更具創造性，降低溫度使響應更準確。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定模型溫度。提高溫度使響應更具創造性，降低溫度使響應更準確。"
+          }
+        }
+      }
+    },
     "Specifies the number of image generation steps. Increasing the number of steps increases generation time but can improve detail." : {
       "comment" : "A description below the slider that explains its purpose.",
       "isCommentAutoGenerated" : true,
@@ -28076,54 +28496,6 @@
             "value" : "您可以在 Buy Me a Coffee 上支持我，金額僅需一小杯綠茶的價格。"
           }
         }
-      }
-    },
-    "Enables advanced options to adjust the model's behavior." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تمكين الخيارات المتقدمة لضبط سلوك النموذج." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktiviert erweiterte Optionen zur Anpassung des Verhaltens des Modells." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enables advanced options to adjust the model's behavior." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Habilita opciones avanzadas para ajustar el comportamiento del modelo." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Active les options avancées pour ajuster le comportement du modèle." } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "モデルの動作を調整するための上級者オプションを有効化します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "모델의 동작을 조정하기 위한 고급 옵션을 활성화합니다." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Включает расширенные параметры для настройки поведения модели." } },
-        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вмикає розширені параметри для налаштування поведінки моделі." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "启用高级选项以调整模型的行为。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "啟用高級選項以調整模型的行為。" } },
-        "zh-HK" : { "stringUnit" : { "state" : "translated", "value" : "啟用高級選項以調整模型的行為。" } }
-      }
-    },
-    "Specifies the model temperature. Increasing the temperature makes the response more creative, while decreasing it makes it more accurate." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحدد درجة حرارة النموذج. زيادة درجة الحرارة تجعل الاستجابة أكثر إبداعًا، بينما تقليلها يجعلها أكثر دقة." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Legt die Modelltemperatur fest. Eine Erhöhung der Temperatur macht die Antwort kreativer, während eine Verringerung sie genauer macht." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Specifies the model temperature. Increasing the temperature makes the response more creative, while decreasing it makes it more accurate." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Especifica la temperatura del modelo. Aumentar la temperatura hace que la respuesta sea más creativa, mientras que disminuirla la hace más precisa." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Spécifie la température du modèle. L'augmentation de la température rend la réponse plus créative, tandis que sa diminution la rend plus précise." } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "モデルの温度を指定します。温度を上げると回答がより創造的になり、温度を下げるとより正確的になります。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "모델 온도를 지정합니다. 온도를 높이면 응답이 더 창의적이 되고, 낮추면 더 정확해집니다." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Указывает температуру модели. Увеличение температуры делает ответ более творческим, а уменьшение — более точным." } },
-        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вказує температуру моделі. Збільшення температури робить відповідь більш творчою, а зменшення — більш точною." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "指定模型温度。提高温度使响应更具创造性，降低温度使响应更准确。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "指定模型溫度。提高溫度使響應更具創造性，降低溫度使響應更準確。" } },
-        "zh-HK" : { "stringUnit" : { "state" : "translated", "value" : "指定模型溫度。提高溫度使響應更具創造性，降低溫度使響應更準確。" } }
-      }
-    },
-    "Specifies the maximum number of tokens the model can remember (reference) during a session." : {
-      "localizations" : {
-        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحدد الحد الأقصى لعدد الرموز التي يمكن للنموذج تذكرها (الرجوع إليها) خلال جلسة." } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Legt die maximale Anzahl von Token fest, die sich das Modell während einer Sitzung merken (auf die es sich beziehen) kann." } },
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Specifies the maximum number of tokens the model can remember (reference) during a session." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Especifica el número máximo de tokens que el modelo puede recordar (referenciar) durante una sesión." } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Spécifie le nombre maximum de jetons que le modèle peut mémoriser (référencer) au cours d'une session." } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "モデルがセッション中に記憶できる（参照できる）最大トークン数を指定します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "세션 동안 모델이 기억할 수 있는(참조할 수 있는) 최대 토큰 수를 지정합니다." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Указывает максимальное количество токенов, которые модель может запомнить (использовать в качестве ссылки) во время сеанса." } },
-        "uk" : { "stringUnit" : { "state" : "translated", "value" : "Вказує максимальну кількість токенів, які модель може запам'ятати (використовувати як посилання) під час сеансу." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "指定模型在会话期间可以记住（参考）的最大标记数量。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "指定模型在會話期間可以記住（參考）的最大標記數量。" } },
-        "zh-HK" : { "stringUnit" : { "state" : "translated", "value" : "指定模型在會話期間可以記住（參考）的最大標記數量。" } }
       }
     }
   },
