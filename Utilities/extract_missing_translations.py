@@ -37,29 +37,19 @@ def extract_missing_translations(lang_code, show_ja=True):
             
         localizations = value.get("localizations", {})
         
-        # Check for developer comment
-        comment = value.get("comment")
-        if not comment:
-            # Skip items without a comment as per requirement
-            continue
+        # Developer comment (optional for missing detection, but displayed if exists)
+        comment = value.get("comment", "No comment provided")
             
-        # Extract Japanese translation as reference
+        # Extract Japanese translation as reference (optional reference)
         original_ja = None
         ja_data = localizations.get("ja")
-        if not ja_data:
-            # Skip items without Japanese translation as per requirement
-            continue
-            
-        if "stringUnit" in ja_data:
-            original_ja = ja_data["stringUnit"].get("value")
-        elif "variations" in ja_data:
-            # For plural variations, use "other" as the representative value
-            plural_other = ja_data.get("variations", {}).get("plural", {}).get("other", {})
-            original_ja = plural_other.get("stringUnit", {}).get("value")
-
-        if not original_ja:
-            # Skip if Japanese value is empty
-            continue
+        if ja_data:
+            if "stringUnit" in ja_data:
+                original_ja = ja_data["stringUnit"].get("value")
+            elif "variations" in ja_data:
+                # For plural variations, use "other" as the representative value
+                plural_other = ja_data.get("variations", {}).get("plural", {}).get("other", {})
+                original_ja = plural_other.get("stringUnit", {}).get("value")
 
         # Check translation status for the target language
         is_missing = False
@@ -71,7 +61,8 @@ def extract_missing_translations(lang_code, show_ja=True):
             # Check standard stringUnit
             if "stringUnit" in lang_data:
                 state = lang_data.get("stringUnit", {}).get("state")
-                if state != "translated":
+                # Also check if value is empty when it should be translated
+                if state != "translated" or not lang_data.get("stringUnit", {}).get("value"):
                     is_missing = True
             # Check plural variations
             elif "variations" in lang_data:
@@ -96,8 +87,8 @@ def extract_missing_translations(lang_code, show_ja=True):
         print(f"Missing translations for '{lang_code}': {len(missing_items)} items found.\n")
         for key, comment, original_ja in missing_items:
             print(f"Key: {key}")
-            # Show Original (ja) if enabled and the target language is not Japanese
-            if show_ja and lang_code != "ja":
+            # Show Original (ja) if exists and enabled and the target language is not Japanese
+            if show_ja and lang_code != "ja" and original_ja:
                 print(f"Original (ja): {original_ja}")
             print(f"Comment: {comment}")
             print("-" * 40)
@@ -110,7 +101,7 @@ if __name__ == "__main__":
     # lang argument is optional to allow showing help by default
     parser.add_argument("lang", nargs="?", help="Language code to check (e.g., ja, en, zh-Hans)")
     parser.add_argument("--no-ja", action="store_false", dest="show_ja", help="Do not output original Japanese localization")
-    parser.add_argument("-v", "--version", action="version", version="1.0.0")
+    parser.add_argument("-v", "--version", action="version", version="1.0.1")
     
     args = parser.parse_args()
     

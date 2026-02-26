@@ -503,6 +503,24 @@ struct ChatView: View {
         var fullThinking = ""
         
         do {
+            // パラメータの計算
+            let repeatLastNValue: Int? = {
+                switch chatSettings.repeatLastNOption {
+                case .none: return nil
+                case .disabled: return 0
+                case .custom: return chatSettings.repeatLastNValue
+                case .max: return -1
+                }
+            }()
+            
+            let numPredictValue: Int? = {
+                switch chatSettings.numPredictOption {
+                case .none: return nil
+                case .custom: return chatSettings.numPredictValue
+                case .unlimited: return -1
+                }
+            }()
+            
             for try await chunk in executor.chat(
                 model: model.name,
                 messages: apiMessages,
@@ -514,6 +532,12 @@ struct ChatView: View {
                 contextWindowValue: chatSettings.contextWindowValue,
                 isSeedEnabled: chatSettings.isSeedEnabled,
                 seed: chatSettings.seed,
+                repeatLastN: repeatLastNValue,
+                repeatPenalty: chatSettings.isRepeatPenaltyEnabled ? chatSettings.repeatPenaltyValue : nil,
+                numPredict: numPredictValue,
+                topK: chatSettings.isTopKEnabled ? chatSettings.topKValue : nil,
+                topP: chatSettings.isTopPEnabled ? chatSettings.topPValue : nil,
+                minP: chatSettings.isMinPEnabled ? chatSettings.minPValue : nil,
                 isSystemPromptEnabled: chatSettings.isSystemPromptEnabled,
                 systemPrompt: chatSettings.systemPrompt,
                 thinkingOption: chatSettings.thinkingOption,

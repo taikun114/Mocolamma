@@ -167,6 +167,33 @@ enum ThinkingOption: String, CaseIterable, Identifiable {
     }
 }
 
+/// 繰り返し参照範囲のオプションを表します。
+enum RepeatLastNOption: String, CaseIterable, Identifiable {
+    case none = "RepeatLastN_None"
+    case disabled = "RepeatLastN_Disabled"
+    case custom = "RepeatLastN_Custom"
+    case max = "RepeatLastN_Max"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+}
+
+/// 最大出力数のオプションを表します。
+enum NumPredictOption: String, CaseIterable, Identifiable {
+    case none = "NumPredict_None"
+    case custom = "NumPredict_Custom"
+    case unlimited = "NumPredict_Unlimited"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+}
+
 /// モデルの保持（Keep Alive）オプションを表します。
 enum KeepAliveOption: String, CaseIterable, Identifiable {
     case `default` = "KeepAlive_Default"
@@ -258,27 +285,27 @@ struct JSONSchemaProperty: Codable {
 
 /// チャットリクエストのオプションを表します。
 struct ChatRequestOptions: Codable {
-    let numKeep: Int?
+    var numKeep: Int?
     var seed: Int?
-    let numPredict: Int?
-    let topK: Int?
-    let topP: Double?
-    let minP: Double?
-    let typicalP: Double?
-    let repeatLastN: Int?
+    var numPredict: Int?
+    var topK: Int?
+    var topP: Double?
+    var minP: Double?
+    var typicalP: Double?
+    var repeatLastN: Int?
     var temperature: Double?
     var numCtx: Int?
-    let repeatPenalty: Double?
-    let presencePenalty: Double?
-    let frequencyPenalty: Double?
-    let penalizeNewline: Bool?
-    let stop: [String]?
-    let numa: Bool?
-    let numBatch: Int?
-    let numGpu: Int?
-    let mainGpu: Int?
-    let useMmap: Bool?
-    let numThread: Int?
+    var repeatPenalty: Double?
+    var presencePenalty: Double?
+    var frequencyPenalty: Double?
+    var penalizeNewline: Bool?
+    var stop: [String]?
+    var numa: Bool?
+    var numBatch: Int?
+    var numGpu: Int?
+    var mainGpu: Int?
+    var useMmap: Bool?
+    var numThread: Int?
     
     enum CodingKeys: String, CodingKey {
         case numKeep = "num_keep"
@@ -518,6 +545,20 @@ class ChatSettings: ObservableObject {
     @Published var isSystemPromptEnabled: Bool = false
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
+    
+    // 追加のカスタム設定
+    @Published var repeatLastNOption: RepeatLastNOption = .none
+    @Published var repeatLastNValue: Int = 64
+    @Published var isRepeatPenaltyEnabled: Bool = false
+    @Published var repeatPenaltyValue: Double = 1.1
+    @Published var numPredictOption: NumPredictOption = .none
+    @Published var numPredictValue: Int = 42
+    @Published var isTopKEnabled: Bool = false
+    @Published var topKValue: Int = 40
+    @Published var isTopPEnabled: Bool = false
+    @Published var topPValue: Double = 0.9
+    @Published var isMinPEnabled: Bool = false
+    @Published var minPValue: Double = 0.0
     
     // シード値設定
     @Published var isSeedEnabled: Bool = false

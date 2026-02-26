@@ -21,6 +21,9 @@ struct InspectorContentView: View {
     @FocusState private var isCustomStepsFocused: Bool
     @FocusState private var isCustomKeepAliveFocused: Bool
     @FocusState private var isChatSeedFocused: Bool
+    @FocusState private var isRepeatLastNFocused: Bool
+    @FocusState private var isNumPredictFocused: Bool
+    @FocusState private var isTopKFocused: Bool
     @State private var inspectorWidth: CGFloat = 0 // インスペクターの幅を保持
     
     private var vStackSpacing: CGFloat {
@@ -126,55 +129,100 @@ struct InspectorContentView: View {
                     }
                     
                     Section("Custom Settings") {
-                        Toggle("Enable Custom Settings", isOn: $chatSettings.useCustomChatSettings)
+                        VStack(alignment: .leading, spacing: vStackSpacing) {
+                            Toggle("Enable Custom Settings", isOn: $chatSettings.useCustomChatSettings)
+                            Text("Enables advanced options to adjust the model's behavior.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                         
                         chatSeedSettingsSection
                             .disabled(!chatSettings.useCustomChatSettings)
                             .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
                         
-                        VStack {
-                            Toggle(isOn: $chatSettings.isTemperatureEnabled) {
-                                Text("Temperature")
-                            }
-                            .padding(.bottom, 4)
-                            HStack {
-                                CompactSlider(value: $chatSettings.chatTemperature, in: 0.0...2.0, step: 0.1)
+                        VStack(alignment: .leading, spacing: 4) {
+                            VStack {
+                                Toggle(isOn: $chatSettings.isTemperatureEnabled) {
+                                    Text("Temperature")
+                                }
+                                .padding(.bottom, 4)
+                                HStack {
+                                    CompactSlider(value: $chatSettings.chatTemperature, in: 0.0...2.0, step: 0.1)
 #if os(iOS)
-                                    .frame(height: 32)
+                                        .frame(height: 32)
 #else
-                                    .frame(height: 16)
+                                        .frame(height: 16)
 #endif
-                                Text(String(format: "%.1f", chatSettings.chatTemperature))
-                                    .font(.body.monospaced())
+                                    Text(String(format: "%.1f", chatSettings.chatTemperature))
+                                        .font(.body.monospaced())
+                                        .foregroundStyle(chatSettings.isTemperatureEnabled ? .secondary : .tertiary)
+                                }
+                                .disabled(!chatSettings.isTemperatureEnabled)
+                                .foregroundColor(chatSettings.isTemperatureEnabled ? .primary : .secondary)
                             }
-                            .disabled(!chatSettings.isTemperatureEnabled)
-                            .foregroundColor(chatSettings.isTemperatureEnabled ? .primary : .secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Text("Specifies the model temperature. Increasing the temperature makes the response more creative, while decreasing it makes it more accurate.")
+                                .font(.caption)
+                                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .disabled(!chatSettings.useCustomChatSettings)
                         .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
                         
-                        VStack {
-                            Toggle(isOn: $chatSettings.isContextWindowEnabled) {
-                                Text("Context Window")
-                            }
-                            .padding(.bottom, 4)
-                            HStack {
-                                CompactSlider(value: $chatSettings.contextWindowValue, in: 512...Double(chatSettings.selectedModelContextLength ?? 4096), step: 128.0)
+                        VStack(alignment: .leading, spacing: 4) {
+                            VStack {
+                                Toggle(isOn: $chatSettings.isContextWindowEnabled) {
+                                    Text("Context Window")
+                                }
+                                .padding(.bottom, 4)
+                                HStack {
+                                    CompactSlider(value: $chatSettings.contextWindowValue, in: 512...Double(chatSettings.selectedModelContextLength ?? 4096), step: 128.0)
 #if os(iOS)
-                                    .frame(height: 32)
+                                        .frame(height: 32)
 #else
-                                    .frame(height: 16)
+                                        .frame(height: 16)
 #endif
-                                Text("\(Int(chatSettings.contextWindowValue))")
-                                    .font(.body.monospaced())
+                                    Text("\(Int(chatSettings.contextWindowValue))")
+                                        .font(.body.monospaced())
+                                        .foregroundStyle(chatSettings.isContextWindowEnabled ? .secondary : .tertiary)
+                                }
+                                .disabled(!chatSettings.isContextWindowEnabled)
+                                .foregroundColor(chatSettings.isContextWindowEnabled ? .primary : .secondary)
                             }
-                            .disabled(!chatSettings.isContextWindowEnabled)
-                            .foregroundColor(chatSettings.isContextWindowEnabled ? .primary : .secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Text("Specifies the maximum number of tokens the model can remember (reference) during a session.")
+                                .font(.caption)
+                                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .disabled(!chatSettings.useCustomChatSettings)
                         .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        repeatLastNSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        repeatPenaltySection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        numPredictSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        topKSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        topPSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
+                        
+                        minPSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
                     }
                 }
                 .formStyle(.grouped)
@@ -183,6 +231,10 @@ struct InspectorContentView: View {
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
                     isCustomKeepAliveFocused = false
+                    isChatSeedFocused = false
+                    isRepeatLastNFocused = false
+                    isNumPredictFocused = false
+                    isTopKFocused = false
                 }
 #endif
             } else if selection == "image_generation" {
@@ -508,6 +560,190 @@ struct InspectorContentView: View {
                 .font(.caption)
                 .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
         }
+    }
+    
+    @ViewBuilder
+    private var repeatLastNSection: some View {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
+            Picker("Repeat Last N", selection: $chatSettings.repeatLastNOption) {
+                ForEach(RepeatLastNOption.allCases) { opt in
+                    if opt == .max {
+                        let contextValue = chatSettings.isContextWindowEnabled ? Int(chatSettings.contextWindowValue) : 2048
+                        Text("RepeatLastN_Max \(contextValue)").tag(opt)
+                    } else {
+                        Text(opt.localizedName).tag(opt)
+                    }
+                }
+            }
+            .pickerStyle(.menu)
+            
+            if chatSettings.repeatLastNOption == .custom {
+                HStack(alignment: .center) {
+                    TextField("Enter Repeat Last N value", value: $chatSettings.repeatLastNValue, format: .number.grouping(.never))
+                        .focused($isRepeatLastNFocused)
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+#if os(iOS)
+                        .keyboardType(.numberPad)
+#endif
+                        .frame(maxWidth: .infinity)
+                    
+                    Stepper("Adjust Repeat Last N value", value: $chatSettings.repeatLastNValue, in: 1...2147483647, step: 1)
+                        .labelsHidden()
+                }
+            }
+            
+            Text("Sets how far back for the model to look back to prevent repetition.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+        }
+    }
+    
+    @ViewBuilder
+    private var repeatPenaltySection: some View {
+        VStack {
+            Toggle(isOn: $chatSettings.isRepeatPenaltyEnabled) {
+                Text("Repeat Penalty")
+            }
+            .padding(.bottom, 4)
+            HStack {
+                CompactSlider(value: $chatSettings.repeatPenaltyValue, in: 0.0...2.0, step: 0.1)
+#if os(iOS)
+                    .frame(height: 32)
+#else
+                    .frame(height: 16)
+#endif
+                Text(String(format: "%.1f", chatSettings.repeatPenaltyValue))
+                    .font(.body.monospaced())
+                    .foregroundStyle(chatSettings.isRepeatPenaltyEnabled ? .secondary : .tertiary)
+            }
+            .disabled(!chatSettings.isRepeatPenaltyEnabled)
+            .foregroundColor(chatSettings.isRepeatPenaltyEnabled ? .primary : .secondary)
+            
+            Text("Sets how strongly to penalize repetitions.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    @ViewBuilder
+    private var numPredictSection: some View {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
+            Picker("Num Predict", selection: $chatSettings.numPredictOption) {
+                ForEach(NumPredictOption.allCases) { opt in
+                    Text(opt.localizedName).tag(opt)
+                }
+            }
+            .pickerStyle(.menu)
+            
+            if chatSettings.numPredictOption == .custom {
+                HStack(alignment: .center) {
+                    TextField("Enter Num Predict value", value: $chatSettings.numPredictValue, format: .number.grouping(.never))
+                        .focused($isNumPredictFocused)
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+#if os(iOS)
+                        .keyboardType(.numberPad)
+#endif
+                        .frame(maxWidth: .infinity)
+                    
+                    Stepper("Adjust Num Predict value", value: $chatSettings.numPredictValue, in: 0...2147483647, step: 1)
+                        .labelsHidden()
+                }
+            }
+            
+            Text("Sets the maximum number of tokens to predict when generating text.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+        }
+    }
+    
+    @ViewBuilder
+    private var topKSection: some View {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
+            Toggle(isOn: $chatSettings.isTopKEnabled) {
+                Text("Top-k")
+            }
+            HStack(alignment: .center) {
+                TextField("Enter Top-k value", value: $chatSettings.topKValue, format: .number.grouping(.never))
+                    .focused($isTopKFocused)
+                    .textFieldStyle(.roundedBorder)
+                    .labelsHidden()
+#if os(iOS)
+                    .keyboardType(.numberPad)
+#endif
+                    .disabled(!chatSettings.isTopKEnabled)
+                
+                Stepper("Adjust Top-k value", value: $chatSettings.topKValue, in: 0...2147483647, step: 1)
+                    .labelsHidden()
+                    .disabled(!chatSettings.isTopKEnabled)
+            }
+            .foregroundColor(chatSettings.isTopKEnabled ? .primary : .secondary)
+            
+            Text("Reduces the probability of generating nonsense. A higher value like 100 will give more diverse answers, while a lower value like 10 will give more stable answers.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+        }
+    }
+    
+    @ViewBuilder
+    private var topPSection: some View {
+        VStack {
+            Toggle(isOn: $chatSettings.isTopPEnabled) {
+                Text("Top-p")
+            }
+            .padding(.bottom, 4)
+            HStack {
+                CompactSlider(value: $chatSettings.topPValue, in: 0.0...1.0, step: 0.01)
+#if os(iOS)
+                    .frame(height: 32)
+#else
+                    .frame(height: 16)
+#endif
+                Text(String(format: "%.2f", chatSettings.topPValue))
+                    .font(.body.monospaced())
+                    .foregroundStyle(chatSettings.isTopPEnabled ? .secondary : .tertiary)
+            }
+            .disabled(!chatSettings.isTopPEnabled)
+            .foregroundColor(chatSettings.isTopPEnabled ? .primary : .secondary)
+            
+            Text("Works together with Top-k. A higher value like 0.95 will lead to more diverse text, while a lower value like 0.5 will generate more focused and stable text.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    @ViewBuilder
+    private var minPSection: some View {
+        VStack {
+            Toggle(isOn: $chatSettings.isMinPEnabled) {
+                Text("Min-p")
+            }
+            .padding(.bottom, 4)
+            HStack {
+                CompactSlider(value: $chatSettings.minPValue, in: 0.0...1.0, step: 0.01)
+#if os(iOS)
+                    .frame(height: 32)
+#else
+                    .frame(height: 16)
+#endif
+                Text(String(format: "%.2f", chatSettings.minPValue))
+                    .font(.body.monospaced())
+                    .foregroundStyle(chatSettings.isMinPEnabled ? .secondary : .tertiary)
+            }
+            .disabled(!chatSettings.isMinPEnabled)
+            .foregroundColor(chatSettings.isMinPEnabled ? .primary : .secondary)
+            
+            Text("An alternative to Top-p, aimed at ensuring a balance of quality and variety. It discourages low-quality responses by excluding tokens with a relative probability below a threshold (P) compared to the most likely token.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     @ViewBuilder
