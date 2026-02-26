@@ -259,7 +259,7 @@ struct JSONSchemaProperty: Codable {
 /// チャットリクエストのオプションを表します。
 struct ChatRequestOptions: Codable {
     let numKeep: Int?
-    let seed: Int?
+    var seed: Int?
     let numPredict: Int?
     let topK: Int?
     let topP: Double?
@@ -491,6 +491,16 @@ enum JSONValue: Codable, Hashable {
     }
 }
 
+// MARK: - シード値ユーティリティ
+
+/// Ollama APIで安全に使用できるシード値の最大値（2^53 - 1）。
+let OLLAMA_SEED_SAFE_LIMIT: Int = 9007199254740991
+
+/// シード値を安全な範囲内にクランプします。
+func clampOllamaSeed(_ seed: Int) -> Int {
+    max(-OLLAMA_SEED_SAFE_LIMIT, min(OLLAMA_SEED_SAFE_LIMIT, seed))
+}
+
 @MainActor
 class ChatSettings: ObservableObject {
     @Published var selectedModelID: OllamaModel.ID?
@@ -508,6 +518,17 @@ class ChatSettings: ObservableObject {
     @Published var isSystemPromptEnabled: Bool = false
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
+    
+    // シード値設定
+    @Published var isSeedEnabled: Bool = false
+    @Published var seed: Int = 0 {
+        didSet {
+            let clamped = clampOllamaSeed(seed)
+            if seed != clamped {
+                seed = clamped
+            }
+        }
+    }
     
     var finalKeepAlive: JSONValue? {
         keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
@@ -605,9 +626,10 @@ class ImageGenerationSettings: ObservableObject {
     @Published var isSeedEnabled: Bool = false
     @Published var seed: Int = 0 {
         didSet {
-            let safeLimit = 9007199254740991
-            if seed > safeLimit { seed = safeLimit }
-            if seed < -safeLimit { seed = -safeLimit }
+            let clamped = clampOllamaSeed(seed)
+            if seed != clamped {
+                seed = clamped
+            }
         }
     }
     

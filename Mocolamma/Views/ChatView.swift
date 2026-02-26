@@ -512,6 +512,8 @@ struct ChatView: View {
                 chatTemperature: chatSettings.chatTemperature,
                 isContextWindowEnabled: chatSettings.isContextWindowEnabled,
                 contextWindowValue: chatSettings.contextWindowValue,
+                isSeedEnabled: chatSettings.isSeedEnabled,
+                seed: chatSettings.seed,
                 isSystemPromptEnabled: chatSettings.isSystemPromptEnabled,
                 systemPrompt: chatSettings.systemPrompt,
                 thinkingOption: chatSettings.thinkingOption,

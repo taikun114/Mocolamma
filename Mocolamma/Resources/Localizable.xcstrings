@@ -23231,6 +23231,83 @@
         }
       }
     },
+    "Specifies the seed value used for text generation." : {
+      "comment" : "シード値に関する説明テキスト。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدد قيمة البذرة المستخدمة لتوليد النص."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt den Seed-Wert an, der für die Texterzeugung verwendet wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies the seed value used for text generation."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica el valor de la semilla utilizado para la generación de texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie la valeur de graine utilisée pour la génération de texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト生成に使用するシード値を指定します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "텍스트 생성에 사용할 시드 값을 지정합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает сид (начальное значение), используемый для генерации текста."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує сид (початкове значення), що використовується для генерації тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定用于文本生成的种子值。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定用於文字生成的種子值。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定用於文字生成的種子值。"
+          }
+        }
+      }
+    },
     "Specifies the width of the image you want to generate." : {
       "comment" : "生成する画像の幅に関する説明テキスト。",
       "localizations" : {

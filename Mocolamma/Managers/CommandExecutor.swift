@@ -958,7 +958,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSeedEnabled: Bool, seed: Int, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
@@ -1099,7 +1099,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 do {
-                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt), thinkingOption: \(thinkingOption)")
+                    print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSeedEnabled: \(isSeedEnabled), seed: \(seed), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt), thinkingOption: \(thinkingOption)")
                     var chatOptions: ChatRequestOptions?
                     if useCustomChatSettings {
                         var options = ChatRequestOptions()
@@ -1109,8 +1109,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         if isContextWindowEnabled {
                             options.numCtx = Int(contextWindowValue) // DoubleをIntにキャスト
                         }
+                        if isSeedEnabled {
+                            options.seed = seed
+                        }
                         chatOptions = options
-                        print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1), numCtx: \(chatOptions?.numCtx ?? -1)")
+                        print("DEBUG: Constructed chatOptions.temperature: \(chatOptions?.temperature ?? -1), numCtx: \(chatOptions?.numCtx ?? -1), seed: \(chatOptions?.seed ?? -1)")
                     }
                     
                     var finalMessages = messages

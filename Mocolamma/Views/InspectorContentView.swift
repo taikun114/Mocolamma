@@ -20,6 +20,7 @@ struct InspectorContentView: View {
     @FocusState private var isCustomHeightFocused: Bool
     @FocusState private var isCustomStepsFocused: Bool
     @FocusState private var isCustomKeepAliveFocused: Bool
+    @FocusState private var isChatSeedFocused: Bool
     @State private var inspectorWidth: CGFloat = 0 // インスペクターの幅を保持
     
     private var vStackSpacing: CGFloat {
@@ -126,6 +127,10 @@ struct InspectorContentView: View {
                     
                     Section("Custom Settings") {
                         Toggle("Enable Custom Settings", isOn: $chatSettings.useCustomChatSettings)
+                        
+                        chatSeedSettingsSection
+                            .disabled(!chatSettings.useCustomChatSettings)
+                            .foregroundColor(chatSettings.useCustomChatSettings ? .primary : .secondary)
                         
                         VStack {
                             Toggle(isOn: $chatSettings.isTemperatureEnabled) {
@@ -478,6 +483,34 @@ struct InspectorContentView: View {
     }
     
     @ViewBuilder
+    private var chatSeedSettingsSection: some View {
+        VStack(alignment: .leading, spacing: vStackSpacing) {
+            Toggle(isOn: $chatSettings.isSeedEnabled) {
+                Text("Seed")
+            }
+            HStack(alignment: .center) {
+                TextField("Enter seed value", value: $chatSettings.seed, format: .number.grouping(.never))
+                    .focused($isChatSeedFocused)
+                    .textFieldStyle(.roundedBorder)
+                    .labelsHidden()
+#if os(iOS)
+                    .keyboardType(.numberPad)
+#endif
+                    .disabled(!chatSettings.isSeedEnabled)
+                
+                Stepper("Adjust seed value", value: $chatSettings.seed, in: -OLLAMA_SEED_SAFE_LIMIT...OLLAMA_SEED_SAFE_LIMIT)
+                    .labelsHidden()
+                    .disabled(!chatSettings.isSeedEnabled)
+            }
+            .foregroundColor(chatSettings.isSeedEnabled ? .primary : .secondary)
+            
+            Text("Specifies the seed value used for text generation.")
+                .font(.caption)
+                .foregroundStyle(chatSettings.useCustomChatSettings ? .secondary : .tertiary)
+        }
+    }
+    
+    @ViewBuilder
     private var seedSettingsSection: some View {
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Toggle(isOn: $imageSettings.isSeedEnabled) {
@@ -493,7 +526,7 @@ struct InspectorContentView: View {
 #endif
                     .disabled(!imageSettings.isSeedEnabled)
                 
-                Stepper("Adjust seed value", value: $imageSettings.seed, in: -9007199254740991...9007199254740991)
+                Stepper("Adjust seed value", value: $imageSettings.seed, in: -OLLAMA_SEED_SAFE_LIMIT...OLLAMA_SEED_SAFE_LIMIT)
                     .labelsHidden()
                     .disabled(!imageSettings.isSeedEnabled)
             }
