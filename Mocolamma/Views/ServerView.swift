@@ -192,6 +192,7 @@ private struct ServerListViewContent: View {
                     } label: {
                         Label("Select", systemImage: "checkmark.circle.fill")
                     }
+                    .labelStyle(.iconOnly)
                     .tint(.accentColor)
                 }
                 .swipeActions(edge: .trailing) {
@@ -201,11 +202,14 @@ private struct ServerListViewContent: View {
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
+                    .labelStyle(.iconOnly)
+                    
                     Button {
                         serverToEdit = server
                     } label: {
                         Label("Edit", systemImage: "pencil")
                     }
+                    .labelStyle(.iconOnly)
                     .tint(.blue)
                 }
 #if os(iOS)

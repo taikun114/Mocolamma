@@ -70,6 +70,8 @@ Notes
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Improve tag display in the model inspector**
 - **Improve the chat screen to enhance error handling**
+- **Improve the appearance of swipe actions**
+  - When swiping a list item on the server and model screens, the action displayed now always shows only the icon, regardless of the item's height.
 - **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 - **Add an icon to the refresh button in the context menu for the number of running models in the server inspector**
 

@@ -295,6 +295,15 @@ struct ModelListContentView: View {
                         Label("Delete...", systemImage: "trash")
                     }
                 }
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .labelStyle(.iconOnly)
+                }
             }
             .onDelete { offsets in
                 let modelsToDelete = offsets.map { sortedModels[$0] }
