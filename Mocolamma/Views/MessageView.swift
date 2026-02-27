@@ -569,7 +569,27 @@ struct MessageView: View {
     
     @ViewBuilder
     private var messageContentView: some View {
-        if isEditing && message.role == "user" {
+        VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
+            if let images = message.images, !images.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(images, id: \.self) { base64 in
+                            if let data = Data(base64Encoded: base64),
+                               let image = PlatformImage(data: data) {
+                                Image(platformImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                        }
+                    }
+                }
+                .frame(height: 100)
+                .fixedSize(horizontal: true, vertical: false)
+            }
+            
+            if isEditing && message.role == "user" {
             VStack(alignment: .trailing) {
                 TextField("Type your message...", text: $message.content, axis: .vertical)
                     .focused($isEditingFocused)
@@ -687,6 +707,7 @@ struct MessageView: View {
             streamingContentBody
         }
     }
+}
     
     @ViewBuilder
     private var streamingContentBody: some View {
@@ -694,11 +715,11 @@ struct MessageView: View {
             ProgressView()
                 .controlSize(.small)
                 .padding(2)
-        } else if message.isStopped && message.content.isEmpty {
+        } else if message.role == "assistant" && message.isStopped && message.content.isEmpty {
             Text("*No message*")
                 .font(.caption)
                 .foregroundColor(.secondary)
-        } else if !message.isStreaming && message.content.isEmpty {
+        } else if message.role == "assistant" && !message.isStreaming && message.content.isEmpty {
             Text("*Could not connect*")
                 .font(.caption)
                 .foregroundColor(.secondary)

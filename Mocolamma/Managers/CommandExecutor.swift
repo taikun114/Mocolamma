@@ -12,11 +12,14 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var models: [OllamaModel] = []
     var apiConnectionError: Bool = false
     var specificConnectionErrorMessage: String?
-    var chatMessages: [ChatMessage] = []
-    var chatInputText: String = ""
-    var isChatStreaming: Bool = false
-    var imageMessages: [ChatMessage] = []
-    var isImageStreaming: Bool = false
+        var chatMessages: [ChatMessage] = []
+        var chatInputText: String = ""
+        var chatInputImages: [Data] = []
+        var isChatStreaming: Bool = false
+        
+        var imageMessages: [ChatMessage] = []
+        var imageInputImages: [Data] = []
+        var isImageStreaming: Bool = false
     var successfullyDownloadedIDs: Set<UUID> = []
     var successfullyCopiedIDs: Set<UUID> = []
     var runningModels: [OllamaRunningModel] = []
@@ -1182,6 +1185,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     func clearChat() {
         chatMessages.removeAll()
         chatInputText = ""
+        chatInputImages = []
         updateIsChatStreaming()
         cancelChatStreaming()
     }
@@ -1189,6 +1193,8 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// 画像生成履歴をクリアします。
     func clearImageGeneration() {
         imageMessages.removeAll()
+        chatInputText = ""
+        imageInputImages = []
         updateIsImageStreaming()
         cancelImageGeneration()
     }

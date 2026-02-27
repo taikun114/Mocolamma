@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ChatInputView: View {
     @Binding var inputText: String
+    @Binding var selectedImages: [Data]
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
     var placeholder: String = "Type your message..."
@@ -10,7 +11,7 @@ struct ChatInputView: View {
     var stopMessage: (() -> Void)? = nil
     
     var body: some View {
-        MessageInputView(inputText: $inputText, isStreaming: $isStreaming, showingInspector: $showingInspector, placeholder: placeholder, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
+        MessageInputView(inputText: $inputText, selectedImages: $selectedImages, isStreaming: $isStreaming, showingInspector: $showingInspector, placeholder: placeholder, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
 #if os(iOS)
             .gesture(
                 DragGesture().onChanged { value in

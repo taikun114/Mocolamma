@@ -62,7 +62,7 @@ struct ChatView: View {
     @ViewBuilder
     private func makeSafeAreaBarContent() -> some View {
         @Bindable var executor = executor
-        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
             sendMessage()
         } stopMessage: {
             if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
@@ -91,7 +91,7 @@ struct ChatView: View {
                     VStack {
                         Spacer()
                         
-                        ChatInputView(inputText: $executor.chatInputText, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
                             sendMessage()
                         } stopMessage: {
                             if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
@@ -329,11 +329,16 @@ struct ChatView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !executor.chatInputText.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
         
         executor.isChatStreaming = true
-        let userMessage = ChatMessage(role: "user", content: executor.chatInputText, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        
+        // 画像をBase64に変換
+        let base64Images = executor.chatInputImages.map { $0.base64EncodedString() }
+        
+        let userMessage = ChatMessage(role: "user", content: executor.chatInputText, images: base64Images.isEmpty ? nil : base64Images, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         executor.chatInputText = ""
+        executor.chatInputImages = []
         executor.chatMessages.append(userMessage)
         
         var apiMessages = executor.chatMessages
@@ -736,6 +741,7 @@ struct ImageGenerationView: View {
         @Bindable var executor = executor
         ChatInputView(
             inputText: $executor.chatInputText,
+            selectedImages: $executor.imageInputImages,
             isStreaming: $executor.isImageStreaming,
             showingInspector: $showingInspector,
             placeholder: "Enter a prompt...",
@@ -927,10 +933,11 @@ struct ImageGenerationView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !executor.chatInputText.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty || !executor.imageInputImages.isEmpty else { return }
         
         let prompt = executor.chatInputText
         executor.chatInputText = ""
+        executor.imageInputImages = []
         executor.isImageStreaming = true
         
         let userMessage = ChatMessage(role: "user", content: prompt, createdAt: MessageView.iso8601Formatter.string(from: Date()))

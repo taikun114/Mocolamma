@@ -113,6 +113,14 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         // capabilitiesがまだ取得できていない状態などは、確実な判定ができないためfalseを返す
         return false
     }
+
+    /// ビジョンに対応しているモデルかどうかを判定します。
+    var supportsVision: Bool {
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "vision" })
+        }
+        return false
+    }
 }
 
 extension OllamaModel {
