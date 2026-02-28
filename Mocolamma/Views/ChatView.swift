@@ -1,5 +1,7 @@
 import SwiftUI
 import Textual
+import ImageIO
+import UniformTypeIdentifiers
 
 struct ChatView: View {
     @Environment(CommandExecutor.self) var executor
@@ -331,21 +333,15 @@ struct ChatView: View {
         }
         guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
         
-        executor.isChatStreaming = true
-        
-        // 画像をBase64に変換
-        let base64Images = executor.chatInputImages.map { $0.base64EncodedString() }
-        
-        let userMessage = ChatMessage(role: "user", content: executor.chatInputText, images: base64Images.isEmpty ? nil : base64Images, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        let text = executor.chatInputText
+        let imagesData = executor.chatInputImages
         executor.chatInputText = ""
         executor.chatInputImages = []
-        executor.chatMessages.append(userMessage)
+        executor.isChatStreaming = true
         
-        var apiMessages = executor.chatMessages
-        if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
-            let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
-            apiMessages.insert(systemMessage, at: 0)
-        }
+        let userMessage = ChatMessage(role: "user", content: text, images: nil, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        userMessage.isProcessingImages = !imagesData.isEmpty
+        executor.chatMessages.append(userMessage)
         
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
         placeholderMessage.revisions = []
@@ -356,8 +352,58 @@ struct ChatView: View {
         let assistantMessageId = placeholderMessage.id
         
         Task {
+            // 画像がある場合はバックグラウンドでPNG変換処理を行う
+            if !imagesData.isEmpty {
+                let base64Images = await processImagesInBackground(imagesData)
+                await MainActor.run {
+                    userMessage.images = base64Images
+                    userMessage.isProcessingImages = false
+                }
+            }
+            
+            var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
+            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
+                apiMessages.insert(systemMessage, at: 0)
+            }
+            
             await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
         }
+    }
+    
+    private func processImagesInBackground(_ imagesData: [Data]) async -> [String] {
+        return await Task.detached(priority: .medium) {
+            var results: [String] = []
+            for data in imagesData {
+                let options: [CFString: Any] = [
+                    kCGImageSourceShouldCache: false
+                ]
+                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
+                
+                // 回転情報を反映し、かつ最大解像度を2048pxに制限して処理を高速化
+                let thumbnailOptions: [CFString: Any] = [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true, // これで回転が修正されます
+                    kCGImageSourceThumbnailMaxPixelSize: 2048 // 2048pxにリサイズして負荷を軽減
+                ]
+                
+                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+                    continue
+                }
+                
+                let outputData = NSMutableData()
+                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                    continue
+                }
+                
+                CGImageDestinationAddImage(destination, cgImage, nil)
+                if CGImageDestinationFinalize(destination) {
+                    // リサイズ済みのデータからBase64文字列を生成（非常に高速になります）
+                    results.append((outputData as Data).base64EncodedString())
+                }
+            }
+            return results
+        }.value
     }
     
     // 過去リビジョン参照中でも、最新の完成版だけをアーカイブしてリトライ開始する

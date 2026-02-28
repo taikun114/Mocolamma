@@ -19,6 +19,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
     @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
+    @Published var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
     
     // 画像生成関連のプロパティ
     @Published var generatedImage: String? // 生成された画像 (Base64)

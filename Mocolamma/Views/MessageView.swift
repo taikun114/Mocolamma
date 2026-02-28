@@ -570,7 +570,16 @@ struct MessageView: View {
     @ViewBuilder
     private var messageContentView: some View {
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
-            if let images = message.images, !images.isEmpty {
+            if message.isProcessingImages {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Processing images...")
+                        .font(.caption)
+                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
+                }
+                .padding(.vertical, 4)
+            } else if let images = message.images, !images.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(images, id: \.self) { base64 in
