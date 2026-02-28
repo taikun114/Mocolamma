@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 struct MessageInputView: View {
     @FocusState private var isInputFocused: Bool
     @Binding var inputText: String
-    @Binding var selectedImages: [Data]
+    @Binding var selectedImages: [ChatInputImage]
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
     var placeholder: String = "Type your message..."
@@ -17,17 +17,17 @@ struct MessageInputView: View {
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
-    @State private var draggingItem: Data?
+    @State private var draggingItem: ChatInputImage?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // 画像プレビュー
             if !selectedImages.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        ForEach(selectedImages.indices, id: \.self) { index in
+                        ForEach(selectedImages) { imageContainer in
                             ZStack(alignment: .topLeading) {
-                                if let image = loadImage(data: selectedImages[index]) {
+                                if let image = imageContainer.thumbnail {
 #if os(iOS)
                                     Image(uiImage: image)
                                         .resizable()
@@ -44,7 +44,7 @@ struct MessageInputView: View {
                                 }
                                 
                                 Button(action: {
-                                    selectedImages.remove(at: index)
+                                    selectedImages.removeAll(where: { $0.id == imageContainer.id })
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundStyle(.white, .black.opacity(0.6))
@@ -56,10 +56,10 @@ struct MessageInputView: View {
                             .padding(.top, 8)
                             .padding(.leading, 8)
                             .onDrag {
-                                self.draggingItem = selectedImages[index]
-                                return NSItemProvider(object: "\(index)" as NSString)
+                                self.draggingItem = imageContainer
+                                return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: selectedImages[index], items: $selectedImages, draggingItem: $draggingItem))
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem))
                         }
                     }
                     .padding(.horizontal, 4)
@@ -270,12 +270,12 @@ struct MessageInputView: View {
                     if url.startAccessingSecurityScopedResource() {
                         defer { url.stopAccessingSecurityScopedResource() }
                         if let data = try? Data(contentsOf: url) {
-                            selectedImages.append(data)
+                            selectedImages.append(ChatInputImage(data: data, thumbnail: createThumbnail(data: data)))
                         }
                     } else {
                         // スコープアクセスなしでも読み込みを試みる（ローカルファイル等）
                         if let data = try? Data(contentsOf: url) {
-                            selectedImages.append(data)
+                            selectedImages.append(ChatInputImage(data: data, thumbnail: createThumbnail(data: data)))
                         }
                     }
                 }
@@ -285,23 +285,33 @@ struct MessageInputView: View {
         }
     }
 
-#if os(iOS)
-    private func loadImage(data: Data) -> UIImage? {
-        UIImage(data: data)
-    }
+    private func createThumbnail(data: Data) -> PlatformImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceShouldCache: false,
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 120 // 60pxの倍（Retina対応）でサムネイル作成
+        ]
+        
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return nil
+        }
+        
+#if os(macOS)
+        return NSImage(cgImage: cgImage, size: NSSize(width: 60, height: 60))
 #else
-    private func loadImage(data: Data) -> NSImage? {
-        NSImage(data: data)
-    }
+        return UIImage(cgImage: cgImage)
 #endif
+    }
 }
 
 // MARK: - ImageDropDelegate
 
 struct ImageDropDelegate: DropDelegate {
-    let item: Data
-    @Binding var items: [Data]
-    @Binding var draggingItem: Data?
+    let item: ChatInputImage
+    @Binding var items: [ChatInputImage]
+    @Binding var draggingItem: ChatInputImage?
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
         return DropProposal(operation: .move)
@@ -315,10 +325,10 @@ struct ImageDropDelegate: DropDelegate {
     func dropEntered(info: DropInfo) {
         guard let draggingItem = draggingItem,
               draggingItem != item,
-              let from = items.firstIndex(of: draggingItem),
-              let to = items.firstIndex(of: item) else { return }
+              let from = items.firstIndex(where: { $0.id == draggingItem.id }),
+              let to = items.firstIndex(where: { $0.id == item.id }) else { return }
 
-        if items[to] != draggingItem {
+        if items[to].id != draggingItem.id {
             withAnimation {
                 items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
             }
@@ -331,7 +341,7 @@ struct ImageDropDelegate: DropDelegate {
 #if os(iOS)
 struct PhotoLibraryPicker: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
-    @Binding var selectedImages: [Data]
+    @Binding var selectedImages: [ChatInputImage]
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
@@ -363,7 +373,7 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
                             DispatchQueue.main.async {
-                                self.parent.selectedImages.append(data)
+                                self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
                             }
                         }
                     }
@@ -371,11 +381,25 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
             }
         }
     }
+
+    private func createThumbnail(data: Data) -> PlatformImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceShouldCache: false,
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 120
+        ]
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
+    }
 }
 #else
 struct PhotoLibraryPicker: NSViewControllerRepresentable {
     @Binding var isPresented: Bool
-    @Binding var selectedImages: [Data]
+    @Binding var selectedImages: [ChatInputImage]
 
     func makeNSViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
@@ -407,13 +431,27 @@ struct PhotoLibraryPicker: NSViewControllerRepresentable {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
                             DispatchQueue.main.async {
-                                self.parent.selectedImages.append(data)
+                                self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private func createThumbnail(data: Data) -> PlatformImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceShouldCache: false,
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 120
+        ]
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return nil
+        }
+        return NSImage(cgImage: cgImage, size: NSSize(width: 60, height: 60))
     }
 }
 #endif

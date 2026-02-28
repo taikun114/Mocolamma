@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ChatInputView: View {
     @Binding var inputText: String
-    @Binding var selectedImages: [Data]
+    @Binding var selectedImages: [ChatInputImage]
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
     var placeholder: String = "Type your message..."

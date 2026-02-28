@@ -14,11 +14,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var specificConnectionErrorMessage: String?
         var chatMessages: [ChatMessage] = []
         var chatInputText: String = ""
-        var chatInputImages: [Data] = []
+        var chatInputImages: [ChatInputImage] = []
         var isChatStreaming: Bool = false
         
         var imageMessages: [ChatMessage] = []
-        var imageInputImages: [Data] = []
+        var imageInputImages: [ChatInputImage] = []
         var isImageStreaming: Bool = false
     var successfullyDownloadedIDs: Set<UUID> = []
     var successfullyCopiedIDs: Set<UUID> = []

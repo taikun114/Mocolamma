@@ -334,7 +334,7 @@ struct ChatView: View {
         guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
         
         let text = executor.chatInputText
-        let imagesData = executor.chatInputImages
+        let imagesData = executor.chatInputImages.map { $0.data }
         executor.chatInputText = ""
         executor.chatInputImages = []
         executor.isChatStreaming = true

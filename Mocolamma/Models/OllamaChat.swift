@@ -1,6 +1,19 @@
 import SwiftUI
 import Foundation
 
+// MARK: - チャット入力用画像モデル
+
+/// ドラッグ&ドロップやリスト表示を効率化するために、画像データをIDでラップします。
+struct ChatInputImage: Identifiable, Equatable {
+    let id = UUID()
+    let data: Data
+    let thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+    
+    static func == (lhs: ChatInputImage, rhs: ChatInputImage) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 // MARK: - チャットAPI リクエスト/レスポンス モデル
 
 /// チャット会話における単一のメッセージを表します。
