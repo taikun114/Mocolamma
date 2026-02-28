@@ -522,6 +522,7 @@ struct MessageView: View {
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Copy")
+        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true))
     }
     
     private func showCopyFeedback() {
