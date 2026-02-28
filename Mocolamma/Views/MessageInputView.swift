@@ -44,7 +44,9 @@ struct MessageInputView: View {
                                 }
                                 
                                 Button(action: {
-                                    selectedImages.removeAll(where: { $0.id == imageContainer.id })
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        selectedImages.removeAll(where: { $0.id == imageContainer.id })
+                                    }
                                 }) {
                                     Image(systemName: "xmark.circle.fill")
                                         .foregroundStyle(.white, .black.opacity(0.6))
@@ -55,6 +57,7 @@ struct MessageInputView: View {
                             }
                             .padding(.top, 8)
                             .padding(.leading, 8)
+                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
                             .onDrag {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
@@ -265,17 +268,24 @@ struct MessageInputView: View {
         ) { result in
             switch result {
             case .success(let urls):
-                for url in urls {
-                    // セキュリティスコープのアクセス開始
-                    if url.startAccessingSecurityScopedResource() {
-                        defer { url.stopAccessingSecurityScopedResource() }
-                        if let data = try? Data(contentsOf: url) {
-                            selectedImages.append(ChatInputImage(data: data, thumbnail: createThumbnail(data: data)))
+                Task {
+                    for url in urls {
+                        let data: Data? = if url.startAccessingSecurityScopedResource() {
+                            try? Data(contentsOf: url)
+                        } else {
+                            try? Data(contentsOf: url)
                         }
-                    } else {
-                        // スコープアクセスなしでも読み込みを試みる（ローカルファイル等）
-                        if let data = try? Data(contentsOf: url) {
-                            selectedImages.append(ChatInputImage(data: data, thumbnail: createThumbnail(data: data)))
+                        
+                        if let urlData = data {
+                            let thumbnail = createThumbnail(data: urlData)
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                                }
+                            }
+                            url.stopAccessingSecurityScopedResource()
+                            // 少しだけ待機して、左から順に現れるようにする
+                            try? await Task.sleep(nanoseconds: 20_000_000)
                         }
                     }
                 }
@@ -385,7 +395,9 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
                             DispatchQueue.main.async {
-                                self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                                }
                             }
                         }
                     }
@@ -455,7 +467,9 @@ struct PhotoLibraryPicker: NSViewControllerRepresentable {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
                             DispatchQueue.main.async {
-                                self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                                }
                             }
                         }
                     }
