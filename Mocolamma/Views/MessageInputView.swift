@@ -1,7 +1,6 @@
 import SwiftUI
-#if os(iOS)
 import PhotosUI
-#endif
+import UniformTypeIdentifiers
 
 struct MessageInputView: View {
     @FocusState private var isInputFocused: Bool
@@ -14,9 +13,10 @@ struct MessageInputView: View {
     var sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
     
-#if os(iOS)
-    @State private var photosPickerItems: [PhotosPickerItem] = []
-#endif
+    // 添付オプション関連の状態
+    @State private var showingAttachSheet = false
+    @State private var showingPhotoPicker = false
+    @State private var showingFilePicker = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -62,10 +62,12 @@ struct MessageInputView: View {
             }
             
             HStack(alignment: .bottom) {
-                // プラスボタン (ビジョン非対応モデルでは無効化)
-#if os(iOS)
-                PhotosPicker(selection: $photosPickerItems, matching: .images) {
+                // プラスボタン (アクションシートを表示)
+                Button(action: {
+                    showingAttachSheet = true
+                }) {
                     ZStack {
+#if os(iOS)
                         if #available(iOS 26, *) {
                             Image(systemName: "plus")
                                 .font(.title2)
@@ -77,50 +79,7 @@ struct MessageInputView: View {
                                 .padding(8)
                                 .background(Circle().fill(.thinMaterial))
                         }
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(!(selectedModel?.supportsVision ?? false))
-                .onChange(of: photosPickerItems) { _, items in
-                    Task {
-                        for item in items {
-                            if let data = try? await item.loadTransferable(type: Data.self) {
-                                selectedImages.append(data)
-                            }
-                        }
-                        photosPickerItems = [] // リセット
-                    }
-                }
 #else
-                Button(action: {
-                    let panel = NSOpenPanel()
-                    panel.allowsMultipleSelection = true
-                    panel.canChooseDirectories = false
-                    panel.canChooseFiles = true
-                    panel.allowedContentTypes = [.image]
-                    
-                    if let window = NSApp.keyWindow {
-                        panel.beginSheetModal(for: window) { response in
-                            if response == .OK {
-                                for url in panel.urls {
-                                    if let data = try? Data(contentsOf: url) {
-                                        selectedImages.append(data)
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if panel.runModal() == .OK {
-                            for url in panel.urls {
-                                if let data = try? Data(contentsOf: url) {
-                                    selectedImages.append(data)
-                                }
-                            }
-                        }
-                    }
-                }) {
-                    ZStack {
                         if #available(macOS 26, *) {
                             Image(systemName: "plus")
                                 .font(.title2)
@@ -132,12 +91,27 @@ struct MessageInputView: View {
                                 .padding(7)
                                 .background(Circle().fill(.thinMaterial))
                         }
+#endif
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .disabled(!(selectedModel?.supportsVision ?? false))
-#endif
+                .confirmationDialog(
+                    Text("Attach Images"),
+                    isPresented: $showingAttachSheet,
+                    titleVisibility: .visible
+                ) {
+                    Button(String(localized: "Photo Library...")) {
+                        showingPhotoPicker = true
+                    }
+                    Button(String(localized: "Choose Files...")) {
+                        showingFilePicker = true
+                    }
+                    Button(String(localized: "Cancel"), role: .cancel) { }
+                } message: {
+                    Text("Please select the location of the images you want to attach.")
+                }
                 
                 ZStack(alignment: .leading) {
 #if os(iOS)
@@ -269,6 +243,39 @@ struct MessageInputView: View {
             }
         }
         .background(Color.clear)
+        // 各種ピッカーのモディファイア
+        .sheet(isPresented: $showingPhotoPicker) {
+            PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $selectedImages)
+#if os(macOS)
+                .frame(minWidth: 500, idealWidth: 800, maxWidth: 1500, minHeight: 300, idealHeight: 550, maxHeight: 1000)
+                .presentationSizing(.fitted)
+#endif
+        }
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.image],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let urls):
+                for url in urls {
+                    // セキュリティスコープのアクセス開始
+                    if url.startAccessingSecurityScopedResource() {
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        if let data = try? Data(contentsOf: url) {
+                            selectedImages.append(data)
+                        }
+                    } else {
+                        // スコープアクセスなしでも読み込みを試みる（ローカルファイル等）
+                        if let data = try? Data(contentsOf: url) {
+                            selectedImages.append(data)
+                        }
+                    }
+                }
+            case .failure(let error):
+                print("Error picking files: \(error.localizedDescription)")
+            }
+        }
     }
 
 #if os(iOS)
@@ -281,3 +288,95 @@ struct MessageInputView: View {
     }
 #endif
 }
+
+// MARK: - PhotoLibraryPicker
+
+#if os(iOS)
+struct PhotoLibraryPicker: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    @Binding var selectedImages: [Data]
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 0 // 複数選択
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: PhotoLibraryPicker
+
+        init(_ parent: PhotoLibraryPicker) {
+            self.parent = parent
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            parent.isPresented = false
+            
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
+                        if let data = data {
+                            DispatchQueue.main.async {
+                                self.parent.selectedImages.append(data)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+#else
+struct PhotoLibraryPicker: NSViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    @Binding var selectedImages: [Data]
+
+    func makeNSViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 0 // 複数選択
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateNSViewController(_ nsViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: PhotoLibraryPicker
+
+        init(_ parent: PhotoLibraryPicker) {
+            self.parent = parent
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            parent.isPresented = false
+            
+            for result in results {
+                if result.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                    result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
+                        if let data = data {
+                            DispatchQueue.main.async {
+                                self.parent.selectedImages.append(data)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
