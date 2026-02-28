@@ -290,7 +290,7 @@ struct MessageInputView: View {
             kCGImageSourceShouldCache: false,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 120 // 60pxの倍（Retina対応）でサムネイル作成
+            kCGImageSourceThumbnailMaxPixelSize: 240 // クロップ用に少し余裕を持ってデコード
         ]
         
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
@@ -298,10 +298,22 @@ struct MessageInputView: View {
             return nil
         }
         
+        // 中央を正方形にクロップ
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
+        let size = min(width, height)
+        let x = (width - size) / 2
+        let y = (height - size) / 2
+        let cropRect = CGRect(x: x, y: y, width: size, height: size)
+        
+        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+            return nil
+        }
+        
 #if os(macOS)
-        return NSImage(cgImage: cgImage, size: NSSize(width: 60, height: 60))
+        return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
 #else
-        return UIImage(cgImage: cgImage)
+        return UIImage(cgImage: croppedCGImage)
 #endif
     }
 }
@@ -387,13 +399,25 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
             kCGImageSourceShouldCache: false,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 120
+            kCGImageSourceThumbnailMaxPixelSize: 240
         ]
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
             return nil
         }
-        return UIImage(cgImage: cgImage)
+        
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
+        let size = min(width, height)
+        let x = (width - size) / 2
+        let y = (height - size) / 2
+        let cropRect = CGRect(x: x, y: y, width: size, height: size)
+        
+        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+            return nil
+        }
+        
+        return UIImage(cgImage: croppedCGImage)
     }
 }
 #else
@@ -445,13 +469,25 @@ struct PhotoLibraryPicker: NSViewControllerRepresentable {
             kCGImageSourceShouldCache: false,
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 120
+            kCGImageSourceThumbnailMaxPixelSize: 240
         ]
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
             return nil
         }
-        return NSImage(cgImage: cgImage, size: NSSize(width: 60, height: 60))
+        
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
+        let size = min(width, height)
+        let x = (width - size) / 2
+        let y = (height - size) / 2
+        let cropRect = CGRect(x: x, y: y, width: size, height: size)
+        
+        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+            return nil
+        }
+        
+        return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
     }
 }
 #endif
