@@ -170,7 +170,7 @@ struct MessageView: View {
                         }
                         
                         if let urlData = data {
-                            let thumbnail = await createThumbnail(data: urlData)
+                            let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
                             await MainActor.run {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
@@ -562,7 +562,8 @@ struct MessageView: View {
                             for (index, base64) in images.enumerated() {
                                 group.addTask {
                                     if let data = Data(base64Encoded: base64) {
-                                        return (index, await createThumbnail(data: data).map { ChatInputImage(data: data, thumbnail: $0) })
+                                        let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                                        return (index, ChatInputImage(data: data, thumbnail: thumbnail))
                                     }
                                     return (index, nil)
                                 }
@@ -596,74 +597,6 @@ struct MessageView: View {
             .disabled(isStreamingAny)
         }
         .id(isStreamingAny)
-    }
-
-    private func createThumbnail(data: Data) async -> PlatformImage? {
-        return await Task.detached(priority: .medium) { // .userInitiated から .medium に変更
-            let options: [CFString: Any] = [
-                kCGImageSourceShouldCache: false,
-                kCGImageSourceCreateThumbnailFromImageAlways: true,
-                kCGImageSourceCreateThumbnailWithTransform: true,
-                kCGImageSourceThumbnailMaxPixelSize: 240
-            ]
-            
-            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-                return nil
-            }
-            
-            let width = CGFloat(cgImage.width)
-            let height = CGFloat(cgImage.height)
-            let size = min(width, height)
-            let x = (width - size) / 2
-            let y = (height - size) / 2
-            let cropRect = CGRect(x: x, y: y, width: size, height: size)
-            
-            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
-                return nil
-            }
-            
-#if os(macOS)
-            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
-#else
-            return UIImage(cgImage: croppedCGImage)
-#endif
-        }.value
-    }
-    
-    private func processImagesInBackground(_ imagesData: [Data]) async -> [String] {
-        return await Task.detached(priority: .medium) {
-            var results: [String] = []
-            for data in imagesData {
-                let options: [CFString: Any] = [
-                    kCGImageSourceShouldCache: false
-                ]
-                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
-                
-                // 回転情報を反映し、かつ最大解像度を2048pxに制限して処理を高速化
-                let thumbnailOptions: [CFString: Any] = [
-                    kCGImageSourceCreateThumbnailFromImageAlways: true,
-                    kCGImageSourceCreateThumbnailWithTransform: true, // これで回転が修正されます
-                    kCGImageSourceThumbnailMaxPixelSize: 2048 // 2048pxにリサイズして負荷を軽減
-                ]
-                
-                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
-                    continue
-                }
-                
-                let outputData = NSMutableData()
-                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
-                    continue
-                }
-                
-                CGImageDestinationAddImage(destination, cgImage, nil)
-                if CGImageDestinationFinalize(destination) {
-                    // リサイズ済みのデータからBase64文字列を生成
-                    results.append((outputData as Data).base64EncodedString())
-                }
-            }
-            return results
-        }.value
     }
     
     @ViewBuilder
@@ -704,7 +637,7 @@ struct MessageView: View {
                     message.isProcessingImages = true
                     
                     let imagesData = editingImages.map { $0.data }
-                    let base64Images = await processImagesInBackground(imagesData)
+                    let base64Images = await ChatInputImage.processImages(imagesData)
                     
                     await MainActor.run {
                         message.images = base64Images
@@ -1225,40 +1158,7 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 }
 
 
-// MARK: - Platform Compatibility & Document Support
-
-#if os(macOS)
-typealias PlatformImage = NSImage
-extension Image {
-    init(platformImage: NSImage) {
-        self.init(nsImage: platformImage)
-    }
-}
-#else
-typealias PlatformImage = UIImage
-extension Image {
-    init(platformImage: UIImage) {
-        self.init(uiImage: platformImage)
-    }
-}
-
-class ImageSaver: NSObject {
-    var onSuccess: (() -> Void)?
-
-    func writeToPhotoAlbum(image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
-    }
-
-    @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
-            print("Error saving image: \(error.localizedDescription)")
-        } else {
-            print("Successfully saved image to photo album.")
-            onSuccess?()
-        }
-    }
-}
-#endif
+// MARK: - Document Support
 
 struct ImageDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.png] }

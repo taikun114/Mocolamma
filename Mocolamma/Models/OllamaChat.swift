@@ -1,5 +1,23 @@
 import SwiftUI
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
+
+#if os(macOS)
+typealias PlatformImage = NSImage
+extension Image {
+    init(platformImage: NSImage) {
+        self.init(nsImage: platformImage)
+    }
+}
+#else
+typealias PlatformImage = UIImage
+extension Image {
+    init(platformImage: UIImage) {
+        self.init(uiImage: platformImage)
+    }
+}
+#endif
 
 // MARK: - チャット入力用画像モデル
 
@@ -11,6 +29,78 @@ struct ChatInputImage: Identifiable, Equatable {
     
     static func == (lhs: ChatInputImage, rhs: ChatInputImage) -> Bool {
         lhs.id == rhs.id
+    }
+}
+
+// MARK: - 画像処理ユーティリティ
+
+extension ChatInputImage {
+    /// データからサムネイルを作成します（非同期）
+    static func createThumbnail(from data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
+#if os(macOS)
+            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+#else
+            return UIImage(cgImage: croppedCGImage)
+#endif
+        }.value
+    }
+    
+    /// 複数の画像をバックグラウンドでPNGに変換し、リサイズします
+    static func processImages(_ imagesData: [Data]) async -> [String] {
+        return await Task.detached(priority: .medium) {
+            var results: [String] = []
+            for data in imagesData {
+                let options: [CFString: Any] = [
+                    kCGImageSourceShouldCache: false
+                ]
+                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
+                
+                let thumbnailOptions: [CFString: Any] = [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true,
+                    kCGImageSourceThumbnailMaxPixelSize: 2048
+                ]
+                
+                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+                    continue
+                }
+                
+                let outputData = NSMutableData()
+                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                    continue
+                }
+                
+                CGImageDestinationAddImage(destination, cgImage, nil)
+                if CGImageDestinationFinalize(destination) {
+                    results.append((outputData as Data).base64EncodedString())
+                }
+            }
+            return results
+        }.value
     }
 }
 

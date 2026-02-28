@@ -354,7 +354,7 @@ struct ChatView: View {
         Task {
             // 画像がある場合はバックグラウンドでPNG変換処理を行う
             if !imagesData.isEmpty {
-                let base64Images = await processImagesInBackground(imagesData)
+                let base64Images = await ChatInputImage.processImages(imagesData)
                 await MainActor.run {
                     userMessage.images = base64Images
                     userMessage.isProcessingImages = false
@@ -369,41 +369,6 @@ struct ChatView: View {
             
             await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
         }
-    }
-    
-    private func processImagesInBackground(_ imagesData: [Data]) async -> [String] {
-        return await Task.detached(priority: .medium) {
-            var results: [String] = []
-            for data in imagesData {
-                let options: [CFString: Any] = [
-                    kCGImageSourceShouldCache: false
-                ]
-                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
-                
-                // 回転情報を反映し、かつ最大解像度を2048pxに制限して処理を高速化
-                let thumbnailOptions: [CFString: Any] = [
-                    kCGImageSourceCreateThumbnailFromImageAlways: true,
-                    kCGImageSourceCreateThumbnailWithTransform: true, // これで回転が修正されます
-                    kCGImageSourceThumbnailMaxPixelSize: 2048 // 2048pxにリサイズして負荷を軽減
-                ]
-                
-                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
-                    continue
-                }
-                
-                let outputData = NSMutableData()
-                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
-                    continue
-                }
-                
-                CGImageDestinationAddImage(destination, cgImage, nil)
-                if CGImageDestinationFinalize(destination) {
-                    // リサイズ済みのデータからBase64文字列を生成（非常に高速になります）
-                    results.append((outputData as Data).base64EncodedString())
-                }
-            }
-            return results
-        }.value
     }
     
     // 過去リビジョン参照中でも、最新の完成版だけをアーカイブしてリトライ開始する
