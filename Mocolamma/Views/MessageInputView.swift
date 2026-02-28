@@ -17,6 +17,7 @@ struct MessageInputView: View {
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
+    @State private var draggingItem: Data?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -24,8 +25,8 @@ struct MessageInputView: View {
             if !selectedImages.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(0..<selectedImages.count, id: \.self) { index in
-                            ZStack(alignment: .topTrailing) {
+                        ForEach(selectedImages.indices, id: \.self) { index in
+                            ZStack(alignment: .topLeading) {
                                 if let image = loadImage(data: selectedImages[index]) {
 #if os(iOS)
                                     Image(uiImage: image)
@@ -50,15 +51,21 @@ struct MessageInputView: View {
                                         .font(.system(size: 20))
                                 }
                                 .buttonStyle(.plain)
-                                .offset(x: 8, y: -8)
+                                .offset(x: -8, y: -8)
                             }
                             .padding(.top, 8)
-                            .padding(.trailing, 8)
+                            .padding(.leading, 8)
+                            .onDrag {
+                                self.draggingItem = selectedImages[index]
+                                return NSItemProvider(object: "\(index)" as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: selectedImages[index], items: $selectedImages, draggingItem: $draggingItem))
                         }
                     }
                     .padding(.horizontal, 4)
                 }
                 .frame(height: 76)
+                .scrollClipDisabled()
             }
             
             HStack(alignment: .bottom) {
@@ -287,6 +294,36 @@ struct MessageInputView: View {
         NSImage(data: data)
     }
 #endif
+}
+
+// MARK: - ImageDropDelegate
+
+struct ImageDropDelegate: DropDelegate {
+    let item: Data
+    @Binding var items: [Data]
+    @Binding var draggingItem: Data?
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        return DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        self.draggingItem = nil
+        return true
+    }
+
+    func dropEntered(info: DropInfo) {
+        guard let draggingItem = draggingItem,
+              draggingItem != item,
+              let from = items.firstIndex(of: draggingItem),
+              let to = items.firstIndex(of: item) else { return }
+
+        if items[to] != draggingItem {
+            withAnimation {
+                items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+            }
+        }
+    }
 }
 
 // MARK: - PhotoLibraryPicker
