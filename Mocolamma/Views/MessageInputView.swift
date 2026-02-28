@@ -277,7 +277,7 @@ struct MessageInputView: View {
                         }
                         
                         if let urlData = data {
-                            let thumbnail = createThumbnail(data: urlData)
+                            let thumbnail = await createThumbnail(data: urlData)
                             await MainActor.run {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
@@ -295,36 +295,38 @@ struct MessageInputView: View {
         }
     }
 
-    private func createThumbnail(data: Data) -> PlatformImage? {
-        let options: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 240 // クロップ用に少し余裕を持ってデコード
-        ]
-        
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-            return nil
-        }
-        
-        // 中央を正方形にクロップ
-        let width = CGFloat(cgImage.width)
-        let height = CGFloat(cgImage.height)
-        let size = min(width, height)
-        let x = (width - size) / 2
-        let y = (height - size) / 2
-        let cropRect = CGRect(x: x, y: y, width: size, height: size)
-        
-        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
-            return nil
-        }
-        
+    private func createThumbnail(data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240 // クロップ用に少し余裕を持ってデコード
+            ]
+            
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            // 中央を正方形にクロップ
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
 #if os(macOS)
-        return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
 #else
-        return UIImage(cgImage: croppedCGImage)
+            return UIImage(cgImage: croppedCGImage)
 #endif
+        }.value
     }
 }
 
@@ -394,9 +396,12 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
                 if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
-                            DispatchQueue.main.async {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                            Task {
+                                let thumbnail = await self.parent.createThumbnail(data: data)
+                                await MainActor.run {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                                    }
                                 }
                             }
                         }
@@ -406,30 +411,32 @@ struct PhotoLibraryPicker: UIViewControllerRepresentable {
         }
     }
 
-    private func createThumbnail(data: Data) -> PlatformImage? {
-        let options: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 240
-        ]
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-            return nil
-        }
-        
-        let width = CGFloat(cgImage.width)
-        let height = CGFloat(cgImage.height)
-        let size = min(width, height)
-        let x = (width - size) / 2
-        let y = (height - size) / 2
-        let cropRect = CGRect(x: x, y: y, width: size, height: size)
-        
-        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
-            return nil
-        }
-        
-        return UIImage(cgImage: croppedCGImage)
+    private func createThumbnail(data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
+            return UIImage(cgImage: croppedCGImage)
+        }.value
     }
 }
 #else
@@ -466,9 +473,12 @@ struct PhotoLibraryPicker: NSViewControllerRepresentable {
                 if result.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                     result.itemProvider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
                         if let data = data {
-                            DispatchQueue.main.async {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: self.parent.createThumbnail(data: data)))
+                            Task {
+                                let thumbnail = await self.parent.createThumbnail(data: data)
+                                await MainActor.run {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        self.parent.selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                                    }
                                 }
                             }
                         }
@@ -478,30 +488,32 @@ struct PhotoLibraryPicker: NSViewControllerRepresentable {
         }
     }
 
-    private func createThumbnail(data: Data) -> PlatformImage? {
-        let options: [CFString: Any] = [
-            kCGImageSourceShouldCache: false,
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 240
-        ]
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-            return nil
-        }
-        
-        let width = CGFloat(cgImage.width)
-        let height = CGFloat(cgImage.height)
-        let size = min(width, height)
-        let x = (width - size) / 2
-        let y = (height - size) / 2
-        let cropRect = CGRect(x: x, y: y, width: size, height: size)
-        
-        guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
-            return nil
-        }
-        
-        return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+    private func createThumbnail(data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
+            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+        }.value
     }
 }
 #endif

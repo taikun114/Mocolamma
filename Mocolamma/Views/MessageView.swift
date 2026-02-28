@@ -2,9 +2,11 @@ import SwiftUI
 import Textual
 import UniformTypeIdentifiers
 import Photos
+import PhotosUI
 
 struct MessageView: View {
     @Environment(CommandExecutor.self) var executor
+    @EnvironmentObject var chatSettings: ChatSettings
     @ObservedObject var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
@@ -18,6 +20,13 @@ struct MessageView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
+    // 編集用画像の状態
+    @State private var editingImages: [ChatInputImage] = []
+    @State private var showingAttachSheet = false
+    @State private var showingPhotoPicker = false
+    @State private var showingFilePicker = false
+    @State private var draggingItem: ChatInputImage?
+    
     // 保存関連の状態
     @State private var showingSaveOptions = false
     @State private var showingFileExporter = false
@@ -29,6 +38,10 @@ struct MessageView: View {
     
     private var isCopied: Bool {
         executor.successfullyCopiedIDs.contains(message.id)
+    }
+
+    private var supportsVision: Bool {
+        chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "vision" }) ?? false
     }
     
     static let iso8601Formatter: ISO8601DateFormatter = {
@@ -71,7 +84,10 @@ struct MessageView: View {
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
                         if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) && !message.isImageGeneration { copyButton }
                         if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
-                            if isEditing { cancelButton; doneButton } else { editButton }
+                            if isEditing {
+                                cancelButton
+                                doneButton
+                            } else { editButton }
                         }
                         if message.role == "assistant" { Spacer() }
                     }
@@ -131,6 +147,45 @@ struct MessageView: View {
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
         .contentShape(Rectangle())
+        .sheet(isPresented: $showingPhotoPicker) {
+            PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $editingImages)
+#if os(macOS)
+                .frame(minWidth: 500, idealWidth: 800, maxWidth: 1500, minHeight: 300, idealHeight: 550, maxHeight: 1000)
+                .presentationSizing(.fitted)
+#endif
+        }
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.image],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let urls):
+                Task {
+                    for url in urls {
+                        let data: Data? = if url.startAccessingSecurityScopedResource() {
+                            try? Data(contentsOf: url)
+                        } else {
+                            try? Data(contentsOf: url)
+                        }
+                        
+                        if let urlData = data {
+                            let thumbnail = await createThumbnail(data: urlData)
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                                }
+                            }
+                            url.stopAccessingSecurityScopedResource()
+                            // 少しだけ待機して、左から順に現れるようにする
+                            try? await Task.sleep(nanoseconds: 20_000_000)
+                        }
+                    }
+                }
+            case .failure(let error):
+                print("Error picking files: \(error.localizedDescription)")
+            }
+        }
 #if os(macOS)
         .onHover { isHovering = $0 }
 #endif
@@ -499,6 +554,32 @@ struct MessageView: View {
                 isEditing = true
                 isEditingFocused = true
                 message.content = message.content
+                
+                // 画像を編集用にコピー
+                Task {
+                    if let images = message.images {
+                        editingImages = await withTaskGroup(of: (Int, ChatInputImage?).self) { group in
+                            for (index, base64) in images.enumerated() {
+                                group.addTask {
+                                    if let data = Data(base64Encoded: base64) {
+                                        return (index, await createThumbnail(data: data).map { ChatInputImage(data: data, thumbnail: $0) })
+                                    }
+                                    return (index, nil)
+                                }
+                            }
+                            
+                            var results = [(Int, ChatInputImage)]()
+                            for await result in group {
+                                if let img = result.1 {
+                                    results.append((result.0, img))
+                                }
+                            }
+                            return results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
+                        }
+                    } else {
+                        editingImages = []
+                    }
+                }
             }) {
                 Image(systemName: "pencil")
                     .contentShape(Rectangle())
@@ -515,6 +596,74 @@ struct MessageView: View {
             .disabled(isStreamingAny)
         }
         .id(isStreamingAny)
+    }
+
+    private func createThumbnail(data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) { // .userInitiated から .medium に変更
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
+#if os(macOS)
+            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+#else
+            return UIImage(cgImage: croppedCGImage)
+#endif
+        }.value
+    }
+    
+    private func processImagesInBackground(_ imagesData: [Data]) async -> [String] {
+        return await Task.detached(priority: .medium) {
+            var results: [String] = []
+            for data in imagesData {
+                let options: [CFString: Any] = [
+                    kCGImageSourceShouldCache: false
+                ]
+                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
+                
+                // 回転情報を反映し、かつ最大解像度を2048pxに制限して処理を高速化
+                let thumbnailOptions: [CFString: Any] = [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true, // これで回転が修正されます
+                    kCGImageSourceThumbnailMaxPixelSize: 2048 // 2048pxにリサイズして負荷を軽減
+                ]
+                
+                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+                    continue
+                }
+                
+                let outputData = NSMutableData()
+                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                    continue
+                }
+                
+                CGImageDestinationAddImage(destination, cgImage, nil)
+                if CGImageDestinationFinalize(destination) {
+                    // リサイズ済みのデータからBase64文字列を生成
+                    results.append((outputData as Data).base64EncodedString())
+                }
+            }
+            return results
+        }.value
     }
     
     @ViewBuilder
@@ -544,7 +693,27 @@ struct MessageView: View {
     private var doneButton: some View {
         Button(action: {
             isEditing = false
-            onRetry?(message.id, message)
+            
+            // 編集内容を反映させるためのTaskを開始
+            Task {
+                // 画像の変更を反映
+                if editingImages.isEmpty {
+                    message.images = nil
+                } else {
+                    // 画像の処理が必要な場合はフラグを立てる
+                    message.isProcessingImages = true
+                    
+                    let imagesData = editingImages.map { $0.data }
+                    let base64Images = await processImagesInBackground(imagesData)
+                    
+                    await MainActor.run {
+                        message.images = base64Images
+                        message.isProcessingImages = false
+                    }
+                }
+                
+                onRetry?(message.id, message)
+            }
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
 #if os(iOS)
@@ -561,7 +730,7 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(!isModelSelected || isStreamingAny || message.content.isEmpty)
+        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && editingImages.isEmpty))
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .id(isStreamingAny ? "on" : "off")
@@ -579,6 +748,81 @@ struct MessageView: View {
                         .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
                 }
                 .padding(.vertical, 4)
+            } else if isEditing && message.role == "user" && (supportsVision || !editingImages.isEmpty) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(editingImages) { imageContainer in
+                            ZStack(alignment: .topLeading) {
+                                if let image = imageContainer.thumbnail {
+                                    Image(platformImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        editingImages.removeAll(where: { $0.id == imageContainer.id })
+                                    }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.white, .black.opacity(0.6))
+                                        .font(.system(size: 20))
+                                }
+                                .buttonStyle(.plain)
+                                                                .offset(x: -8, y: -8)
+                                                                }
+                                                                .padding(.top, 0)
+                                                                .padding(.leading, 0)
+                                                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+                                
+                            .onDrag {
+                                self.draggingItem = imageContainer
+                                return NSItemProvider(object: imageContainer.id.uuidString as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem))
+                        }
+                        
+                        // 画像追加タイル (ビジョン対応モデルが選択されている場合のみ表示)
+                        if supportsVision {
+                            Button(action: {
+                                showingAttachSheet = true
+                            }) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.white.opacity(0.2))
+                                        .frame(width: 80, height: 80)
+                                    
+                                    Image(systemName: "plus")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .confirmationDialog(
+                                Text("Attach Images"),
+                                isPresented: $showingAttachSheet,
+                                titleVisibility: .visible
+                            ) {
+                                Button(String(localized: "Photo Library...")) {
+                                    showingPhotoPicker = true
+                                }
+                                Button(String(localized: "Choose Files...")) {
+                                    showingFilePicker = true
+                                }
+                                Button(String(localized: "Cancel"), role: .cancel) { }
+                            } message: {
+                                Text("Please select the location of the images you want to attach.")
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+                .frame(height: 90)
+                .scrollClipDisabled()
             } else if let images = message.images, !images.isEmpty {
                 // 画像が少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
                 ViewThatFits(in: .horizontal) {
