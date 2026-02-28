@@ -580,7 +580,8 @@ struct MessageView: View {
                 }
                 .padding(.vertical, 4)
             } else if let images = message.images, !images.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
+                // 画像が少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
+                ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
                         ForEach(images, id: \.self) { base64 in
                             if let data = Data(base64Encoded: base64),
@@ -593,9 +594,22 @@ struct MessageView: View {
                             }
                         }
                     }
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(images, id: \.self) { base64 in
+                                if let data = Data(base64Encoded: base64),
+                                   let image = PlatformImage(data: data) {
+                                    Image(platformImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                            }
+                        }
+                    }
                 }
                 .frame(height: 100)
-                .fixedSize(horizontal: true, vertical: false)
             }
             
             if isEditing && message.role == "user" {
@@ -732,7 +746,7 @@ struct MessageView: View {
             Text("*Could not connect*")
                 .font(.caption)
                 .foregroundColor(.secondary)
-        } else {
+        } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
                 let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
                     ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
@@ -744,6 +758,8 @@ struct MessageView: View {
                     .textual.overflowMode(.scroll)
                     .compositingGroup() // 描画を最適化
             }
+        } else {
+            EmptyView()
         }
     }
     
