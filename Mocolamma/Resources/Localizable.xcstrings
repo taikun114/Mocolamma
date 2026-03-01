@@ -24173,6 +24173,76 @@
         }
       }
     },
+    "Send" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送信"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전송"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслати"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發送"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發送"
+          }
+        }
+      }
+    },
     "Send Feedback" : {
       "comment" : "フィードバックを送信ボタン。",
       "localizations" : {
@@ -26793,6 +26863,146 @@
     "Textual by Guillermo Gonzalez" : {
       "shouldTranslate" : false
     },
+    "The selected model \"%@\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار \"%@\" لا يدعم التعرف على الصور، لذا لن يتم إرسال الصور. هل أنت متأكد من أنك تريد الإرسال كما هو؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell \"%@\" unterstützt keine Bilderkennung, daher werden keine Bilder gesendet. Sind Sie sicher, dass Sie es so senden möchten?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado \"%@\" no admite el reconocimiento de imágenes, por lo que no se enviarán imágenes. ¿Está seguro de que desea enviarlo tal cual?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné « %@ » ne prend pas en charge la reconnaissance d'images, les images ne seront donc pas envoyées. Êtes-vous sûr de vouloir l'envoyer tel quel ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル「%@」は画像認識に対応していないため、画像は送信されません。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델 \"%@\"은(는) 이미지 인식을 지원하지 않으므로 이미지가 전송되지 않습니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель «%@» не поддерживает распознавание изображений, поэтому изображения не будут отправлены. Вы уверены, что хотите отправить как есть?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель «%@» не підтримує розпізнавання зображень, тому зображення не будуть надіслані. Ви впевнені, що хочете надіслати як є?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型“%@”不支持图像识别，因此不会发送图像。您確定要按原样发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        }
+      }
+    },
+    "The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار لا يدعم التعرف على الصور، لذا لن يتم إرسال الصور. هل أنت متأكد من أنك تريد الإرسال كما هو؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell unterstützt keine Bilderkennung, daher werden keine Bilder gesendet. Sind Sie sicher, dass Sie es so senden möchten?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado no admite el reconocimiento de imágenes, por lo que no se enviarán imágenes. ¿Está seguro de que desea enviarlo tal cual?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné ne prend pas en charge la reconnaissance d'images, les images ne seront donc pas envoyées. Êtes-vous sûr de vouloir l'envoyer tel quel ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルは画像認識に対応していないため、画像は送信されません。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델은 이미지 인식을 지원하지 않으므로 이미지가 전송되지 않습니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель не поддерживает распознавание изображений, поэтому изображения не будут отправлены. Вы уверены, что хотите отправить как есть?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель не підтримує розпізнавання зображень, тому зображення не будуть надіслані. Ви впевнені, що хочете надіслати як є?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型不支持图像识别，因此不会发送图像。您確定要按原样发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        }
+      }
+    },
     "Thinking" : {
       "comment" : "モデルの思考を有効化するかどうかを切り替えるとグルスイッチ。",
       "localizations" : {
@@ -27408,6 +27618,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此模型不支援聊天。"
+          }
+        }
+      }
+    },
+    "This model does not support images" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا النموذج لا يدعم الصور"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell unterstützt keine Bilder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este modelo no admite imágenes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce modèle ne prend pas en charge les images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルは画像に対応していません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 모델은 이미지를 지원하지 않습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта модель не поддерживает изображения"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ця модель не підтримує зображення"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支持图像"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援圖像"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援圖像"
           }
         }
       }

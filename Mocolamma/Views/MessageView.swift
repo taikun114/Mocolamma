@@ -17,6 +17,7 @@ struct MessageView: View {
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
+    @State private var showingVisionWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
@@ -671,28 +672,11 @@ struct MessageView: View {
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
-            isEditing = false
-            
-            // 編集内容を反映させるためのTaskを開始
-            Task {
-                // 画像の変更を反映
-                if editingImages.isEmpty {
-                    message.images = nil
-                } else {
-                    // 画像の処理が必要な場合はフラグを立てる
-                    message.isProcessingImages = true
-                    
-                    let imagesData = editingImages.map { $0.data }
-                    let base64Images = await ChatInputImage.processImages(imagesData)
-                    
-                    await MainActor.run {
-                        message.images = base64Images
-                        message.isProcessingImages = false
-                    }
-                }
-                
-                onRetry?(message.id, message)
+            if !editingImages.isEmpty && !supportsVision {
+                showingVisionWarningAlert = true
+                return
             }
+            performDone()
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
 #if os(iOS)
@@ -709,10 +693,48 @@ struct MessageView: View {
         }
         .buttonStyle(.plain)
         .help(String(localized: "Complete editing and retry."))
-        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && editingImages.isEmpty))
+        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .id(isStreamingAny ? "on" : "off")
+        .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
+            Button("Send") {
+                performDone(skipImages: true)
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            } else {
+                Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            }
+        }
+    }
+    
+    private func performDone(skipImages: Bool = false) {
+        isEditing = false
+        
+        // 編集内容を反映させるためのTaskを開始
+        Task {
+            // 画像の変更を反映
+            if editingImages.isEmpty || skipImages {
+                message.images = nil
+            } else {
+                // 画像の処理が必要な場合はフラグを立てる
+                message.isProcessingImages = true
+                
+                let imagesData = editingImages.map { $0.data }
+                let base64Images = await ChatInputImage.processImages(imagesData)
+                
+                await MainActor.run {
+                    message.images = base64Images
+                    message.isProcessingImages = false
+                }
+            }
+            
+            onRetry?(message.id, message)
+        }
     }
     
     @ViewBuilder

@@ -11,6 +11,7 @@ struct ChatView: View {
     
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
+    @State private var showingVisionWarningAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     
@@ -146,6 +147,21 @@ struct ChatView: View {
             unsupportedModelAlertContent
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
+        }
+        .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
+            Button("Send") {
+                if let model = currentSelectedModel {
+                    performSendMessage(model: model, skipImages: true)
+                }
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = currentSelectedModel?.name {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            } else {
+                Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            }
         }
         .alert(Text("Error Occurred"), isPresented: Binding<Bool>(
             get: { generalErrorMessage != nil },
@@ -334,10 +350,23 @@ struct ChatView: View {
         }
         guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
         
+        // ビジョン非対応モデルで画像がある場合の警告チェック
+        if !executor.chatInputImages.isEmpty && !model.supportsVision {
+            showingVisionWarningAlert = true
+            return
+        }
+        
+        performSendMessage(model: model)
+    }
+    
+    private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
         let text = executor.chatInputText
-        let imagesData = executor.chatInputImages.map { $0.data }
+        let imagesData = skipImages ? [] : executor.chatInputImages.map { $0.data }
+        
         executor.chatInputText = ""
-        executor.chatInputImages = []
+        if !skipImages {
+            executor.chatInputImages = []
+        }
         executor.isChatStreaming = true
         
         let userMessage = ChatMessage(role: "user", content: text, images: nil, createdAt: MessageView.iso8601Formatter.string(from: Date()))

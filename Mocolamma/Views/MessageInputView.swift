@@ -233,7 +233,7 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isStreaming ? false : (inputText.isEmpty && selectedImages.isEmpty || selectedModel == nil))
+                    .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 } else {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                         ZStack {
@@ -246,7 +246,7 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isStreaming ? false : (inputText.isEmpty && selectedImages.isEmpty || selectedModel == nil))
+                    .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 }
 #else
                 if #available(macOS 26, *) {
@@ -261,7 +261,7 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isStreaming ? false : (inputText.isEmpty && selectedImages.isEmpty || selectedModel == nil))
+                    .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 } else {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                         ZStack {
@@ -274,7 +274,7 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isStreaming ? false : (inputText.isEmpty && selectedImages.isEmpty || selectedModel == nil))
+                    .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 }
 #endif
             }
