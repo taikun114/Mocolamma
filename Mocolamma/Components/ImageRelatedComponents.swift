@@ -48,6 +48,16 @@ struct AreaImageDropDelegate: DropDelegate {
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
         guard isEnabled else { return nil }
+        
+        // ドラッグされているアイテムに画像が含まれているか確認
+        let providers = info.itemProviders(for: [.image, .fileURL])
+        let hasImage = providers.contains { provider in
+            // 直接の画像データ、または画像として認識可能なファイルURLを確認
+            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier)
+        }
+        
+        guard hasImage else { return nil }
+        
         executor?.notifyDragActivity()
         return DropProposal(operation: .copy)
     }
@@ -60,16 +70,30 @@ struct AreaImageDropDelegate: DropDelegate {
         // ファイルURLの処理 (macOSのファイル、iOSのファイルアプリ) - こちらを優先
         let urlProviders = info.itemProviders(for: [.fileURL])
         if !urlProviders.isEmpty {
+            var imageURLs: [URL] = []
+            let group = DispatchGroup()
+            
             for provider in urlProviders {
+                group.enter()
                 _ = provider.loadObject(ofClass: URL.self) { url, _ in
                     if let url = url {
-                        DispatchQueue.main.async {
-                            onURLsDropped?([url])
+                        // 拡張子またはUTTypeで画像か判定
+                        let ext = url.pathExtension.lowercased()
+                        let isImage = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "tiff", "bmp", "avif"].contains(ext)
+                        if isImage {
+                            imageURLs.append(url)
                         }
                     }
+                    group.leave()
                 }
             }
-            return true // URLとして処理した場合は終了
+            
+            group.notify(queue: .main) {
+                if !imageURLs.isEmpty {
+                    onURLsDropped?(imageURLs)
+                }
+            }
+            return true // URLとして処理（または試行）した場合は終了
         }
 
         // 画像データの処理 (iOSのPhotosアプリ、ブラウザなど、URLが取得できない場合)
@@ -92,6 +116,15 @@ struct AreaImageDropDelegate: DropDelegate {
 
     func dropEntered(info: DropInfo) {
         guard isEnabled else { return }
+        
+        // ドラッグされているアイテムに画像が含まれているか確認
+        let providers = info.itemProviders(for: [.image, .fileURL])
+        let hasImage = providers.contains { provider in
+            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier)
+        }
+        
+        guard hasImage else { return }
+        
         withAnimation(.easeInOut(duration: 0.2)) {
             isDraggingOver = true
             executor?.startDragging()

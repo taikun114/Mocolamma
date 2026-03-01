@@ -316,7 +316,7 @@ struct MessageInputView: View {
                     try? Data(contentsOf: url)
                 }
                 
-                if let urlData = data {
+                if let urlData = data, PlatformImage(data: urlData) != nil {
                     let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -334,14 +334,16 @@ struct MessageInputView: View {
     private func addImages(from data: [Data]) {
         Task {
             for urlData in data {
-                let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
-                await MainActor.run {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                if PlatformImage(data: urlData) != nil {
+                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                        }
                     }
+                    // 少しだけ待機して、左から順に現れるようにする
+                    try? await Task.sleep(nanoseconds: 20_000_000)
                 }
-                // 少しだけ待機して、左から順に現れるようにする
-                try? await Task.sleep(nanoseconds: 20_000_000)
             }
         }
     }

@@ -101,14 +101,14 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 if currentChangeCount != self.lastDragPasteboardChangeCount {
                     self.lastDragPasteboardChangeCount = currentChangeCount
                     
-                    // ファイルが含まれているか確認
+                    // ファイルが含まれており、かつそれが画像として読み込み可能か確認
                     let hasFiles = pb.types?.contains(.fileURL) == true || 
                                  pb.types?.contains(NSPasteboard.PasteboardType("NSFilenamesPboardType")) == true
                     
-                    if hasFiles {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            self.isDraggingFile = true
-                        }
+                    let hasImages = pb.canReadObject(forClasses: [PlatformImage.self], options: nil)
+                    
+                    if hasFiles && hasImages {
+                        self.startDragging()
                     }
                 }
                 
