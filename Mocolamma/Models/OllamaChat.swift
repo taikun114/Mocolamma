@@ -156,7 +156,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
         case generatedImage = "generated_image"
-        case isImageGeneration = "is_image_generation"
     }
     
     required init(from decoder: Decoder) throws {
@@ -172,7 +171,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
         self.generatedImage = try container.decodeIfPresent(String.self, forKey: .generatedImage)
-        self.isImageGeneration = try container.decodeIfPresent(Bool.self, forKey: .isImageGeneration) ?? false
     }
     
     func encode(to encoder: Encoder) throws {
@@ -188,7 +186,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(evalCount, forKey: .evalCount)
         try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
         try container.encodeIfPresent(generatedImage, forKey: .generatedImage)
-        try container.encode(isImageGeneration, forKey: .isImageGeneration)
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
