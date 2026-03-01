@@ -760,6 +760,14 @@ struct MessageView: View {
                                         .scaledToFill()
                                         .frame(width: 80, height: 80)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            if let fullImage = PlatformImage(data: imageContainer.data) {
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    executor.previewImage = fullImage
+                                                }
+                                            }
+                                        }
                                 }
                                 
                                 Button(action: {
@@ -836,6 +844,12 @@ struct MessageView: View {
                                     .scaledToFill()
                                     .frame(width: 100, height: 100)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            executor.previewImage = image
+                                        }
+                                    }
                             }
                         }
                     }
@@ -849,6 +863,12 @@ struct MessageView: View {
                                         .scaledToFill()
                                         .frame(width: 100, height: 100)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                executor.previewImage = image
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -904,6 +924,12 @@ struct MessageView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(8)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                executor.previewImage = image
+                            }
+                        }
                         .contextMenu {
                             Button {
                                 copyImageToClipboard(image: image)

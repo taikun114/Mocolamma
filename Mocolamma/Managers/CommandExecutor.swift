@@ -20,6 +20,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var imageMessages: [ChatMessage] = []
         var imageInputImages: [ChatInputImage] = []
         var isImageStreaming: Bool = false
+        var previewImage: PlatformImage? = nil
     var successfullyDownloadedIDs: Set<UUID> = []
     var successfullyCopiedIDs: Set<UUID> = []
     var runningModels: [OllamaRunningModel] = []

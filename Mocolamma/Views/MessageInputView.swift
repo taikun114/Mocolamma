@@ -24,81 +24,81 @@ struct MessageInputView: View {
     var body: some View {
         @Bindable var executor = executor
         VStack(alignment: .leading, spacing: 8) {
-            // 画像プレビュー
-            if !selectedImages.isEmpty || (executor.isDraggingFile && selectedModel?.supportsVision == true) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(selectedImages) { imageContainer in
-                            ZStack(alignment: .topLeading) {
-                                if let image = imageContainer.thumbnail {
-#if os(iOS)
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-#else
-                                    Image(nsImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 60, height: 60)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-#endif
-                                }
-                                
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        selectedImages.removeAll(where: { $0.id == imageContainer.id })
+                // 画像プレビュー
+                if !selectedImages.isEmpty || (executor.isDraggingFile && selectedModel?.supportsVision == true) {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(selectedImages) { imageContainer in
+                                ZStack(alignment: .topLeading) {
+                                    if let image = imageContainer.thumbnail {
+                                        Image(platformImage: image)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 60, height: 60)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                if let fullImage = PlatformImage(data: imageContainer.data) {
+                                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                                        executor.previewImage = fullImage
+                                                    }
+                                                }
+                                            }
                                     }
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundStyle(.white, .black.opacity(0.6))
-                                        .font(.system(size: 20))
+                                    
+                                    Button(action: {
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            selectedImages.removeAll(where: { $0.id == imageContainer.id })
+                                        }
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(.white, .black.opacity(0.6))
+                                            .font(.system(size: 20))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .offset(x: -8, y: -8)
                                 }
-                                .buttonStyle(.plain)
-                                .offset(x: -8, y: -8)
+                                .padding(.top, 8)
+                                .padding(.leading, 8)
+                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+                                .onDrag {
+                                    self.draggingItem = imageContainer
+                                    return NSItemProvider(object: imageContainer.id.uuidString as NSString)
+                                }
+                                .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
                             }
-                            .padding(.top, 8)
-                            .padding(.leading, 8)
-                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                            .onDrag {
-                                self.draggingItem = imageContainer
-                                return NSItemProvider(object: imageContainer.id.uuidString as NSString)
-                            }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
                         }
-                    }
-                    .padding(.horizontal, 4)
-                }
-                .frame(height: 76)
-                .scrollClipDisabled()
-                .overlay {
-                    if executor.isDraggingFile && selectedModel?.supportsVision == true {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.accentColor.opacity(0.15))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                )
-                                .background(isDraggingOver ? Color.accentColor.opacity(0.1) : Color.clear)
-                            
-                            HStack {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.title3)
-                                Text("Drop here to add images")
-                                    .font(.system(.body, design: .rounded))
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.accentColor)
-                        }
-                        .padding(.top, 8)
                         .padding(.horizontal, 4)
                     }
+                    .frame(height: 76)
+                    .scrollClipDisabled()
+                    .overlay {
+                        if executor.isDraggingFile && selectedModel?.supportsVision == true {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.accentColor.opacity(0.15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [5]))
+                                    )
+                                    .background(isDraggingOver ? Color.accentColor.opacity(0.1) : Color.clear)
+                                
+                                HStack {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.title3)
+                                    Text("Drop here to add images")
+                                        .font(.system(.body, design: .rounded))
+                                        .fontWeight(.bold)
+                                }
+                                .foregroundColor(.accentColor)
+                            }
+                            .padding(.top, 8)
+                            .padding(.horizontal, 4)
+                        }
+                    }
                 }
-            }
-            
-            HStack(alignment: .bottom) {
+                
+                HStack(alignment: .bottom) {
                 // プラスボタン (アクションシートを表示)
                 Button(action: {
                     showingAttachSheet = true

@@ -56,6 +56,16 @@ struct ChatMessagesView: View {
                     Text(emptyStateDescription)
                 }
             }
+            
+            // 拡大表示オーバーレイ
+            if let image = executor.previewImage {
+                ImagePreviewOverlay(image: image) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        executor.previewImage = nil
+                    }
+                }
+                .zIndex(100)
+            }
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }

@@ -44,9 +44,9 @@ struct ContentView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
+    init(serverManager: ServerManager, executor: CommandExecutor, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
         self.serverManager = serverManager
-        self.executor = CommandExecutor(serverManager: serverManager)
+        self.executor = executor
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
@@ -282,6 +282,7 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
+    let previewExecutor = CommandExecutor(serverManager: previewServerManager)
+    ContentView(serverManager: previewServerManager, executor: previewExecutor, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
         .environmentObject(RefreshTrigger())
 }

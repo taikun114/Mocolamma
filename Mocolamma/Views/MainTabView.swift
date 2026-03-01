@@ -76,6 +76,11 @@ struct MainTabView: View {
             .tabItem { Label("Settings", systemImage: "gear") }
             .tag("settings")
         }
+        .onChange(of: selection) { _, _ in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                executor.previewImage = nil
+            }
+        }
         .tabViewStyle(.sidebarAdaptable)
         .inspector(isPresented: isiOSAppOnVision ? .constant(false) : $showingInspector) {
             inspectorContent

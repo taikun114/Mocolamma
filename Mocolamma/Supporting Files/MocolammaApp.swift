@@ -27,6 +27,7 @@ struct MocolammaApp: App {
     @StateObject private var serverManager = ServerManager()
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @StateObject private var imageSettings = ImageGenerationSettings()
+    @State private var executor: CommandExecutor
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
     @State private var showingAddModelsSheet = false
@@ -53,17 +54,21 @@ struct MocolammaApp: App {
         }
     }
     
-#if os(macOS)
     init() {
+        let sm = ServerManager()
+        _serverManager = StateObject(wrappedValue: sm)
+        _executor = State(wrappedValue: CommandExecutor(serverManager: sm))
+#if os(macOS)
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
-    }
 #endif
+    }
     
     var body: some Scene {
         WindowGroup() {
             // ContentViewにrefreshTriggerのPublisherを渡します。
             ContentView(
                 serverManager: serverManager,
+                executor: executor,
                 selection: $selection,
                 showingInspector: $showingInspector,
                 showingAddModelsSheet: $showingAddModelsSheet,
@@ -124,6 +129,34 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
+                
+                Divider()
+                
+                // 画像拡大縮小メニュー
+                Group {
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomIn, object: nil)
+                    }) {
+                        Label("Zoom In", systemImage: "plus.magnifyingglass")
+                    }
+                    .keyboardShortcut("+", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomOut, object: nil)
+                    }) {
+                        Label("Zoom Out", systemImage: "minus.magnifyingglass")
+                    }
+                    .keyboardShortcut("-", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewActualSize, object: nil)
+                    }) {
+                        Label("Actual Size", systemImage: "magnifyingglass")
+                    }
+                    .keyboardShortcut("0", modifiers: .command)
+                }
+                .disabled(executor.previewImage == nil)
+                
                 Divider()
             }
             
@@ -210,6 +243,34 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
+                
+                Divider()
+                
+                // 画像拡大縮小メニュー
+                Group {
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomIn, object: nil)
+                    }) {
+                        Label("Zoom In", systemImage: "plus.magnifyingglass")
+                    }
+                    .keyboardShortcut("+", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomOut, object: nil)
+                    }) {
+                        Label("Zoom Out", systemImage: "minus.magnifyingglass")
+                    }
+                    .keyboardShortcut("-", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewActualSize, object: nil)
+                    }) {
+                        Label("Actual Size", systemImage: "magnifyingglass")
+                    }
+                    .keyboardShortcut("0", modifiers: .command)
+                }
+                .disabled(executor.previewImage == nil)
+                
                 Divider()
             }
             
