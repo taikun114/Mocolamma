@@ -23,6 +23,17 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var successfullyDownloadedIDs: Set<UUID> = []
     var successfullyCopiedIDs: Set<UUID> = []
     var runningModels: [OllamaRunningModel] = []
+    var isDraggingFile: Bool = false
+    
+    // システム全体のドラッグ監視用 (deinitからアクセスできるようnonisolatedに)
+    @ObservationIgnored
+    nonisolated(unsafe) private var dragMonitoringTimer: Timer?
+    @ObservationIgnored
+    private var lastDragPasteboardChangeCount: Int = -1
+    @ObservationIgnored
+    private var dragResetTask: Task<Void, Never>?
+    @ObservationIgnored
+    private var lastDragActivityTime: Date = Date.distantPast
     
     // モデルプル時の進捗状況
     var isPulling: Bool = false
@@ -75,6 +86,108 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         isImageStreaming = imageMessages.firstIndex { $0.isStreaming } != nil
     }
     
+    /// システム全体のファイルドラッグ状態を監視するためのタイマーをセットアップします。
+    private func setupDragMonitoring() {
+        #if os(macOS)
+        // ドラッグ用ペーストボードの監視を開始 (0.1秒ごとにチェック)
+        dragMonitoringTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self else { return }
+                
+                let pb = NSPasteboard(name: .drag)
+                let currentChangeCount = pb.changeCount
+                
+                // ペーストボードの内容が変更された場合
+                if currentChangeCount != self.lastDragPasteboardChangeCount {
+                    self.lastDragPasteboardChangeCount = currentChangeCount
+                    
+                    // ファイルが含まれているか確認
+                    let hasFiles = pb.types?.contains(.fileURL) == true || 
+                                 pb.types?.contains(NSPasteboard.PasteboardType("NSFilenamesPboardType")) == true
+                    
+                    if hasFiles {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            self.isDraggingFile = true
+                        }
+                    }
+                }
+                
+                // マウスボタンが離されている場合は、ドラッグ終了とみなす
+                // NSEvent.pressedMouseButtons はグローバルな状態を取得でき、権限も不要
+                if NSEvent.pressedMouseButtons == 0 {
+                    if self.isDraggingFile {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            self.isDraggingFile = false
+                        }
+                    }
+                }
+            }
+        }
+        #endif
+    }
+    
+    /// ドラッグが開始されたことを通知します。
+    func startDragging() {
+        lastDragActivityTime = Date()
+        if !isDraggingFile {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isDraggingFile = true
+            }
+        }
+        
+        // ウォッチドッグタスクの開始
+        startDragWatchdog()
+    }
+    
+    /// ドラッグのアクティビティ（更新）を通知します。
+    func notifyDragActivity() {
+        lastDragActivityTime = Date()
+    }
+    
+    /// ドラッグが継続しているか監視し、信号が途絶えたらリセットします。
+    private func startDragWatchdog() {
+        dragResetTask?.cancel()
+        dragResetTask = Task {
+            while !Task.isCancelled {
+                // 100ミリ秒ごとにチェック
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                
+                if !Task.isCancelled {
+                    let now = Date()
+                    // 最終アクティビティから2.0秒以上経過していたら終了とみなす
+                    // iOSでは指を止めている間にイベントが途切れることがあるため、長めに設定
+                    if now.timeIntervalSince(lastDragActivityTime) > 2.0 {
+                        await MainActor.run {
+                            if self.isDraggingFile {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    self.isDraggingFile = false
+                                }
+                            }
+                        }
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
+    /// ドラッグが終了した（またはビューから外れた）ことを通知します。
+    func stopDragging(immediate: Bool = false) {
+        if immediate {
+            dragResetTask?.cancel()
+            isDraggingFile = false
+            return
+        }
+        // 非即時の場合はウォッチドッグに任せる
+    }
+    
+    deinit {
+        #if os(macOS)
+        dragMonitoringTimer?.invalidate()
+        dragMonitoringTimer = nil
+        #endif
+    }
+    
     /// デモサーバーかどうかを判定します
     private func isDemoServer() -> Bool {
         guard let host = apiBaseURL else { return false }
@@ -93,6 +206,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         configuration.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
         configuration.timeoutIntervalForResource = opt.overallResourceTimeout
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        
+        // ドラッグ監視のセットアップ (ポーリング方式)
+        setupDragMonitoring()
         
         // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
         serverManager.$servers

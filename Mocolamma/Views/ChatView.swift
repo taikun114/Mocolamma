@@ -125,6 +125,7 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
+        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
         .task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled {
@@ -802,6 +803,7 @@ struct ImageGenerationView: View {
                 imageSettings.selectedModelID = nil
             }
         }
+        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
         .task {
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled {

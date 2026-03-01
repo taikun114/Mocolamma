@@ -6,6 +6,7 @@ import UIKit
 #endif
 
 struct ChatMessagesView: View {
+    @Environment(CommandExecutor.self) var executor
     @Binding var messages: [ChatMessage]
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
@@ -56,6 +57,7 @@ struct ChatMessagesView: View {
                 }
             }
         }
+        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
 }
 

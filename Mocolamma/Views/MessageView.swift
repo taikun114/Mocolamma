@@ -26,6 +26,7 @@ struct MessageView: View {
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
     @State private var draggingItem: ChatInputImage?
+    @State private var isDraggingOver = false
     
     // 保存関連の状態
     @State private var showingSaveOptions = false
@@ -51,11 +52,43 @@ struct MessageView: View {
     }()
     
     var body: some View {
+        @Bindable var executor = executor
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
                 .padding(10)
                 .background(message.role == "user" ? Color.accentColor : Color.gray.opacity(0.1))
                 .cornerRadius(16)
+                .overlay {
+                    if isEditing && isDraggingOver && supportsVision {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.2))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .strokeBorder(Color.white, style: StrokeStyle(lineWidth: 2, dash: [5]))
+                                )
+                            
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title3)
+                                Text("Drop here to add images")
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.white)
+                        }
+                    }
+                }
+                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: supportsVision, onURLsDropped: { urls in
+                    if isEditing && supportsVision {
+                        addImages(from: urls)
+                    }
+                }, onDataDropped: { data in
+                    if isEditing && supportsVision {
+                        addImages(from: data)
+                    }
+                }))
+
                 .lineSpacing(4)
             
             HStack {
@@ -161,27 +194,7 @@ struct MessageView: View {
         ) { result in
             switch result {
             case .success(let urls):
-                Task {
-                    for url in urls {
-                        let data: Data? = if url.startAccessingSecurityScopedResource() {
-                            try? Data(contentsOf: url)
-                        } else {
-                            try? Data(contentsOf: url)
-                        }
-                        
-                        if let urlData = data {
-                            let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
-                            await MainActor.run {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
-                                }
-                            }
-                            url.stopAccessingSecurityScopedResource()
-                            // 少しだけ待機して、左から順に現れるようにする
-                            try? await Task.sleep(nanoseconds: 20_000_000)
-                        }
-                    }
-                }
+                addImages(from: urls)
             case .failure(let error):
                 print("Error picking files: \(error.localizedDescription)")
             }
@@ -203,6 +216,45 @@ struct MessageView: View {
             }
             return Date()
         }())
+    }
+    
+    private func addImages(from urls: [URL]) {
+        Task {
+            for url in urls {
+                let data: Data? = if url.startAccessingSecurityScopedResource() {
+                    try? Data(contentsOf: url)
+                } else {
+                    try? Data(contentsOf: url)
+                }
+                
+                if let urlData = data {
+                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                        }
+                    }
+                    url.stopAccessingSecurityScopedResource()
+                    // 少しだけ待機して、左から順に現れるようにする
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                }
+            }
+        }
+    }
+
+    private func addImages(from data: [Data]) {
+        Task {
+            for urlData in data {
+                let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                    }
+                }
+                // 少しだけ待機して、左から順に現れるようにする
+                try? await Task.sleep(nanoseconds: 20_000_000)
+            }
+        }
     }
     
     @ViewBuilder
@@ -409,10 +461,8 @@ struct MessageView: View {
     
     private func saveToPhotoLibrary() {
         guard let base64String = message.generatedImage,
-              let data = Data(base64Encoded: base64String),
-              let image = PlatformImage(data: data) else { return }
+              let data = Data(base64Encoded: base64String) else { return }
         
-#if os(macOS)
         PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
             guard status == .authorized || status == .limited else {
                 print("Photos access denied: \(status)")
@@ -439,13 +489,6 @@ struct MessageView: View {
                 print("Failed to create temp file for Photos: \(error.localizedDescription)")
             }
         }
-#else
-        let imageSaver = ImageSaver()
-        imageSaver.onSuccess = {
-            showSuccessFeedback()
-        }
-        imageSaver.writeToPhotoAlbum(image: image)
-#endif
     }
     
     private func prepareForFileSave() {
@@ -715,7 +758,7 @@ struct MessageView: View {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem))
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
                         }
                         
                         // 画像追加タイル (ビジョン対応モデルが選択されている場合のみ表示)

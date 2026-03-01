@@ -3,6 +3,7 @@ import PhotosUI
 import UniformTypeIdentifiers
 
 struct MessageInputView: View {
+    @Environment(CommandExecutor.self) var executor
     @FocusState private var isInputFocused: Bool
     @Binding var inputText: String
     @Binding var selectedImages: [ChatInputImage]
@@ -18,11 +19,13 @@ struct MessageInputView: View {
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
     @State private var draggingItem: ChatInputImage?
+    @State private var isDraggingOver = false
     
     var body: some View {
+        @Bindable var executor = executor
         VStack(alignment: .leading, spacing: 8) {
             // 画像プレビュー
-            if !selectedImages.isEmpty {
+            if !selectedImages.isEmpty || (executor.isDraggingFile && selectedModel?.supportsVision == true) {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(selectedImages) { imageContainer in
@@ -62,13 +65,37 @@ struct MessageInputView: View {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem))
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
                         }
                     }
                     .padding(.horizontal, 4)
                 }
                 .frame(height: 76)
                 .scrollClipDisabled()
+                .overlay {
+                    if executor.isDraggingFile && selectedModel?.supportsVision == true {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.accentColor.opacity(0.15))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [5]))
+                                )
+                                .background(isDraggingOver ? Color.accentColor.opacity(0.1) : Color.clear)
+                            
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title3)
+                                Text("Drop here to add images")
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.accentColor)
+                        }
+                        .padding(.top, 8)
+                        .padding(.horizontal, 4)
+                    }
+                }
             }
             
             HStack(alignment: .bottom) {
@@ -253,6 +280,11 @@ struct MessageInputView: View {
             }
         }
         .background(Color.clear)
+        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $selectedImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: selectedModel?.supportsVision ?? false, onURLsDropped: { urls in
+            addImages(from: urls)
+        }, onDataDropped: { data in
+            addImages(from: data)
+        }))
         // 各種ピッカーのモディファイア
         .sheet(isPresented: $showingPhotoPicker) {
             PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $selectedImages)
@@ -268,29 +300,48 @@ struct MessageInputView: View {
         ) { result in
             switch result {
             case .success(let urls):
-                Task {
-                    for url in urls {
-                        let data: Data? = if url.startAccessingSecurityScopedResource() {
-                            try? Data(contentsOf: url)
-                        } else {
-                            try? Data(contentsOf: url)
-                        }
-                        
-                        if let urlData = data {
-                            let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
-                            await MainActor.run {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
-                                }
-                            }
-                            url.stopAccessingSecurityScopedResource()
-                            // 少しだけ待機して、左から順に現れるようにする
-                            try? await Task.sleep(nanoseconds: 20_000_000)
-                        }
-                    }
-                }
+                addImages(from: urls)
             case .failure(let error):
                 print("Error picking files: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func addImages(from urls: [URL]) {
+        Task {
+            for url in urls {
+                let data: Data? = if url.startAccessingSecurityScopedResource() {
+                    try? Data(contentsOf: url)
+                } else {
+                    try? Data(contentsOf: url)
+                }
+                
+                if let urlData = data {
+                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                        }
+                    }
+                    url.stopAccessingSecurityScopedResource()
+                    // 少しだけ待機して、左から順に現れるようにする
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                }
+            }
+        }
+    }
+
+    private func addImages(from data: [Data]) {
+        Task {
+            for urlData in data {
+                let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                    }
+                }
+                // 少しだけ待機して、左から順に現れるようにする
+                try? await Task.sleep(nanoseconds: 20_000_000)
             }
         }
     }
