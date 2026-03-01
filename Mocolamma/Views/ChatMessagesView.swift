@@ -5,6 +5,17 @@ import AppKit
 import UIKit
 #endif
 
+struct ContainerHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 600
+}
+
+extension EnvironmentValues {
+    var containerHeight: CGFloat {
+        get { self[ContainerHeightKey.self] }
+        set { self[ContainerHeightKey.self] = newValue }
+    }
+}
+
 struct ChatMessagesView: View {
     @Environment(CommandExecutor.self) var executor
     @Binding var messages: [ChatMessage]
@@ -37,35 +48,38 @@ struct ChatMessagesView: View {
     }
     
     var body: some View {
-        ZStack {
-            ChatMessagesScrollView(
-                messages: $messages,
-                onRetry: onRetry,
-                isOverallStreaming: $isOverallStreaming,
-                isModelSelected: isModelSelected,
-                supportsEffects: supportsEffects,
-                reduceMotionEnabled: reduceMotionEnabled,
-                isUsingSafeAreaBar: isUsingSafeAreaBar
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            if messages.isEmpty {
-                ContentUnavailableView {
-                    Label(emptyStateTitle, systemImage: emptyStateImage)
-                } description: {
-                    Text(emptyStateDescription)
-                }
-            }
-            
-            // 拡大表示オーバーレイ
-            if let image = executor.previewImage {
-                ImagePreviewOverlay(image: image) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        executor.previewImage = nil
+        GeometryReader { geometry in
+            ZStack {
+                ChatMessagesScrollView(
+                    messages: $messages,
+                    onRetry: onRetry,
+                    isOverallStreaming: $isOverallStreaming,
+                    isModelSelected: isModelSelected,
+                    supportsEffects: supportsEffects,
+                    reduceMotionEnabled: reduceMotionEnabled,
+                    isUsingSafeAreaBar: isUsingSafeAreaBar
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                if messages.isEmpty {
+                    ContentUnavailableView {
+                        Label(emptyStateTitle, systemImage: emptyStateImage)
+                    } description: {
+                        Text(emptyStateDescription)
                     }
                 }
-                .zIndex(100)
+                
+                // 拡大表示オーバーレイ
+                if let image = executor.previewImage {
+                    ImagePreviewOverlay(image: image) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            executor.previewImage = nil
+                        }
+                    }
+                    .zIndex(100)
+                }
             }
+            .environment(\.containerHeight, geometry.size.height)
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }

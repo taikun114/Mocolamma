@@ -20,6 +20,7 @@ struct MessageView: View {
     @State private var showingVisionWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.containerHeight) private var containerHeight
     
     // 編集用画像の状態
     @State private var editingImages: [ChatInputImage] = []
@@ -920,9 +921,13 @@ struct MessageView: View {
                 if let base64String = message.generatedImage,
                    let data = Data(base64Encoded: base64String),
                    let image = PlatformImage(data: data) {
+                    let ratio = image.size.width / image.size.height
+                    let limitedHeight = containerHeight * 0.7
+                    
                     Image(platformImage: image)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .aspectRatio(ratio, contentMode: .fit)
+                        .frame(maxWidth: limitedHeight * ratio, maxHeight: limitedHeight)
                         .cornerRadius(8)
                         .contentShape(Rectangle())
                         .onTapGesture {
