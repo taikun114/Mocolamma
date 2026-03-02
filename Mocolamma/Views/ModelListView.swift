@@ -36,6 +36,7 @@ struct ModelListView: View {
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
     
     @Binding var showingAddSheet: Bool // モデル追加シートの表示/非表示を制御するバインディング
+    @Binding var selectedFilterTag: String? // フィルター状態をバインディングで受け取ります
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -47,8 +48,6 @@ struct ModelListView: View {
     @State private var sortCriterion: SortCriterion = .number
     @State private var sortOrderOption: SortOrder = .ascending
     
-    // MARK: - Filtering State
-    @State private var selectedFilterTag: String? = nil
     
     // 利用可能な全てのタグ（能力）を抽出して指定された順序でソートしたリスト
     private var availableTags: [String] {
@@ -584,6 +583,7 @@ struct PullProgressView: View {
         selectedModel: .constant(nil), // ダミーのBinding<OllamaModel.ID?>
         sortOrder: .constant([.init(\.originalIndex, order: .forward)]), // ダミーのBinding<[KeyPathComparator<OllamaModel>]>
         showingAddSheet: .constant(false), // ダミーのBinding<Bool>
+        selectedFilterTag: .constant(nil), // ダミーのBinding<String?>
         showingDeleteConfirmation: .constant(false), // ダミーのBinding<Bool>
         modelToDelete: .constant(nil), // ダミーのBinding<OllamaModel?>
         isSelected: true, // ダミーのisSelected

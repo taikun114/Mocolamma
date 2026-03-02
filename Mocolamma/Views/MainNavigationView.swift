@@ -9,6 +9,7 @@ struct MainNavigationView: View {
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var selectedFilterTag: String?
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
@@ -34,6 +35,7 @@ struct MainNavigationView: View {
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
                 sortOrder: $sortOrder,
+                selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
@@ -47,7 +49,8 @@ struct MainNavigationView: View {
                 sortedModels: sortedModels,
                 selectedServerForInspector: selectedServerForInspector,
                 serverManager: serverManager,
-                showingInspector: $showingInspector
+                showingInspector: $showingInspector,
+                selectedFilterTag: $selectedFilterTag
             )
             .inspectorColumnWidth(min: 250, ideal: 250, max: 300)
         }

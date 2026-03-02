@@ -11,6 +11,7 @@ struct MainTabView: View {
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var selectedFilterTag: String?
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
@@ -37,6 +38,7 @@ struct MainTabView: View {
                     selectedModel: $selectedModel,
                     sortOrder: $sortOrder,
                     showingAddSheet: $showingAddModelsSheet,
+                    selectedFilterTag: $selectedFilterTag,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
                     isSelected: selection == "models",
@@ -123,7 +125,8 @@ struct MainTabView: View {
             sortedModels: sortedModels,
             selectedServerForInspector: selectedServerForInspector,
             serverManager: serverManager,
-            showingInspector: $showingInspector
+            showingInspector: $showingInspector,
+            selectedFilterTag: $selectedFilterTag
         )
         .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
     }

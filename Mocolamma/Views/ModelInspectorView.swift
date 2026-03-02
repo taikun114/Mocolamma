@@ -13,6 +13,7 @@ struct ModelInspectorView: View {
     let fetchedCapabilities: [String]?
     let licenseBody: String?
     let licenseLink: String?
+    @Binding var selectedFilterTag: String?
     
     @State private var showingLicenseSheet = false
     
@@ -98,6 +99,8 @@ struct ModelInspectorView: View {
     private func tagView(for capability: String) -> some View {
         let displayText: String
         let iconName: String
+        let isSelected = selectedFilterTag == capability
+        
         switch capability.lowercased() {
         case "completion":
             displayText = String(localized: "Completion")
@@ -121,16 +124,44 @@ struct ModelInspectorView: View {
             displayText = capability
             iconName = "tag"
         }
-        return HStack(spacing: 4) {
-            Image(systemName: iconName)
-            Text(displayText)
+        
+        return Button(action: {
+            if selectedFilterTag == capability {
+                selectedFilterTag = nil
+            } else {
+                selectedFilterTag = capability
+            }
+        }) {
+            HStack(spacing: 4) {
+                Image(systemName: iconName)
+                Text(displayText)
+            }
+            .font(.caption)
+            .bold()
+#if os(iOS)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+#else
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+#endif
+            .background(Capsule().fill(Color.accentColor.opacity(isSelected ? 0.3 : 0.2)))
+            .foregroundColor(.accentColor)
+            .overlay(
+                Capsule()
+                    .stroke(Color.accentColor, lineWidth: isSelected ? 2 : 0)
+            )
         }
-        .font(.caption)
-        .bold()
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Capsule().fill(Color.accentColor.opacity(0.2)))
-        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+        .onHover { inside in
+#if os(macOS)
+            if inside {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+#endif
+        }
     }
     
     var body: some View {

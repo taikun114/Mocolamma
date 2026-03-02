@@ -34,6 +34,9 @@ struct ContentView: View {
         .init(\.originalIndex, order: .forward)
     ]
     
+    // フィルター状態を保持するState変数
+    @State private var selectedFilterTag: String? = nil
+    
     // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)
@@ -71,6 +74,7 @@ struct ContentView: View {
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
                 sortOrder: $sortOrder,
+                selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
@@ -86,6 +90,7 @@ struct ContentView: View {
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
                 sortOrder: $sortOrder,
+                selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,

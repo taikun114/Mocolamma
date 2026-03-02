@@ -13,6 +13,7 @@ struct InspectorContentView: View {
     let selectedServerForInspector: ServerInfo?
     @ObservedObject var serverManager: ServerManager
     @Binding var showingInspector: Bool
+    @Binding var selectedFilterTag: String?
     
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @FocusState private var isSystemPromptFocused: Bool
@@ -49,7 +50,7 @@ struct InspectorContentView: View {
             if selection == "models" {
                 if let selectedModelID = selectedModel,
                    let model = sortedModels.first(where: { $0.id == selectedModelID }) {
-                    ModelInspectorDetailView(model: model)
+                    ModelInspectorDetailView(model: model, selectedFilterTag: $selectedFilterTag)
                         .id(model.id)
                 } else {
                     Text("Select a model to see the details.")

@@ -8,6 +8,7 @@ struct MainContentDetailView: View {
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
+    @Binding var selectedFilterTag: String?
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
@@ -22,6 +23,7 @@ struct MainContentDetailView: View {
                         selectedModel: $selectedModel,
                         sortOrder: $sortOrder,
                         showingAddSheet: $showingAddModelsSheet,
+                        selectedFilterTag: $selectedFilterTag,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         modelToDelete: $modelToDelete,
                         isSelected: sidebarSelection == "models",
