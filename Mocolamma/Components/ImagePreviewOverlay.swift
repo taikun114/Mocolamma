@@ -59,6 +59,7 @@ struct ImagePreviewOverlay: View {
         ZStack {
             // 背景（クリックで閉じる）
             Color.black.opacity(0.8)
+                .contentShape(Rectangle())
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     onClose()
@@ -75,6 +76,9 @@ struct ImagePreviewOverlay: View {
                 }
             }
             .edgesIgnoringSafeArea(.all)
+            .onTapGesture {
+                onClose()
+            }
             #endif
             
             // 拡大画像
