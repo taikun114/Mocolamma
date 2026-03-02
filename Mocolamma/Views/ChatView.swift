@@ -242,28 +242,40 @@ struct ChatView: View {
             .disabled(executor.isRunning)
             
             Menu {
-                Picker("Select Model", selection: $chatSettings.selectedModelID) {
-                    Text("Select Model").tag(nil as OllamaModel.ID?)
-                    ForEach(executor.models.filter { $0.supportsCompletion }) { model in
-                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                        HStack {
-                            Text(model.name)
-                            if isRunning {
-                                Image(systemName: "tray.and.arrow.down")
-                            }
-                        }
-                        .tag(model.id as OllamaModel.ID?)
+                Section {
+                    Picker("Select Model", selection: $chatSettings.selectedModelID) {
+                        Text("Select Model").tag(nil as OllamaModel.ID?)
                     }
-                    if executor.models.filter({ $0.supportsCompletion }).isEmpty {
-                        Divider()
-                        Text(LocalizedStringKey("No models available"))
-                            .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる
-                            .selectionDisabled(true)
+                    .pickerStyle(.inline)
+                }
+                
+                Section {
+                    Picker("Models", selection: $chatSettings.selectedModelID) {
+                        ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                            HStack {
+                                Text(model.name)
+                                if isRunning {
+                                    Image(systemName: "tray.and.arrow.down")
+                                }
+                            }
+                            .tag(model.id as OllamaModel.ID?)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                }
+                
+                if executor.models.filter({ $0.supportsCompletion }).isEmpty {
+                    Section {
+                        Button(action: {}) {
+                            Text(LocalizedStringKey("No models available"))
+                        }
+                        .disabled(true)
                     }
                 }
-                .pickerStyle(.inline)
             } label: {
-                Image(systemName: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+                let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
+                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
 #else // macOS
@@ -871,28 +883,40 @@ struct ImageGenerationView: View {
             .disabled(executor.isRunning)
             
             Menu {
-                Picker("Select Model", selection: $imageSettings.selectedModelID) {
-                    Text("Select Model").tag(nil as OllamaModel.ID?)
-                    ForEach(executor.models.filter { $0.isImageModel }) { model in
-                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                        HStack {
-                            Text(model.name)
-                            if isRunning {
-                                Image(systemName: "tray.and.arrow.down")
-                            }
-                        }
-                        .tag(model.id as OllamaModel.ID?)
+                Section {
+                    Picker("Select Model", selection: $imageSettings.selectedModelID) {
+                        Text("Select Model").tag(nil as OllamaModel.ID?)
                     }
-                    if executor.models.filter({ $0.isImageModel }).isEmpty {
-                        Divider()
-                        Text(LocalizedStringKey("No models available"))
-                            .tag("no-image-models-available-tag" as OllamaModel.ID?)
-                            .selectionDisabled(true)
+                    .pickerStyle(.inline)
+                }
+                
+                Section {
+                    Picker("Models", selection: $imageSettings.selectedModelID) {
+                        ForEach(executor.models.filter { $0.isImageModel }) { model in
+                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                            HStack {
+                                Text(model.name)
+                                if isRunning {
+                                    Image(systemName: "tray.and.arrow.down")
+                                }
+                            }
+                            .tag(model.id as OllamaModel.ID?)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                }
+                
+                if executor.models.filter({ $0.isImageModel }).isEmpty {
+                    Section {
+                        Button(action: {}) {
+                            Text(LocalizedStringKey("No models available"))
+                        }
+                        .disabled(true)
                     }
                 }
-                .pickerStyle(.inline)
             } label: {
-                Image(systemName: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+                let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
+                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
 #else
