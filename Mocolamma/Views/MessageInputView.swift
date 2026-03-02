@@ -173,7 +173,7 @@ struct MessageInputView: View {
                         .textFieldStyle(.plain)
                         .disabled(selectedModel == nil)
                         .onChange(of: selectedModel) { _, model in
-                            if model != nil && !showingInspector { isInputFocused = true }
+                            if model != nil { isInputFocused = true }
                         }
                         .lineLimit(1...10)
                         .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる

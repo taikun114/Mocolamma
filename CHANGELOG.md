@@ -52,6 +52,7 @@ Notes
 - **Fix to display image model details correctly**
 - **Fix issue where model screen could be refreshed during model download**
 - **Fix issue where the chat screen would freeze while scrolling**
+- **Fix issue where selecting a model while the Inspector is open does not focus the input field**
 - **Fix issue where the scroll edge effect might not display correctly in chat and image generation screens on macOS**
   - Fixed an issue where, on macOS 26.0 or later, the scroll edge effect on the toolbar would display incorrectly (appearing as a hard style instead of a soft style) when showing the Chat or Image Generation screen, until the Inspector was opened/closed or the window size was changed. The beautiful blur effect now displays correctly.
 - **Improve the Inspector button icon to display a more understandable one**
