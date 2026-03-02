@@ -25,13 +25,16 @@ Notes
 - **Revamping the Markdown rendering engine**
   - The Markdown rendering engine for chat has been updated from [**MarkdownUI**](https://github.com/gonzalezreal/swift-markdown-ui) to [**Textual**](https://github.com/gonzalezreal/textual), incorporating improvements such as enhanced performance and syntax highlighting for code blocks, resulting in a more user-friendly experience.
   - As a result, Mocolamma now requires **iOS / iPadOS 18.0 or later, macOS 15.0 or later, visionOS 2.0 or later**. Please note that users on older operating systems will need to perform a software update.
+- **Support for attaching images in chat**
+  - Models with image recognition capabilities now allow you to attach images to receive responses. For image file compatibility, attached images are converted to PNG format and large images are resized to a maximum of 2048px × 2048px before being sent to the API.
+  - Attached images can be rearranged by dragging and dropping them, and you can also drag and drop image files from other apps to attach them.
 - **Support for Ollama's image generation feature (beta)**
   - As Ollama's image generation feature is currently in beta, future Ollama updates may introduce changes to its functionality (Ollama API), potentially causing the image generation feature to stop working in Mocolamma.
   - A demo of the image generation feature is available. Select `demo-image:0b` as the image generation model and send any prompt. This will perform a simulation advancing 0.2 seconds per step, finally outputting a test image.
 - **Support image model tag**
   - Image model tag is now correctly displayed in the model inspector.
-- **Add model download simulation in demo mode**
-  - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
+- **Add Image Preview feature**
+  - You can preview attached images or generated images in a large enlarged view.
 - **Add an unload model button to the server screen inspector**
   - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
 - **Add a Keep Alive option to the chat and image generation screen inspectors**
@@ -40,40 +43,44 @@ Notes
   - This enables reproducible generation.
 - **Add many advanced options to custom settings for chat**
   - For advanced users who want to tweak model behavior and conduct tests, added the following options: “Seed,” “Repeat Last N,” “Repeat Penalty,” “Num Predict,” “Top-k,” “Top-p,” and “Min-p.”
+- **Add model download simulation in demo mode**
+  - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
 - **Add Arabic (`ar`), Chinese (Hong Kong) (`zh-HK`), Chinese (Simplified) (`zh-Hans`), Chinese (Traditional) (`zh-Hant`), Korean (`ko`), Russian (`ru`), Ukrainian (`uk`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
 ### Bug Fixes and Improvements
 - **Fix to display image model details correctly**
+- **Fix issue where model screen could be refreshed during model download**
 - **Fix issue where the chat screen would freeze while scrolling**
 - **Fix issue where the scroll edge effect might not display correctly in chat and image generation screens on macOS**
   - Fixed an issue where, on macOS 26.0 or later, the scroll edge effect on the toolbar would display incorrectly (appearing as a hard style instead of a soft style) when showing the Chat or Image Generation screen, until the Inspector was opened/closed or the window size was changed. The beautiful blur effect now displays correctly.
-- **Fix issue where model screen could be refreshed during model download**
-- **Improve to show an error when selecting an image-only model in the chat screen**
+- **Improve the Inspector button icon to display a more understandable one**
+  - When the inspector is displayed in sheet style (e.g., on iPhone or iPad in compact view), the `info.circle` icon is now shown. When displayed in sidebar style, it remains unchanged.
+- **Improve API timeout alert messages**
+  - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
+- **Improve the appearance of swipe actions**
+  - When swiping a list item on the server and model screens, the action displayed now always shows only the icon, regardless of the item's height.
 - **Improve to prevent the add server and model sheet from closing when swiping down on iOS / iPadOS**
 - **Improve the style of the Add and Complete buttons on the add server and model sheet on iOS / iPadOS 26**
   - The Complete button now uses the system native design, and the Add button now uses a design very close to the system native design.
-- **Improve to display an action sheet requesting confirmation on the New Chat button**
-- **Improve the Inspector button icon to display a more understandable one**
-  - When the inspector is displayed in sheet style (e.g., on iPhone or iPad in compact view), the `info.circle` icon is now shown. When displayed in sidebar style, it remains unchanged.
-- **Improve message bubble display on iOS / iPadOS when the display size is large**
-  - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
-- **Improve to display a checkmark icon when message copying is successful**
+- **Improve download progress display performance on the model screen**
+- **Improve tag display in the model inspector**
 - **Improve the model inspector to display a specific license when a license title is missing but the license body exists**
   - If the license body contains `MIT License`, it will display `MIT License` as the license title. If the license body contains both `Apache License` and `Version 2.0`, it will display `Apache License 2.0` as the license title.
-- **Improve API timeout alert messages**
-  - Added an advisory message about changing the timeout duration in settings when loading large models takes a long time.
-- **Improve to display the language above the code block**
-- **Improve download progress display performance on the model screen**
 - **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
-- **Improve tag display in the model inspector**
+- **Improve the appearance of the model picker in the chat screen and image generation screen on iOS / iPadOS**
+  - A divider line has been added between options, and model names are now displayed when the model picker is within an overflow menu.
+- **Improve to show an error when selecting an image-only model in the chat screen**
+- **Improve to display an action sheet requesting confirmation on the New Chat button**
+- **Improve message bubble display on iOS / iPadOS when the display size is large**
+  - When using an iPad with a wider window or a large-screen iPhone in landscape mode, message bubbles now have a slightly reduced maximum width just like on macOS, making them easier to read.
+- **Improve to display a checkmark icon when message copying is successful**
+- **Improve to display the language above the code block**
 - **Improve the chat screen to enhance error handling**
-- **Improve the appearance of swipe actions**
-  - When swiping a list item on the server and model screens, the action displayed now always shows only the icon, regardless of the item's height.
-- **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 - **Add an icon to the refresh button in the context menu for the number of running models in the server inspector**
+- **Add filtering to the model picker in the chat screen to prevent models that do not support chat from being displayed**
 
 ## 1.1.0
 ### New Features
