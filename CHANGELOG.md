@@ -37,6 +37,8 @@ Notes
   - You can preview attached images or generated images in a large enlarged view.
 - **Add an unload model button to the server screen inspector**
   - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
+- **Add a tag filter to the model screen**
+  - This makes it easier to find models that support specific capabilities.
 - **Add a Keep Alive option to the chat and image generation screen inspectors**
   - This allows you to specify how long the model is kept in memory on the Ollama server.
 - **Add a Seed option to the chat and image generation screen inspectors**

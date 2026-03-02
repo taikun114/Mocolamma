@@ -47,10 +47,91 @@ struct ModelListView: View {
     @State private var sortCriterion: SortCriterion = .number
     @State private var sortOrderOption: SortOrder = .ascending
     
+    // MARK: - Filtering State
+    @State private var selectedFilterTag: String? = nil
     
-    // 現在のソート順に基づいてモデルリストを返すComputed Property
+    // 利用可能な全てのタグ（能力）を抽出して指定された順序でソートしたリスト
+    private var availableTags: [String] {
+        let tags = executor.models.compactMap { $0.capabilities }.flatMap { $0 }
+        return Array(Set(tags)).sorted { tag1, tag2 in
+            tagWeight(tag1) < tagWeight(tag2)
+        }
+    }
+    
+    // タグの表示順序を制御するための重み付け
+    private func tagWeight(_ tag: String) -> Int {
+        switch tag.lowercased() {
+        case "completion": return 1
+        case "thinking": return 2
+        case "tools": return 3
+        case "vision": return 4
+        case "embedding": return 5
+        case "image": return 6
+        default: return 100
+        }
+    }
+    
+    // タグの表示名をローカライズして返すヘルパー
+    private func localizedTagName(_ tag: String) -> String {
+        switch tag.lowercased() {
+        case "completion": return String(localized: "Completion")
+        case "vision": return String(localized: "Vision")
+        case "image": return String(localized: "Image")
+        case "embedding": return String(localized: "Embedding")
+        case "tools": return String(localized: "Tools")
+        case "thinking": return String(localized: "Thinking")
+        default: return tag.capitalized
+        }
+    }
+    
+    // タグのアイコン名を返すヘルパー
+    private func tagIconName(_ tag: String) -> String {
+        switch tag.lowercased() {
+        case "completion": return "character.cursor.ibeam"
+        case "vision": return "eye"
+        case "tools": return "wrench.and.screwdriver"
+        case "thinking": return "brain.filled.head.profile"
+        case "embedding": return "square.stack.3d.up"
+        case "image": return "photo"
+        default: return "tag"
+        }
+    }
+    
+    // 現在のフィルター状態に基づいたアイコン名を返す
+    private var filterIconName: String {
+        if let tag = selectedFilterTag {
+            return tagIconName(tag)
+        }
+        return "line.3.horizontal.decrease"
+    }
+    
+    // ソート項目のアイコン名を返す
+    private func criterionIconName(_ criterion: SortCriterion) -> String {
+        switch criterion {
+        case .name: return "textformat"
+        case .number: return "textformat.numbers"
+        case .size: return "internaldrive"
+        case .date: return "calendar"
+        }
+    }
+    
+    // ソート順序のアイコン名を返す
+    private func orderIconName(_ order: SortOrder) -> String {
+        switch order {
+        case .ascending: return "chevron.down.2"
+        case .descending: return "chevron.up.2"
+        }
+    }
+    
+    // 現在のソート順とフィルターに基づいてモデルリストを返すComputed Property
     var sortedModels: [OllamaModel] {
-        let models = executor.models
+        var models = executor.models
+        
+        // フィルタリング適用
+        if let filter = selectedFilterTag {
+            models = models.filter { $0.capabilities?.contains(filter) ?? false }
+        }
+        
         let ascending = sortOrderOption == .ascending
         
         switch sortCriterion {
@@ -97,6 +178,20 @@ struct ModelListView: View {
     private var modelToolbarContent: some ToolbarContent {
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
+            Menu {
+                Picker("Filter", selection: $selectedFilterTag) {
+                    Label("All Models", systemImage: "tray.full").tag(nil as String?)
+                    ForEach(availableTags, id: \.self) { tag in
+                        Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Label("Filter", systemImage: filterIconName)
+            }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+        }
+        ToolbarItem(placement: .primaryAction) {
             Button(action: {
                 appRefreshTrigger.send()
             }) {
@@ -110,16 +205,30 @@ struct ModelListView: View {
         ToolbarItem(placement: .primaryAction) {
             Menu {
                 Picker("Sort by", selection: $sortCriterion) {
-                    ForEach(SortCriterion.allCases) {
-                        criterion in
-                        Text(LocalizedStringKey(criterion.rawValue)).tag(criterion)
+                    ForEach(SortCriterion.allCases) { criterion in
+                        Label(LocalizedStringKey(criterion.rawValue), systemImage: criterionIconName(criterion)).tag(criterion)
                     }
                 }
+                
                 Divider()
+                
+                Menu {
+                    Picker("Filter", selection: $selectedFilterTag) {
+                        Label("All Models", systemImage: "tray.full").tag(nil as String?)
+                        ForEach(availableTags, id: \.self) { tag in
+                            Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                } label: {
+                    Label("Filter", systemImage: filterIconName)
+                }
+                
+                Divider()
+                
                 Picker("Order", selection: $sortOrderOption) {
-                    ForEach(SortOrder.allCases) {
-                        order in
-                        Text(LocalizedStringKey(order.rawValue)).tag(order)
+                    ForEach(SortOrder.allCases) { order in
+                        Label(LocalizedStringKey(order.rawValue), systemImage: orderIconName(order)).tag(order)
                     }
                 }
             } label: {

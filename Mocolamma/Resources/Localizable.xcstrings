@@ -1690,6 +1690,12 @@
             "value" : "Tatsächliche Größe"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actual Size"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2896,6 +2902,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "調整 Top-k 的值"
+          }
+        }
+      }
+    },
+    "All Models" : {
+      "comment" : "すべてのモデルを選択するためのオプション。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كل النماذج"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Modelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Models"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los modelos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les modèles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのモデル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 모델"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все модели"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усі моделі"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有模型"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有模型"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有模型"
           }
         }
       }
@@ -12623,6 +12706,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在從演示伺服器取得模型…"
+          }
+        }
+      }
+    },
+    "Filter" : {
+      "comment" : "フィルターメニューやセクションのラベル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصفية"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルター"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "필터"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтр"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фільтр"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "筛选"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "篩選"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "篩選"
           }
         }
       }
@@ -24257,6 +24417,12 @@
             "value" : "Senden"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -27024,6 +27190,12 @@
             "value" : "Das ausgewählte Modell \"%@\" unterstützt keine Bilderkennung, daher werden keine Bilder gesendet. Sind Sie sicher, dass Sie es so senden möchten?"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model \"%@\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -27092,6 +27264,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Das ausgewählte Modell unterstützt keine Bilderkennung, daher werden keine Bilder gesendet. Sind Sie sicher, dass Sie es so senden möchten?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?"
           }
         },
         "es" : {
@@ -27781,6 +27959,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dieses Modell unterstützt keine Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This model does not support images"
           }
         },
         "es" : {
@@ -29401,6 +29585,12 @@
             "value" : "Vergrößern"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom In"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29469,6 +29659,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verkleinern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom Out"
           }
         },
         "es" : {
