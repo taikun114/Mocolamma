@@ -776,9 +776,19 @@ struct InspectorContentView: View {
     private func keepAlivePicker(option: Binding<KeepAliveOption>, customValue: Binding<Int>, customUnit: Binding<KeepAliveUnit>) -> some View {
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Picker("Keep Alive", selection: option) {
-                ForEach(KeepAliveOption.allCases) { opt in
+                Text(KeepAliveOption.default.localizedName)
+                    .tag(KeepAliveOption.default)
+                
+                Divider()
+                
+                ForEach(KeepAliveOption.allCases.filter { $0 != .default && $0 != .custom }) { opt in
                     Text(opt.localizedName).tag(opt)
                 }
+                
+                Divider()
+                
+                Text(KeepAliveOption.custom.localizedName)
+                    .tag(KeepAliveOption.custom)
             }
             .pickerStyle(.menu)
             
