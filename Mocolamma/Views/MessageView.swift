@@ -116,8 +116,9 @@ struct MessageView: View {
                         if message.role == "user" { Spacer() }
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
                         if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
+                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) && !message.isImageGeneration { copyButton }
+                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
                         if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
                             if isEditing {
                                 cancelButton
@@ -148,12 +149,16 @@ struct MessageView: View {
                         retryButton
                     }
                     
+                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
+                        copyButton
+                    }
+
                     if message.isImageGeneration && message.generatedImage != nil {
                         downloadButton
                     }
-                    
-                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) && !message.isImageGeneration {
-                        copyButton
+
+                    if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
+                        shareButton
                     }
                     
                     if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
@@ -539,22 +544,30 @@ struct MessageView: View {
     @ViewBuilder
     private var copyButton: some View {
         Button(action: {
+            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+                copyImageToClipboard(image: image)
+            } else {
 #if os(macOS)
-            let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            var contentToCopy = message.content
-            if let thinking = message.thinking, !thinking.isEmpty {
-                contentToCopy = "<think>\(thinking)</think>\n" + message.content
-            }
-            pasteboard.setString(contentToCopy, forType: .string)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                var contentToCopy = message.content
+                if let thinking = message.thinking, !thinking.isEmpty {
+                    contentToCopy = "<think>\(thinking)</think>\n" + contentToCopy
+                } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                    contentToCopy = "<think>\(finalThinking)</think>\n" + contentToCopy
+                }
+                pasteboard.setString(contentToCopy, forType: .string)
 #else
-            var contentToCopy = message.content
-            if let thinking = message.thinking, !thinking.isEmpty {
-                contentToCopy = "<think>\(thinking)</think>\n" + message.content
-            }
-            UIPasteboard.general.string = contentToCopy
+                var contentToCopy = message.content
+                if let thinking = message.thinking, !thinking.isEmpty {
+                    contentToCopy = "<think>\(thinking)</think>\n" + contentToCopy
+                } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                    contentToCopy = "<think>\(finalThinking)</think>\n" + contentToCopy
+                }
+                UIPasteboard.general.string = contentToCopy
 #endif
-            showCopyFeedback()
+                showCopyFeedback()
+            }
         }) {
             Image(systemName: isCopied ? "checkmark" : SFSymbol.copy)
                 .contentShape(Rectangle())
@@ -569,7 +582,43 @@ struct MessageView: View {
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
         .help("Copy")
-        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true))
+        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
+    }
+    
+    private var shareButton: some View {
+        Group {
+            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+                ShareLink(item: Image(platformImage: image), preview: SharePreview(message.content, image: Image(platformImage: image))) {
+                    Image(systemName: "square.and.arrow.up")
+                        .contentShape(Rectangle())
+                        .padding(5)
+                }
+            } else {
+                let shareText: String = {
+                    var content = message.content
+                    if let thinking = message.thinking, !thinking.isEmpty {
+                        content = "<think>\(thinking)</think>\n" + content
+                    } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                        content = "<think>\(finalThinking)</think>\n" + content
+                    }
+                    return content
+                }()
+                ShareLink(item: shareText) {
+                    Image(systemName: "square.and.arrow.up")
+                        .contentShape(Rectangle())
+                        .padding(5)
+                }
+            }
+        }
+#if os(iOS)
+        .font(.body)
+#else
+        .font(.caption2)
+#endif
+        .buttonStyle(.plain)
+        .foregroundColor(.accentColor)
+        .help("Share")
+        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
     }
     
     private func showCopyFeedback() {

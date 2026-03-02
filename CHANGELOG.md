@@ -41,6 +41,8 @@ Notes
   - This allows you to specify how long the model is kept in memory on the Ollama server.
 - **Add a Seed option to the chat and image generation screen inspectors**
   - This enables reproducible generation.
+- **Add a share button below the message bubble in the chat screen and image generation screen**
+  - You can now quickly share the generated results.
 - **Add many advanced options to custom settings for chat**
   - For advanced users who want to tweak model behavior and conduct tests, added the following options: “Seed,” “Repeat Last N,” “Repeat Penalty,” “Num Predict,” “Top-k,” “Top-p,” and “Min-p.”
 - **Add model download simulation in demo mode**
