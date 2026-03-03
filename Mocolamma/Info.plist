@@ -7,6 +7,11 @@
 		<string>_bonjour._tcp</string>
 		<string>_lnp._tcp.</string>
 	</array>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIImageName</key>
