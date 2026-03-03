@@ -76,13 +76,25 @@ struct ChatView: View {
             executor.isChatStreaming = false
             executor.cancelChatStreaming()
         }
+#if !os(visionOS)
         .padding()
+#endif
     }
     
     var body: some View {
         @Bindable var executor = executor
         Group {
-            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+#if os(visionOS)
+            chatContent
+                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                    makeSafeAreaBarContent()
+                        .frame(width: 600)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .glassBackgroundEffect()
+                }
+#elseif os(iOS)
+            if #available(iOS 26.0, *) {
                 chatContent
                     .safeAreaBar(edge: .bottom) {
                         makeSafeAreaBarContent()
@@ -112,6 +124,31 @@ struct ChatView: View {
                     }
                 }
             }
+#else
+            ZStack {
+                chatContent
+                
+                VStack {
+                    Spacer()
+                    
+                    ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+                        sendMessage()
+                    } stopMessage: {
+                        if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                            executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                            executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                            executor.updateIsChatStreaming()
+                        }
+                        executor.isChatStreaming = false
+                        executor.cancelChatStreaming()
+                    }
+                }
+                .padding()
+                .if(horizontalSizeClass != .compact) { view in
+                    view.ignoresSafeArea(.container, edges: [.bottom])
+                }
+            }
+#endif
         }
 #if !os(macOS)
         .onTapGesture {
@@ -809,13 +846,25 @@ struct ImageGenerationView: View {
             executor.isImageStreaming = false
             executor.cancelImageGeneration()
         }
+#if !os(visionOS)
         .padding()
+#endif
     }
     
     var body: some View {
         @Bindable var executor = executor
         Group {
-            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+#if os(visionOS)
+            content
+                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                    makeInputArea()
+                        .frame(width: 600)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .glassBackgroundEffect()
+                }
+#elseif os(iOS)
+            if #available(iOS 26.0, *) {
                 content
                     .safeAreaBar(edge: .bottom) {
                         makeInputArea()
@@ -830,6 +879,16 @@ struct ImageGenerationView: View {
                     }
                 }
             }
+#else
+            ZStack {
+                content
+                
+                VStack {
+                    Spacer()
+                    makeInputArea()
+                }
+            }
+#endif
         }
 #if !os(macOS)
         .onTapGesture {

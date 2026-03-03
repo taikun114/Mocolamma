@@ -78,6 +78,10 @@ struct LicenseInfoModalView: View {
                         Spacer()
                         Button("Close") { dismiss() }
                             .buttonStyle(.borderedProminent)
+#if os(visionOS)
+                            .tint(.accentColor)
+                            .foregroundStyle(.white)
+#endif
                             .controlSize(.large)
                             .keyboardShortcut(.cancelAction)
                             .padding(.horizontal, 16)

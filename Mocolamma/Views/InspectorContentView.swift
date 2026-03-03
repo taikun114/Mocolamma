@@ -474,6 +474,10 @@ struct InspectorContentView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+#if os(visionOS)
+            .tint(.accentColor.opacity(1.0))
+            .foregroundStyle(.white.opacity(1.0))
+#endif
             .controlSize(.small)
             .disabled(imageSettings.customWidthEnabled)
         } else {
@@ -499,6 +503,10 @@ struct InspectorContentView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+#if os(visionOS)
+            .tint(.accentColor.opacity(1.0))
+            .foregroundStyle(.white.opacity(1.0))
+#endif
             .controlSize(.small)
             .disabled(imageSettings.customHeightEnabled)
         } else {

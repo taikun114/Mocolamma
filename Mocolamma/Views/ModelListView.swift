@@ -262,9 +262,18 @@ struct ModelListView: View {
         let copyIconName = SFSymbol.copy
 
         Group {
-    #if !os(macOS)
-            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-                // iOS 26.0 / visionOS 26.0以降：safeAreaBarを使用して進捗を表示（ボケ効果が正常に機能する）
+#if os(visionOS)
+            ModelListContentView(
+                sortedModels: sortedModels,
+                selectedModel: $selectedModel,
+                sortOrder: $sortOrder,
+                modelToDelete: $modelToDelete,
+                showingDeleteConfirmation: $showingDeleteConfirmation,
+                copyIconName: copyIconName
+            )
+#elseif os(iOS)
+            if #available(iOS 26.0, *) {
+                // iOS 26.0以降：safeAreaBarを使用して進捗を表示
                 ModelListContentView(
                     sortedModels: sortedModels,
                     selectedModel: $selectedModel,
@@ -277,8 +286,7 @@ struct ModelListView: View {
                     PullProgressView(executor: executor, isSelected: isSelected)
                 }
             } else {
-
-                // iOS 26.0 / visionOS 26.0未満：VStack内に配置
+                // iOS 26.0未満：VStack内に配置
                 VStack(spacing: 0) {
                     ModelListContentView(
                         sortedModels: sortedModels,
@@ -308,6 +316,19 @@ struct ModelListView: View {
             }
 #endif
         }
+#if os(visionOS)
+        .ornament(
+            visibility: (executor.isPulling || executor.isPullingErrorHold) && isSelected ? .visible : .hidden,
+            attachmentAnchor: .scene(.bottom),
+            contentAlignment: .center
+        ) {
+            PullProgressView(executor: executor, isSelected: isSelected)
+                .frame(width: 600)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .glassBackgroundEffect()
+        }
+#endif
         .overlay(alignment: .center) {
             if serverManager.selectedServer == nil {
                 ContentUnavailableView(
@@ -509,9 +530,11 @@ struct PullProgressView: View {
                         .frame(maxWidth: .infinity, minHeight: 14)
                 }
             }
+#if !os(visionOS)
             .padding(.horizontal, 12)
             .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
             .padding(.bottom, 12)
+#endif
         }
     }
     
@@ -524,6 +547,16 @@ struct PullProgressView: View {
         let progressString = String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
                                     percent as CVarArg, completed as CVarArg, total as CVarArg)
         
+#if os(visionOS)
+        HStack {
+            Text(progressString)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Spacer()
+            if executor.pullSpeedBytesPerSec > 0 {
+                speedAndETASection
+            }
+        }
+#else
         if horizontalSizeClass == .compact {
             VStack(alignment: .leading) {
                 Text(progressString)
@@ -542,6 +575,7 @@ struct PullProgressView: View {
                 }
             }
         }
+#endif
     }
     
     @ViewBuilder
@@ -552,7 +586,11 @@ struct PullProgressView: View {
         let etaSec = eta % 60
         Text(String(format: NSLocalizedString("%@/s, Time Remaining: %02d:%02d", comment: "速度と残り時間表示。ダウンロード速度毎秒, Time Remaining: 分数:秒数"), speedString, etaMin, etaSec))
             .foregroundStyle(.secondary)
+#if os(visionOS)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+#else
             .frame(maxWidth: .infinity, alignment: horizontalSizeClass == .compact ? .leading : .trailing)
+#endif
     }
     
     private func parseError(from output: String) -> String? {

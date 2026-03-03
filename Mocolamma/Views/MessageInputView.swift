@@ -236,7 +236,10 @@ struct MessageInputView: View {
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(8)
-#if !os(visionOS)
+#if os(visionOS)
+                                .background(Circle().fill(Color.accentColor.opacity(1.0)))
+                                .foregroundColor(.white.opacity(1.0))
+#else
                                 .glassEffect(.regular.tint(.accentColor).interactive())
 #endif
                         }
@@ -266,7 +269,10 @@ struct MessageInputView: View {
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(7)
-#if !os(visionOS)
+#if os(visionOS)
+                                .background(Circle().fill(Color.accentColor.opacity(1.0)))
+                                .foregroundColor(.white.opacity(1.0))
+#else
                                 .glassEffect(.regular.tint(.accentColor).interactive())
 #endif
                         }

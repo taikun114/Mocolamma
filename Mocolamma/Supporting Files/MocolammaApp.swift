@@ -82,6 +82,8 @@ struct MocolammaApp: App {
             )
 #if os(macOS)
             .frame(minWidth: 1000, minHeight: 500)
+#elseif os(visionOS)
+            .frame(minWidth: 700, maxWidth: 1200, minHeight: 500, maxHeight: 900)
 #endif
             .environmentObject(appRefreshTrigger)
             .environmentObject(imageSettings)
@@ -94,6 +96,10 @@ struct MocolammaApp: App {
                 AboutView()
             }
         }
+#if os(visionOS)
+        .defaultSize(width: 900, height: 600)
+        .windowResizability(.contentSize)
+#endif
         .commands {
 #if os(macOS)
             CommandGroup(replacing: .appInfo) {
@@ -347,11 +353,13 @@ struct MocolammaApp: App {
             )
             .onAppear { showingInspector = true }
             .onDisappear { showingInspector = false }
+            .frame(minWidth: 350, maxWidth: 600, minHeight: 400, maxHeight: 900)
             .environmentObject(chatSettings)
             .environmentObject(imageSettings)
             .environment(executor)
         }
         .defaultSize(width: 400, height: 600)
+        .windowResizability(.contentSize)
 #endif
     }
 }
