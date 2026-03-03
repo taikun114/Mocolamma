@@ -50,6 +50,22 @@ struct AboutView: View {
         Form {
             Section(header: Text("About Mocolamma").font(.headline)) {
                 HStack(alignment: .center, spacing: 20) {
+#if os(visionOS)
+                    // visionOS用レイヤー構造アイコン
+                    ZStack {
+                        Image("AppIcon/Back/Content")
+                            .resizable()
+                        Image("AppIcon/Middle/Content")
+                            .resizable()
+                        Image("AppIcon/Front/Content")
+                            .resizable()
+                    }
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 96, height: 96)
+                    .clipShape(Circle())
+                    .padding(8)
+                    .padding(.trailing, -8)
+#else
                     if isOS26OrLater {
 #if os(macOS)
                         Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
@@ -84,6 +100,7 @@ struct AboutView: View {
                             .id(colorScheme)
 #endif
                     }
+#endif
                     
                     VStack(alignment: .leading) {
                         VStack(alignment: .leading) {

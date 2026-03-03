@@ -42,11 +42,29 @@ struct LicenseInfoModalView: View {
     private let createDmgVersionString: String = "1.2.2"
     private let openCodeVersionString: String = "0.4.2"
     
+    // スクロール軸の決定
+    private var scrollAxes: Axis.Set {
+#if os(visionOS)
+        return .vertical
+#else
+        return isTextWrapped ? .vertical : [.vertical, .horizontal]
+#endif
+    }
+    
+    // 水平方向の固定解除（折り返し）の決定
+    private var horizontalFixed: Bool {
+#if os(visionOS)
+        return false
+#else
+        return !isTextWrapped
+#endif
+    }
+    
     var body: some View {
 #if os(macOS)
         licenseInfoModalViewContent
             .frame(width: 650, height: 450)
-            .overlay(alignment: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 0) {
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
                         Color.clear
@@ -69,8 +87,8 @@ struct LicenseInfoModalView: View {
                 .frame(height: 60)
             }
 #else
-        NavigationView {
-            licenseInfoModalViewContent
+        NavigationStack {
+            licenseScrollView
                 .navigationTitle("License Information")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -79,6 +97,7 @@ struct LicenseInfoModalView: View {
                             Image(systemName: "xmark")
                         }
                     }
+#if !os(visionOS)
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
                             isTextWrapped.toggle()
@@ -87,16 +106,38 @@ struct LicenseInfoModalView: View {
                             Label("Toggle Text Wrapping", systemImage: "arrow.up.and.down.text.horizontal")
                         }
                     }
+#endif
                 }
         }
+#if os(visionOS)
+        .frame(width: 800, height: 600)
+#endif
         .onAppear {
             isTextWrapped = true
         }
 #endif
     }
     
+    @ViewBuilder
+    private var licenseScrollView: some View {
+        let scrollView = ScrollView(scrollAxes) {
+            licenseInfoModalViewContent
+        }
+        
+#if os(visionOS)
+        if #available(visionOS 26.0, *) {
+            scrollView
+                .scrollInputBehavior(.enabled, for: .look)
+        } else {
+            scrollView
+        }
+#else
+        scrollView
+#endif
+    }
+    
     private var licenseInfoModalViewContent: some View {
-        ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) { // axes を切り替える
+        ScrollView(scrollAxes) { // scrollAxes を使用
             VStack(alignment: .leading) {
                 VStack(alignment: .leading) {
                     Text("Open Source License")
@@ -125,7 +166,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 Divider()
                     .padding(.horizontal)
@@ -171,7 +212,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: CompactSlider
                 VStack(alignment: .leading) {
@@ -210,7 +251,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: Textual
                 VStack(alignment: .leading) {
@@ -249,7 +290,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: Gemini CLI
                 VStack(alignment: .leading) {
@@ -288,7 +329,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: - Qwen Code
                 VStack(alignment: .leading) {
@@ -335,7 +376,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: OpenCode
                 VStack(alignment: .leading) {
@@ -373,7 +414,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: create-dmg
                 VStack(alignment: .leading) {
@@ -412,18 +453,13 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-#if os(macOS)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            Spacer().frame(height: 60)
-        }
-#endif
     }
 }
 
