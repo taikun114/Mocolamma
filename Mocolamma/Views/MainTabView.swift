@@ -19,20 +19,21 @@ struct MainTabView: View {
     @Binding var showingAddModelsSheet: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var modelToDelete: OllamaModel?
-    let sortedModels: [OllamaModel]
-    
+    var sortedModels: [OllamaModel]
     @State private var isInspectorSheetPresented = false
-    
+
     var body: some View {
         TabView(selection: $selection) {
             NavigationStack {
                 ServerView(
                     serverManager: serverManager,
                     executor: executor,
-                    onTogglePreview: { toggleInspector() },
+                    onTogglePreview: toggleInspector,
                     selectedServerForInspector: $selectedServerForInspector
                 )
             }
+            .environmentObject(serverManager)
+            .environment(executor)
             .tabItem { Label("Server", systemImage: "server.rack") }
             .tag("server")
             
@@ -46,7 +47,7 @@ struct MainTabView: View {
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     modelToDelete: $modelToDelete,
                     isSelected: selection == "models",
-                    onTogglePreview: { toggleInspector() }
+                    onTogglePreview: toggleInspector
                 )
             }
             .environmentObject(serverManager)
@@ -110,6 +111,17 @@ struct MainTabView: View {
 #endif
             }
         }
+#if os(visionOS)
+        .ornament(
+            visibility: showingInspector ? .visible : .hidden,
+            attachmentAnchor: .scene(.trailing),
+            contentAlignment: .leading
+        ) {
+            inspectorContent
+                .frame(width: 400, height: 600)
+                .glassBackgroundEffect()
+        }
+#endif
     }
     
     private func toggleInspector() {
@@ -127,11 +139,7 @@ struct MainTabView: View {
                 serverManager.inspectorSelectedModelID = imageSettings.selectedModelID
             }
             
-            if showingInspector {
-                dismissWindow(id: "inspector")
-            } else {
-                openWindow(id: "inspector")
-            }
+            showingInspector.toggle()
         } else if isiOSAppOnVision {
             isInspectorSheetPresented.toggle()
         } else {
@@ -154,9 +162,9 @@ struct MainTabView: View {
             showingInspector: $showingInspector,
             selectedFilterTag: $selectedFilterTag
         )
-#if !os(visionOS)
-        .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
-#endif
+        .environmentObject(chatSettings)
+        .environmentObject(imageSettings)
+        .environment(executor)
     }
     
     private var inspectorTitle: String {

@@ -37,8 +37,8 @@ struct InspectorContentView: View {
     
     private var isCompactLayout: Bool {
 #if os(visionOS)
-        // visionOSでは幅400以下でコンパクトレイアウト（2x2）を適用
-        return inspectorWidth > 0 && inspectorWidth <= 400
+        // visionOSでは常に通常のレイアウト（1x4）を使用する
+        return false
 #elseif os(iOS)
         // iOS（iPad含む）で幅が320未満の場合にコンパクトレイアウト（2x2）を適用
         return inspectorWidth > 0 && inspectorWidth < 320

@@ -339,28 +339,6 @@ struct MocolammaApp: App {
         .defaultSize(width: 500, height: 600)
         .windowResizability(.contentSize)
 #endif
-
-#if os(visionOS)
-        WindowGroup("Inspector", id: "inspector") {
-            InspectorContentView(
-                selection: serverManager.inspectorSelection,
-                selectedModel: $serverManager.inspectorSelectedModelID,
-                sortedModels: executor.models.sorted(using: [KeyPathComparator(\.originalIndex)]),
-                selectedServerForInspector: serverManager.inspectorSelectedServer,
-                serverManager: serverManager,
-                showingInspector: $showingInspector,
-                selectedFilterTag: .constant(nil)
-            )
-            .onAppear { showingInspector = true }
-            .onDisappear { showingInspector = false }
-            .frame(minWidth: 350, maxWidth: 600, minHeight: 400, maxHeight: 900)
-            .environmentObject(chatSettings)
-            .environmentObject(imageSettings)
-            .environment(executor)
-        }
-        .defaultSize(width: 400, height: 600)
-        .windowResizability(.contentSize)
-#endif
     }
 }
 
