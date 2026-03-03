@@ -105,12 +105,20 @@ struct ContentView: View {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 350)
+            .presentationSizing(.fitted)
+#endif
         }
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 300)
+            .presentationSizing(.fitted)
+#endif
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {
