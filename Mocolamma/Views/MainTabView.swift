@@ -5,6 +5,9 @@ import CompactSlider
 @available(macOS 15.0, iOS 18.0, *)
 struct MainTabView: View {
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+    @EnvironmentObject var chatSettings: ChatSettings
+    @EnvironmentObject var imageSettings: ImageGenerationSettings
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     var executor: CommandExecutor
@@ -111,7 +114,24 @@ struct MainTabView: View {
     
     private func toggleInspector() {
         if isNativeVisionOS {
-            openWindow(id: "inspector")
+            // visionOS用：インスペクタに表示する内容を同期
+            serverManager.inspectorSelection = selection
+            serverManager.inspectorSelectedServer = selectedServerForInspector
+            
+            // 選択中の画面に応じてモデルIDを同期
+            if selection == "models" {
+                serverManager.inspectorSelectedModelID = selectedModel
+            } else if selection == "chat" {
+                serverManager.inspectorSelectedModelID = chatSettings.selectedModelID
+            } else if selection == "image_generation" {
+                serverManager.inspectorSelectedModelID = imageSettings.selectedModelID
+            }
+            
+            if showingInspector {
+                dismissWindow(id: "inspector")
+            } else {
+                openWindow(id: "inspector")
+            }
         } else if isiOSAppOnVision {
             isInspectorSheetPresented.toggle()
         } else {

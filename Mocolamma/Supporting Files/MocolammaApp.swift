@@ -342,9 +342,11 @@ struct MocolammaApp: App {
                 sortedModels: executor.models.sorted(using: [KeyPathComparator(\.originalIndex)]),
                 selectedServerForInspector: serverManager.inspectorSelectedServer,
                 serverManager: serverManager,
-                showingInspector: .constant(true),
+                showingInspector: $showingInspector,
                 selectedFilterTag: .constant(nil)
             )
+            .onAppear { showingInspector = true }
+            .onDisappear { showingInspector = false }
             .environmentObject(chatSettings)
             .environmentObject(imageSettings)
             .environment(executor)
