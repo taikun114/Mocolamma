@@ -141,7 +141,7 @@ struct AreaImageDropDelegate: DropDelegate {
 
 // MARK: - PhotoLibraryPicker
 
-#if os(iOS)
+#if !os(macOS)
 struct PhotoLibraryPicker: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     @Binding var selectedImages: [ChatInputImage]

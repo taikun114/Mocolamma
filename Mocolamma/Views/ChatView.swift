@@ -52,7 +52,7 @@ struct ChatView: View {
                 )
             } else {
                 // OSバージョン26以降かどうかの条件分岐
-                if #available(iOS 26.0, macOS 26.0, *) {
+                if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
                     ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
                 } else {
                     ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
@@ -82,7 +82,7 @@ struct ChatView: View {
     var body: some View {
         @Bindable var executor = executor
         Group {
-            if #available(iOS 26.0, macOS 26.0, *) {
+            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
                 chatContent
                     .safeAreaBar(edge: .bottom) {
                         makeSafeAreaBarContent()
@@ -113,7 +113,7 @@ struct ChatView: View {
                 }
             }
         }
-#if os(iOS)
+#if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
@@ -232,11 +232,56 @@ struct ChatView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-#if os(iOS)
-        ToolbarItemGroup(placement: .primaryAction) { // リフレッシュとモデル選択のグループ (iOS)
+#if os(macOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { appRefreshTrigger.send() }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+        }
+        
+        ToolbarItem(placement: .primaryAction) {
+            Picker("Select Model", selection: $chatSettings.selectedModelID) {
+                Text("Select Model").tag(nil as OllamaModel.ID?)
+                Divider()
+                ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                    let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                    HStack {
+                        Text(model.name)
+                        if isRunning { Image(systemName: "tray.and.arrow.down") }
+                    }
+                    .tag(model.id as OllamaModel.ID?)
+                }
+                if executor.models.filter({ $0.supportsCompletion }).isEmpty {
+                    Divider()
+                    Text(LocalizedStringKey("No models available"))
+                        .tag("no-models-available-tag" as OllamaModel.ID?)
+                        .selectionDisabled(true)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: 150)
+        }
+        
+        ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                appRefreshTrigger.send()
+                if !executor.chatMessages.isEmpty { showingNewChatConfirm = true }
             }) {
+                Label("New Chat", systemImage: "square.and.pencil")
+            }
+            .disabled(executor.chatMessages.isEmpty)
+            .confirmationDialog(String(localized: "Are you sure you want to clear the chat history?"), isPresented: $showingNewChatConfirm, titleVisibility: .visible) {
+                Button(String(localized: "Clear Chat History"), role: .destructive) {
+                    executor.clearChat()
+                    executor.isChatStreaming = false
+                    errorMessage = nil
+                }
+                Button(String(localized: "Cancel"), role: .cancel) { }
+            }
+        }
+#else
+        ToolbarItemGroup(placement: .primaryAction) {
+            Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning)
@@ -248,29 +293,22 @@ struct ChatView: View {
                     }
                     .pickerStyle(.inline)
                 }
-                
                 Section {
                     Picker("Models", selection: $chatSettings.selectedModelID) {
                         ForEach(executor.models.filter { $0.supportsCompletion }) { model in
                             let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                             HStack {
                                 Text(model.name)
-                                if isRunning {
-                                    Image(systemName: "tray.and.arrow.down")
-                                }
+                                if isRunning { Image(systemName: "tray.and.arrow.down") }
                             }
                             .tag(model.id as OllamaModel.ID?)
                         }
                     }
                     .pickerStyle(.inline)
                 }
-                
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Section {
-                        Button(action: {}) {
-                            Text(LocalizedStringKey("No models available"))
-                        }
-                        .disabled(true)
+                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
                     }
                 }
             } label: {
@@ -278,61 +316,21 @@ struct ChatView: View {
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
         }
-#else // macOS
-        ToolbarItem(placement: .primaryAction) { // リフレッシュボタン（macOS）
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning)
-        }
-        ToolbarItem(placement: .primaryAction) { // モデルピッカー (macOS)
-            Picker("Select Model", selection: $chatSettings.selectedModelID) {
-                Text("Select Model").tag(nil as OllamaModel.ID?)
-                Divider()
-                ForEach(executor.models.filter { $0.supportsCompletion }) { model in
-                    let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                    HStack {
-                        Text(model.name)
-                        if isRunning {
-                            Image(systemName: "tray.and.arrow.down")
-                        }
-                    }
-                    .tag(model.id as OllamaModel.ID?)
-                }
-                if executor.models.filter({ $0.supportsCompletion }).isEmpty {
-                    Divider()
-                    Text(LocalizedStringKey("No models available"))
-                        .tag("no-models-available-tag" as OllamaModel.ID?) // ユニークでnilでない文字列を割り当てる
-                        .selectionDisabled(true)
-                }
-            }
-            .pickerStyle(.menu)
-            .frame(maxWidth: 150)
-        }
-#endif
         
 #if os(iOS)
-        if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // モデルグループと新規チャットの間のスペーサー
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
         }
 #endif
         
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                if !executor.chatMessages.isEmpty {
-                    showingNewChatConfirm = true
-                }
+                if !executor.chatMessages.isEmpty { showingNewChatConfirm = true }
             }) {
                 Label("New Chat", systemImage: "square.and.pencil")
             }
             .disabled(executor.chatMessages.isEmpty)
-            .confirmationDialog(
-                String(localized: "Are you sure you want to clear the chat history?"),
-                isPresented: $showingNewChatConfirm,
-                titleVisibility: .visible
-            ) {
+            .confirmationDialog(String(localized: "Are you sure you want to clear the chat history?"), isPresented: $showingNewChatConfirm, titleVisibility: .visible) {
                 Button(String(localized: "Clear Chat History"), role: .destructive) {
                     executor.clearChat()
                     executor.isChatStreaming = false
@@ -343,12 +341,14 @@ struct ChatView: View {
         }
         
 #if os(iOS)
-        if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // 新規チャットとインスペクターの間のスペーサー
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
         }
+#endif
+
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onToggleInspector() }) {
-                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
+                Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
         }
 #endif
@@ -777,7 +777,7 @@ struct ImageGenerationView: View {
                     isOverallStreaming: $executor.isImageStreaming,
                     isModelSelected: imageSettings.selectedModelID != nil,
                     isUsingSafeAreaBar: {
-                        if #available(iOS 26.0, macOS 26.0, *) { return true }
+                        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) { return true }
                         return false
                     }(),
                     emptyStateTitle: "Image Generation",
@@ -815,7 +815,7 @@ struct ImageGenerationView: View {
     var body: some View {
         @Bindable var executor = executor
         Group {
-            if #available(iOS 26.0, macOS 26.0, *) {
+            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
                 content
                     .safeAreaBar(edge: .bottom) {
                         makeInputArea()
@@ -831,7 +831,7 @@ struct ImageGenerationView: View {
                 }
             }
         }
-#if os(iOS)
+#if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
@@ -873,61 +873,14 @@ struct ImageGenerationView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-#if os(iOS)
-        ToolbarItemGroup(placement: .primaryAction) {
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning)
-            
-            Menu {
-                Section {
-                    Picker("Select Model", selection: $imageSettings.selectedModelID) {
-                        Text("Select Model").tag(nil as OllamaModel.ID?)
-                    }
-                    .pickerStyle(.inline)
-                }
-                
-                Section {
-                    Picker("Models", selection: $imageSettings.selectedModelID) {
-                        ForEach(executor.models.filter { $0.isImageModel }) { model in
-                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                            HStack {
-                                Text(model.name)
-                                if isRunning {
-                                    Image(systemName: "tray.and.arrow.down")
-                                }
-                            }
-                            .tag(model.id as OllamaModel.ID?)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                }
-                
-                if executor.models.filter({ $0.isImageModel }).isEmpty {
-                    Section {
-                        Button(action: {}) {
-                            Text(LocalizedStringKey("No models available"))
-                        }
-                        .disabled(true)
-                    }
-                }
-            } label: {
-                let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
-                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
-            }
-        }
-#else
+#if os(macOS)
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
+            Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning)
         }
+        
         ToolbarItem(placement: .primaryAction) {
             Picker("Select Model", selection: $imageSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
@@ -936,9 +889,7 @@ struct ImageGenerationView: View {
                     let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                     HStack {
                         Text(model.name)
-                        if isRunning {
-                            Image(systemName: "tray.and.arrow.down")
-                        }
+                        if isRunning { Image(systemName: "tray.and.arrow.down") }
                     }
                     .tag(model.id as OllamaModel.ID?)
                 }
@@ -952,28 +903,59 @@ struct ImageGenerationView: View {
             .pickerStyle(.menu)
             .frame(maxWidth: 150)
         }
-#endif
-        
-#if os(iOS)
-        if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // モデルグループと新規生成の間のスペーサー
+#else
+        ToolbarItemGroup(placement: .primaryAction) {
+            Button(action: { appRefreshTrigger.send() }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning)
+            
+            Menu {
+                Section {
+                    Picker("Select Model", selection: $imageSettings.selectedModelID) {
+                        Text("Select Model").tag(nil as OllamaModel.ID?)
+                    }
+                    .pickerStyle(.inline)
+                }
+                Section {
+                    Picker("Models", selection: $imageSettings.selectedModelID) {
+                        ForEach(executor.models.filter { $0.isImageModel }) { model in
+                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                            HStack {
+                                Text(model.name)
+                                if isRunning { Image(systemName: "tray.and.arrow.down") }
+                            }
+                            .tag(model.id as OllamaModel.ID?)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                }
+                if executor.models.filter({ $0.isImageModel }).isEmpty {
+                    Section {
+                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
+                    }
+                }
+            } label: {
+                let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
+                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+            }
         }
 #endif
-        
+
+#if os(iOS)
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+        }
+#endif
+
         ToolbarItem(placement: .primaryAction) {
             Button(action: {
-                if !executor.imageMessages.isEmpty {
-                    showingClearConfirm = true
-                }
+                if !executor.imageMessages.isEmpty { showingClearConfirm = true }
             }) {
                 Label("New Generation", systemImage: "square.and.pencil")
             }
             .disabled(executor.imageMessages.isEmpty)
-            .confirmationDialog(
-                String(localized: "Are you sure you want to clear the generation history?"),
-                isPresented: $showingClearConfirm,
-                titleVisibility: .visible
-            ) {
+            .confirmationDialog(String(localized: "Are you sure you want to clear the generation history?"), isPresented: $showingClearConfirm, titleVisibility: .visible) {
                 Button(String(localized: "Clear History"), role: .destructive) {
                     executor.clearImageGeneration()
                     executor.chatInputText = ""
@@ -981,14 +963,17 @@ struct ImageGenerationView: View {
                 Button(String(localized: "Cancel"), role: .cancel) { }
             }
         }
-        
+
 #if os(iOS)
-        if #available(iOS 26, *) {
-            ToolbarSpacer(.fixed, placement: .primaryAction) // 新規生成とインスペクターの間のスペーサー
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .primaryAction)
         }
+#endif
+
+#if !os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onToggleInspector() }) {
-                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
+                Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
         }
 #endif

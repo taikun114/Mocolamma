@@ -11,7 +11,7 @@ struct ServerRowView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     private var indicatorSize: CGFloat {
-#if os(iOS)
+#if !os(macOS)
         return 12
 #else
         return 10
@@ -19,7 +19,7 @@ struct ServerRowView: View {
     }
     
     private var spinnerScaleFactor: CGFloat {
-#if os(iOS)
+#if !os(macOS)
         return indicatorSize / 15 // iOSでは少し大きく
 #else
         return indicatorSize / 20 // macOSでは現状維持

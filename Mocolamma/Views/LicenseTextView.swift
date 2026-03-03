@@ -79,10 +79,14 @@ struct LicenseTextView: View {
                             }
                         }
                     }
+                    
+#if os(iOS)
                     // iOS 26.0 以降の場合のみ ToolbarSpacer を追加
                     if #available(iOS 26.0, *) {
-                        ToolbarSpacer(.fixed, placement: .primaryAction) // ToolbarItem の外に配置
+                        ToolbarSpacer(.fixed, placement: .primaryAction)
                     }
+#endif
+
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
                             isTextWrapped.toggle()

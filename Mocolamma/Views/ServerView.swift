@@ -32,29 +32,28 @@ struct ServerView: View {
     private var serverToolbarContent: some ToolbarContent {
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
+            Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
         }
 #endif
         
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                showingAddServerSheet = true
-            }) {
+            Button(action: { showingAddServerSheet = true }) {
                 Label("Add Server", systemImage: "plus")
             }
         }
-        
+
 #if os(iOS)
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
         }
+#endif
+
+#if !os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onTogglePreview() }) {
-                Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
+                Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
         }
 #endif
@@ -212,7 +211,7 @@ private struct ServerListViewContent: View {
                     .labelStyle(.iconOnly)
                     .tint(.blue)
                 }
-#if os(iOS)
+#if !os(macOS)
                 .onTapGesture {
                     listSelection = server.id
                 }
@@ -227,7 +226,7 @@ private struct ServerListViewContent: View {
             }
 #endif
         }
-#if os(iOS)
+#if !os(macOS)
         .refreshable {
             appRefreshTrigger.send()
         }
@@ -250,7 +249,7 @@ private struct ServerRowContent: View {
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
-#if os(iOS)
+#if !os(macOS)
         .contentShape(Rectangle())
         
 #endif

@@ -36,8 +36,8 @@ struct InspectorContentView: View {
     }
     
     private var isCompactLayout: Bool {
-#if os(iOS)
-        // iOS（iPad含む）で幅が320未満の場合にコンパクトレイアウト（2x2）を適用
+#if !os(macOS)
+        // iOS（iPad含む）やvisionOSで幅が320未満の場合にコンパクトレイアウト（2x2）を適用
         return inspectorWidth > 0 && inspectorWidth < 320
 #else
         // macOSでは常に通常のレイアウト（1x4）
@@ -149,7 +149,7 @@ struct InspectorContentView: View {
                                 .padding(.bottom, 4)
                                 HStack {
                                     CompactSlider(value: $chatSettings.chatTemperature, in: 0.0...2.0, step: 0.1)
-#if os(iOS)
+#if !os(macOS)
                                         .frame(height: 32)
 #else
                                         .frame(height: 16)
@@ -179,7 +179,7 @@ struct InspectorContentView: View {
                                 .padding(.bottom, 4)
                                 HStack {
                                     CompactSlider(value: $chatSettings.contextWindowValue, in: 512...Double(chatSettings.selectedModelContextLength ?? 4096), step: 128.0)
-#if os(iOS)
+#if !os(macOS)
                                         .frame(height: 32)
 #else
                                         .frame(height: 16)
@@ -228,7 +228,7 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
-#if os(iOS)
+#if !os(macOS)
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
                     isCustomKeepAliveFocused = false
@@ -268,7 +268,7 @@ struct InspectorContentView: View {
                                     .focused($isCustomWidthFocused)
                                     .textFieldStyle(.roundedBorder)
                                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                                     .keyboardType(.numberPad)
 #endif
                                     .disabled(!imageSettings.customWidthEnabled)
@@ -292,7 +292,7 @@ struct InspectorContentView: View {
                                     .focused($isCustomHeightFocused)
                                     .textFieldStyle(.roundedBorder)
                                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                                     .keyboardType(.numberPad)
 #endif
                                     .disabled(!imageSettings.customHeightEnabled)
@@ -316,7 +316,7 @@ struct InspectorContentView: View {
                                     .focused($isCustomStepsFocused)
                                     .textFieldStyle(.roundedBorder)
                                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                                     .keyboardType(.numberPad)
 #endif
                                     .disabled(!imageSettings.customStepsEnabled)
@@ -344,7 +344,7 @@ struct InspectorContentView: View {
                             }
                     }
                 )
-#if os(iOS)
+#if !os(macOS)
                 .onTapGesture {
                     isCustomWidthFocused = false
                     isCustomHeightFocused = false
@@ -385,7 +385,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customWidthEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
-#if os(iOS)
+#if !os(macOS)
                 .frame(height: 32)
 #else
                 .frame(height: 16)
@@ -429,7 +429,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customHeightEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
-#if os(iOS)
+#if !os(macOS)
                 .frame(height: 32)
 #else
                 .frame(height: 16)
@@ -523,7 +523,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customStepsEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.steps, in: 1...20, step: 1)
-#if os(iOS)
+#if !os(macOS)
                 .frame(height: 32)
 #else
                 .frame(height: 16)
@@ -546,7 +546,7 @@ struct InspectorContentView: View {
                     .focused($isChatSeedFocused)
                     .textFieldStyle(.roundedBorder)
                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                     .keyboardType(.numberPad)
 #endif
                     .disabled(!chatSettings.isSeedEnabled)
@@ -584,7 +584,7 @@ struct InspectorContentView: View {
                         .focused($isRepeatLastNFocused)
                         .textFieldStyle(.roundedBorder)
                         .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                         .keyboardType(.numberPad)
 #endif
                         .frame(maxWidth: .infinity)
@@ -609,7 +609,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.repeatPenaltyValue, in: 0.0...2.0, step: 0.1)
-#if os(iOS)
+#if !os(macOS)
                     .frame(height: 32)
 #else
                     .frame(height: 16)
@@ -645,7 +645,7 @@ struct InspectorContentView: View {
                         .focused($isNumPredictFocused)
                         .textFieldStyle(.roundedBorder)
                         .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                         .keyboardType(.numberPad)
 #endif
                         .frame(maxWidth: .infinity)
@@ -672,7 +672,7 @@ struct InspectorContentView: View {
                     .focused($isTopKFocused)
                     .textFieldStyle(.roundedBorder)
                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                     .keyboardType(.numberPad)
 #endif
                     .disabled(!chatSettings.isTopKEnabled)
@@ -698,7 +698,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.topPValue, in: 0.0...1.0, step: 0.01)
-#if os(iOS)
+#if !os(macOS)
                     .frame(height: 32)
 #else
                     .frame(height: 16)
@@ -727,7 +727,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.minPValue, in: 0.0...1.0, step: 0.01)
-#if os(iOS)
+#if !os(macOS)
                     .frame(height: 32)
 #else
                     .frame(height: 16)
@@ -758,7 +758,7 @@ struct InspectorContentView: View {
                 TextField("Enter seed value", value: $imageSettings.seed, format: .number.grouping(.never))
                     .textFieldStyle(.roundedBorder)
                     .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                     .keyboardType(.numberPad)
 #endif
                     .disabled(!imageSettings.isSeedEnabled)
@@ -799,7 +799,7 @@ struct InspectorContentView: View {
                         .focused($isCustomKeepAliveFocused)
                         .textFieldStyle(.roundedBorder)
                         .labelsHidden()
-#if os(iOS)
+#if !os(macOS)
                         .keyboardType(.numberPad)
 #endif
                         .frame(maxWidth: .infinity)

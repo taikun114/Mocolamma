@@ -12,7 +12,7 @@ struct ServerInspectorView: View {
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
     
     private var indicatorSize: CGFloat {
-#if os(iOS)
+#if !os(macOS)
         return 10
 #else
         return 8

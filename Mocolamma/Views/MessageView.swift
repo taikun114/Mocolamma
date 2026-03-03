@@ -98,11 +98,11 @@ struct MessageView: View {
             }
             .id(isStreamingAny)
             
-#if os(iOS)
+#if !os(macOS)
             Spacer().frame(height: 8)
 #endif
             Group {
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
@@ -332,7 +332,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
@@ -377,7 +377,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
@@ -399,7 +399,7 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
@@ -421,7 +421,7 @@ struct MessageView: View {
                 .symbolVariant(isDownloadSuccessful ? .none : .none) // 整合性のための指定
                 .contentTransition(.symbolEffect(.replace))
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
@@ -574,7 +574,7 @@ struct MessageView: View {
                 .padding(5)
                 .contentTransition(.symbolEffect(.replace))
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
@@ -610,7 +610,7 @@ struct MessageView: View {
                 }
             }
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
@@ -683,7 +683,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
@@ -702,7 +702,7 @@ struct MessageView: View {
             isEditing = false
         }) {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
-#if os(iOS)
+#if !os(macOS)
                 .font(.body)
                 .bold()
 #else
@@ -729,7 +729,7 @@ struct MessageView: View {
             performDone()
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
-#if os(iOS)
+#if !os(macOS)
                 .font(.body)
                 .bold()
 #else

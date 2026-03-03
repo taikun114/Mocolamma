@@ -42,6 +42,7 @@ struct MainNavigationView: View {
                 sortedModels: sortedModels
             )
         }
+#if !os(visionOS)
         .inspector(isPresented: $showingInspector) {
             InspectorContentView(
                 selection: selection,
@@ -54,5 +55,6 @@ struct MainNavigationView: View {
             )
             .inspectorColumnWidth(min: 250, ideal: 250, max: 300)
         }
+#endif
     }
 }

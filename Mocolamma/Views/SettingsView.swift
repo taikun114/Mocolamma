@@ -77,7 +77,7 @@ struct SettingsView: View {
         }
         
         Section("Permissions") {
-#if os(iOS)
+#if !os(macOS)
             Group {
                 if horizontalSizeClass == .compact { // iPhone縦向き、またはiPad狭い分割画面
                     VStack(alignment: .leading, spacing: 12) {

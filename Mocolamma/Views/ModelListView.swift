@@ -191,16 +191,12 @@ struct ModelListView: View {
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
+            Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
         }
-#endif
-        
-#if os(iOS)
+#else
         ToolbarItem(placement: .primaryAction) {
             Menu {
                 Picker("Sort by", selection: $sortCriterion) {
@@ -208,9 +204,7 @@ struct ModelListView: View {
                         Label(LocalizedStringKey(criterion.rawValue), systemImage: criterionIconName(criterion)).tag(criterion)
                     }
                 }
-                
                 Divider()
-                
                 Menu {
                     Picker("Filter", selection: $selectedFilterTag) {
                         Label("All Models", systemImage: "tray.full").tag(nil as String?)
@@ -222,9 +216,7 @@ struct ModelListView: View {
                 } label: {
                     Label("Filter", systemImage: filterIconName)
                 }
-                
                 Divider()
-                
                 Picker("Order", selection: $sortOrderOption) {
                     ForEach(SortOrder.allCases) { order in
                         Label(LocalizedStringKey(order.rawValue), systemImage: orderIconName(order)).tag(order)
@@ -235,28 +227,31 @@ struct ModelListView: View {
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
+#endif
+
+#if os(iOS)
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
         }
 #endif
         
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                showingAddSheet = true
-            }) {
+            Button(action: { showingAddSheet = true }) {
                 Label("Add New", systemImage: "plus")
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
         
+#if !os(macOS)
+        Group {
 #if os(iOS)
-        Group { // 条件付きコンテンツをGroupでラップ
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
+#endif
             ToolbarItem(placement: .primaryAction) {
                 Button(action: { onTogglePreview() }) {
-                    Label("Inspector", systemImage: horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing")
+                    Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
                 }
             }
         }
@@ -265,11 +260,11 @@ struct ModelListView: View {
     
     var body: some View {
         let copyIconName = SFSymbol.copy
-        
+
         Group {
-#if os(iOS)
-            if #available(iOS 26.0, *) {
-                // iOS 26.0以降：safeAreaBarを使用して進捗を表示（ボケ効果が正常に機能する）
+    #if !os(macOS)
+            if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+                // iOS 26.0 / visionOS 26.0以降：safeAreaBarを使用して進捗を表示（ボケ効果が正常に機能する）
                 ModelListContentView(
                     sortedModels: sortedModels,
                     selectedModel: $selectedModel,
@@ -282,7 +277,8 @@ struct ModelListView: View {
                     PullProgressView(executor: executor, isSelected: isSelected)
                 }
             } else {
-                // iOS 26.0未満：VStack内に配置
+
+                // iOS 26.0 / visionOS 26.0未満：VStack内に配置
                 VStack(spacing: 0) {
                     ModelListContentView(
                         sortedModels: sortedModels,
@@ -369,7 +365,7 @@ struct ModelListContentView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     var body: some View {
-#if os(iOS)
+#if !os(macOS)
         List(selection: $selectedModel) {
             ForEach(sortedModels) { model in
                 HStack(alignment: .center, spacing: 16) {

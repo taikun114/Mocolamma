@@ -62,7 +62,7 @@ struct ServerFormView: View {
                         save()
                     }
                 
-#if os(iOS)
+#if !os(macOS)
                 if isVerifying {
                     HStack {
                         ProgressView()
@@ -123,7 +123,7 @@ struct ServerFormView: View {
         } message: {
             Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "ConnectionError.message"))
         }
-#if os(iOS)
+#if !os(macOS)
         .navigationTitle(editingServer == nil ? "Add Server" : "Edit Server")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -133,7 +133,7 @@ struct ServerFormView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                if #available(iOS 26.0, *) {
+                if #available(iOS 26.0, visionOS 26.0, *) {
                     Button(role: .confirm) {
                         save()
                     }

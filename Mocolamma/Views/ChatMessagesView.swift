@@ -30,7 +30,7 @@ struct ChatMessagesView: View {
     let emptyStateImage: String
     
     private var reduceMotionEnabled: Bool {
-#if os(iOS)
+#if !os(macOS)
         return UIAccessibility.isReduceMotionEnabled
 #elseif os(macOS)
         return NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -40,11 +40,10 @@ struct ChatMessagesView: View {
     }
     
     private var supportsEffects: Bool {
-#if os(iOS)
-        if #available(iOS 26, *) { return true } else { return false }
-#else
-        if #available(macOS 26, *) { return true } else { return false }
+#if os(macOS) || os(iOS)
+        if #available(iOS 26, macOS 26, *) { return true }
 #endif
+        return false
     }
     
     var body: some View {

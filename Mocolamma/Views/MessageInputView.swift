@@ -104,12 +104,14 @@ struct MessageInputView: View {
                     showingAttachSheet = true
                 }) {
                     ZStack {
-#if os(iOS)
-                        if #available(iOS 26, *) {
+#if !os(macOS)
+                        if #available(iOS 26, visionOS 26.0, *) {
                             Image(systemName: "plus")
                                 .font(.title2)
                                 .padding(8)
+#if !os(visionOS)
                                 .glassEffect(.regular.interactive())
+#endif
                         } else {
                             Image(systemName: "plus")
                                 .font(.title2)
@@ -121,7 +123,9 @@ struct MessageInputView: View {
                             Image(systemName: "plus")
                                 .font(.title2)
                                 .padding(7)
+#if !os(visionOS)
                                 .glassEffect(.regular.interactive())
+#endif
                         } else {
                             Image(systemName: "plus")
                                 .font(.title2)
@@ -151,10 +155,12 @@ struct MessageInputView: View {
                 }
                 
                 ZStack(alignment: .leading) {
-#if os(iOS)
-                    if #available(iOS 26, *) {
+#if !os(macOS)
+                    if #available(iOS 26, visionOS 26.0, *) {
                         Color.clear
+#if !os(visionOS)
                             .glassEffect(in: .rect(cornerRadius: 16.0))
+#endif
                     } else {
                         VisualEffectView(material: .systemThinMaterial)
                             .cornerRadius(16)
@@ -162,7 +168,9 @@ struct MessageInputView: View {
 #else
                     if #available(macOS 26, *) {
                         Color.clear
+#if !os(visionOS)
                             .glassEffect(in: .rect(cornerRadius: 16.0))
+#endif
                     } else {
                         VisualEffectView(material: .headerView, blendingMode: .withinWindow)
                             .cornerRadius(16)
@@ -220,15 +228,17 @@ struct MessageInputView: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 
-#if os(iOS)
-                if #available(iOS 26, *) {
+#if !os(macOS)
+                if #available(iOS 26, visionOS 26.0, *) {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
                         ZStack {
                             Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(8)
+#if !os(visionOS)
                                 .glassEffect(.regular.tint(.accentColor).interactive())
+#endif
                         }
                         .contentShape(Rectangle())
                     }
@@ -256,7 +266,9 @@ struct MessageInputView: View {
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(7)
+#if !os(visionOS)
                                 .glassEffect(.regular.tint(.accentColor).interactive())
+#endif
                         }
                         .contentShape(Rectangle())
                     }

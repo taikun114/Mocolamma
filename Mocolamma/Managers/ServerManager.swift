@@ -49,6 +49,15 @@ class ServerManager: ObservableObject {
     /// インスペクターの再描画を誘発するためのトークン
     @Published var inspectorRefreshToken: UUID = UUID()
     
+    /// インスペクターに表示する現在のカテゴリ（server, models, chat, image_generationなど）
+    @Published var inspectorSelection: String?
+    
+    /// インスペクターで選択されているモデルのID
+    @Published var inspectorSelectedModelID: OllamaModel.ID?
+    
+    /// インスペクターで選択されているサーバー
+    @Published var inspectorSelectedServer: ServerInfo?
+    
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合はnilを返します。
     var currentServerHost: String? {

@@ -49,7 +49,7 @@ struct AddModelsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                     
-#if os(iOS) // iOSではボタンがメッセージの下に表示される
+#if !os(macOS) // iOSではボタンがメッセージの下に表示される
                     Button {
                         showingOpenLinkAlert = true
                     } label: {
@@ -121,7 +121,7 @@ struct AddModelsSheet: View {
         } message: {
             Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "ユーザに、Ollamaのモデル一覧が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。"))
         }
-#if os(iOS)
+#if !os(macOS)
         .navigationTitle("Add Model")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -138,14 +138,19 @@ struct AddModelsSheet: View {
                     }
                 }) {
                     if #available(iOS 26.0, *) {
+#if os(iOS)
                         Image(systemName: "plus")
                             .foregroundStyle(.white)
                             .opacity(0.8)
+#else
+                        Image(systemName: "plus")
+#endif
                     } else {
                         Image(systemName: "plus")
                     }
                 }
                 .keyboardShortcut(.defaultAction)
+
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
                 .applyGlassProminentButtonStyle(isDisabled: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
             }

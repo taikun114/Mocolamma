@@ -21,7 +21,7 @@ struct ContentView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
     
     @Binding var showingInspector: Bool
-    @StateObject private var chatSettings = ChatSettings()
+    @EnvironmentObject var chatSettings: ChatSettings
     
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -137,8 +137,13 @@ struct ContentView: View {
         }
         .onAppear {
             selection = "server"
+            // 初期値を同期
+            serverManager.inspectorSelection = selection
+            serverManager.inspectorSelectedModelID = selectedModel
+            serverManager.inspectorSelectedServer = selectedServerForInspector
         }
         .onChange(of: selection) { oldSelection, newSelection in
+            serverManager.inspectorSelection = newSelection
             if newSelection == "server" {
                 updateSelectedServerForInspector()
             }
@@ -146,9 +151,11 @@ struct ContentView: View {
                 showingInspector = false
             }
         }
-        .onChange(of: serverManager.selectedServerID) { _, _ in
+        .onChange(of: selectedModel) { _, newValue in
+            serverManager.inspectorSelectedModelID = newValue
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
+            serverManager.inspectorSelectedServer = newServer
             if newServer != nil {
                 if selection == "server" {
                     appRefreshTrigger.send()

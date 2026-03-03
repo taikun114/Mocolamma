@@ -22,11 +22,14 @@ struct MocolammaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 #endif
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+    
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
     @StateObject private var imageSettings = ImageGenerationSettings()
+    @StateObject private var chatSettings = ChatSettings() // ContentViewから昇格させて共有
     @State private var executor: CommandExecutor
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
@@ -64,7 +67,7 @@ struct MocolammaApp: App {
     }
     
     var body: some Scene {
-        WindowGroup() {
+        WindowGroup {
             // ContentViewにrefreshTriggerのPublisherを渡します。
             ContentView(
                 serverManager: serverManager,
@@ -82,6 +85,8 @@ struct MocolammaApp: App {
 #endif
             .environmentObject(appRefreshTrigger)
             .environmentObject(imageSettings)
+            .environmentObject(chatSettings)
+            .environment(executor)
             .onAppear {
                 localNetworkChecker.refresh()
             }
@@ -197,7 +202,7 @@ struct MocolammaApp: App {
             }
             
 #else
-            // iPadOSの場合、設定メニュー項目を置き換えてアプリ内設定を開く
+            // macOS以外（iOS / iPadOS / visionOS）
             CommandGroup(replacing: .appSettings) {
                 Button(action: {
                     showingAboutSheet = true
@@ -215,7 +220,7 @@ struct MocolammaApp: App {
             SidebarCommands()
             InspectorCommands()
             
-            // 表示メニュー（iPadOS）
+            // 表示メニュー
             CommandGroup(before: .sidebar) {
                 Picker("View", selection: $selection) {
                     Label("Server", systemImage: "server.rack")
@@ -274,7 +279,6 @@ struct MocolammaApp: App {
                 Divider()
             }
             
-            // iPadOSでも「サーバーを追加」メニュー項目を追加
             CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 Button(action: {
                     showingAddServerSheet = true
@@ -328,6 +332,24 @@ struct MocolammaApp: App {
         }
         .defaultSize(width: 500, height: 600)
         .windowResizability(.contentSize)
+#endif
+
+#if os(visionOS)
+        WindowGroup("Inspector", id: "inspector") {
+            InspectorContentView(
+                selection: serverManager.inspectorSelection,
+                selectedModel: $serverManager.inspectorSelectedModelID,
+                sortedModels: executor.models.sorted(using: [KeyPathComparator(\.originalIndex)]),
+                selectedServerForInspector: serverManager.inspectorSelectedServer,
+                serverManager: serverManager,
+                showingInspector: .constant(true),
+                selectedFilterTag: .constant(nil)
+            )
+            .environmentObject(chatSettings)
+            .environmentObject(imageSettings)
+            .environment(executor)
+        }
+        .defaultSize(width: 400, height: 600)
 #endif
     }
 }

@@ -12,7 +12,7 @@ struct ChatInputView: View {
     
     var body: some View {
         MessageInputView(inputText: $inputText, selectedImages: $selectedImages, isStreaming: $isStreaming, showingInspector: $showingInspector, placeholder: placeholder, selectedModel: selectedModel, sendMessage: sendMessage, stopMessage: stopMessage)
-#if os(iOS)
+#if !os(macOS)
             .gesture(
                 DragGesture().onChanged { value in
                     if value.translation.height > 30 { // 30ポイント下にドラッグ
@@ -23,7 +23,7 @@ struct ChatInputView: View {
 #endif
     }
     
-#if os(iOS)
+#if !os(macOS)
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }

@@ -10,7 +10,7 @@ struct AboutView: View {
     @Environment(\.openURL) var openURL
     
     private var isOS26OrLater: Bool {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
             return true
         } else {
             return false
@@ -112,7 +112,7 @@ struct AboutView: View {
                     }
                 }
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Mocolamma is an Open Source Application.")
                     Button(action: { showingLicenseInfoModal = true }) {
@@ -146,7 +146,7 @@ struct AboutView: View {
                 }
 #endif
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Contributors involved in the development")
                     Button(action: { showingContributorsAlert = true }) {
@@ -199,7 +199,7 @@ struct AboutView: View {
             }
             
             Section(header: Text("Support and Feedback").font(.headline)) {
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Found a bug?")
                     Button(action: { showingBugReportAlert = true }) {
@@ -250,7 +250,7 @@ struct AboutView: View {
                 }
 #endif
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Have an idea?")
                     Button(action: { showingFeedbackMailAlert = true }) {
@@ -279,7 +279,7 @@ struct AboutView: View {
                 }
 #endif
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Ask questions and share your opinions")
                     Button(action: { showingCommunityAlert = true }) {
@@ -332,7 +332,7 @@ struct AboutView: View {
             }
             
             Section(header: Text("Support Developer").font(.headline)) {
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Give It a Star to GitHub Repository")
@@ -395,7 +395,7 @@ struct AboutView: View {
                 }
 #endif
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Buy Me Green Tea")
@@ -458,7 +458,7 @@ struct AboutView: View {
                 }
 #endif
                 
-#if os(iOS)
+#if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading) {
                         Text("Donate at PayPal")
@@ -556,15 +556,17 @@ struct AboutView: View {
 #endif
         
         let osType: String
-#if os(iOS)
-        if ProcessInfo.processInfo.isiOSAppOnMac {
+#if os(visionOS)
+        osType = "visionOS"
+#elseif os(iOS)
+        if isiOSAppOnVision {
+            osType = "visionOS (iPad App)"
+        } else if ProcessInfo.processInfo.isiOSAppOnMac {
             osType = "macOS (iPad App)"
         } else if UIDevice.current.userInterfaceIdiom == .pad {
             osType = "iPadOS"
         } else if UIDevice.current.userInterfaceIdiom == .phone {
             osType = "iOS"
-        } else if UIDevice.current.userInterfaceIdiom == .vision {
-            osType = "visionOS (iPad App)"
         } else {
             osType = "iOS / iPadOS (Unknown)"
         }

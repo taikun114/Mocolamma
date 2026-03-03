@@ -138,7 +138,7 @@ struct ModelInspectorView: View {
             }
             .font(.caption)
             .bold()
-#if os(iOS)
+#if !os(macOS)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
 #else

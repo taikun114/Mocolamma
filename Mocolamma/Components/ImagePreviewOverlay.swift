@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if os(iOS)
+#if !os(macOS)
 import UIKit
 
 /// iOS/iPadOSのすべてのジェスチャーを統合管理するView
@@ -107,8 +107,10 @@ struct GestureCaptureView: UIViewRepresentable {
                 isZoomMode = true
                 zoomAnchor = gesture.location(in: gesture.view)
                 lastLocation = zoomAnchor
+#if !os(visionOS)
                 let impact = UIImpactFeedbackGenerator(style: .medium)
                 impact.impactOccurred()
+#endif
             }
         }
     }
@@ -139,7 +141,7 @@ struct ImagePreviewOverlay: View {
                     }
                 
                 // iPad/iOS用のジェスチャーキャプチャView
-                #if os(iOS)
+                #if !os(macOS)
                 GestureCaptureView(
                     onScroll: { delta in
                         withAnimation(.interactiveSpring()) {

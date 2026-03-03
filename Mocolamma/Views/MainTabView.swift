@@ -4,6 +4,7 @@ import CompactSlider
 // MARK: - メインタブビュー（現代のOSバージョン用）
 @available(macOS 15.0, iOS 18.0, *)
 struct MainTabView: View {
+    @Environment(\.openWindow) private var openWindow
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     var executor: CommandExecutor
@@ -84,9 +85,12 @@ struct MainTabView: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
-        .inspector(isPresented: isiOSAppOnVision ? .constant(false) : $showingInspector) {
+#if !os(visionOS)
+        .inspector(isPresented: (isiOSAppOnVision) ? .constant(false) : $showingInspector) {
             inspectorContent
+                .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
         }
+#endif
         .sheet(isPresented: $isInspectorSheetPresented) {
             NavigationStack {
                 inspectorContent
@@ -98,7 +102,7 @@ struct MainTabView: View {
                         }
                     }
                     .navigationTitle(inspectorTitle)
-#if os(iOS)
+#if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
 #endif
             }
@@ -106,13 +110,15 @@ struct MainTabView: View {
     }
     
     private func toggleInspector() {
-        if isiOSAppOnVision {
+        if isNativeVisionOS {
+            openWindow(id: "inspector")
+        } else if isiOSAppOnVision {
             isInspectorSheetPresented.toggle()
         } else {
             showingInspector.toggle()
         }
         
-#if os(iOS)
+#if !os(macOS)
         // キーボードを非表示にする
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 #endif
@@ -128,7 +134,9 @@ struct MainTabView: View {
             showingInspector: $showingInspector,
             selectedFilterTag: $selectedFilterTag
         )
+#if !os(visionOS)
         .inspectorColumnWidth(min: 250, ideal: 250, max: 400)
+#endif
     }
     
     private var inspectorTitle: String {
