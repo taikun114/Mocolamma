@@ -125,27 +125,31 @@ struct ChatView: View {
                 }
             }
 #else
-            ZStack {
+            if #available(macOS 26.0, *) {
                 chatContent
-                
-                VStack {
-                    Spacer()
-                    
-                    ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                        sendMessage()
-                    } stopMessage: {
-                        if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                            executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                            executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                            executor.updateIsChatStreaming()
-                        }
-                        executor.isChatStreaming = false
-                        executor.cancelChatStreaming()
+                    .safeAreaBar(edge: .bottom) {
+                        makeSafeAreaBarContent()
                     }
-                }
-                .padding()
-                .if(horizontalSizeClass != .compact) { view in
-                    view.ignoresSafeArea(.container, edges: [.bottom])
+            } else {
+                ZStack {
+                    chatContent
+                    
+                    VStack {
+                        Spacer()
+                        
+                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+                            sendMessage()
+                        } stopMessage: {
+                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                                executor.updateIsChatStreaming()
+                            }
+                            executor.isChatStreaming = false
+                            executor.cancelChatStreaming()
+                        }
+                    }
+                    .padding()
                 }
             }
 #endif
@@ -880,12 +884,19 @@ struct ImageGenerationView: View {
                 }
             }
 #else
-            ZStack {
+            if #available(macOS 26.0, *) {
                 content
-                
-                VStack {
-                    Spacer()
-                    makeInputArea()
+                    .safeAreaBar(edge: .bottom) {
+                        makeInputArea()
+                    }
+            } else {
+                ZStack {
+                    content
+                    
+                    VStack {
+                        Spacer()
+                        makeInputArea()
+                    }
                 }
             }
 #endif
