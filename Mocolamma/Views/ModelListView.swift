@@ -188,7 +188,7 @@ struct ModelListView: View {
             } label: {
                 Label("Filter", systemImage: filterIconName)
             }
-            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+            .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
@@ -223,9 +223,9 @@ struct ModelListView: View {
                     }
                 }
             } label: {
-                Label("Sort", systemImage: "line.3.horizontal.decrease")
+                Label("Sort", systemImage: filterIconName)
             }
-            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+            .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
 #endif
 
