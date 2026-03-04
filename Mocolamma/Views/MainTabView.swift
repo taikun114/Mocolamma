@@ -117,9 +117,18 @@ struct MainTabView: View {
             attachmentAnchor: .scene(.trailing),
             contentAlignment: .leading
         ) {
-            inspectorContent
-                .frame(width: 400, height: 600)
-                .glassBackgroundEffect()
+            ZStack {
+                if showingInspector {
+                    inspectorContent
+                        .frame(width: 400, height: 600)
+                        .glassBackgroundEffect()
+                        .transition(.asymmetric(
+                            insertion: .offset(x: -50).combined(with: .opacity),
+                            removal: .offset(x: -50).combined(with: .opacity)
+                        ))
+                }
+            }
+            .frame(width: 400, height: 600)
         }
 #endif
     }
@@ -139,7 +148,9 @@ struct MainTabView: View {
                 serverManager.inspectorSelectedModelID = imageSettings.selectedModelID
             }
             
-            showingInspector.toggle()
+            withAnimation(.easeOut(duration: 0.3)) {
+                showingInspector.toggle()
+            }
         } else if isiOSAppOnVision {
             isInspectorSheetPresented.toggle()
         } else {

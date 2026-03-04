@@ -231,6 +231,9 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
+#if os(visionOS)
+                .scrollClipDisabled()
+#endif
 #if !os(macOS)
                 .onTapGesture {
                     isSystemPromptFocused = false // キーボードを閉じる
@@ -336,6 +339,9 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
+#if os(visionOS)
+                .scrollClipDisabled()
+#endif
                 .background(
                     GeometryReader { geometry in
                         Color.clear
@@ -373,6 +379,8 @@ struct InspectorContentView: View {
             }
             .help("Toggle Inspector")
         }
+#elseif os(visionOS)
+        .padding(.vertical)
 #endif
     }
     

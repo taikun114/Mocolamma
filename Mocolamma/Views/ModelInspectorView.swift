@@ -532,6 +532,9 @@ struct ModelInspectorView: View {
             }
             .padding()
         }
+#if os(visionOS)
+        .scrollClipDisabled()
+#endif
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {
                 LicenseTextView(licenseText: licenseBody, licenseLink: licenseLink, licenseTitle: licenseName)

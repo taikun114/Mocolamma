@@ -226,5 +226,8 @@ struct ServerInspectorView: View {
             }
             .padding()
         }
+#if os(visionOS)
+        .scrollClipDisabled()
+#endif
     }
 }
