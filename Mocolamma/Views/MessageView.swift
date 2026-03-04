@@ -58,7 +58,19 @@ struct MessageView: View {
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
                 .padding(10)
-                .background(message.role == "user" ? Color.accentColor : Color.gray.opacity(0.1))
+                .background(
+                    Group {
+                        if message.role == "user" {
+                            Color.accentColor
+                        } else {
+#if os(visionOS)
+                            AnyView(Rectangle().fill(.regularMaterial))
+#else
+                            AnyView(Color.gray.opacity(0.1))
+#endif
+                        }
+                    }
+                )
                 .cornerRadius(16)
                 .overlay {
                     if isEditing && isDraggingOver && supportsVision {
@@ -118,7 +130,7 @@ struct MessageView: View {
                         if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
                         if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
-                        if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
+                        if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
                                 doneButton
@@ -145,7 +157,7 @@ struct MessageView: View {
                         if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
                         if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
-                        if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
+                        if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
                                 doneButton
@@ -187,7 +199,7 @@ struct MessageView: View {
                         shareButton
                     }
                     
-                    if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                    if message.role == "user" && isLastOwnUserMessage {
                         if isEditing {
                             cancelButton
                             doneButton
@@ -776,10 +788,18 @@ struct MessageView: View {
 #endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
+#if os(visionOS)
+                .bold()
+#else
                 .background(Capsule().fill(Color.gray.opacity(0.2)))
                 .foregroundColor(.secondary)
+#endif
         }
+#if os(visionOS)
+        .buttonStyle(.bordered)
+#else
         .buttonStyle(.plain)
+#endif
         .help(String(localized: "Cancel editing."))
         .disabled(message.isStreaming)
     }
@@ -803,10 +823,20 @@ struct MessageView: View {
 #endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
+#if os(visionOS)
+                .bold()
+                .foregroundStyle(.white)
+#else
                 .background(Capsule().fill(Color.accentColor.opacity(0.2)))
                 .foregroundColor(.accentColor)
+#endif
         }
+#if os(visionOS)
+        .buttonStyle(.borderedProminent)
+        .tint(.accentColor)
+#else
         .buttonStyle(.plain)
+#endif
         .help(String(localized: "Complete editing and retry."))
         .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
         .allowsHitTesting(!isStreamingAny)
@@ -1006,7 +1036,11 @@ struct MessageView: View {
                     .lineLimit(1...10)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
+#if os(visionOS)
+                    .background(.regularMaterial)
+#else
                     .background(.background.secondary.opacity(0.7))
+#endif
                     .cornerRadius(8)
                     .onKeyPress(KeyEquivalent.return) {
 #if os(macOS)
