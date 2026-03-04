@@ -14,6 +14,7 @@ struct ChatView: View {
     @State private var showingVisionWarningAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
+    @State private var inputAreaHeight: CGFloat = 0
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -53,9 +54,9 @@ struct ChatView: View {
             } else {
                 // OSバージョン26以降かどうかの条件分岐
                 if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
                 } else {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
+                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
                 }
             }
         }
@@ -78,6 +79,13 @@ struct ChatView: View {
         }
 #if !os(visionOS)
         .padding()
+#endif
+#if os(visionOS)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            (proxy.size.height + 32) / 2
+        } action: { newValue in
+            inputAreaHeight = newValue
+        }
 #endif
     }
     
@@ -774,6 +782,7 @@ struct ImageGenerationView: View {
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
     @State private var showingClearConfirm: Bool = false
+    @State private var inputAreaHeight: CGFloat = 0
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -820,6 +829,7 @@ struct ImageGenerationView: View {
                         if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) { return true }
                         return false
                     }(),
+                    bottomInset: inputAreaHeight,
                     emptyStateTitle: "Image Generation",
                     emptyStateDescription: "Here you can generate images using models that support image generation.",
                     emptyStateImage: "photo.stack.fill"
@@ -851,6 +861,13 @@ struct ImageGenerationView: View {
         }
 #if !os(visionOS)
         .padding()
+#endif
+#if os(visionOS)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            (proxy.size.height + 32) / 2
+        } action: { newValue in
+            inputAreaHeight = newValue
+        }
 #endif
     }
     

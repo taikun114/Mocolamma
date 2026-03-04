@@ -23,6 +23,7 @@ struct ChatMessagesView: View {
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
     let isUsingSafeAreaBar: Bool
+    var bottomInset: CGFloat = 0
     
     // 空の状態の表示をカスタマイズするための引数を追加
     let emptyStateTitle: LocalizedStringKey
@@ -56,7 +57,8 @@ struct ChatMessagesView: View {
                     isModelSelected: isModelSelected,
                     supportsEffects: supportsEffects,
                     reduceMotionEnabled: reduceMotionEnabled,
-                    isUsingSafeAreaBar: isUsingSafeAreaBar
+                    isUsingSafeAreaBar: isUsingSafeAreaBar,
+                    bottomInset: bottomInset
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
@@ -70,11 +72,11 @@ struct ChatMessagesView: View {
                 
                 // 拡大表示オーバーレイ
                 if let image = executor.previewImage {
-                    ImagePreviewOverlay(image: image) {
+                    ImagePreviewOverlay(image: image, onClose: {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             executor.previewImage = nil
                         }
-                    }
+                    }, bottomInset: bottomInset)
                     .zIndex(100)
                 }
             }
@@ -92,6 +94,7 @@ struct ChatMessagesScrollView: View {
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
     let isUsingSafeAreaBar: Bool
+    var bottomInset: CGFloat = 0
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -113,6 +116,11 @@ struct ChatMessagesScrollView: View {
                 .if(!isUsingSafeAreaBar) { view in
                     view.padding(.bottom, 50)
                 }
+                
+                if bottomInset > 0 {
+                    Spacer(minLength: bottomInset)
+                }
+                
                 Spacer().id("bottom-spacer")
             }
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))

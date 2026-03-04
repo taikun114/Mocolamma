@@ -37,6 +37,9 @@ struct MessageInputView: View {
                                             .frame(width: 60, height: 60)
                                             .clipShape(RoundedRectangle(cornerRadius: 8))
                                             .contentShape(Rectangle())
+#if os(visionOS)
+                                            .hoverEffect()
+#endif
                                             .onTapGesture {
                                                 if let fullImage = PlatformImage(data: imageContainer.data) {
                                                     withAnimation(.easeInOut(duration: 0.2)) {

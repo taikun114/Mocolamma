@@ -40,6 +40,9 @@ struct ModelListView: View {
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var inputAreaHeight: CGFloat = 0
+    @State private var pullErrorMessage: String? = nil
+    @State private var showingPullErrorAlert: Bool = false
     let isSelected: Bool // 現在のタブが選択されているか
     
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
@@ -163,13 +166,15 @@ struct ModelListView: View {
     }
     
     
-    private func parseError(from output: String) -> String? {
+    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
         if let data = output.data(using: .utf8),
            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let err = obj["error"] as? String {
-            return err.replacingOccurrences(of: "\n", with: " ")
+            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
         }
-        if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
+        if output.lowercased().contains("error") {
+            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+        }
         return nil
     }
     
@@ -269,7 +274,8 @@ struct ModelListView: View {
                 sortOrder: $sortOrder,
                 modelToDelete: $modelToDelete,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
-                copyIconName: copyIconName
+                copyIconName: copyIconName,
+                bottomInset: inputAreaHeight
             )
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
@@ -280,7 +286,8 @@ struct ModelListView: View {
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
-                    copyIconName: copyIconName
+                    copyIconName: copyIconName,
+                    bottomInset: 0
                 )
                 .safeAreaBar(edge: .bottom) {
                     PullProgressView(executor: executor, isSelected: isSelected)
@@ -294,7 +301,8 @@ struct ModelListView: View {
                         sortOrder: $sortOrder,
                         modelToDelete: $modelToDelete,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
-                        copyIconName: copyIconName
+                        copyIconName: copyIconName,
+                        bottomInset: 0
                     )
                     
                     PullProgressView(executor: executor, isSelected: isSelected)
@@ -309,7 +317,8 @@ struct ModelListView: View {
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
-                    copyIconName: copyIconName
+                    copyIconName: copyIconName,
+                    bottomInset: 0
                 )
                 
                 PullProgressView(executor: executor, isSelected: isSelected)
@@ -327,6 +336,11 @@ struct ModelListView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .glassBackgroundEffect()
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height / 2
+                } action: { newValue in
+                    inputAreaHeight = newValue
+                }
         }
 #endif
         .overlay(alignment: .center) {
@@ -367,6 +381,23 @@ struct ModelListView: View {
                 appRefreshTrigger.send()
             }
         }
+        .onChange(of: executor.isPullingErrorHold) { _, newValue in
+            if newValue && executor.pullHasError {
+                if let errorText = parseError(from: executor.output, replaceNewline: false) {
+                    pullErrorMessage = errorText
+                    showingPullErrorAlert = true
+                }
+            }
+        }
+        .alert("Download Failed", isPresented: $showingPullErrorAlert) {
+            Button("OK") { }
+        } message: {
+            if let errorMessage = pullErrorMessage {
+                Text(errorMessage)
+            } else {
+                Text("An unknown error occurred during model download.")
+            }
+        }
     }
 }
 
@@ -382,6 +413,7 @@ struct ModelListContentView: View {
     @Binding var modelToDelete: OllamaModel?
     @Binding var showingDeleteConfirmation: Bool
     let copyIconName: String
+    var bottomInset: CGFloat = 0
     
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
@@ -438,6 +470,14 @@ struct ModelListContentView: View {
                 }
             }
         }
+#if os(visionOS)
+        .safeAreaInset(edge: .bottom) {
+            if bottomInset > 0 {
+                Color.clear
+                    .frame(height: bottomInset)
+            }
+        }
+#endif
         .refreshable {
             guard !executor.isPulling else { return }
             appRefreshTrigger.send()
@@ -497,6 +537,39 @@ struct PullProgressView: View {
     
     var body: some View {
         if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
+#if os(visionOS)
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    ProgressView(value: executor.pullProgress) {
+                        Text(executor.pullStatus)
+                    } currentValueLabel: {
+                        progressLabels
+                    }
+                    .progressViewStyle(.linear)
+                    .animation(.default, value: executor.pullProgress)
+                    
+                    if let errorText = parseError(from: executor.output) {
+                        MarqueeText(text: errorText)
+                            .foregroundColor(.red)
+                            .padding(.top, 2)
+                            .frame(maxWidth: .infinity, minHeight: 14)
+                    }
+                }
+                
+                if executor.isPullingErrorHold && executor.pullHasError {
+                    Button(action: {
+                        if !executor.lastPulledModelName.isEmpty {
+                            executor.pullModel(modelName: executor.lastPulledModelName)
+                        }
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                            .help("Retry")
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                }
+            }
+#else
             VStack(alignment: .center, spacing: 8) {
                 ProgressView(value: executor.pullProgress) {
                     HStack(alignment: .bottom) {
@@ -530,7 +603,6 @@ struct PullProgressView: View {
                         .frame(maxWidth: .infinity, minHeight: 14)
                 }
             }
-#if !os(visionOS)
             .padding(.horizontal, 12)
             .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
             .padding(.bottom, 12)
@@ -593,13 +665,15 @@ struct PullProgressView: View {
 #endif
     }
     
-    private func parseError(from output: String) -> String? {
+    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
         if let data = output.data(using: .utf8),
            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let err = obj["error"] as? String {
-            return err.replacingOccurrences(of: "\n", with: " ")
+            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
         }
-        if output.lowercased().contains("error") { return output.replacingOccurrences(of: "\n", with: " ") }
+        if output.lowercased().contains("error") {
+            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+        }
         return nil
     }
 }

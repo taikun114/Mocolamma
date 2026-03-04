@@ -120,6 +120,7 @@ struct GestureCaptureView: UIViewRepresentable {
 struct ImagePreviewOverlay: View {
     let image: PlatformImage
     let onClose: () -> Void
+    var bottomInset: CGFloat = 0
     
     @State private var scale: CGFloat = 1.0
     @GestureState private var magnifyBy = CGFloat(1.0)
@@ -170,6 +171,7 @@ struct ImagePreviewOverlay: View {
                     }
                 )
                 .edgesIgnoringSafeArea(.all)
+                .padding(.bottom, bottomInset)
                 .zIndex(10)
                 #endif
                 
@@ -177,6 +179,7 @@ struct ImagePreviewOverlay: View {
                 Image(platformImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+                    .padding(.bottom, bottomInset)
                     .scaleEffect(scale * magnifyBy)
                     .offset(offset)
                     #if os(macOS)
