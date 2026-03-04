@@ -145,12 +145,21 @@ struct ModelInspectorView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
 #endif
+#if os(visionOS)
+            .background(Capsule().fill(Color.accentColor))
+            .foregroundColor(.white)
+            .overlay(
+                Capsule()
+                    .stroke(Color.white, lineWidth: isSelected ? 2 : 0)
+            )
+#else
             .background(Capsule().fill(Color.accentColor.opacity(isSelected ? 0.3 : 0.2)))
             .foregroundColor(.accentColor)
             .overlay(
                 Capsule()
                     .stroke(Color.accentColor, lineWidth: isSelected ? 2 : 0)
             )
+#endif
         }
         .buttonStyle(.plain)
         .onHover { inside in
@@ -442,10 +451,18 @@ struct ModelInspectorView: View {
                                         showingLicenseSheet = true
                                     }) {
                                         Text(licenseName)
+#if os(visionOS)
+                                            .font(.body).bold()
+#else
                                             .font(.title3).bold()
                                             .foregroundColor(.accentColor)
+#endif
                                     }
+#if os(visionOS)
+                                    .buttonStyle(.bordered)
+#else
                                     .buttonStyle(PlainButtonStyle())
+#endif
                                 } else {
                                     Text(licenseName)
                                         .font(.title3).bold()

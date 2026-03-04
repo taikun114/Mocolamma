@@ -71,10 +71,19 @@ struct RunningModelsCountView: View {
                                     await commandExecutor.unloadModel(modelName: model.name, host: host)
                                 }
                             }) {
+#if os(visionOS)
+                                Label("Unload", systemImage: "tray.and.arrow.up")
+                                    .labelStyle(.iconOnly)
+#else
                                 Image(systemName: "tray.and.arrow.up")
                                     .foregroundStyle(Color.accentColor)
+#endif
                             }
+#if os(visionOS)
+                            .buttonStyle(.bordered)
+#else
                             .buttonStyle(.plain)
+#endif
                             .help("Unload this model from memory.")
                         }
                         

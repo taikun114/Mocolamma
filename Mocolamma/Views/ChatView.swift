@@ -89,8 +89,7 @@ struct ChatView: View {
                 .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
                     makeSafeAreaBarContent()
                         .frame(width: 600)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
+                        .padding(16)
                         .glassBackgroundEffect()
                 }
 #elseif os(iOS)
@@ -863,8 +862,7 @@ struct ImageGenerationView: View {
                 .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
                     makeInputArea()
                         .frame(width: 600)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
+                        .padding(16)
                         .glassBackgroundEffect()
                 }
 #elseif os(iOS)

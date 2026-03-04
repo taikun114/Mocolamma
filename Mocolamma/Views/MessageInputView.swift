@@ -103,6 +103,11 @@ struct MessageInputView: View {
                 Button(action: {
                     showingAttachSheet = true
                 }) {
+#if os(visionOS)
+                    Image(systemName: "plus")
+                        .font(.title2)
+                        .padding(8)
+#else
                     ZStack {
 #if !os(macOS)
                         if #available(iOS 26, visionOS 26.0, *) {
@@ -135,8 +140,14 @@ struct MessageInputView: View {
 #endif
                     }
                     .contentShape(Rectangle())
+#endif
                 }
+#if os(visionOS)
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
+#else
                 .buttonStyle(.plain)
+#endif
                 .disabled(!(selectedModel?.supportsVision ?? false))
                 .confirmationDialog(
                     Text("Attach Images"),
@@ -179,6 +190,9 @@ struct MessageInputView: View {
                     TextField(LocalizedStringKey(placeholder), text: $inputText, axis: .vertical)
                         .focused($isInputFocused)
                         .textFieldStyle(.plain)
+#if os(visionOS)
+                        .hoverEffectDisabled()
+#endif
                         .disabled(selectedModel == nil)
                         .onChange(of: selectedModel) { _, model in
                             if model != nil { isInputFocused = true }
@@ -187,11 +201,16 @@ struct MessageInputView: View {
                         .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
-                        .background(Color.clear) // TextFieldの背景を透明にする
-                    
-                        .cornerRadius(16) // 角を丸くする
+                        .contentShape(.rect(cornerRadius: 24))
+#if os(visionOS)
+                        .hoverEffect()
+                        .background(.regularMaterial)
+#else
+                        .background(Color.clear)
+#endif
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: 24)
                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                         )
                         .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
@@ -231,21 +250,29 @@ struct MessageInputView: View {
 #if !os(macOS)
                 if #available(iOS 26, visionOS 26.0, *) {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+#if os(visionOS)
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
+                            .font(.title2)
+                            .padding(8)
+#else
                         ZStack {
                             Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(8)
-#if os(visionOS)
-                                .background(Circle().fill(Color.accentColor.opacity(1.0)))
-                                .foregroundColor(.white.opacity(1.0))
-#else
                                 .glassEffect(.regular.tint(.accentColor).interactive())
-#endif
                         }
                         .contentShape(Rectangle())
+#endif
                     }
+#if os(visionOS)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.circle)
+                    .tint(.accentColor)
+                    .foregroundStyle(.white)
+#else
                     .buttonStyle(.plain)
+#endif
                     .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 } else {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
@@ -264,21 +291,29 @@ struct MessageInputView: View {
 #else
                 if #available(macOS 26, *) {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+#if os(visionOS)
+                        Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
+                            .font(.title2)
+                            .padding(8)
+#else
                         ZStack {
                             Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(7)
-#if os(visionOS)
-                                .background(Circle().fill(Color.accentColor.opacity(1.0)))
-                                .foregroundColor(.white.opacity(1.0))
-#else
                                 .glassEffect(.regular.tint(.accentColor).interactive())
-#endif
                         }
                         .contentShape(Rectangle())
+#endif
                     }
+#if os(visionOS)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.circle)
+                    .tint(.accentColor)
+                    .foregroundStyle(.white)
+#else
                     .buttonStyle(.plain)
+#endif
                     .disabled(isStreaming ? false : (selectedModel == nil || (inputText.isEmpty && (selectedImages.isEmpty || selectedModel?.supportsVision != true))))
                 } else {
                     Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {

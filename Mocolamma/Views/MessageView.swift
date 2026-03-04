@@ -102,7 +102,33 @@ struct MessageView: View {
             Spacer().frame(height: 8)
 #endif
             Group {
-#if !os(macOS)
+#if os(visionOS)
+                HStack(alignment: .center, spacing: 8) {
+                    if message.role == "user" { Spacer() }
+                    
+                    Text(dateString)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    
+                    if message.role == "assistant" { tokenAndSpeed }
+                    
+                    HStack(spacing: 6) {
+                        if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
+                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
+                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
+                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
+                            if isEditing {
+                                cancelButton
+                                doneButton
+                            } else { editButton }
+                        }
+                    }
+                    
+                    if message.role == "assistant" { Spacer() }
+                }
+#elseif os(iOS)
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
@@ -314,7 +340,7 @@ struct MessageView: View {
     
     @ViewBuilder
     private var revisionNavigator: some View {
-        Group { // ビュービルダー全体にdisabled修飾子を適用するためにGroupでラップ
+        HStack(alignment: .center, spacing: 4) {
             Button(action: {
                 message.currentRevisionIndex -= 1
                 let revision = message.revisions[message.currentRevisionIndex]
@@ -337,8 +363,13 @@ struct MessageView: View {
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Previous Revision")
             .disabled(message.currentRevisionIndex == 0)
             
@@ -346,6 +377,10 @@ struct MessageView: View {
                 Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .fixedSize(horizontal: true, vertical: false)
+#if os(visionOS)
+                    .padding(.horizontal, 4)
+#endif
             }
             
             Button(action: {
@@ -382,8 +417,13 @@ struct MessageView: View {
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Next Revision")
             .disabled(message.currentRevisionIndex == message.revisions.count)
         }
@@ -404,8 +444,13 @@ struct MessageView: View {
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
         .help("Retry")
         .disabled(!isModelSelected)
     }
@@ -426,8 +471,13 @@ struct MessageView: View {
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
         .help("Download Image")
         .confirmationDialog(Text("Select Destination"), isPresented: $showingSaveOptions, titleVisibility: .visible) {
             Button(String(localized: "Save to Photo Library")) {
@@ -579,8 +629,13 @@ struct MessageView: View {
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
         .help("Copy")
         .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
     }
@@ -615,8 +670,13 @@ struct MessageView: View {
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
         .help("Share")
         .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
     }
@@ -688,8 +748,13 @@ struct MessageView: View {
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Edit")
             .disabled(isStreamingAny)
         }
