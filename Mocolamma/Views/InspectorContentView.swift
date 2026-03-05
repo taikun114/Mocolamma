@@ -152,6 +152,7 @@ struct InspectorContentView: View {
                                 .padding(.bottom, 4)
                                 HStack {
                                     CompactSlider(value: $chatSettings.chatTemperature, in: 0.0...2.0, step: 0.1)
+                                        .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                                         .frame(height: 32)
 #else
@@ -182,6 +183,7 @@ struct InspectorContentView: View {
                                 .padding(.bottom, 4)
                                 HStack {
                                     CompactSlider(value: $chatSettings.contextWindowValue, in: 512...Double(chatSettings.selectedModelContextLength ?? 4096), step: 128.0)
+                                        .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                                         .frame(height: 32)
 #else
@@ -395,6 +397,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customWidthEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.width, in: 64...2048, step: 64)
+                .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                 .frame(height: 32)
 #else
@@ -439,6 +442,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customHeightEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.height, in: 64...2048, step: 64)
+                .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                 .frame(height: 32)
 #else
@@ -541,6 +545,7 @@ struct InspectorContentView: View {
                     .foregroundStyle(imageSettings.customStepsEnabled ? .tertiary : .secondary)
             }
             CompactSlider(value: $imageSettings.steps, in: 1...20, step: 1)
+                .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                 .frame(height: 32)
 #else
@@ -627,6 +632,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.repeatPenaltyValue, in: 0.0...2.0, step: 0.1)
+                    .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                     .frame(height: 32)
 #else
@@ -716,6 +722,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.topPValue, in: 0.0...1.0, step: 0.01)
+                    .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                     .frame(height: 32)
 #else
@@ -745,6 +752,7 @@ struct InspectorContentView: View {
             .padding(.bottom, 4)
             HStack {
                 CompactSlider(value: $chatSettings.minPValue, in: 0.0...1.0, step: 0.01)
+                    .compactSliderOptionsByAdding(.precisionControl())
 #if !os(macOS)
                     .frame(height: 32)
 #else
