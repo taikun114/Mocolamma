@@ -230,6 +230,7 @@ struct ModelListView: View {
             } label: {
                 Label("Sort", systemImage: filterIconName)
             }
+            .help(String(localized: "Sort and Filter"))
             .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
 #endif

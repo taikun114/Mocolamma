@@ -363,6 +363,12 @@ struct ChatView: View {
                 let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
+            .help({
+                if let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+                    return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
+                }
+                return String(localized: "Select Model")
+            }())
         }
         
 #if os(iOS)
@@ -1024,6 +1030,12 @@ struct ImageGenerationView: View {
                 let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
             }
+            .help({
+                if let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name {
+                    return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
+                }
+                return String(localized: "Select Model")
+            }())
         }
 #endif
 
