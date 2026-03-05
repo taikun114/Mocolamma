@@ -180,6 +180,15 @@ struct ModelListView: View {
     
     @ToolbarContentBuilder
     private var modelToolbarContent: some ToolbarContent {
+#if os(macOS) || os(visionOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { appRefreshTrigger.send() }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
+        }
+#endif
+
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Menu {
@@ -195,14 +204,15 @@ struct ModelListView: View {
             }
             .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
+#else
         ToolbarItem(placement: .primaryAction) {
+#if !os(visionOS)
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
-        }
-#else
-        ToolbarItem(placement: .primaryAction) {
+#endif
+            
             Menu {
                 Picker("Sort by", selection: $sortCriterion) {
                     ForEach(SortCriterion.allCases) { criterion in

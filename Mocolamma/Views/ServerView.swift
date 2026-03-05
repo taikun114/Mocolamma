@@ -30,7 +30,7 @@ struct ServerView: View {
     
     @ToolbarContentBuilder
     private var serverToolbarContent: some ToolbarContent {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
