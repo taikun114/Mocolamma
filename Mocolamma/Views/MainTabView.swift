@@ -83,10 +83,20 @@ struct MainTabView: View {
             .tabItem { Label("Settings", systemImage: "gear") }
             .tag("settings")
         }
-        .onChange(of: selection) { _, _ in
-            withAnimation(.easeInOut(duration: 0.2)) {
+        .onChange(of: selection) { _, newSelection in
+#if os(visionOS)
+            withAnimation(.easeInOut(duration: 0.3)) {
                 executor.previewImage = nil
+                if newSelection == "settings" && showingInspector {
+                    showingInspector = false
+                }
             }
+#else
+            executor.previewImage = nil
+            if newSelection == "settings" && showingInspector {
+                showingInspector = false
+            }
+#endif
         }
         .tabViewStyle(.sidebarAdaptable)
 #if !os(visionOS)
@@ -113,21 +123,34 @@ struct MainTabView: View {
         }
 #if os(visionOS)
         .ornament(
-            visibility: showingInspector ? .visible : .hidden,
+            visibility: .automatic,
             attachmentAnchor: .scene(.trailing),
             contentAlignment: .leading
         ) {
             ZStack {
                 if showingInspector {
-                    inspectorContent
-                        .frame(width: 400, height: 600)
-                        .glassBackgroundEffect()
-                        .transition(.asymmetric(
-                            insertion: .offset(x: -50).combined(with: .opacity),
-                            removal: .offset(x: -50).combined(with: .opacity)
-                        ))
+                    // インスペクター全体のコンテナ（登場・退場アニメーション用）
+                    ZStack {
+                        // 内部コンテンツのコンテナ（コンテンツ切り替えフェード用）
+                        // idをこのZStackに持たせることで、内部の inspectorContent がまるごと入れ替わるようにする
+                        ZStack {
+                            inspectorContent
+                        }
+                        .id("\(selection ?? "")-\(selectedModel ?? "")-\(selectedServerForInspector?.id.uuidString ?? "")")
+                        .transition(.opacity)
+                    }
+                    .frame(width: 400, height: 600)
+                    .glassBackgroundEffect()
+                    .transition(.asymmetric(
+                        insertion: .offset(x: -50).combined(with: .opacity),
+                        removal: .offset(x: -50).combined(with: .opacity)
+                    ))
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: selection)
+            .animation(.easeInOut(duration: 0.3), value: selectedModel)
+            .animation(.easeInOut(duration: 0.3), value: selectedServerForInspector)
+            .animation(.easeInOut(duration: 0.3), value: showingInspector)
             .frame(width: 400, height: 600)
         }
 #endif

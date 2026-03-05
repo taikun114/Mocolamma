@@ -156,11 +156,23 @@ struct ContentView: View {
                 updateSelectedServerForInspector()
             }
             if newSelection == "settings" && showingInspector {
+#if os(visionOS)
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showingInspector = false
+                }
+#else
                 showingInspector = false
+#endif
             }
         }
         .onChange(of: selectedModel) { _, newValue in
+#if os(visionOS)
+            withAnimation(.easeInOut(duration: 0.3)) {
+                serverManager.inspectorSelectedModelID = newValue
+            }
+#else
             serverManager.inspectorSelectedModelID = newValue
+#endif
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
             serverManager.inspectorSelectedServer = newServer

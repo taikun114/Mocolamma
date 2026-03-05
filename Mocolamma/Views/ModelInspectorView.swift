@@ -547,8 +547,15 @@ struct ModelInspectorView: View {
                         .foregroundColor(.secondary)
                 }
             }
+            .id(isLoading)
+#if os(visionOS)
+            .transition(.opacity)
+#endif
             .padding()
         }
+#if os(visionOS)
+        .animation(.easeInOut(duration: 0.3), value: isLoading)
+#endif
 #if os(visionOS)
         .scrollClipDisabled()
 #endif

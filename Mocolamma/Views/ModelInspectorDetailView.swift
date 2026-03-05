@@ -28,13 +28,37 @@ struct ModelInspectorDetailView: View {
             selectedFilterTag: $selectedFilterTag
         )
         .onAppear(perform: loadModelInfo)
+        .onChange(of: model.id) { _, _ in
+            loadModelInfo()
+        }
     }
     
     private func loadModelInfo() {
+#if os(visionOS)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isLoadingInfo = true
+        }
+#else
         isLoadingInfo = true
+#endif
         Task {
             let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
             await MainActor.run {
+#if os(visionOS)
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.modelInfo = fetchedResponse?.model_info
+                    self.licenseBody = fetchedResponse?.license
+                    // デモモデルの場合はテスト用ライセンスURLを設定
+                    if model.name == "demo:0b" || model.name == "demo2:0b" {
+                        self.licenseLink = "https://example.com/"
+                    } else {
+                        // 通常のモデルでは、model_infoからライセンスリンクを取得
+                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+                    }
+                    self.fetchedCapabilities = fetchedResponse?.capabilities
+                    self.isLoadingInfo = false
+                }
+#else
                 self.modelInfo = fetchedResponse?.model_info
                 self.licenseBody = fetchedResponse?.license
                 // デモモデルの場合はテスト用ライセンスURLを設定
@@ -46,6 +70,7 @@ struct ModelInspectorDetailView: View {
                 }
                 self.fetchedCapabilities = fetchedResponse?.capabilities
                 self.isLoadingInfo = false
+#endif
             }
         }
     }
