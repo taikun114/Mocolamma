@@ -9,6 +9,16 @@ enum ServerConnectionStatus {
     case unknownHost
     case timedOut // タイムアウト
     case checking
+    
+    /// 疎通が確認できている（接続済み、またはエラーメッセージが返ってきている）かどうか
+    var isConnected: Bool {
+        switch self {
+        case .connected, .errorWithMessage:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 // MARK: - サーバーマネージャー

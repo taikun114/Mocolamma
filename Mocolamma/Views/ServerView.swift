@@ -127,6 +127,14 @@ struct ServerView: View {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
+            
+            // 初期状態でリスト選択（ハイライト）がない場合、チェック済みサーバーをインスペクタの表示対象にする
+            if listSelection == nil {
+                if let activeID = serverManager.selectedServerID {
+                    selectedServerForInspector = serverManager.servers.first(where: { $0.id == activeID })
+                }
+            }
+            
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled {
                 appRefreshTrigger.send()
@@ -167,7 +175,12 @@ struct ServerView: View {
         if let newID = newID {
             selectedServerForInspector = serverManager.servers.first(where: { $0.id == newID })
         } else {
-            selectedServerForInspector = nil
+            // リスト選択が解除された場合は、現在選択（チェック）されているサーバーを表示
+            if let activeID = serverManager.selectedServerID {
+                selectedServerForInspector = serverManager.servers.first(where: { $0.id == activeID })
+            } else {
+                selectedServerForInspector = nil
+            }
         }
     }
 }

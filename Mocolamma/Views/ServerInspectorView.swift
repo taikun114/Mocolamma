@@ -195,12 +195,41 @@ struct ServerInspectorView: View {
                                 }
                             }
                     }
-                    VStack(alignment: .leading) {
-                        Text("Running Models:")
-                            .font(.subheadline)
-                        RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
-                            .environment(commandExecutor)
+                    
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading) {
+                            Text("Running Models:")
+                                .font(.subheadline)
+                            RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showList: false)
+                                .environment(commandExecutor)
+                        }
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                        }) {
+#if os(visionOS)
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                                .labelStyle(.iconOnly)
+                                .frame(width: 20, height: 20)
+#else
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundStyle(Color.accentColor)
+                                .frame(width: 20, height: 20)
+#endif
+                        }
+#if os(visionOS)
+                        .buttonStyle(.bordered)
+#else
+                        .buttonStyle(.plain)
+#endif
+                        .help("Refresh the list of running models.")
+                        .disabled(connectionStatus?.isConnected != true)
                     }
+                    
+                    RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showSummary: false)
+                        .environment(commandExecutor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .task(id: server.host) {

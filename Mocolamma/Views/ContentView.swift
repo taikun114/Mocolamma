@@ -146,6 +146,7 @@ struct ContentView: View {
         .onAppear {
             selection = "server"
             // 初期値を同期
+            updateSelectedServerForInspector()
             serverManager.inspectorSelection = selection
             serverManager.inspectorSelectedModelID = selectedModel
             serverManager.inspectorSelectedServer = selectedServerForInspector

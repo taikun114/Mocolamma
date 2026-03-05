@@ -8,6 +8,15 @@ struct RunningModelsCountView: View {
     @State private var isLoading: Bool = false
     @State private var isExpanded: Bool = false
     
+    // 追加のプロパティ
+    var showList: Bool = true
+    var showSummary: Bool = true
+    var externalModels: [OllamaRunningModel]? = nil
+    
+    private var currentModels: [OllamaRunningModel] {
+        externalModels ?? runningModels
+    }
+    
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -20,7 +29,7 @@ struct RunningModelsCountView: View {
             return "-"
         } else {
             if case .connected = connectionStatus {
-                return String(runningModels.count)
+                return String(currentModels.count)
             } else {
                 return "-"
             }
@@ -29,20 +38,22 @@ struct RunningModelsCountView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .bottom, spacing: 4) {
-                Text(displayCountText)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.primary)
-                Text("running")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 2)
+            if showSummary {
+                HStack(alignment: .bottom, spacing: 4) {
+                    Text(displayCountText)
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(.primary)
+                    Text("running")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 2)
+                }
             }
             
-            if runningModels.count > 0 {
+            if showList && currentModels.count > 0 {
                 VStack(alignment: .leading, spacing: 4) {
-                    ForEach(Array(runningModels.enumerated()), id: \.element.name) { index, model in
+                    ForEach(Array(currentModels.enumerated()), id: \.element.name) { index, model in
                         HStack(alignment: .top) {
                             VStack(alignment: .leading) {
                                 Text(model.name)
@@ -74,9 +85,11 @@ struct RunningModelsCountView: View {
 #if os(visionOS)
                                 Label("Unload", systemImage: "tray.and.arrow.up")
                                     .labelStyle(.iconOnly)
+                                    .frame(width: 20, height: 20)
 #else
                                 Image(systemName: "tray.and.arrow.up")
                                     .foregroundStyle(Color.accentColor)
+                                    .frame(width: 20, height: 20)
 #endif
                             }
 #if os(visionOS)
@@ -86,8 +99,26 @@ struct RunningModelsCountView: View {
 #endif
                             .help("Unload this model from memory.")
                         }
+                        .contentShape(Rectangle())
+                        .contextMenu {
+                            Button(action: {
+                                Task {
+                                    await commandExecutor.unloadModel(modelName: model.name, host: host)
+                                }
+                            }) {
+                                Label("Unload", systemImage: "tray.and.arrow.up")
+                            }
+                            
+                            Divider()
+                            
+                            Button(action: {
+                                Task { await refresh() }
+                            }) {
+                                Label("Refresh", systemImage: "arrow.clockwise")
+                            }
+                        }
                         
-                        if index < runningModels.count - 1 {
+                        if index < currentModels.count - 1 {
                             Divider()
                         }
                     }
@@ -96,17 +127,14 @@ struct RunningModelsCountView: View {
             }
         }
         .task(id: host) {
-            await refresh()
-        }
-        .contextMenu {
-            Button(action: {
-                Task { await refresh() }
-            }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
+            if externalModels == nil {
+                await refresh()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("InspectorRefreshRequested"))) { _ in
-            Task { await refresh() }
+            if externalModels == nil {
+                Task { await refresh() }
+            }
         }
     }
     
