@@ -1216,7 +1216,13 @@ struct SimpleStyle: StructuredText.Style {
             )
             .code(
                 .monospaced,
-                .backgroundColor(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2))
+                .backgroundColor({
+#if os(visionOS)
+                    return Color.black.opacity(0.2)
+#else
+                    return message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2)
+#endif
+                }())
             )
     }
 
@@ -1359,7 +1365,11 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
                     .padding()
             }
         }
+#if os(visionOS)
+        .background(Color.black.opacity(0.2))
+#else
         .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.1))
+#endif
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .padding(.vertical, 8)
         .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
