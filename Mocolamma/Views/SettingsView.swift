@@ -104,7 +104,12 @@ struct SettingsView: View {
                             Button(action: { localNetworkChecker.refresh() }) {
                                 Image(systemName: "arrow.clockwise")
                             }
+#if os(visionOS)
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.circle)
+#else
                             .buttonStyle(.borderless)
+#endif
                             .help("Refresh status")
                         }
                         Button(action: { showingInstructions = true }) {
@@ -145,7 +150,12 @@ struct SettingsView: View {
                         }
                         Spacer()
                         Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
+#if os(visionOS)
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.circle)
+#else
                             .buttonStyle(.borderless)
+#endif
                             .help("Refresh status")
                         Button(action: { showingInstructions = true }) {
                             HStack {

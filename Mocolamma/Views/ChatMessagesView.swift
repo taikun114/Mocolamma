@@ -80,6 +80,12 @@ struct ChatMessagesView: View {
                     .zIndex(100)
                 }
             }
+            .contentShape(Rectangle())
+#if !os(macOS)
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+#endif
             .environment(\.containerHeight, geometry.size.height)
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
@@ -123,6 +129,9 @@ struct ChatMessagesScrollView: View {
                 
                 Spacer().id("bottom-spacer")
             }
+#if os(iOS)
+            .scrollDismissesKeyboard(.interactively)
+#endif
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
             .onChange(of: messages.count) { oldCount, newCount in
                 if newCount > oldCount {
