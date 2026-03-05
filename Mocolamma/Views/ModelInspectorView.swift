@@ -551,13 +551,16 @@ struct ModelInspectorView: View {
 #if os(visionOS)
             .transition(.opacity)
 #endif
-            .padding()
+            .padding(.horizontal)
         }
 #if os(visionOS)
+        .safeAreaInset(edge: .top) {
+            Color.clear.frame(height: 8)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 8)
+        }
         .animation(.easeInOut(duration: 0.3), value: isLoading)
-#endif
-#if os(visionOS)
-        .scrollClipDisabled()
 #endif
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {
