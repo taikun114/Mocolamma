@@ -128,6 +128,7 @@ struct ImagePreviewOverlay: View {
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
     
+    @State private var isDragging = false
     @State private var eventMonitor: Any?
     
     var body: some View {
@@ -196,12 +197,20 @@ struct ImagePreviewOverlay: View {
                     .simultaneousGesture(
                         DragGesture()
                             .onChanged { value in
+                                #if os(macOS)
+                                NSCursor.closedHand.set()
+                                isDragging = true
+                                #endif
                                 offset = CGSize(
                                     width: lastOffset.width + value.translation.width,
                                     height: lastOffset.height + value.translation.height
                                 )
                             }
                             .onEnded { _ in
+                                #if os(macOS)
+                                isDragging = false
+                                NSCursor.openHand.set()
+                                #endif
                                 lastOffset = offset
                             }
                     )
@@ -217,6 +226,15 @@ struct ImagePreviewOverlay: View {
                     }
                     .onTapGesture(count: 1) {
                         onClose()
+                    }
+                    .onHover { inside in
+                        #if os(macOS)
+                        if inside {
+                            NSCursor.openHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                        #endif
                     }
                     #endif
             }
