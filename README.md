@@ -29,12 +29,14 @@
   - [Download](#download)
     - [macOS Version](#macos-version)
     - [iOS / iPadOS Version](#ios--ipados-version)
+    - [visionOS Version](#visionos-version)
   - [System Requirements](#system-requirements)
   - [Differences between free and paid versions](#differences-between-free-and-paid-versions)
 - [Features](#features)
   - [Server Tab](#server-tab)
   - [Model Tab](#model-tab)
   - [Chat Tab](#chat-tab)
+  - [Image Generation Tab](#image-generation-tab)
   - [Privacy and Security](#privacy-and-security)
 - [Support and Feedback](#support-and-feedback)
   - [Bug Reports](#bug-reports)
@@ -70,6 +72,9 @@ Mocolamma can be downloaded for free from the [**releases page**](https://github
 #### iOS / iPadOS Version
 Mocolamma can be purchased for $1.99 on the [**App Store**](https://apps.apple.com/us/app/mocolamma/id6753896649).
 
+#### visionOS Version
+Mocolamma can be purchased for $1.99 on the [**App Store**](https://apps.apple.com/us/app/mocolamma/id6753896649).
+
 > [!TIP]
 > Purchasing Mocolamma on the App Store for macOS, iOS / iPadOS, or visionOS will enable access from all platforms with a single purchase!
 
@@ -77,12 +82,16 @@ Mocolamma can be purchased for $1.99 on the [**App Store**](https://apps.apple.c
 > App Store prices may vary by region and could be automatically adjusted due to exchange rates. These prices are based on the Japanese yen prices of 250 yen, but actual prices may differ depending on your region.
 
 ### System Requirements
-Mocolamma supports **Intel-based Macs** and **Apple Silicon Macs** running **macOS Sonoma (14.0) or later**, and **iPhones and iPads** running **iOS / iPadOS 17.0 or later**, as well as **Apple Vision Pro** running **visionOS 2.0 or later** as an iPad app.
+The system requirements for Mocolamma are as follows:
+
+- **macOS Sequoia (15.0) or later** installed on Mac computer
+  - **Intel-based Mac computer and Mac computer with Apple silicon** are supported.
+- **iOS / iPadOS 18.0 or later** installed on iPhone and iPad
+- **visionOS 2.0 or later** installed on Apple Vision Pro
 
 > [!NOTE]
-> I do not own an Apple Vision Pro, and have only tested on the simulator without real device testing, so there's a possibility of unintended behavior on visionOS.\
-> In my development environment, despite having the visionOS 1.X simulator installed and properly configured, it doesn't appear in the simulator device list, so I can't confirm if Mocolamma works on visionOS 1.X.\
-> Mocolamma's development settings should support visionOS 1.X as well, so I believe Mocolamma can be installed on visionOS 1.X, but since I haven't been able to test on the simulator, even if installation is successful, there's a possibility it may not work correctly.
+> Ollama is not included with Mocolamma. A separate Ollama server is required to use most of Mocolamma's features.\
+> Also, the Ollama server must be configured to be accessible from within your local network.
 
 ### Differences between free and paid versions
 Mocolamma has both a free version (GitHub version, macOS only) and a paid version (App Store version), but both have almost identical functionality. **The only difference is the availability of automatic updates.**\
@@ -107,8 +116,16 @@ From the model tab, you can view models stored on the selected server and add mo
 ### Chat Tab
 ![Chat Tab](docs/images/Chat-Tab.webp)
 
-The chat tab allows you to have simple chats using models stored on the selected server. This is merely a simple chat usable for model testing, so it doesn't have message saving functionality or detailed parameter settings, but it's convenient for casually testing downloaded models.\
-For advanced chat features, I recommend using the official Ollama app or specialized chat-focused applications.
+The chat tab allows you to have simple chats using models stored on the selected server. Since this is a simple chat for model testing, it does not have a message saving function, but it is useful for casually testing downloaded models.\
+For advanced chat features, I recommend using the official Ollama app or a dedicated chat-focused application.
+
+### Image Generation Tab
+
+The image generation tab allows you to generate images using image models stored on the selected server. You can also save the generated images to your device or share them.
+
+> [!NOTE]
+> Ollama's image generation feature is currently in beta. It may stop working due to future changes in the Ollama API specification.\
+> Also, as of March 2026, using the image generation feature with Ollama requires using a Mac computer with Apple silicon as the Ollama server.
 
 ### Privacy and Security
 Mocolamma **does not collect any information about users**.\

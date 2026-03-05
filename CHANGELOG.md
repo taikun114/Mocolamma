@@ -25,6 +25,8 @@ Notes
 - **Revamping the Markdown rendering engine**
   - The Markdown rendering engine for chat has been updated from [**MarkdownUI**](https://github.com/gonzalezreal/swift-markdown-ui) to [**Textual**](https://github.com/gonzalezreal/textual), incorporating improvements such as enhanced performance and syntax highlighting for code blocks, resulting in a more user-friendly experience.
   - As a result, Mocolamma now requires **iOS / iPadOS 18.0 or later, macOS 15.0 or later, visionOS 2.0 or later**. Please note that users on older operating systems will need to perform a software update.
+- **Native support for visionOS**
+  - Mocolamma now runs natively on visionOS devices. On visionOS, the inspector and message input screens feature optimized displays, and the interface uses a native SwiftUI design that blends seamlessly into the space, improving usability.
 - **Support for attaching images in chat**
   - Models with image recognition capabilities now allow you to attach images to receive responses. For image file compatibility, attached images are converted to PNG format and large images are resized to a maximum of 2048px × 2048px before being sent to the API.
   - Attached images can be rearranged by dragging and dropping them, and you can also drag and drop image files from other apps to attach them.
@@ -74,6 +76,7 @@ Notes
   - If the license body contains `MIT License`, it will display `MIT License` as the license title. If the license body contains both `Apache License` and `Version 2.0`, it will display `Apache License 2.0` as the license title.
 - **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
+- **Improve to also show an alert when an error occurs during model download**
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Improve the appearance of the model picker in the chat screen and image generation screen on iOS / iPadOS**
   - A divider line has been added between options, and model names are now displayed when the model picker is within an overflow menu.
