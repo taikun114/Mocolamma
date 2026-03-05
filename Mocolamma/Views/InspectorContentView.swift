@@ -30,8 +30,14 @@ struct InspectorContentView: View {
     private var vStackSpacing: CGFloat {
 #if os(macOS)
         return 8
-#else
+#elseif os(visionOS)
         return 16
+#else
+        if #available(iOS 26.0, *) {
+            return 16
+        } else {
+            return 8
+        }
 #endif
     }
     
