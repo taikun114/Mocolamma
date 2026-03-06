@@ -75,6 +75,27 @@ struct SettingsView: View {
                     APITimeoutManager.shared.set(option: newValue)
                 }
             }
+#elseif os(visionOS)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Timeout")
+                    Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Picker("API Timeout", selection: $apiTimeoutSelection) {
+                    Text("30 sec").tag(APITimeoutOption.seconds30)
+                    Text("1 min").tag(APITimeoutOption.minutes1)
+                    Text("5 min").tag(APITimeoutOption.minutes5)
+                    Text("Unlimited").tag(APITimeoutOption.unlimited)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .onChange(of: apiTimeoutSelection) { _, newValue in
+                    APITimeoutManager.shared.set(option: newValue)
+                }
+            }
 #else
             Picker(selection: $apiTimeoutSelection) {
                 Text("30 sec").tag(APITimeoutOption.seconds30)
