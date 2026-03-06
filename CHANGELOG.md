@@ -41,6 +41,8 @@ Notes
   - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
 - **Add a tag filter to the model screen**
   - This makes it easier to find models that support specific capabilities. You can filter by selecting the desired items from the filter button on the toolbar or by tapping the tags displayed in the model inspector.
+- **Add an auto-follow scroll feature to the chat screen and image generation screen**
+  - When scrolled to the bottom, messages will now automatically scroll downward to follow as they become longer, such as during stream responses. Auto-follow scrolling is disabled by scrolling slightly upward and re-enables when scrolling back to the bottom.
 - **Add a Keep Alive option to the chat and image generation screen inspectors**
   - This allows you to specify how long the model is kept in memory on the Ollama server.
 - **Add a Seed option to the chat and image generation screen inspectors**

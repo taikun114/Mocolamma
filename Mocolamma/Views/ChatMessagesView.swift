@@ -102,6 +102,8 @@ struct ChatMessagesScrollView: View {
     let isUsingSafeAreaBar: Bool
     var bottomInset: CGFloat = 0
     
+    @State private var isNearBottom: Bool = true
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -133,6 +135,28 @@ struct ChatMessagesScrollView: View {
             .scrollDismissesKeyboard(.interactively)
 #endif
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                let contentHeight = geometry.contentSize.height
+                let visibleHeight = geometry.containerSize.height
+                let scrollOffset = geometry.contentOffset.y
+                
+                // iOSでのバウンスやセーフエリアを考慮した計算
+                let maxOffset = max(0, contentHeight - visibleHeight)
+                let distanceFromBottom = maxOffset - scrollOffset
+                
+                // 200px以内なら「底に近い」と判定（安定性と手動操作のバランスを考慮）
+                return distanceFromBottom < 200 || scrollOffset > maxOffset - 5
+            } action: { _, newValue in
+                isNearBottom = newValue
+            }
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentSize.height
+            } action: { oldHeight, newHeight in
+                // ストリーミング中で、かつユーザーが底付近にいる場合に、コンテンツが伸びたらスクロール
+                if isOverallStreaming && isNearBottom && newHeight > oldHeight {
+                    scrollBottom(proxy: proxy)
+                }
+            }
             .onChange(of: messages.count) { oldCount, newCount in
                 if newCount > oldCount {
                     // 新しいメッセージが追加されたときのみスクロール
