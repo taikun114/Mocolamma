@@ -48,6 +48,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
     private var urlSession: URLSession!
+    private var connectionCheckSession: URLSession! // 接続確認専用（30秒固定）
     private var pullTask: URLSessionDataTask?
     private var pullLineBuffer = "" // 不完全なJSON行を保持する文字列バッファ
     private var lastSpeedSampleTime: Date? // 速度算出用の前回サンプル時刻
@@ -207,6 +208,12 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         configuration.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
         configuration.timeoutIntervalForResource = opt.overallResourceTimeout
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        
+        // 接続確認専用セッション（30秒固定）
+        let checkConfig = URLSessionConfiguration.default
+        checkConfig.timeoutIntervalForRequest = 30.0
+        checkConfig.timeoutIntervalForResource = 30.0
+        connectionCheckSession = URLSession(configuration: checkConfig)
         
         // ドラッグ監視のセットアップ (ポーリング方式)
         setupDragMonitoring()
@@ -375,7 +382,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
         
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await urlSession.data(from: url)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("API Error: Unknown response type.", comment: "不明なAPIレスポンスタイプのエラーメッセージ。")
@@ -631,7 +638,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await urlSession.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("Delete Error: Unknown response type.", comment: "Ollamaサーバーからモデルを削除しようとした時、不明なレスポンスタイプが返ってきた場合のエラーメッセージ。")
@@ -697,7 +704,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
         
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (_, response) = try await urlSession.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 print("Unload Error: HTTP status code \((response as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -882,7 +889,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await urlSession.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 print("API Error: /api/show - HTTP status code \((response as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -953,7 +960,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         request.httpMethod = "GET"
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await connectionCheckSession.data(for: request)
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
                     print("Connection check: Successfully connected to \(host)")
@@ -972,27 +979,21 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 return .unknownHost
             }
         } catch let error as URLError {
-            print("Connection check error to \(host): \(error.localizedDescription)")
-            // タイムアウトエラーのチェック
-            if error.code == .timedOut {
+            print("Connection check URLError to \(host): \(error.code) - \(error.localizedDescription)")
+            switch error.code {
+            case .timedOut:
                 return .timedOut
+            case .cannotFindHost, .dnsLookupFailed:
+                return .unknownHost
+            case .secureConnectionFailed, .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid:
+                let msg = NSLocalizedString("TLS error occurred. Could not establish a secure connection.", comment: "TLS接続エラー時のメッセージ。")
+                return .errorWithMessage(statusCode: -1, errorMessage: msg)
+            default:
+                return .notConnected(statusCode: error.code.rawValue)
             }
-            // TLSエラーのチェック
-            if scheme == "https" && (
-                error.code == .secureConnectionFailed ||
-                error.code == .serverCertificateUntrusted ||
-                error.code == .cannotConnectToHost || // 接続できない場合もTLS関連の可能性あり
-                error.code == .networkConnectionLost // 接続が失われた場合もTLS関連の可能性あり
-            ) {
-                self.specificConnectionErrorMessage = NSLocalizedString("Could not connect to API.\nTLS error occurred, could not establish a secure connection.", comment: "TLS接続エラー時のメッセージ。")
-            } else {
-                self.specificConnectionErrorMessage = nil // 他のエラーの場合はクリア
-            }
-            return .unknownHost
         } catch {
-            print("Connection check error to \(host): \(error.localizedDescription)")
-            self.specificConnectionErrorMessage = nil // URLError以外のエラーの場合はクリア
-            return .unknownHost
+            print("Connection check other error to \(host): \(error.localizedDescription)")
+            return .notConnected(statusCode: -1)
         }
     }
     /// Ollamaのバージョンを取得します。
@@ -1010,7 +1011,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             throw URLError(.badURL)
         }
         
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, _) = try await urlSession.data(from: url)
         let response = try JSONDecoder().decode(OllamaVersionResponse.self, from: data)
         return response.version
     }
@@ -1034,7 +1035,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await urlSession.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
             return ps.models.count
@@ -1064,7 +1065,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await urlSession.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
             self.runningModels = ps.models

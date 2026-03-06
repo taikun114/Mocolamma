@@ -70,6 +70,8 @@ Notes
 - **Improve to prevent the add server and model sheet from closing when swiping down on iOS / iPadOS**
 - **Improve the style of the Add and Complete buttons on the add server and model sheet on iOS / iPadOS 26**
   - The Complete button now uses the system native design, and the Add button now uses a design very close to the system native design.
+- **Improve error handling when adding servers**
+  - When a connection to a server fails, detailed error information is now displayed. Additionally, if a server with the same hostname is already registered, you can no longer register it.
 - **Improve download progress display performance on the model screen**
 - **Improve tag display in the model inspector**
 - **Improve the model inspector to display a specific license when a license title is missing but the license body exists**

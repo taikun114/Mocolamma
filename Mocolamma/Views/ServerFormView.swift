@@ -13,7 +13,10 @@ struct ServerFormView: View {
     @State private var serverNameInput: String
     @State private var serverHostInput: String
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
+    @State private var showingValidationErrorAlert = false // 入力バリデーションエラーのアラート
+    @State private var validationErrorMessage = "" // バリデーションエラーメッセージ
     @State private var isVerifying = false // 接続確認中の状態を追跡
+    @State private var connectionStatus: ServerConnectionStatus? // 最新の接続ステータス
     @FocusState private var isNameFieldFocused: Bool
     var editingServer: ServerInfo?
     
@@ -121,7 +124,12 @@ struct ServerFormView: View {
                 dismiss() // シートを閉じる
             }
         } message: {
-            Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "ConnectionError.message"))
+            Text(connectionStatus?.localizedDescription ?? String(localized: "Could not connect to the server."))
+        }
+        .alert(String(localized: "Validation Error"), isPresented: $showingValidationErrorAlert) {
+            Button("OK") { }
+        } message: {
+            Text(validationErrorMessage)
         }
 #if !os(macOS)
         .navigationTitle(editingServer == nil ? "Add Server" : "Edit Server")
@@ -161,47 +169,64 @@ struct ServerFormView: View {
     
     /// 保存/更新処理
     private func save() {
-        guard !isSaveButtonDisabled else { return } // 保存ボタンが無効の場合は何もしない
+        guard !isSaveButtonDisabled else { return }
+        
+        let trimmedName = serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedHost = serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let processedHost = processHostInput(trimmedHost)
+        
+        // 1. 重複チェック（ポート番号補完後のホスト名で比較）
+        let isDuplicateHost = serverManager.servers.contains { server in
+            // 自分自身（編集中のサーバー）は除外
+            if let editingID = editingServer?.id, server.id == editingID {
+                return false
+            }
+            return server.host.lowercased() == processedHost.lowercased()
+        }
+        
+        if isDuplicateHost {
+            validationErrorMessage = String(localized: "A server with the same host already exists.")
+            showingValidationErrorAlert = true
+            return
+        }
+        
+        // 2. ホスト形式の簡易チェック（スペースの有無など）
+        if trimmedHost.contains(" ") {
+            validationErrorMessage = String(localized: "Host cannot contain spaces.")
+            showingValidationErrorAlert = true
+            return
+        }
         
         Task {
-            let trimmedHost = serverHostInput.trimmingCharacters(in: .whitespacesAndNewlines)
-            
             // ホスト名が「demo-mode」の場合はデモサーバーとして扱う
             if trimmedHost.lowercased() == "demo-mode" {
-                isVerifying = false // 接続確認は行わない
-                
-                // デモモードの場合、接続確認は行わず、デモサーバーを直接追加
+                isVerifying = false
                 if let server = editingServer {
-                    // 編集モード: サーバーを更新
                     serverManager.updateServer(
-                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: "demo-mode", isDemo: true)
+                        serverInfo: ServerInfo(id: server.id, name: trimmedName, host: "demo-mode", isDemo: true)
                     )
                 } else {
-                    // 追加モード: 新しいデモサーバーを追加
-                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: "demo-mode", isDemo: true)
+                    serverManager.addServer(name: trimmedName, host: "demo-mode", isDemo: true)
                 }
-                appRefreshTrigger.send() // リフレッシュをトリガー
-                dismiss() // シートを閉じる
+                appRefreshTrigger.send()
+                dismiss()
             } else {
-                isVerifying = true // 接続確認を開始
-                let processedHost = processHostInput(trimmedHost)
+                isVerifying = true
                 
-                // ホスト名が「demo-mode」でない場合は通常の接続確認を行う
-                let connectionStatus = await executor.checkAPIConnectivity(host: processedHost)
-                isVerifying = false // 接続確認を終了
+                let status = await executor.checkAPIConnectivity(host: processedHost)
+                connectionStatus = status
+                isVerifying = false
                 
-                if case .connected = connectionStatus {
+                if case .connected = status {
                     if let server = editingServer {
-                        // 編集モード: サーバーを更新
                         serverManager.updateServer(
-                            serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                            serverInfo: ServerInfo(id: server.id, name: trimmedName, host: processedHost)
                         )
                     } else {
-                        // 追加モード: 新しいサーバーを追加
-                        serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                        serverManager.addServer(name: trimmedName, host: processedHost)
                     }
-                    appRefreshTrigger.send() // リフレッシュをトリガー
-                    dismiss() // シートを閉じる
+                    appRefreshTrigger.send()
+                    dismiss()
                 } else {
                     // 接続失敗: アラートを表示
                     showingConnectionErrorAlert = true

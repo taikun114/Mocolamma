@@ -19,6 +19,24 @@ enum ServerConnectionStatus {
             return false
         }
     }
+    
+    /// ユーザーフレンドリーな状態説明メッセージ
+    var localizedDescription: String {
+        switch self {
+        case .connected:
+            return String(localized: "Connected successfully.")
+        case .notConnected(let code):
+            return String(localized: "Failed to connect. (HTTP \(code))")
+        case .errorWithMessage(_, let message):
+            return message ?? String(localized: "An unknown error occurred.")
+        case .unknownHost:
+            return String(localized: "Could not find the host. Please check the address.")
+        case .timedOut:
+            return String(localized: "Connection timed out. The server might be down or the address is incorrect.")
+        case .checking:
+            return String(localized: "Checking connection...")
+        }
+    }
 }
 
 // MARK: - サーバーマネージャー

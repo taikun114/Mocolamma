@@ -1445,6 +1445,82 @@
         }
       }
     },
+    "A server with the same host already exists." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يوجد بالفعل خادم بنفس المضيف."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Server mit demselben Host existiert bereits."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A server with the same host already exists."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya existe un servidor con el mismo host."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un serveur avec le même hôte existe déjà."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同じホストのサーバーが既に登録されています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동일한 호스트를 가진 서버가 이미 존재합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер с таким же хостом уже существует."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер з таким самим хостом вже існує."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "具有相同主机的服务器已存在。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "具有相同主機的伺服器已存在。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "具有相同主機的伺服器已存在。"
+          }
+        }
+      }
+    },
     "About Mocolamma" : {
       "comment" : "メニューバーやヘッドラインなどに表示される、このアプリ(Mocolamma)についてのテキスト。",
       "localizations" : {
@@ -6064,6 +6140,82 @@
         }
       }
     },
+    "Checking connection..." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ التحقق من الاتصال..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung wird geprüft..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking connection..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando la conexión..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de la connexion..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続を確認中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연결 확인 중..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка соединения..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевірка з'єднання..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在检查连接..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在檢查連線..."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在檢查連線..."
+          }
+        }
+      }
+    },
     "Checking..." : {
       "comment" : "サーバーに接続することができるかどうかを確認しているときに表示される確認中テキスト。",
       "localizations" : {
@@ -6923,6 +7075,82 @@
         }
       }
     },
+    "Connected successfully." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الاتصال بنجاح."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolgreich verbunden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected successfully."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectado con éxito."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecté avec succès."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正常に接続されました。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "성공적으로 연결되었습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Соединение успешно установлено."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "З'єднання успешно встановлено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接成功。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線成功。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線成功。"
+          }
+        }
+      }
+    },
     "Connecting..." : {
       "comment" : "Ollamaサーバーとの接続を試みている間に表示されるメッセージ。",
       "localizations" : {
@@ -7077,79 +7305,78 @@
         }
       }
     },
-    "ConnectionError.message" : {
-      "comment" : "Connection error message when adding a server。",
+    "Connection timed out. The server might be down or the address is incorrect." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذر الاتصال بـ API.\nيرجى التأكد من صحة المضيف وأن خادم Ollama يعمل."
+            "value" : "انتهت مهلة الاتصال. قد يكون الخادم معطلاً أو العنوان غير صحيح."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verbindung zur API fehlgeschlagen.\nBitte überprüfen Sie, ob der Host korrekt ist und der Ollama-Server läuft."
+            "value" : "Zeitüberschreitung der Verbindung. Der Server ist möglicherweise ausgefallen oder die Adresse ist falsch."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Could not connect to the API.\nPlease check if the host is correct and the Ollama server is running."
+            "value" : "Connection timed out. The server might be down or the address is incorrect."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo conectar a la API.\nPor favor, comprueba si el host es correcto y si el servidor Ollama está en funcionamiento."
+            "value" : "Tiempo de espera de conexión agotado. Es posible que el servidor esté caído o que la dirección sea incorrecta."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de se connecter à l'API.\nVeuillez vérifier si l'hôte est correct et si le serveur Ollama est en cours d'exécution."
+            "value" : "Délai de connexion dépassé. Le serveur est peut-être en panne ou l'adresse est incorrecte."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "APIに接続できませんでした。\nホストが正しく、Ollamaサーバーが実行中であることを確認してください。"
+            "value" : "接続がタイムアウトしました。サーバーが停止しているか、アドレスが間違っている可能性があります。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "API에 연결할 수 없습니다.\n호스트가 올바르고 Ollama 서버가 실행 중인지 확인하세요."
+            "value" : "연결 시간이 초과되었습니다. 서버가 다운되었거나 주소가 잘못되었을 수 있습니다."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не удалось подключиться к API.\nУбедитесь, что хост указан верно и сервер Ollama запущен."
+            "value" : "Время ожидания соединения истекло. Возможно, сервер не работает или адрес указан неверно."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вдалося підключитися до API.\nПереконайтеся, що хост вказано правильно і сервер Ollama запущено."
+            "value" : "Час очікування з'єднання вичерпано. Можливо, сервер не працює або адреса вказана неправильно."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法连接到 API。\n请确保主机名正确且 Ollama 服务器正在运行。"
+            "value" : "连接超时。服务器可能已关闭或地址不正确。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法連線至 API。\n請確保主機名稱正確且 Ollama 伺服器正在執行。"
+            "value" : "連線逾時。伺服器可能已關閉或位址不正確。"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法連線至 API。\n請確保主機名稱正確且 Ollama 伺服器正在執行。"
+            "value" : "連線逾時。伺服器可能已關閉或位址不正確。"
           }
         }
       }
@@ -7848,79 +8075,154 @@
         }
       }
     },
-    "Could not connect to API.\nTLS error occurred, could not establish a secure connection." : {
-      "comment" : "TLS接続エラー時のメッセージ。",
+    "Could not connect to the server." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذر الاتصال بـ API.\nحدث خطأ في TLS، ولا يمكن إنشاء اتصال آمن."
+            "value" : "تعذر الاتصال بالخادم."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verbindung zur API fehlgeschlagen.\nEs ist ein TLS-Fehler aufgetreten, eine sichere Verbindung konnte nicht hergestellt werden."
+            "value" : "Verbindung zum Server konnte nicht hergestellt werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Could not connect to API.\nTLS error occurred, could not establish a secure connection."
+            "value" : "Could not connect to the server."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo conectar a la API.\nOcurrió un error de TLS, no se pudo establecer una conexión segura."
+            "value" : "No se pudo conectar al servidor."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de se connecter à l'API.\nUne erreur TLS s'est produite, impossible d'établir une connexion sécurisée."
+            "value" : "Impossible de se connecter au serveur."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "APIに接続できませんでした。\nTLSエラーが起きたため、セキュリティ保護された接続を確立できませんでした。"
+            "value" : "サーバーに接続できませんでした。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "API에 연결할 수 없습니다.\nTLS 오류가 발생하여 보안 연결을 설정할 수 없습니다."
+            "value" : "서버에 연결할 수 없습니다."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не удалось подключиться к API.\nПроизошла ошибка TLS, невозможно установить безопасное соединение."
+            "value" : "Не удалось подключиться к серверу."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вдалося підключитися до API.\nСталася помилка TLS, неможливо встановити безпечне з'єднання."
+            "value" : "Не вдалося підключитися до сервера."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法连接到 API。\n由于 TLS 错误，无法建立安全连接。"
+            "value" : "无法连接到服务器。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法連線至 API。\n由於 TLS 錯誤，無法建立安全連線。"
+            "value" : "無法連線到伺服器。"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法連線至 API。\n由於 TLS 錯誤，無法建立安全連線。"
+            "value" : "無法連線到伺服器。"
+          }
+        }
+      }
+    },
+    "Could not find the host. Please check the address." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر العثور على المضيف. يرجى التحقق من العنوان."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host konnte nicht gefunden werden. Bitte überprüfen Sie die Adresse."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not find the host. Please check the address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo encontrar el host. Por favor, compruebe la dirección."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hôte introuvable. Veuillez vérifier l'adresse."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホストが見つかりませんでした。アドレスを確認してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "호스트를 찾을 수 없습니다. 주소를 확인하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось найти хост. Пожалуйста, проверьте адрес."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося знайти хост. Будь ласка, перевірте адресу."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到主机。请检查地址。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到主機。請檢查地址。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到主機。請檢查地址。"
           }
         }
       }
@@ -12478,6 +12780,82 @@
         }
       }
     },
+    "Failed to connect. (HTTP %lld)" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل الاتصال. (HTTP %lld)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung fehlgeschlagen. (HTTP %lld)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to connect. (HTTP %lld)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al conectar. (HTTP %lld)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la connexion. (HTTP %lld)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続に失敗しました。(HTTP %lld)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연결에 실패했습니다. (HTTP %lld)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка подключения. (HTTP %lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка підключення. (HTTP %lld)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接失败。(HTTP %lld)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線失敗。(HTTP %lld)"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連線失敗。(HTTP %lld)"
+          }
+        }
+      }
+    },
     "Failed to generate image." : {
       "comment" : "A message displayed when an image generation fails.",
       "isCommentAutoGenerated" : true,
@@ -13952,6 +14330,82 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "主機"
+          }
+        }
+      }
+    },
+    "Host cannot contain spaces." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن أن يحتوي المضيف على مسافات."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Host darf keine Leerzeichen enthalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host cannot contain spaces."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El host no puede contener espacios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'hôte ne peut pas contenir d'espaces."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホスト名にスペースを含めることはできません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "호스트에는 공백을 포함할 수 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост не может содержать пробелы."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хост не може містити пробіли."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主机名不能包含空格。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主機名稱不能包含空白。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主機名稱不能包含空白。"
           }
         }
       }
@@ -22907,7 +23361,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "실행 중인 모델 목록을 새로 고칩니다。"
+            "value" : "실행 중인 모델 목록을 새로 고칩니다."
           }
         },
         "ru" : {
@@ -28407,6 +28861,83 @@
         }
       }
     },
+    "TLS error occurred. Could not establish a secure connection." : {
+      "comment" : "TLS接続エラー時のメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ في TLS. تعذر إنشاء اتصال آمن."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TLS-Fehler aufgetreten. Es konnte keine sichere Verbindung hergestellt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TLS error occurred. Could not establish a secure connection."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocurrió un error TLS. No se pudo establecer una conexión segura."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur TLS s'est produite. Impossible d'établir une connexion sécurisée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TLSエラーが発生しました。安全な接続を確立できませんでした。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TLS 오류가 발생했습니다. 보안 연결을 설정할 수 없습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка TLS. Не удалось установить безопасное соединение."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сталася помилка TLS. Не вдалося встановити безпечне з'єднання."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发生 TLS 错误。无法建立安全连接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生 TLS 錯誤。無法建立安全連線。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生 TLS 錯誤。無法建立安全連線。"
+          }
+        }
+      }
+    },
     "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on." : {
       "comment" : "iOSとiPadOSでこのアプリ(Mocolamma)にローカルネットワーク許可を与えるための方法を紹介するテキスト。",
       "localizations" : {
@@ -29335,6 +29866,82 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "仍然更新"
+          }
+        }
+      }
+    },
+    "Validation Error" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطأ في التحقق"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validierungsfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validation Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de validación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de validation"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バリデーションエラー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유효성 검사 오류"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка валидации"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка валідації"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "验证错误"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "驗證錯誤"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "驗證錯誤"
           }
         }
       }
