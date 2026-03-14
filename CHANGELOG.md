@@ -39,6 +39,8 @@ Notes
   - You can preview attached images or generated images in a large enlarged view.
 - **Add an unload model button to the server screen inspector**
   - This allows you to quickly unload (free from memory) models currently loaded into Ollama server memory.
+- **Add an icon customization feature to the add/edit server screen**
+  - You can now change each server's icon to any SF Symbols icon of your choice. This only changes the icon displayed on the server screen, but if you have multiple servers configured, you can now identify them by their icons as well as their names.
 - **Add a tag filter to the model screen**
   - This makes it easier to find models that support specific capabilities. You can filter by selecting the desired items from the filter button on the toolbar or by tapping the tags displayed in the model inspector.
 - **Add an auto-follow scroll feature to the chat screen and image generation screen**

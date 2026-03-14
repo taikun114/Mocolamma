@@ -1,4 +1,5 @@
 import SwiftUI
+import UniversalSFSymbolsPicker
 
 // MARK: - サーバーフォームビュー
 
@@ -12,6 +13,8 @@ struct ServerFormView: View {
     
     @State private var serverNameInput: String
     @State private var serverHostInput: String
+    @State private var serverIconInput: String // サーバーのアイコン
+    @State private var isShowingSymbolPicker = false // シンボルピッカーの表示状態
     @State private var showingConnectionErrorAlert = false // 接続エラーアラートの表示/非表示
     @State private var showingValidationErrorAlert = false // 入力バリデーションエラーのアラート
     @State private var validationErrorMessage = "" // バリデーションエラーメッセージ
@@ -33,6 +36,7 @@ struct ServerFormView: View {
         // 編集モードの場合、既存のサーバー情報で入力フィールドを初期化
         _serverNameInput = State(initialValue: editingServer?.name ?? "")
         _serverHostInput = State(initialValue: editingServer?.host ?? "")
+        _serverIconInput = State(initialValue: editingServer?.iconName ?? "server.rack")
     }
     
     // 保存/更新ボタンを無効化するための計算プロパティ
@@ -48,22 +52,47 @@ struct ServerFormView: View {
                 .bold()
 #endif
             
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Name")
-                    .font(.headline)
-                TextField("e.g., Ollama Server", text: $serverNameInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onSubmit {
-                        save()
+            VStack(alignment: .leading, spacing: 20) {
+                HStack(alignment: .center, spacing: 16) {
+                    // アイコン選択ボタン
+                    Button {
+                        isShowingSymbolPicker = true
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color.secondary.opacity(0.15))
+                                .frame(width: 54, height: 54)
+                            
+                            Image(systemName: serverIconInput)
+                                .font(.system(size: 24))
+                                .contentTransition(.symbolEffect(.replace))
+                        }
                     }
+                    .buttonStyle(.plain)
+                    .help(String(localized: "Select Icon"))
+                    .symbolPicker(isPresented: $isShowingSymbolPicker, selection: $serverIconInput)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Name")
+                            .font(.headline)
+                        TextField("e.g., Ollama Server", text: $serverNameInput)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .focused($isNameFieldFocused)
+                            .onSubmit {
+                                save()
+                            }
+                    }
+                }
                 
-                Text("Host")
-                    .font(.headline)
-                TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onSubmit {
-                        save()
-                    }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Host")
+                        .font(.headline)
+                    TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .onSubmit {
+                            save()
+                        }
+                }
                 
 #if !os(macOS)
                 if isVerifying {
@@ -104,7 +133,7 @@ struct ServerFormView: View {
         }
         .padding()
 #if os(macOS)
-        .frame(width: 350, height: 250) // シートの固定サイズ
+        .frame(width: 400, height: 270) // フォームのサイズを少し広げる
 #endif
         .alert(LocalizedStringKey("ConnectionError.title"), isPresented: $showingConnectionErrorAlert) {
             Button("OK") { }
@@ -114,11 +143,11 @@ struct ServerFormView: View {
                 if let server = editingServer {
                     // 編集モード: サーバーを更新
                     serverManager.updateServer(
-                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                        serverInfo: ServerInfo(id: server.id, name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost, iconName: serverIconInput)
                     )
                 } else {
                     // 追加モード: 新しいサーバーを追加
-                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost)
+                    serverManager.addServer(name: serverNameInput.trimmingCharacters(in: .whitespacesAndNewlines), host: processedHost, iconName: serverIconInput)
                 }
                 appRefreshTrigger.send() // リフレッシュをトリガー
                 dismiss() // シートを閉じる
@@ -203,10 +232,10 @@ struct ServerFormView: View {
                 isVerifying = false
                 if let server = editingServer {
                     serverManager.updateServer(
-                        serverInfo: ServerInfo(id: server.id, name: trimmedName, host: "demo-mode", isDemo: true)
+                        serverInfo: ServerInfo(id: server.id, name: trimmedName, host: "demo-mode", iconName: serverIconInput, isDemo: true)
                     )
                 } else {
-                    serverManager.addServer(name: trimmedName, host: "demo-mode", isDemo: true)
+                    serverManager.addServer(name: trimmedName, host: "demo-mode", iconName: serverIconInput, isDemo: true)
                 }
                 appRefreshTrigger.send()
                 dismiss()
@@ -220,10 +249,10 @@ struct ServerFormView: View {
                 if case .connected = status {
                     if let server = editingServer {
                         serverManager.updateServer(
-                            serverInfo: ServerInfo(id: server.id, name: trimmedName, host: processedHost)
+                            serverInfo: ServerInfo(id: server.id, name: trimmedName, host: processedHost, iconName: serverIconInput)
                         )
                     } else {
-                        serverManager.addServer(name: trimmedName, host: processedHost)
+                        serverManager.addServer(name: trimmedName, host: processedHost, iconName: serverIconInput)
                     }
                     appRefreshTrigger.send()
                     dismiss()
@@ -255,6 +284,69 @@ struct ServerFormView: View {
         
         // コロンがない、またはコロンの後にポート番号がない場合は、デフォルトポートを追加する
         return lowercasedHost + ":11434"
+    }
+}
+
+// MARK: - Symbol Picker Helper
+
+/// SFSymbolPickerの検索状態などを管理するためのラッパービューです。
+struct SymbolPickerWrapper: View {
+    @Binding var isPresented: Bool
+    @Binding var selection: String
+    let showAs: SFSymbolPickerDisplayMode
+    
+    @State private var searchText = ""
+    
+    var body: some View {
+        SFSymbolPicker(
+            isPresented: $isPresented,
+            selection: Binding(
+                get: { selection },
+                set: { if let val = $0 { selection = val } }
+            ),
+            showAs: showAs,
+            showSearchBar: showAs == .popover, // ポップオーバー時はカスタム検索バーを表示、シート時は非表示
+            showIconName: true,
+            searchText: $searchText
+        )
+        .conditionalSearchable(show: showAs == .sheet, text: $searchText)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func conditionalSearchable(show: Bool, text: Binding<String>) -> some View {
+        if show {
+            self.searchable(text: text)
+        } else {
+            self
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func symbolPicker(isPresented: Binding<Bool>, selection: Binding<String>) -> some View {
+#if os(iOS)
+        self.sheet(isPresented: isPresented) {
+            NavigationStack {
+                SymbolPickerWrapper(
+                    isPresented: isPresented,
+                    selection: selection,
+                    showAs: .sheet
+                )
+            }
+        }
+#else
+        self.popover(isPresented: isPresented, arrowEdge: .top) {
+            SymbolPickerWrapper(
+                isPresented: isPresented,
+                selection: selection,
+                showAs: .popover
+            )
+            .frame(width: 500, height: 400)
+        }
+#endif
     }
 }
 

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
 		6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6D80A9482F4725EF00B2D5A4 /* Textual */; };
+		6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */; };
+		6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */; };
+		6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +77,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */,
+				6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */,
+				6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */,
+				6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */,
 				6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,6 +143,9 @@
 			packageProductDependencies = (
 				6D7D84A02E3B68FA006EDB4D /* CompactSlider */,
 				6D80A9482F4725EF00B2D5A4 /* Textual */,
+				6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */,
+				6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */,
+				6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */,
 			);
 			productName = Mocolamma;
 			productReference = 6DC81A322E3236B3005F2E03 /* Mocolamma.app */;
@@ -234,6 +243,7 @@
 			packageReferences = (
 				6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */,
 				6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */,
+				6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DC81A332E3236B3005F2E03 /* Products */;
@@ -448,7 +458,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -514,7 +524,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -574,7 +584,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -593,7 +603,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -611,7 +621,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -628,7 +638,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4187;
+				CURRENT_PROJECT_VERSION = 4218;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -699,6 +709,14 @@
 				version = 0.3.1;
 			};
 		};
+		6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/taikun114/UniversalSFSymbolsPicker";
+			requirement = {
+				kind = exactVersion;
+				version = 0.1.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -711,6 +729,19 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */;
 			productName = Textual;
+		};
+		6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UniversalSFSymbolsPicker;
+		};
+		6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UniversalSFSymbolsPicker;
+		};
+		6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */;
+			productName = UniversalSFSymbolsPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

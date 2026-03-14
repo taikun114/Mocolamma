@@ -81,7 +81,7 @@ struct ServerRowView: View {
             .padding(.trailing, 4)
             
             // サーバーアイコン
-            Image(systemName: "server.rack")
+            Image(systemName: server.iconName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32, height: 32)

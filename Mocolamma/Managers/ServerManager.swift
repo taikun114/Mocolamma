@@ -130,9 +130,10 @@ class ServerManager: ObservableObject {
     /// - Parameters:
     ///   - name: 追加するサーバーの名前。
     ///   - host: 追加するサーバーのホストURL。
+    ///   - iconName: 追加するサーバーのアイコン名。
     ///   - isDemo: デモサーバーかどうか。
-    func addServer(name: String, host: String, isDemo: Bool = false) {
-        let newServer = ServerInfo(name: name, host: host, isDemo: isDemo)
+    func addServer(name: String, host: String, iconName: String = "server.rack", isDemo: Bool = false) {
+        let newServer = ServerInfo(name: name, host: host, iconName: iconName, isDemo: isDemo)
         servers.append(newServer)
         // 新しく追加されたサーバーを選択状態にする
         selectedServerID = newServer.id
