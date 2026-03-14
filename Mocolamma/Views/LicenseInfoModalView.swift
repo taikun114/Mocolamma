@@ -20,7 +20,10 @@ struct LicenseInfoModalView: View {
     
     @State private var showingTextualLinkAlert = false
     @State private var isTextualLinkHovered: Bool = false
-    
+
+    @State private var showingUniversalSFSymbolsPickerLinkAlert = false
+    @State private var isUniversalSFSymbolsPickerLinkHovered: Bool = false
+
     @State private var showingOpenCodeLinkAlert = false
     @State private var isOpenCodeLinkHovered: Bool = false
     
@@ -37,6 +40,7 @@ struct LicenseInfoModalView: View {
     
     private let compactSliderVersionString: String = "2.0.9"
     private let textualVersionString: String = "0.3.1"
+    private let universalSFSymbolsPickerVersionString: String = "0.1.2"
     private let geminiCLIVersionString: String = "0.33.1"
     private let qwenCodeVersionString: String = "0.12.3"
     private let createDmgVersionString: String = "1.2.2"
@@ -295,7 +299,46 @@ struct LicenseInfoModalView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 1)
                     .fixedSize(horizontal: horizontalFixed, vertical: false)
-                
+
+                // MARK: UniversalSFSymbolsPicker
+                VStack(alignment: .leading) {
+                    Button(action: { showingUniversalSFSymbolsPickerLinkAlert = true }) {
+                        Text("UniversalSFSymbolsPicker by Taiga Imaura")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.accentColor)
+                            .underline(isUniversalSFSymbolsPickerLinkHovered)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Open link to the UniversalSFSymbolsPicker GitHub page.")
+                    .padding(.bottom, 1)
+                    .onHover { hovered in isUniversalSFSymbolsPickerLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingUniversalSFSymbolsPickerLinkAlert) {
+                        Button("Open") {
+                            if let url = URL(string: "https://github.com/taikun114/UniversalSFSymbolsPicker") { openURL(url) }
+                        }
+                        .keyboardShortcut(.defaultAction)
+                        Button("Cancel", role: .cancel) {}
+                    } message: { Text("Are you sure you want to open the UniversalSFSymbolsPicker GitHub page?") }
+
+                    Text("Version: \(universalSFSymbolsPickerVersionString)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 1)
+
+                    Text(verbatim: "MIT License")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 10)
+                .padding(.horizontal)
+
+                Text(verbatim: "MIT License\n\nCopyright (c) 2026 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                    .font(.callout.monospaced())
+                    .padding(.horizontal)
+                    .padding(.vertical, 1)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
+
                 // MARK: Gemini CLI
                 VStack(alignment: .leading) {
                     Button(action: { showingGeminiCLILinkAlert = true }) {

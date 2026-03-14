@@ -5447,6 +5447,83 @@
         }
       }
     },
+    "Are you sure you want to open the UniversalSFSymbolsPicker GitHub page?" : {
+      "comment" : "ユーザに、UniversalSFSymbolsPickerのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل أنت متأكد أنك تريد فتح صفحة GitHub لـ UniversalSFSymbolsPicker؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die UniversalSFSymbolsPicker GitHub Seite wirklich öffnen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the UniversalSFSymbolsPicker GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres abrir la página de GitHub de UniversalSFSymbolsPicker?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de UniversalSFSymbolsPicker ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPickerのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker GitHub 페이지를 여시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите открыть страницу UniversalSFSymbolsPicker на GitHub?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви впевнені, що хочете відкрити сторінку UniversalSFSymbolsPicker на GitHub?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您确定要打开 UniversalSFSymbolsPicker 的 GitHub 页面吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 UniversalSFSymbolsPicker 的 GitHub 頁面嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您確定要開啟 UniversalSFSymbolsPicker 的 GitHub 頁面嗎？"
+          }
+        }
+      }
+    },
     "Ascending" : {
       "comment" : "リストやデータを昇順で並び替えるための選択肢。",
       "localizations" : {
@@ -21365,6 +21442,83 @@
         }
       }
     },
+    "Open link to the UniversalSFSymbolsPicker GitHub page." : {
+      "comment" : "UniversalSFSymbolsPickerのGitHubページへのリンクを開くボタンのツールチップテキスト。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح الرابط لصفحة GitHub لـ UniversalSFSymbolsPicker."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur UniversalSFSymbolsPicker GitHub Seite öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the UniversalSFSymbolsPicker GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de UniversalSFSymbolsPicker."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de UniversalSFSymbolsPicker."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPickerのGitHubページへのリンクを開きます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker GitHub 페이지 링크를 엽니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть ссылку на страницу UniversalSFSymbolsPicker на GitHub."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити посилання на сторінку UniversalSFSymbolsPicker на GitHub."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 UniversalSFSymbolsPicker GitHub 页面的链接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 UniversalSFSymbolsPicker GitHub 頁面的連結。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 UniversalSFSymbolsPicker GitHub 頁面的連結。"
+          }
+        }
+      }
+    },
     "Open Link?" : {
       "comment" : "外部リンクを開くアラートタイトルテキスト。",
       "localizations" : {
@@ -29560,6 +29714,9 @@
           }
         }
       }
+    },
+    "UniversalSFSymbolsPicker by Taiga Imaura" : {
+      "shouldTranslate" : false
     },
     "Unlimited" : {
       "comment" : "APIタイムアウト設定を無制限にするオプション名。",
