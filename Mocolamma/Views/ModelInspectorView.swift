@@ -13,6 +13,7 @@ struct ModelInspectorView: View {
     let fetchedCapabilities: [String]?
     let licenseBody: String?
     let licenseLink: String?
+    @Binding var selectedFilterTag: String?
     
     @State private var showingLicenseSheet = false
     
@@ -68,15 +69,29 @@ struct ModelInspectorView: View {
     
     
     private var licenseName: String {
-        let rawLicense = modelInfo?["general.license"]?.stringValue ?? String(localized: "Other License")
-        switch rawLicense.lowercased() {
-        case "mit":
-            return "MIT License"
-        case "apache-2.0":
-            return "Apache License 2.0"
-        default:
-            return rawLicense
+        // 1. modelInfoに明示的なライセンス名がある場合
+        if let rawLicense = modelInfo?["general.license"]?.stringValue {
+            switch rawLicense.lowercased() {
+            case "mit":
+                return "MIT License"
+            case "apache-2.0":
+                return "Apache License 2.0"
+            default:
+                return rawLicense
+            }
         }
+        
+        // 2. ライセンス名がないが本文がある場合、本文から推測
+        if let body = licenseBody {
+            if body.contains("MIT License") {
+                return "MIT License"
+            }
+            if body.contains("Apache License") && body.contains("Version 2.0") {
+                return "Apache License 2.0"
+            }
+        }
+        
+        return String(localized: "Other License")
     }
     
     // MARK: - ヘルパー関数
@@ -84,6 +99,8 @@ struct ModelInspectorView: View {
     private func tagView(for capability: String) -> some View {
         let displayText: String
         let iconName: String
+        let isSelected = selectedFilterTag == capability
+        
         switch capability.lowercased() {
         case "completion":
             displayText = String(localized: "Completion")
@@ -100,30 +117,64 @@ struct ModelInspectorView: View {
         case "embedding":
             displayText = String(localized: "Embedding")
             iconName = "square.stack.3d.up"
+        case "image":
+            displayText = String(localized: "Image")
+            iconName = "photo"
         default:
             displayText = capability
             iconName = "tag"
         }
-        return HStack(spacing: 4) {
-            Image(systemName: iconName)
-            Text(displayText)
+        
+        return Button(action: {
+            if selectedFilterTag == capability {
+                selectedFilterTag = nil
+            } else {
+                selectedFilterTag = capability
+            }
+        }) {
+            HStack(spacing: 4) {
+                Image(systemName: iconName)
+                Text(displayText)
+            }
+            .font(.caption)
+            .bold()
+#if !os(macOS)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+#else
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+#endif
+#if os(visionOS)
+            .background(Capsule().fill(Color.accentColor))
+            .foregroundColor(.white)
+            .overlay(
+                Capsule()
+                    .stroke(Color.white, lineWidth: isSelected ? 2 : 0)
+            )
+#else
+            .background(Capsule().fill(Color.accentColor.opacity(isSelected ? 0.3 : 0.2)))
+            .foregroundColor(.accentColor)
+            .overlay(
+                Capsule()
+                    .stroke(Color.accentColor, lineWidth: isSelected ? 2 : 0)
+            )
+#endif
         }
-        .font(.caption)
-        .bold()
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Capsule().fill(Color.accentColor.opacity(0.2)))
-        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+        .onHover { inside in
+#if os(macOS)
+            if inside {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+#endif
+        }
     }
     
     var body: some View {
-        let copyIconName = {
-            if #available(macOS 15.0, iOS 18.0, *) {
-                return "document.on.document"
-            } else {
-                return "doc.on.doc"
-            }
-        }()
+        let copyIconName = SFSymbol.copy
         
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -136,14 +187,14 @@ struct ModelInspectorView: View {
                 
                 // 機能セクション
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
+                    ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
                                 tagView(for: capability)
                             }
                         }
-                        
                     }
+                    .scrollClipDisabled() // クリッピングを無効化
                 }
                 
                 Divider()
@@ -390,20 +441,32 @@ struct ModelInspectorView: View {
                 } else if modelInfo != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         
-                        VStack(alignment: .leading) {
-                            Text("License:") // ライセンス
-                            if licenseBody != nil {
-                                Button(action: {
-                                    showingLicenseSheet = true
-                                }) {
+                        // ライセンス情報がある場合のみ表示
+                        // modelInfoにlicenseキーがあるか、licenseBodyがある場合
+                        if modelInfo?["general.license"] != nil || licenseBody != nil {
+                            VStack(alignment: .leading) {
+                                Text("License:") // ライセンス
+                                if licenseBody != nil {
+                                    Button(action: {
+                                        showingLicenseSheet = true
+                                    }) {
+                                        Text(licenseName)
+#if os(visionOS)
+                                            .font(.body).bold()
+#else
+                                            .font(.title3).bold()
+                                            .foregroundColor(.accentColor)
+#endif
+                                    }
+#if os(visionOS)
+                                    .buttonStyle(.bordered)
+#else
+                                    .buttonStyle(PlainButtonStyle())
+#endif
+                                } else {
                                     Text(licenseName)
                                         .font(.title3).bold()
-                                        .foregroundColor(.accentColor)
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                            } else {
-                                Text(licenseName)
-                                    .font(.title3).bold()
                             }
                         }
                         
@@ -413,6 +476,7 @@ struct ModelInspectorView: View {
                                 Text("Parameter Count:") // パラメーターカウント
                                 Text(count.formatted)
                                     .font(.title3).bold()
+                                    .help(String(count.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
@@ -431,6 +495,7 @@ struct ModelInspectorView: View {
                                 Text("Context Length:") // コンテキスト長
                                 Text(length.formatted)
                                     .font(.title3).bold()
+                                    .help(String(length.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
@@ -449,6 +514,7 @@ struct ModelInspectorView: View {
                                 Text("Embedding Length:") // エンベディング長
                                 Text(length.formatted)
                                     .font(.title3).bold()
+                                    .help(String(length.raw))
                                     .contextMenu {
                                         Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
@@ -462,8 +528,11 @@ struct ModelInspectorView: View {
                             }
                         }
                         
-                        // もし情報が一つもなければ
-                        if parameterCount == nil && contextLength == nil && embeddingLength == nil && licenseBody == nil {
+                        // 全ての詳細項目が空の場合のみ「モデル情報がありません」を表示
+                        let hasLicense = modelInfo?["general.license"] != nil || licenseBody != nil
+                        let hasAnyInfo = parameterCount != nil || contextLength != nil || embeddingLength != nil || hasLicense
+                        
+                        if !hasAnyInfo {
                             Text("No model information available.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -478,8 +547,21 @@ struct ModelInspectorView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            .padding()
+            .id(isLoading)
+#if os(visionOS)
+            .transition(.opacity)
+#endif
+            .padding(.horizontal)
         }
+#if os(visionOS)
+        .safeAreaInset(edge: .top) {
+            Color.clear.frame(height: 8)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 8)
+        }
+        .animation(.easeInOut(duration: 0.3), value: isLoading)
+#endif
         .sheet(isPresented: $showingLicenseSheet) {
             if let licenseBody = licenseBody {
                 LicenseTextView(licenseText: licenseBody, licenseLink: licenseLink, licenseTitle: licenseName)

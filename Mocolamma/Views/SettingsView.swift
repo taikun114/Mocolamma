@@ -54,7 +54,8 @@ struct SettingsView: View {
                     LoginItemManager.shared.setEnabled(newValue)
                 }
 #endif
-            HStack(alignment: .center) {
+#if os(iOS)
+            HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("API Timeout")
                     Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
@@ -62,7 +63,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Picker("", selection: $apiTimeoutSelection) {
+                Picker("API Timeout", selection: $apiTimeoutSelection) {
                     Text("30 sec").tag(APITimeoutOption.seconds30)
                     Text("1 min").tag(APITimeoutOption.minutes1)
                     Text("5 min").tag(APITimeoutOption.minutes5)
@@ -74,10 +75,50 @@ struct SettingsView: View {
                     APITimeoutManager.shared.set(option: newValue)
                 }
             }
+#elseif os(visionOS)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Timeout")
+                    Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Picker("API Timeout", selection: $apiTimeoutSelection) {
+                    Text("30 sec").tag(APITimeoutOption.seconds30)
+                    Text("1 min").tag(APITimeoutOption.minutes1)
+                    Text("5 min").tag(APITimeoutOption.minutes5)
+                    Text("Unlimited").tag(APITimeoutOption.unlimited)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .onChange(of: apiTimeoutSelection) { _, newValue in
+                    APITimeoutManager.shared.set(option: newValue)
+                }
+            }
+#else
+            Picker(selection: $apiTimeoutSelection) {
+                Text("30 sec").tag(APITimeoutOption.seconds30)
+                Text("1 min").tag(APITimeoutOption.minutes1)
+                Text("5 min").tag(APITimeoutOption.minutes5)
+                Text("Unlimited").tag(APITimeoutOption.unlimited)
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("API Timeout")
+                    Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .pickerStyle(.menu)
+            .onChange(of: apiTimeoutSelection) { _, newValue in
+                APITimeoutManager.shared.set(option: newValue)
+            }
+#endif
         }
         
         Section("Permissions") {
-#if os(iOS)
+#if !os(macOS)
             Group {
                 if horizontalSizeClass == .compact { // iPhone縦向き、またはiPad狭い分割画面
                     VStack(alignment: .leading, spacing: 12) {
@@ -104,7 +145,12 @@ struct SettingsView: View {
                             Button(action: { localNetworkChecker.refresh() }) {
                                 Image(systemName: "arrow.clockwise")
                             }
+#if os(visionOS)
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.circle)
+#else
                             .buttonStyle(.borderless)
+#endif
                             .help("Refresh status")
                         }
                         Button(action: { showingInstructions = true }) {
@@ -124,6 +170,47 @@ struct SettingsView: View {
                         }
                     }
                 } else { // .regular - iPhone横向き、iPad全画面表示または広い分割画面
+#if os(visionOS)
+                    HStack(spacing: 16) {
+                        if differentiateWithoutColor {
+                            Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .foregroundStyle(localNetworkChecker.isAllowed ? .green : .red)
+                                .fontWeight(.bold)
+                        } else {
+                            Circle()
+                                .fill(localNetworkChecker.isAllowed ? Color.green : Color.red)
+                                .frame(width: 10, height: 10)
+                        }
+                        VStack(alignment: .leading) {
+                            Text("Local Network Access")
+                            Text("Permission is required to connect to Ollama servers on the same network.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button(action: { localNetworkChecker.refresh() }) { Image(systemName: "arrow.clockwise") }
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.circle)
+                            .help("Refresh status")
+                        Button(action: { showingInstructions = true }) {
+                            HStack {
+                                Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "gearshape.fill")
+                                Text(localNetworkChecker.isAllowed ? "Allowed" : "How to Set Up")
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(localNetworkChecker.isAllowed)
+                        .help(localNetworkChecker.isAllowed ? "Local network permission is granted." : "How to set up local network permission.")
+                        .alert("How to Set Up", isPresented: $showingInstructions) {
+                            Button("OK") { }
+                        } message: {
+                            Text("To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.")
+                        }
+                    }
+#else
                     HStack {
                         if differentiateWithoutColor {
                             Image(systemName: localNetworkChecker.isAllowed ? "checkmark" : "xmark")
@@ -162,6 +249,7 @@ struct SettingsView: View {
                             Text("To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on.")
                         }
                     }
+#endif
                 }
             }
 #else

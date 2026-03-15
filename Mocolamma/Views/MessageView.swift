@@ -1,7 +1,12 @@
 import SwiftUI
-import MarkdownUI
+import Textual
+import UniformTypeIdentifiers
+import Photos
+import PhotosUI
 
 struct MessageView: View {
+    @Environment(CommandExecutor.self) var executor
+    @EnvironmentObject var chatSettings: ChatSettings
     @ObservedObject var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
@@ -12,7 +17,35 @@ struct MessageView: View {
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
+    @State private var showingVisionWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.containerHeight) private var containerHeight
+    
+    // 編集用画像の状態
+    @State private var editingImages: [ChatInputImage] = []
+    @State private var showingAttachSheet = false
+    @State private var showingPhotoPicker = false
+    @State private var showingFilePicker = false
+    @State private var draggingItem: ChatInputImage?
+    @State private var isDraggingOver = false
+    
+    // 保存関連の状態
+    @State private var showingSaveOptions = false
+    @State private var showingFileExporter = false
+    @State private var imageDocument: ImageDocument?
+    
+    private var isDownloadSuccessful: Bool {
+        executor.successfullyDownloadedIDs.contains(message.id)
+    }
+    
+    private var isCopied: Bool {
+        executor.successfullyCopiedIDs.contains(message.id)
+    }
+
+    private var supportsVision: Bool {
+        chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "vision" }) ?? false
+    }
     
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -21,24 +54,93 @@ struct MessageView: View {
     }()
     
     var body: some View {
+        @Bindable var executor = executor
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
                 .padding(10)
-                .background(message.role == "user" ? Color.accentColor : Color.gray.opacity(0.1))
+                .background(
+                    Group {
+                        if message.role == "user" {
+                            Color.accentColor
+                        } else {
+#if os(visionOS)
+                            AnyView(Rectangle().fill(.regularMaterial))
+#else
+                            AnyView(Color.gray.opacity(0.1))
+#endif
+                        }
+                    }
+                )
                 .cornerRadius(16)
+                .overlay {
+                    if isEditing && isDraggingOver && supportsVision {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.2))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .strokeBorder(Color.white, style: StrokeStyle(lineWidth: 2, dash: [5]))
+                                )
+                            
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title3)
+                                Text("Drop here to add images")
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.white)
+                        }
+                    }
+                }
+                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: supportsVision, onURLsDropped: { urls in
+                    if isEditing && supportsVision {
+                        addImages(from: urls)
+                    }
+                }, onDataDropped: { data in
+                    if isEditing && supportsVision {
+                        addImages(from: data)
+                    }
+                }))
+
                 .lineSpacing(4)
-                .textSelection(.enabled)
             
             HStack {
                 EmptyView()
             }
             .id(isStreamingAny)
             
-#if os(iOS)
+#if !os(macOS)
             Spacer().frame(height: 8)
 #endif
             Group {
-#if os(iOS)
+#if os(visionOS)
+                HStack(alignment: .center, spacing: 8) {
+                    if message.role == "user" { Spacer() }
+                    
+                    Text(dateString)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    
+                    if message.role == "assistant" { tokenAndSpeed }
+                    
+                    HStack(spacing: 6) {
+                        if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
+                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
+                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
+                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "user" && isLastOwnUserMessage {
+                            if isEditing {
+                                cancelButton
+                                doneButton
+                            } else { editButton }
+                        }
+                    }
+                    
+                    if message.role == "assistant" { Spacer() }
+                }
+#elseif os(iOS)
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
@@ -53,8 +155,13 @@ struct MessageView: View {
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
                         if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
                         if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
-                        if message.role == "user" && isLastOwnUserMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) {
-                            if isEditing { cancelButton; doneButton } else { editButton }
+                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
+                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "user" && isLastOwnUserMessage {
+                            if isEditing {
+                                cancelButton
+                                doneButton
+                            } else { editButton }
                         }
                         if message.role == "assistant" { Spacer() }
                     }
@@ -83,8 +190,16 @@ struct MessageView: View {
                     if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
                         copyButton
                     }
+
+                    if message.isImageGeneration && message.generatedImage != nil {
+                        downloadButton
+                    }
+
+                    if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
+                        shareButton
+                    }
                     
-                    if message.role == "user" && isLastOwnUserMessage && (!message.isStreaming || message.isStopped) {
+                    if message.role == "user" && isLastOwnUserMessage {
                         if isEditing {
                             cancelButton
                             doneButton
@@ -108,12 +223,27 @@ struct MessageView: View {
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-#if os(macOS)
-        .padding(message.role == "user" ? .leading : .trailing, 64)
-#else
-        .padding(message.role == "user" ? .leading : .trailing, 0)
-#endif
+        .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
         .contentShape(Rectangle())
+        .sheet(isPresented: $showingPhotoPicker) {
+            PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $editingImages)
+#if os(macOS)
+                .frame(minWidth: 500, idealWidth: 800, maxWidth: 1500, minHeight: 300, idealHeight: 550, maxHeight: 1000)
+                .presentationSizing(.fitted)
+#endif
+        }
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.image],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let urls):
+                addImages(from: urls)
+            case .failure(let error):
+                print("Error picking files: \(error.localizedDescription)")
+            }
+        }
 #if os(macOS)
         .onHover { isHovering = $0 }
 #endif
@@ -133,12 +263,59 @@ struct MessageView: View {
         }())
     }
     
+    private func addImages(from urls: [URL]) {
+        Task {
+            for url in urls {
+                let data: Data? = if url.startAccessingSecurityScopedResource() {
+                    try? Data(contentsOf: url)
+                } else {
+                    try? Data(contentsOf: url)
+                }
+                
+                if let urlData = data, PlatformImage(data: urlData) != nil {
+                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                        }
+                    }
+                    url.stopAccessingSecurityScopedResource()
+                    // 少しだけ待機して、左から順に現れるようにする
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                }
+            }
+        }
+    }
+
+    private func addImages(from data: [Data]) {
+        Task {
+            for urlData in data {
+                if PlatformImage(data: urlData) != nil {
+                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                        }
+                    }
+                    // 少しだけ待機して、左から順に現れるようにする
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                }
+            }
+        }
+    }
+    
     @ViewBuilder
     private var tokenAndSpeed: some View {
         if message.isStopped {
             Text("Stopped")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+        } else if message.isImageGeneration {
+            if let duration = message.totalDuration {
+                Text(formatDuration(nanoseconds: duration))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
         } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
             Text("\(evalCount) Tokens")
                 .font(.caption2)
@@ -150,9 +327,32 @@ struct MessageView: View {
         }
     }
     
+    private func formatDuration(nanoseconds: Int) -> String {
+        let totalSeconds = Int(round(Double(nanoseconds) / 1_000_000_000.0))
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        var parts: [String] = []
+        
+        if hours > 0 {
+            parts.append(String(format: NSLocalizedString("%dh", comment: "Duration hours (English)"), hours))
+        }
+        
+        if minutes > 0 || hours > 0 {
+            parts.append(String(format: NSLocalizedString("%dm", comment: "Duration minutes (English)"), minutes))
+        }
+        
+        parts.append(String(format: NSLocalizedString("%ds", comment: "Duration seconds (English)"), seconds))
+        
+        // 日本語環境の場合の特殊処理（もしxcstringsだけで解決できない場合のため）
+        // ただし、本来は xcstrings で "%dh" を "%d時間" に翻訳するのがベストプラクティスです。
+        return parts.joined(separator: " ")
+    }
+    
     @ViewBuilder
     private var revisionNavigator: some View {
-        Group { // ビュービルダー全体にdisabled修飾子を適用するためにGroupでラップ
+        HStack(alignment: .center, spacing: 4) {
             Button(action: {
                 message.currentRevisionIndex -= 1
                 let revision = message.revisions[message.currentRevisionIndex]
@@ -164,23 +364,24 @@ struct MessageView: View {
                 message.evalCount = revision.evalCount
                 message.evalDuration = revision.evalDuration
                 message.isStopped = revision.isStopped
-                
-                message.fixedContent = message.content
-                message.pendingContent = ""
-                message.fixedThinking = message.thinking ?? ""
-                message.pendingThinking = ""
+                message.generatedImage = revision.generatedImage
             }) {
                 Image(systemName: "chevron.backward")
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Previous Revision")
             .disabled(message.currentRevisionIndex == 0)
             
@@ -188,6 +389,10 @@ struct MessageView: View {
                 Text("\(message.currentRevisionIndex + 1)/\(message.revisions.count + 1)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .fixedSize(horizontal: true, vertical: false)
+#if os(visionOS)
+                    .padding(.horizontal, 4)
+#endif
             }
             
             Button(action: {
@@ -202,6 +407,7 @@ struct MessageView: View {
                     message.evalCount = revision.evalCount
                     message.evalDuration = revision.evalDuration
                     message.isStopped = revision.isStopped
+                    message.generatedImage = revision.generatedImage
                 } else {
                     message.content = message.latestContent ?? ""
                     message.thinking = message.finalThinking
@@ -211,23 +417,25 @@ struct MessageView: View {
                     message.evalCount = message.finalEvalCount
                     message.evalDuration = message.finalEvalDuration
                     message.isStopped = message.finalIsStopped
+                    message.generatedImage = message.latestGeneratedImage
                 }
-                message.fixedContent = message.content
-                message.pendingContent = ""
-                message.fixedThinking = message.thinking ?? ""
-                message.pendingThinking = ""
             }) {
                 Image(systemName: "chevron.forward")
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Next Revision")
             .disabled(message.currentRevisionIndex == message.revisions.count)
         }
@@ -239,64 +447,273 @@ struct MessageView: View {
         Button(action: {
             onRetry?(message.id, message)
         }) {
-            Group {
-                if #available(macOS 15.0, iOS 18.0, *) {
-                    Image(systemName: "arrow.trianglehead.clockwise.rotate.90")
-                } else {
-                    Image(systemName: "arrow.circlepath")
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(5)
+            Image(systemName: SFSymbol.retry)
+                .contentShape(Rectangle())
+                .padding(5)
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
         .help("Retry")
         .disabled(!isModelSelected)
     }
     
     @ViewBuilder
-    private var copyButton: some View {
+    private var downloadButton: some View {
         Button(action: {
-#if os(macOS)
-            let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            var contentToCopy = message.content
-            if let thinking = message.thinking, !thinking.isEmpty {
-                contentToCopy = "<think>\(thinking)</think>\n" + message.content
-            }
-            pasteboard.setString(contentToCopy, forType: .string)
-#else
-            var contentToCopy = message.content
-            if let thinking = message.thinking, !thinking.isEmpty {
-                contentToCopy = "<think>\(thinking)</think>\n" + message.content
-            }
-            UIPasteboard.general.string = contentToCopy
-#endif
+            showingSaveOptions = true
         }) {
-            Group {
-                if #available(macOS 15.0, iOS 18.0, *) {
-                    Image(systemName: "document.on.document")
-                } else {
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            .contentShape(Rectangle())
-            .padding(5)
+            Image(systemName: isDownloadSuccessful ? "checkmark" : "arrow.down.to.line")
+                .contentShape(Rectangle())
+                .padding(5)
+                .symbolVariant(isDownloadSuccessful ? .none : .none) // 整合性のための指定
+                .contentTransition(.symbolEffect(.replace))
         }
-#if os(iOS)
+#if !os(macOS)
         .font(.body)
 #else
         .font(.caption2)
 #endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
         .buttonStyle(.plain)
         .foregroundColor(.accentColor)
+#endif
+        .help("Download Image")
+        .confirmationDialog(Text("Select Destination"), isPresented: $showingSaveOptions, titleVisibility: .visible) {
+            Button(String(localized: "Save to Photo Library")) {
+                saveToPhotoLibrary()
+            }
+            Button(String(localized: "Save as File...")) {
+                prepareForFileSave()
+            }
+            Button(String(localized: "Cancel"), role: .cancel) { }
+        } message: {
+            Text("Please select where to save this image.")
+        }
+        .fileExporter(
+            isPresented: $showingFileExporter,
+            document: imageDocument,
+            contentType: .png,
+            defaultFilename: "generated_image.png"
+        ) { result in
+            switch result {
+            case .success(let url):
+                print("Image saved to: \(url.path)")
+                showSuccessFeedback()
+            case .failure(let error):
+                print("Failed to save image: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func showSuccessFeedback() {
+        Task { @MainActor in
+            withAnimation(.spring()) {
+                _ = executor.successfullyDownloadedIDs.insert(message.id)
+            }
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            withAnimation(.spring()) {
+                _ = executor.successfullyDownloadedIDs.remove(message.id)
+            }
+        }
+    }
+    
+    private func saveToPhotoLibrary() {
+        guard let base64String = message.generatedImage,
+              let data = Data(base64Encoded: base64String) else { return }
+        
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            guard status == .authorized || status == .limited else {
+                print("Photos access denied: \(status)")
+                return
+            }
+            
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".png")
+            do {
+                try data.write(to: tempURL)
+                PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: tempURL)
+                } completionHandler: { success, error in
+                    Task { @MainActor in
+                        if success {
+                            print("Successfully saved to Photos")
+                            showSuccessFeedback()
+                        } else {
+                            print("Error saving to Photos: \(error?.localizedDescription ?? "Unknown error")")
+                        }
+                        try? FileManager.default.removeItem(at: tempURL)
+                    }
+                }
+            } catch {
+                print("Failed to create temp file for Photos: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func prepareForFileSave() {
+        guard let base64String = message.generatedImage,
+              let data = Data(base64Encoded: base64String) else { return }
+        
+#if os(macOS)
+        // アクションシートが閉じるのを待つための遅延
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let savePanel = NSSavePanel()
+            savePanel.allowedContentTypes = [.png]
+            savePanel.nameFieldStringValue = "generated_image.png"
+            
+            if let window = NSApp.keyWindow {
+                savePanel.beginSheetModal(for: window) { response in
+                    if response == .OK, let url = savePanel.url {
+                        do {
+                            try data.write(to: url)
+                            showSuccessFeedback()
+                        } catch {
+                            print("Failed to save file: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            } else {
+                savePanel.begin { response in
+                    if response == .OK, let url = savePanel.url {
+                        do {
+                            try data.write(to: url)
+                            showSuccessFeedback()
+                        } catch {
+                            print("Failed to save file: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+#else
+        self.imageDocument = ImageDocument(image: data)
+        self.showingFileExporter = true
+#endif
+    }
+    
+    @ViewBuilder
+    private var copyButton: some View {
+        Button(action: {
+            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+                copyImageToClipboard(image: image)
+            } else {
+#if os(macOS)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                var contentToCopy = message.content
+                if let thinking = message.thinking, !thinking.isEmpty {
+                    contentToCopy = "<think>\(thinking)</think>\n" + contentToCopy
+                } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                    contentToCopy = "<think>\(finalThinking)</think>\n" + contentToCopy
+                }
+                pasteboard.setString(contentToCopy, forType: .string)
+#else
+                var contentToCopy = message.content
+                if let thinking = message.thinking, !thinking.isEmpty {
+                    contentToCopy = "<think>\(thinking)</think>\n" + contentToCopy
+                } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                    contentToCopy = "<think>\(finalThinking)</think>\n" + contentToCopy
+                }
+                UIPasteboard.general.string = contentToCopy
+#endif
+                showCopyFeedback()
+            }
+        }) {
+            Image(systemName: isCopied ? "checkmark" : SFSymbol.copy)
+                .contentShape(Rectangle())
+                .padding(5)
+                .contentTransition(.symbolEffect(.replace))
+        }
+#if !os(macOS)
+        .font(.body)
+#else
+        .font(.caption2)
+#endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
+        .buttonStyle(.plain)
+        .foregroundColor(.accentColor)
+#endif
         .help("Copy")
+        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
+    }
+    
+    private var shareButton: some View {
+        Group {
+            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+                ShareLink(item: Image(platformImage: image), preview: SharePreview(message.content, image: Image(platformImage: image))) {
+                    Image(systemName: "square.and.arrow.up")
+                        .contentShape(Rectangle())
+                        .padding(5)
+                }
+            } else {
+                let shareText: String = {
+                    var content = message.content
+                    if let thinking = message.thinking, !thinking.isEmpty {
+                        content = "<think>\(thinking)</think>\n" + content
+                    } else if let finalThinking = message.finalThinking, !finalThinking.isEmpty {
+                        content = "<think>\(finalThinking)</think>\n" + content
+                    }
+                    return content
+                }()
+                ShareLink(item: shareText) {
+                    Image(systemName: "square.and.arrow.up")
+                        .contentShape(Rectangle())
+                        .padding(5)
+                }
+            }
+        }
+#if !os(macOS)
+        .font(.body)
+#else
+        .font(.caption2)
+#endif
+#if os(visionOS)
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.circle)
+#else
+        .buttonStyle(.plain)
+        .foregroundColor(.accentColor)
+#endif
+        .help("Share")
+        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
+    }
+    
+    private func showCopyFeedback() {
+        Task { @MainActor in
+            withAnimation(.spring()) {
+                _ = executor.successfullyCopiedIDs.insert(message.id)
+            }
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            withAnimation(.spring()) {
+                _ = executor.successfullyCopiedIDs.remove(message.id)
+            }
+        }
+    }
+    
+    private func copyImageToClipboard(image: PlatformImage) {
+#if os(macOS)
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.writeObjects([image])
+#else
+        UIPasteboard.general.image = image
+#endif
+        showCopyFeedback()
     }
     
     @ViewBuilder
@@ -306,18 +723,50 @@ struct MessageView: View {
                 isEditing = true
                 isEditingFocused = true
                 message.content = message.content
+                
+                // 画像を編集用にコピー
+                Task {
+                    if let images = message.images {
+                        editingImages = await withTaskGroup(of: (Int, ChatInputImage?).self) { group in
+                            for (index, base64) in images.enumerated() {
+                                group.addTask {
+                                    if let data = Data(base64Encoded: base64) {
+                                        let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                                        return (index, ChatInputImage(data: data, thumbnail: thumbnail))
+                                    }
+                                    return (index, nil)
+                                }
+                            }
+                            
+                            var results = [(Int, ChatInputImage)]()
+                            for await result in group {
+                                if let img = result.1 {
+                                    results.append((result.0, img))
+                                }
+                            }
+                            return results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
+                        }
+                    } else {
+                        editingImages = []
+                    }
+                }
             }) {
                 Image(systemName: "pencil")
                     .contentShape(Rectangle())
                     .padding(5)
             }
-#if os(iOS)
+#if !os(macOS)
             .font(.body)
 #else
             .font(.caption2)
 #endif
+#if os(visionOS)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+#else
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
+#endif
             .help("Edit")
             .disabled(isStreamingAny)
         }
@@ -328,21 +777,29 @@ struct MessageView: View {
     private var cancelButton: some View {
         Button(action: {
             isEditing = false
-            message.content = message.fixedContent
         }) {
             Label { Text("Cancel") } icon: { Image(systemName: "xmark") }
-#if os(iOS)
+#if !os(macOS)
                 .font(.body)
+                .bold()
 #else
                 .font(.caption2)
-#endif
                 .bold()
+#endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
+#if os(visionOS)
+                .bold()
+#else
                 .background(Capsule().fill(Color.gray.opacity(0.2)))
                 .foregroundColor(.secondary)
+#endif
         }
+#if os(visionOS)
+        .buttonStyle(.bordered)
+#else
         .buttonStyle(.plain)
+#endif
         .help(String(localized: "Cancel editing."))
         .disabled(message.isStreaming)
     }
@@ -350,34 +807,228 @@ struct MessageView: View {
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
-            isEditing = false
-            message.fixedContent = message.content
-            message.pendingContent = ""
-            onRetry?(message.id, message)
+            if !editingImages.isEmpty && !supportsVision {
+                showingVisionWarningAlert = true
+                return
+            }
+            performDone()
         }) {
             Label { Text("Done") } icon: { Image(systemName: "checkmark") }
-#if os(iOS)
+#if !os(macOS)
                 .font(.body)
+                .bold()
 #else
                 .font(.caption2)
-#endif
                 .bold()
+#endif
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
+#if os(visionOS)
+                .bold()
+                .foregroundStyle(.white)
+#else
                 .background(Capsule().fill(Color.accentColor.opacity(0.2)))
                 .foregroundColor(.accentColor)
+#endif
         }
+#if os(visionOS)
+        .buttonStyle(.borderedProminent)
+        .tint(.accentColor)
+#else
         .buttonStyle(.plain)
+#endif
         .help(String(localized: "Complete editing and retry."))
-        .disabled(!isModelSelected || isStreamingAny || message.content.isEmpty)
+        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .id(isStreamingAny ? "on" : "off")
+        .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
+            Button("Send") {
+                performDone(skipImages: true)
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            } else {
+                Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            }
+        }
+    }
+    
+    private func performDone(skipImages: Bool = false) {
+        isEditing = false
+        
+        // 編集内容を反映させるためのTaskを開始
+        Task {
+            // 画像の変更を反映
+            if editingImages.isEmpty || skipImages {
+                message.images = nil
+            } else {
+                // 画像の処理が必要な場合はフラグを立てる
+                message.isProcessingImages = true
+                
+                let imagesData = editingImages.map { $0.data }
+                let base64Images = await ChatInputImage.processImages(imagesData)
+                
+                await MainActor.run {
+                    message.images = base64Images
+                    message.isProcessingImages = false
+                }
+            }
+            
+            onRetry?(message.id, message)
+        }
     }
     
     @ViewBuilder
     private var messageContentView: some View {
-        if isEditing && message.role == "user" {
+        VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
+            if message.isProcessingImages {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Processing images...")
+                        .font(.caption)
+                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
+                }
+                .padding(.vertical, 4)
+            } else if isEditing && message.role == "user" && (supportsVision || !editingImages.isEmpty) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(editingImages) { imageContainer in
+                            ZStack(alignment: .topLeading) {
+                                if let image = imageContainer.thumbnail {
+                                    Image(platformImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .contentShape(Rectangle())
+#if os(visionOS)
+                                        .hoverEffect()
+#endif
+                                        .onTapGesture {
+                                            if let fullImage = PlatformImage(data: imageContainer.data) {
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    executor.previewImage = fullImage
+                                                }
+                                            }
+                                        }
+                                }
+                                
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        editingImages.removeAll(where: { $0.id == imageContainer.id })
+                                    }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.white, .black.opacity(0.6))
+                                        .font(.system(size: 20))
+                                }
+                                .buttonStyle(.plain)
+                                                                .offset(x: -8, y: -8)
+                                                                }
+                                                                .padding(.top, 0)
+                                                                .padding(.leading, 0)
+                                                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+                                
+                            .onDrag {
+                                self.draggingItem = imageContainer
+                                return NSItemProvider(object: imageContainer.id.uuidString as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
+                        }
+                        
+                        // 画像追加タイル (ビジョン対応モデルが選択されている場合のみ表示)
+                        if supportsVision {
+                            Button(action: {
+                                showingAttachSheet = true
+                            }) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.white.opacity(0.2))
+                                        .frame(width: 80, height: 80)
+                                    
+                                    Image(systemName: "plus")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .confirmationDialog(
+                                Text("Attach Images"),
+                                isPresented: $showingAttachSheet,
+                                titleVisibility: .visible
+                            ) {
+                                Button(String(localized: "Photo Library...")) {
+                                    showingPhotoPicker = true
+                                }
+                                Button(String(localized: "Choose Files...")) {
+                                    showingFilePicker = true
+                                }
+                                Button(String(localized: "Cancel"), role: .cancel) { }
+                            } message: {
+                                Text("Please select the location of the images you want to attach.")
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+                .frame(height: 90)
+                .scrollClipDisabled()
+            } else if let images = message.images, !images.isEmpty {
+                // 画像が少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(images, id: \.self) { base64 in
+                            if let data = Data(base64Encoded: base64),
+                               let image = PlatformImage(data: data) {
+                                Image(platformImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            executor.previewImage = image
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(images, id: \.self) { base64 in
+                                if let data = Data(base64Encoded: base64),
+                                   let image = PlatformImage(data: data) {
+                                    Image(platformImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .contentShape(Rectangle())
+#if os(visionOS)
+                                        .hoverEffect()
+#endif
+                                        .onTapGesture {
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                executor.previewImage = image
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(height: 100)
+            }
+            
+            if isEditing && message.role == "user" {
             VStack(alignment: .trailing) {
                 TextField("Type your message...", text: $message.content, axis: .vertical)
                     .focused($isEditingFocused)
@@ -391,15 +1042,17 @@ struct MessageView: View {
                     .lineLimit(1...10)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
+#if os(visionOS)
+                    .background(.regularMaterial)
+#else
                     .background(.background.secondary.opacity(0.7))
+#endif
                     .cornerRadius(8)
                     .onKeyPress(KeyEquivalent.return) {
 #if os(macOS)
                         if NSEvent.modifierFlags.contains(.command) {
                             Task { @MainActor in
                                 isEditing = false
-                                message.fixedContent = message.content
-                                message.pendingContent = ""
                                 onRetry?(message.id, message)
                             }
                             return .handled
@@ -417,23 +1070,81 @@ struct MessageView: View {
                         message.content += "\n"
                     }
             }
-        } else if !(message.fixedThinking.isEmpty && message.pendingThinking.isEmpty) {
+        } else if message.isImageGeneration && message.role == "assistant" {
+            VStack(alignment: .leading, spacing: 10) {
+                if let base64String = message.generatedImage,
+                   let data = Data(base64Encoded: base64String),
+                   let image = PlatformImage(data: data) {
+                    let ratio = image.size.width / image.size.height
+                    let limitedHeight = containerHeight * 0.7
+                    
+                    Image(platformImage: image)
+                        .resizable()
+                        .aspectRatio(ratio, contentMode: .fit)
+                        .frame(maxWidth: limitedHeight * ratio, maxHeight: limitedHeight)
+                        .cornerRadius(8)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                executor.previewImage = image
+                            }
+                        }
+                        .contextMenu {
+                            Button {
+                                copyImageToClipboard(image: image)
+                            } label: {
+                                Label(String(localized: "Copy Image"), systemImage: SFSymbol.copy)
+                            }
+                        }
+                        .draggable(Image(platformImage: image))
+                } else if message.isStreaming {
+                    VStack(spacing: 8) {
+                        ProgressView()
+                            .controlSize(.regular)
+                        
+                        if let completed = message.imageProgressCompleted, let total = message.imageProgressTotal {
+                            ProgressView(value: Double(completed), total: Double(total))
+                                .progressViewStyle(.linear)
+                            Text("\(completed) / \(total)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Generating image...")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                } else if message.content == "*Cancelled*" {
+                    Text("*Cancelled*")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if !message.content.isEmpty {
+                    let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
+                        ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
+                        : message.content
+                    StructuredText(markdown: displayContent)
+                        .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                        .textual.structuredTextStyle(SimpleStyle(message: message))
+                        .textual.textSelection(.enabled)
+                        .textual.overflowMode(.scroll)
+                        .compositingGroup() // 描画を最適化
+                } else {
+                    Text("Failed to generate image.")
+                        .foregroundColor(.red)
+                }
+            }
+        } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
-                        if !message.fixedThinking.isEmpty {
-                            Text(message.fixedThinking)
+                        if let thinking = message.thinking, !thinking.isEmpty {
+                            Text(thinking)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
-                        }
-                        if !message.pendingThinking.isEmpty {
-                            Text(message.pendingThinking)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 } label: {
@@ -449,34 +1160,36 @@ struct MessageView: View {
             streamingContentBody
         }
     }
+}
     
     @ViewBuilder
     private var streamingContentBody: some View {
-        if message.isStreaming && message.fixedContent.isEmpty && message.pendingContent.isEmpty {
+        if message.isStreaming && message.content.isEmpty {
             ProgressView()
                 .controlSize(.small)
                 .padding(2)
-        } else if message.isStopped && (message.fixedContent + message.pendingContent).isEmpty {
+        } else if message.role == "assistant" && message.isStopped && message.content.isEmpty {
             Text("*No message*")
                 .font(.caption)
                 .foregroundColor(.secondary)
-        } else if !message.isStreaming && (message.fixedContent + message.pendingContent).isEmpty {
+        } else if message.role == "assistant" && !message.isStreaming && message.content.isEmpty {
             Text("*Could not connect*")
                 .font(.caption)
                 .foregroundColor(.secondary)
-        } else {
+        } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
-                if !message.fixedContent.isEmpty {
-                    Markdown(message.fixedContent)
-                        .markdownTheme(Theme.simple(for: message))
-                }
-                if !message.pendingContent.isEmpty {
-                    Text(message.pendingContent)
-                        .font(.body)
-                        .foregroundColor(message.role == "user" ? .white : .primary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
+                    ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
+                    : message.content
+                StructuredText(markdown: displayContent)
+                    .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
+                    .textual.structuredTextStyle(SimpleStyle(message: message))
+                    .textual.textSelection(.enabled)
+                    .textual.overflowMode(.scroll)
+                    .compositingGroup() // 描画を最適化
             }
+        } else {
+            EmptyView()
         }
     }
     
@@ -488,119 +1201,246 @@ struct MessageView: View {
     }
 }
 
-extension Theme {
-    static func simple(for message: ChatMessage) -> Theme {
-        Theme()
-            .text {
-                ForegroundColor(message.role == "user" ? .white : nil)
-            }
-            .strong {
-                FontWeight(.bold)
-            }
-            .emphasis {
-                FontStyle(.italic)
-            }
-            .link {
-                ForegroundColor(message.role == "user" ? .white : nil)
-                UnderlineStyle(.single)
-            }
-            .code {
-                FontFamilyVariant(.monospaced)
-                BackgroundColor(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-            }
-        
-            .heading1 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(2.0))
-                        FontWeight(.bold)
+// MARK: - Textual Custom Style
+
+struct SimpleStyle: StructuredText.Style {
+    let message: ChatMessage
+
+    var inlineStyle: InlineStyle {
+        InlineStyle()
+            .strong(.bold)
+            .emphasis(.italic)
+            .link(
+                .foregroundColor(message.role == "user" ? Color.white : Color.accentColor),
+                .underlineStyle(.single)
+            )
+            .code(
+                .monospaced,
+                .backgroundColor({
+#if os(visionOS)
+                    return Color.black.opacity(0.2)
+#else
+                    return message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.2)
+#endif
+                }())
+            )
+    }
+
+    var headingStyle: some StructuredText.HeadingStyle {
+        SimpleHeadingStyle()
+    }
+
+    var paragraphStyle: some StructuredText.ParagraphStyle {
+        SimpleParagraphStyle()
+    }
+
+    var blockQuoteStyle: some StructuredText.BlockQuoteStyle {
+        SimpleBlockQuoteStyle(message: message)
+    }
+
+    var codeBlockStyle: some StructuredText.CodeBlockStyle {
+        SimpleCodeBlockStyle(message: message)
+    }
+
+    var listItemStyle: some StructuredText.ListItemStyle {
+        SimpleListItemStyle()
+    }
+
+    var unorderedListMarker: some StructuredText.UnorderedListMarker {
+        StructuredText.SymbolListMarker.disc
+    }
+
+    var orderedListMarker: some StructuredText.OrderedListMarker {
+        StructuredText.DecimalListMarker.decimal
+    }
+
+    var tableStyle: some StructuredText.TableStyle {
+        SimpleTableStyle(message: message)
+    }
+
+    var tableCellStyle: some StructuredText.TableCellStyle {
+        SimpleTableCellStyle()
+    }
+
+    var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
+        StructuredText.DividerThematicBreakStyle.divider
+    }
+}
+
+struct SimpleListItemStyle: StructuredText.ListItemStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.block
+    }
+}
+
+struct SimpleTableStyle: StructuredText.TableStyle {
+    let message: ChatMessage
+    private static let borderWidth: CGFloat = 1
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
+            .textual.blockSpacing(.fontScaled(top: 1.6, bottom: 1.6))
+            .textual.tableOverlay { layout in
+                Canvas { context, _ in
+                    for divider in layout.dividers() {
+                        context.fill(
+                            Path(divider),
+                            with: .style(message.role == "user" ? Color.white.opacity(0.4) : Color.gray.opacity(0.4))
+                        )
                     }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading2 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.75))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading3 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.5))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading4 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.25))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading5 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(1.0))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .heading6 { configuration in
-                configuration.label
-                    .markdownTextStyle {
-                        FontSize(.em(0.8))
-                        FontWeight(.bold)
-                    }
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-            }
-            .paragraph { configuration in
-                configuration.label
-                    .relativeLineSpacing(.em(0.3))
-                    .markdownMargin(top: .zero, bottom: .em(0.8))
-            }
-            .listItem { configuration in
-                configuration.label
-                    .markdownMargin(top: .em(0.3))
-            }
-            .blockquote { configuration in
-                configuration.label
-                    .padding()
-                    .overlay(alignment: .leading) {
-                        Rectangle()
-                            .fill(message.role == "user" ? .white : .gray)
-                            .frame(width: 4)
-                    }
-            }
-            .codeBlock { configuration in
-                ScrollView(.horizontal) {
-                    configuration.label
-                        .markdownTextStyle {
-                            FontFamilyVariant(.monospaced)
-                        }
-                        .markdownMargin(top: .em(0.3))
-                        .padding()
                 }
-                .background(message.role == "user" ? .white.opacity(0.2) : .gray.opacity(0.2))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.vertical, 8)
             }
-            .tableCell { configuration in
-                configuration.label
-                    .padding(8)
-            }
-            .table { configuration in
-                configuration.label
-                    .padding(.bottom, 8)
+            .padding(Self.borderWidth)
+            .overlay {
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(message.role == "user" ? Color.white.opacity(0.4) : Color.gray.opacity(0.4), lineWidth: Self.borderWidth)
             }
     }
 }
+
+struct SimpleHeadingStyle: StructuredText.HeadingStyle {
+    private static let fontScales: [CGFloat] = [2.0, 1.75, 1.5, 1.25, 1.0, 0.8]
+
+    func makeBody(configuration: Configuration) -> some View {
+        let level = min(configuration.headingLevel, 6)
+        let fontScale = Self.fontScales[level - 1]
+
+        configuration.label
+            .textual.fontScale(fontScale)
+            .fontWeight(.bold)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+    }
+}
+
+struct SimpleParagraphStyle: StructuredText.ParagraphStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.lineSpacing(.fontScaled(0.3))
+            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+    }
+}
+
+struct SimpleBlockQuoteStyle: StructuredText.BlockQuoteStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding()
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(message.role == "user" ? Color.white : Color.gray)
+                    .frame(width: 4)
+            }
+    }
+}
+
+struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // ヘッダー: 言語名
+            HStack {
+                Text(formatLanguageName(configuration.languageHint))
+                    .font(.caption2.monospaced())
+                    .fontWeight(.bold)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.gray.opacity(0.05))
+
+            Divider()
+                .opacity(0.5)
+
+            // コード本体
+            Overflow {
+                configuration.label
+                    .monospaced()
+                    .textual.lineSpacing(.fontScaled(0.39))
+                    .padding()
+            }
+        }
+#if os(visionOS)
+        .background(Color.black.opacity(0.2))
+#else
+        .background(message.role == "user" ? Color.white.opacity(0.2) : Color.gray.opacity(0.1))
+#endif
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(.vertical, 8)
+        .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.8))
+    }
+
+    private func formatLanguageName(_ hint: String?) -> String {
+        guard let hint = hint?.lowercased() else {
+            return String(localized: "Code")
+        }
+
+        // 特定の言語名の正式な表記マッピング（途中に大文字が入るものや記号を含むもの）
+        let specialCases: [String: String] = [
+            "javascript": "JavaScript",
+            "typescript": "TypeScript",
+            "csharp": "C#",
+            "php": "PHP",
+            "sql": "SQL",
+            "json": "JSON",
+            "html": "HTML",
+            "css": "CSS",
+            "xml": "XML",
+            "yaml": "YAML",
+            "csv": "CSV",
+            "cpp": "C++",
+            "cplusplus": "C++",
+            "objectivec": "Objective-C"
+        ]
+
+        if let specialName = specialCases[hint] {
+            return specialName
+        }
+
+        // 1文字の場合は大文字にする (例: "r" -> "R")
+        if hint.count == 1 {
+            return hint.uppercased()
+        }
+
+        // それ以外は先頭を大文字にする (例: "swift" -> "Swift", "markdown" -> "Markdown")
+        return hint.prefix(1).uppercased() + hint.dropFirst()
+    }
+}
+
+struct SimpleTableCellStyle: StructuredText.TableCellStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(8)
+            .textual.textSelection(.enabled)
+    }
+}
+
+
+// MARK: - Document Support
+
+struct ImageDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.png] }
+    var image: Data
+
+    init(image: Data) {
+        self.image = image
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        if let data = configuration.file.regularFileContents {
+            self.image = data
+        } else {
+            throw CocoaError(.fileReadUnknown)
+        }
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        return FileWrapper(regularFileWithContents: image)
+    }
+}
+

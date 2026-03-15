@@ -21,7 +21,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let modified_at: String // ISO 8601形式の文字列
     let size: Int64 // バイト単位の数値
     let digest: String
-    let details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
+    var details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
     
     // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)
@@ -92,6 +92,34 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         dateFormatter.dateStyle = .medium // 例: Jul 24, 2025
         dateFormatter.timeStyle = .short // 例: 9:30 PM
         return dateFormatter.string(from: comparableModifiedDate)
+    }
+    
+    /// 画像生成モデルかどうかを判定するヘルパー
+    var isImageModel: Bool {
+        // capabilitiesに"image"が含まれているか
+        if let caps = capabilities, caps.contains(where: { $0.lowercased() == "image" }) {
+            return true
+        }
+        return false
+    }
+    
+    /// チャット（Completion）に対応しているモデルかどうかを判定します。
+    var supportsCompletion: Bool {
+        // capabilitiesがあればそれを尊重
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "completion" })
+        }
+        
+        // capabilitiesがまだ取得できていない状態などは、確実な判定ができないためfalseを返す
+        return false
+    }
+
+    /// ビジョンに対応しているモデルかどうかを判定します。
+    var supportsVision: Bool {
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "vision" })
+        }
+        return false
     }
 }
 

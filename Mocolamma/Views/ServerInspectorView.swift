@@ -4,7 +4,7 @@ import AppKit
 #endif
 
 struct ServerInspectorView: View {
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus? // チェック中にnilになる可能性あり
@@ -12,7 +12,7 @@ struct ServerInspectorView: View {
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
     
     private var indicatorSize: CGFloat {
-#if os(iOS)
+#if !os(macOS)
         return 10
 #else
         return 8
@@ -20,13 +20,7 @@ struct ServerInspectorView: View {
     }
     
     var body: some View {
-        let copyIconName = {
-            if #available(macOS 15.0, iOS 18.0, *) {
-                return "document.on.document"
-            } else {
-                return "doc.on.doc"
-            }
-        }()
+        let copyIconName = SFSymbol.copy
         
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -177,7 +171,7 @@ struct ServerInspectorView: View {
                                 UIPasteboard.general.string = server.host
 #endif
                             }
-                        }                
+                        }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -199,14 +193,43 @@ struct ServerInspectorView: View {
                                     UIPasteboard.general.string = ollamaVersion ?? "-"
 #endif
                                 }
-                            }                    
+                            }
                     }
-                    VStack(alignment: .leading) {
-                        Text("Running Models:")
-                            .font(.subheadline)
-                        RunningModelsCountView(host: server.host, connectionStatus: connectionStatus)
-                            .environmentObject(commandExecutor)
+                    
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading) {
+                            Text("Running Models:")
+                                .font(.subheadline)
+                            RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showList: false)
+                                .environment(commandExecutor)
+                        }
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+                        }) {
+#if os(visionOS)
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                                .labelStyle(.iconOnly)
+                                .frame(width: 20, height: 20)
+#else
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundStyle(Color.accentColor)
+                                .frame(width: 20, height: 20)
+#endif
+                        }
+#if os(visionOS)
+                        .buttonStyle(.bordered)
+#else
+                        .buttonStyle(.plain)
+#endif
+                        .help("Refresh the list of running models.")
+                        .disabled(connectionStatus?.isConnected != true)
                     }
+                    
+                    RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showSummary: false)
+                        .environment(commandExecutor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .task(id: server.host) {
@@ -232,5 +255,8 @@ struct ServerInspectorView: View {
             }
             .padding()
         }
+#if os(visionOS)
+        .scrollClipDisabled()
+#endif
     }
 }

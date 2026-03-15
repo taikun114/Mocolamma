@@ -1,0 +1,2 @@
+NSLocalNetworkUsageDescription = "Это необходимо для связи с серверами Ollama в локальной сети.";
+NSPhotoLibraryAddUsageDescription = "Это необходимо для сохранения сгенерированных изображений в вашу медиатеку.";

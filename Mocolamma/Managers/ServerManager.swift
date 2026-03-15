@@ -9,6 +9,34 @@ enum ServerConnectionStatus {
     case unknownHost
     case timedOut // タイムアウト
     case checking
+    
+    /// 疎通が確認できている（接続済み、またはエラーメッセージが返ってきている）かどうか
+    var isConnected: Bool {
+        switch self {
+        case .connected, .errorWithMessage:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    /// ユーザーフレンドリーな状態説明メッセージ
+    var localizedDescription: String {
+        switch self {
+        case .connected:
+            return String(localized: "Connected successfully.")
+        case .notConnected(let code):
+            return String(localized: "Failed to connect. (HTTP \(code))")
+        case .errorWithMessage(_, let message):
+            return message ?? String(localized: "An unknown error occurred.")
+        case .unknownHost:
+            return String(localized: "Could not find the host. Please check the address.")
+        case .timedOut:
+            return String(localized: "Connection timed out. The server might be down or the address is incorrect.")
+        case .checking:
+            return String(localized: "Checking connection...")
+        }
+    }
 }
 
 // MARK: - サーバーマネージャー
@@ -48,6 +76,15 @@ class ServerManager: ObservableObject {
     
     /// インスペクターの再描画を誘発するためのトークン
     @Published var inspectorRefreshToken: UUID = UUID()
+    
+    /// インスペクターに表示する現在のカテゴリ（server, models, chat, image_generationなど）
+    @Published var inspectorSelection: String?
+    
+    /// インスペクターで選択されているモデルのID
+    @Published var inspectorSelectedModelID: OllamaModel.ID?
+    
+    /// インスペクターで選択されているサーバー
+    @Published var inspectorSelectedServer: ServerInfo?
     
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合はnilを返します。
@@ -93,9 +130,10 @@ class ServerManager: ObservableObject {
     /// - Parameters:
     ///   - name: 追加するサーバーの名前。
     ///   - host: 追加するサーバーのホストURL。
+    ///   - iconName: 追加するサーバーのアイコン名。
     ///   - isDemo: デモサーバーかどうか。
-    func addServer(name: String, host: String, isDemo: Bool = false) {
-        let newServer = ServerInfo(name: name, host: host, isDemo: isDemo)
+    func addServer(name: String, host: String, iconName: String = "server.rack", isDemo: Bool = false) {
+        let newServer = ServerInfo(name: name, host: host, iconName: iconName, isDemo: isDemo)
         servers.append(newServer)
         // 新しく追加されたサーバーを選択状態にする
         selectedServerID = newServer.id

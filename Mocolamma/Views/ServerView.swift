@@ -6,7 +6,7 @@ import SwiftUI
 /// サーバーのリストを表示し、新しいサーバーの追加、既存サーバーの編集を管理します。
 struct ServerView: View {
     @ObservedObject var serverManager: ServerManager
-    @ObservedObject var executor: CommandExecutor
+    var executor: CommandExecutor
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     @State private var showingAddServerSheet = false
@@ -14,6 +14,7 @@ struct ServerView: View {
     @State private var showingDeleteConfirmationServer = false
     @State private var serverToDelete: ServerInfo?
     @State private var listSelection: ServerInfo.ID?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     let onTogglePreview: () -> Void
     
@@ -29,31 +30,30 @@ struct ServerView: View {
     
     @ToolbarContentBuilder
     private var serverToolbarContent: some ToolbarContent {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                appRefreshTrigger.send()
-            }) {
+            Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
         }
 #endif
         
         ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-                showingAddServerSheet = true
-            }) {
+            Button(action: { showingAddServerSheet = true }) {
                 Label("Add Server", systemImage: "plus")
             }
         }
-        
+
 #if os(iOS)
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
         }
+#endif
+
+#if !os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { onTogglePreview() }) {
-                Label("Inspector", systemImage: "sidebar.trailing")
+                Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
         }
 #endif
@@ -88,12 +88,20 @@ struct ServerView: View {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 300)
+            .presentationSizing(.fitted)
+#endif
         }
         .sheet(item: $serverToEdit) { server in
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 300)
+            .presentationSizing(.fitted)
+#endif
         }
         .alert("Delete Server", isPresented: $showingDeleteConfirmationServer) {
             Button("Delete", role: .destructive) {
@@ -119,6 +127,14 @@ struct ServerView: View {
             if serverManager.selectedServerID == nil && !serverManager.servers.isEmpty {
                 serverManager.selectedServerID = serverManager.servers.first?.id
             }
+            
+            // 初期状態でリスト選択（ハイライト）がない場合、チェック済みサーバーをインスペクタの表示対象にする
+            if listSelection == nil {
+                if let activeID = serverManager.selectedServerID {
+                    selectedServerForInspector = serverManager.servers.first(where: { $0.id == activeID })
+                }
+            }
+            
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled {
                 appRefreshTrigger.send()
@@ -159,14 +175,19 @@ struct ServerView: View {
         if let newID = newID {
             selectedServerForInspector = serverManager.servers.first(where: { $0.id == newID })
         } else {
-            selectedServerForInspector = nil
+            // リスト選択が解除された場合は、現在選択（チェック）されているサーバーを表示
+            if let activeID = serverManager.selectedServerID {
+                selectedServerForInspector = serverManager.servers.first(where: { $0.id == activeID })
+            } else {
+                selectedServerForInspector = nil
+            }
         }
     }
 }
 
 private struct ServerListViewContent: View {
     @ObservedObject var serverManager: ServerManager
-    @ObservedObject var executor: CommandExecutor
+    var executor: CommandExecutor
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
@@ -191,6 +212,7 @@ private struct ServerListViewContent: View {
                     } label: {
                         Label("Select", systemImage: "checkmark.circle.fill")
                     }
+                    .labelStyle(.iconOnly)
                     .tint(.accentColor)
                 }
                 .swipeActions(edge: .trailing) {
@@ -200,14 +222,17 @@ private struct ServerListViewContent: View {
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
+                    .labelStyle(.iconOnly)
+                    
                     Button {
                         serverToEdit = server
                     } label: {
                         Label("Edit", systemImage: "pencil")
                     }
+                    .labelStyle(.iconOnly)
                     .tint(.blue)
                 }
-#if os(iOS)
+#if !os(macOS)
                 .onTapGesture {
                     listSelection = server.id
                 }
@@ -222,7 +247,7 @@ private struct ServerListViewContent: View {
             }
 #endif
         }
-#if os(iOS)
+#if !os(macOS)
         .refreshable {
             appRefreshTrigger.send()
         }
@@ -245,7 +270,7 @@ private struct ServerRowContent: View {
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
-#if os(iOS)
+#if !os(macOS)
         .contentShape(Rectangle())
         
 #endif

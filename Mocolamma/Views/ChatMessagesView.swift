@@ -5,15 +5,33 @@ import AppKit
 import UIKit
 #endif
 
+struct ContainerHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 600
+}
+
+extension EnvironmentValues {
+    var containerHeight: CGFloat {
+        get { self[ContainerHeightKey.self] }
+        set { self[ContainerHeightKey.self] = newValue }
+    }
+}
+
 struct ChatMessagesView: View {
+    @Environment(CommandExecutor.self) var executor
     @Binding var messages: [ChatMessage]
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
     let isUsingSafeAreaBar: Bool
+    var bottomInset: CGFloat = 0
+    
+    // 空の状態の表示をカスタマイズするための引数を追加
+    let emptyStateTitle: LocalizedStringKey
+    let emptyStateDescription: LocalizedStringKey
+    let emptyStateImage: String
     
     private var reduceMotionEnabled: Bool {
-#if os(iOS)
+#if !os(macOS)
         return UIAccessibility.isReduceMotionEnabled
 #elseif os(macOS)
         return NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -23,23 +41,54 @@ struct ChatMessagesView: View {
     }
     
     private var supportsEffects: Bool {
-#if os(iOS)
-        if #available(iOS 26, *) { return true } else { return false }
-#else
-        if #available(macOS 26, *) { return true } else { return false }
+#if os(macOS) || os(iOS)
+        if #available(iOS 26, macOS 26, *) { return true }
 #endif
+        return false
     }
     
     var body: some View {
-        ChatMessagesScrollView(
-            messages: $messages,
-            onRetry: onRetry,
-            isOverallStreaming: $isOverallStreaming,
-            isModelSelected: isModelSelected,
-            supportsEffects: supportsEffects,
-            reduceMotionEnabled: reduceMotionEnabled,
-            isUsingSafeAreaBar: isUsingSafeAreaBar
-        )
+        GeometryReader { geometry in
+            ZStack {
+                ChatMessagesScrollView(
+                    messages: $messages,
+                    onRetry: onRetry,
+                    isOverallStreaming: $isOverallStreaming,
+                    isModelSelected: isModelSelected,
+                    supportsEffects: supportsEffects,
+                    reduceMotionEnabled: reduceMotionEnabled,
+                    isUsingSafeAreaBar: isUsingSafeAreaBar,
+                    bottomInset: bottomInset
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                if messages.isEmpty {
+                    ContentUnavailableView {
+                        Label(emptyStateTitle, systemImage: emptyStateImage)
+                    } description: {
+                        Text(emptyStateDescription)
+                    }
+                }
+                
+                // 拡大表示オーバーレイ
+                if let image = executor.previewImage {
+                    ImagePreviewOverlay(image: image, onClose: {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            executor.previewImage = nil
+                        }
+                    }, bottomInset: bottomInset)
+                    .zIndex(100)
+                }
+            }
+            .contentShape(Rectangle())
+#if !os(macOS)
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+#endif
+            .environment(\.containerHeight, geometry.size.height)
+        }
+        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
 }
 
@@ -51,11 +100,15 @@ struct ChatMessagesScrollView: View {
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
     let isUsingSafeAreaBar: Bool
+    var bottomInset: CGFloat = 0
+    
+    @State private var isNearBottom: Bool = true
     
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
+                // LazyVStackからVStackに変更してレイアウトの安定性を確保
+                VStack(alignment: .leading, spacing: 10) {
                     ForEach(messages) { message in
                         MessageViewWrapper(
                             message: message,
@@ -71,18 +124,60 @@ struct ChatMessagesScrollView: View {
                 .if(!isUsingSafeAreaBar) { view in
                     view.padding(.bottom, 50)
                 }
+                
+                if bottomInset > 0 {
+                    Spacer(minLength: bottomInset)
+                }
+                
                 Spacer().id("bottom-spacer")
             }
+#if os(iOS)
+            .scrollDismissesKeyboard(.interactively)
+#endif
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
-            .onChange(of: messages.count) { oldCount, newCount in
-                if newCount > oldCount, let lastMessage = messages.last, lastMessage.role == "assistant" {
-                    Task {
-                        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒待機
-                        withAnimation(reduceMotionEnabled ? .none : .default) {
-                            proxy.scrollTo("bottom-spacer", anchor: .bottom)
-                        }
-                    }
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                let contentHeight = geometry.contentSize.height
+                let visibleHeight = geometry.containerSize.height
+                let scrollOffset = geometry.contentOffset.y
+                
+                // iOSでのバウンスやセーフエリアを考慮した計算
+                let maxOffset = max(0, contentHeight - visibleHeight)
+                let distanceFromBottom = maxOffset - scrollOffset
+                
+                // 200px以内なら「底に近い」と判定（安定性と手動操作のバランスを考慮）
+                return distanceFromBottom < 200 || scrollOffset > maxOffset - 5
+            } action: { _, newValue in
+                isNearBottom = newValue
+            }
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentSize.height
+            } action: { oldHeight, newHeight in
+                // ストリーミング中で、かつユーザーが底付近にいる場合に、コンテンツが伸びたらスクロール
+                if isOverallStreaming && isNearBottom && newHeight > oldHeight {
+                    scrollBottom(proxy: proxy)
                 }
+            }
+            .onChange(of: messages.count) { oldCount, newCount in
+                if newCount > oldCount {
+                    // 新しいメッセージが追加されたときのみスクロール
+                    scrollBottom(proxy: proxy)
+                }
+            }
+            // 最後のメッセージの内容（ストリーミング）が更新された時も追従したい場合
+            .onChange(of: isOverallStreaming) { _, newValue in
+                if newValue {
+                    scrollBottom(proxy: proxy)
+                }
+            }
+        }
+    }
+    
+    private func scrollBottom(proxy: ScrollViewProxy) {
+        Task {
+            // レイアウト確定を待つための最小限の遅延
+            try? await Task.sleep(nanoseconds: 50_000_000) 
+            withAnimation(reduceMotionEnabled ? .none : .default) {
+                proxy.scrollTo("bottom-spacer", anchor: .bottom)
             }
         }
     }

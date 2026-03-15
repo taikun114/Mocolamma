@@ -5,7 +5,7 @@ import SwiftUI
 /// 新しいモデルの追加（プル）を行うためのシートビューです。ユーザーがモデル名を入力し、ダウンロードを開始するためのUIを提供します。
 struct AddModelsSheet: View {
     @Binding var showingAddSheet: Bool // シートの表示/非表示を制御するバインディング
-    @ObservedObject var executor: CommandExecutor // CommandExecutorのインスタンスを受け取ります
+    var executor: CommandExecutor // @ObservedObjectを削除
     
     @State private var modelNameInput: String = "" // モデル名入力
     @State private var showHttpErrorAlert: Bool = false
@@ -49,7 +49,7 @@ struct AddModelsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                     
-#if os(iOS) // iOSではボタンがメッセージの下に表示される
+#if !os(macOS) // iOSではボタンがメッセージの下に表示される
                     Button {
                         showingOpenLinkAlert = true
                     } label: {
@@ -90,7 +90,7 @@ struct AddModelsSheet: View {
 #if os(macOS)
         .frame(width: 400, height: 250) // シートの固定サイズ
 #endif
-        .onReceive(executor.$pullHttpErrorTriggered) { triggered in
+        .onChange(of: executor.pullHttpErrorTriggered) { _, triggered in
             if triggered && !pullErrorTriggeredSeen {
                 httpErrorMessage = executor.pullHttpErrorMessage
                 showHttpErrorAlert = true
@@ -121,7 +121,7 @@ struct AddModelsSheet: View {
         } message: {
             Text(String(localized: "Are you sure you want to open the Ollama models page?", comment: "ユーザに、Ollamaのモデル一覧が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。"))
         }
-#if os(iOS)
+#if !os(macOS)
         .navigationTitle("Add Model")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -137,9 +137,20 @@ struct AddModelsSheet: View {
                         add()
                     }
                 }) {
-                    Image(systemName: "plus")
+                    if #available(iOS 26.0, *) {
+#if os(iOS)
+                        Image(systemName: "plus")
+                            .foregroundStyle(.white)
+                            .opacity(0.8)
+#else
+                        Image(systemName: "plus")
+#endif
+                    } else {
+                        Image(systemName: "plus")
+                    }
                 }
                 .keyboardShortcut(.defaultAction)
+
                 .disabled(modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
                 .applyGlassProminentButtonStyle(isDisabled: modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling)
             }
@@ -147,6 +158,7 @@ struct AddModelsSheet: View {
         .onAppear {
             isTextFieldFocused = true
         }
+        .interactiveDismissDisabled()
 #endif
     }
     

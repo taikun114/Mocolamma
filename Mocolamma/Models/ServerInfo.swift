@@ -12,6 +12,7 @@ struct ServerInfo: Identifiable, Codable, Equatable {
     let id: UUID // 各サーバーを一意に識別するためのID
     var name: String // サーバーの表示名
     var host: String // サーバーのホストURL (例: "localhost:11434" または "192.168.1.50:11434")
+    var iconName: String // サーバーのアイコン名 (SF Symbol)
     let isDemo: Bool // デモサーバーであるかどうか
     
     /// 新しいServerInfoインスタンスを初期化します。
@@ -19,11 +20,13 @@ struct ServerInfo: Identifiable, Codable, Equatable {
     ///   - id: サーバーの一意なID。デフォルトで新しいUUIDが生成されます。
     ///   - name: サーバーの表示名。
     ///   - host: サーバーのホストURL。
+    ///   - iconName: サーバーのアイコン名。
     ///   - isDemo: デモサーバーかどうか。
-    init(id: UUID = UUID(), name: String, host: String, isDemo: Bool = false) {
+    init(id: UUID = UUID(), name: String, host: String, iconName: String = "server.rack", isDemo: Bool = false) {
         self.id = id
         self.name = name
         self.host = host
+        self.iconName = iconName
         self.isDemo = isDemo
     }
     
@@ -33,6 +36,7 @@ struct ServerInfo: Identifiable, Codable, Equatable {
         case id
         case name
         case host
+        case iconName
         case isDemo
     }
     
@@ -43,12 +47,13 @@ struct ServerInfo: Identifiable, Codable, Equatable {
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         host = try container.decode(String.self, forKey: .host)
+        iconName = try container.decodeIfPresent(String.self, forKey: .iconName) ?? "server.rack"
         // isDemoプロパティが存在しない場合でもnilを許容し、デフォルト値をfalseとする
         isDemo = try container.decodeIfPresent(Bool.self, forKey: .isDemo) ?? false
     }
     
-    // Equatableプロトコルの実装（ID・名前・ホストで比較）
+    // Equatableプロトコルの実装（ID・名前・ホスト・アイコンで比較）
     static func == (lhs: ServerInfo, rhs: ServerInfo) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name && lhs.host == rhs.host && lhs.isDemo == rhs.isDemo
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.host == rhs.host && lhs.iconName == rhs.iconName && lhs.isDemo == rhs.isDemo
     }
 }

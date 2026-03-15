@@ -11,7 +11,7 @@ struct ContentView: View {
     // ServerManagerのインスタンスをAppStateに保持し、ライフサイクル全体で利用可能にする
     @ObservedObject var serverManager: ServerManager
     // CommandExecutorはServerManagerに依存するため、後から初期化
-    @StateObject var executor: CommandExecutor
+    @State var executor: CommandExecutor
     
     @State private var selectedModel: OllamaModel.ID? // 選択されたモデルのID
     // サイドバー/タブの選択状態をAppレベルから受け取ります
@@ -21,7 +21,7 @@ struct ContentView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
     
     @Binding var showingInspector: Bool
-    @StateObject private var chatSettings = ChatSettings()
+    @EnvironmentObject var chatSettings: ChatSettings
     
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -34,6 +34,9 @@ struct ContentView: View {
         .init(\.originalIndex, order: .forward)
     ]
     
+    // フィルター状態を保持するState変数
+    @State private var selectedFilterTag: String? = nil
+    
     // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
     var sortedModels: [OllamaModel] {
         executor.models.sorted(using: sortOrder)
@@ -44,114 +47,78 @@ struct ContentView: View {
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     // ContentViewの初期化子を更新
-    init(serverManager: ServerManager, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, isPulling: Binding<Bool>) {
+    init(serverManager: ServerManager, executor: CommandExecutor, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
         self.serverManager = serverManager
-        _executor = StateObject(wrappedValue: CommandExecutor(serverManager: serverManager))
+        self.executor = executor
         self._selection = selection
         self._showingInspector = showingInspector
         self._showingAddModelsSheet = showingAddModelsSheet
         self._showingAddServerSheet = showingAddServerSheet
         self._shouldClearChat = shouldClearChat
+        self._shouldClearGeneration = shouldClearGeneration
         self._isPulling = isPulling
     }
     
     @Binding var shouldClearChat: Bool
+    @Binding var shouldClearGeneration: Bool
     @Binding var isPulling: Bool
     
     var body: some View {
         Group {
 #if os(macOS)
             MainNavigationView(
-                sidebarSelection: $selection,
+                selection: $selection,
                 selectedModel: $selectedModel,
                 executor: executor,
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
                 sortOrder: $sortOrder,
+                selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
                 columnVisibility: $columnVisibility,
                 sortedModels: sortedModels
             )
-#elseif os(iOS)
-            if #available(iOS 18.0, *) {
-                MainTabView(
-                    selection: $selection,
-                    selectedModel: $selectedModel,
-                    executor: executor,
-                    serverManager: serverManager,
-                    selectedServerForInspector: $selectedServerForInspector,
-                    showingInspector: $showingInspector,
-                    sortOrder: $sortOrder,
-                    showingAddModelsSheet: $showingAddModelsSheet,
-                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                    modelToDelete: $modelToDelete,
-                    sortedModels: sortedModels
-                )
-            } else {
-                if UIDevice.current.userInterfaceIdiom == .phone {
-                    LegacyIPhoneTabView(
-                        selection: $selection,
-                        selectedModel: $selectedModel,
-                        executor: executor,
-                        serverManager: serverManager,
-                        selectedServerForInspector: $selectedServerForInspector,
-                        showingInspector: $showingInspector,
-                        sortOrder: $sortOrder,
-                        showingAddModelsSheet: $showingAddModelsSheet,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        modelToDelete: $modelToDelete,
-                        sortedModels: sortedModels
-                    )
-                } else {
-                    MainNavigationView(
-                        sidebarSelection: $selection,
-                        selectedModel: $selectedModel,
-                        executor: executor,
-                        serverManager: serverManager,
-                        selectedServerForInspector: $selectedServerForInspector,
-                        showingInspector: $showingInspector,
-                        sortOrder: $sortOrder,
-                        showingAddModelsSheet: $showingAddModelsSheet,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        modelToDelete: $modelToDelete,
-                        columnVisibility: $columnVisibility,
-                        sortedModels: sortedModels
-                    )
-                }
-            }
 #else
-            MainNavigationView(
-                sidebarSelection: $selection,
+            MainTabView(
+                selection: $selection,
                 selectedModel: $selectedModel,
                 executor: executor,
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
                 sortOrder: $sortOrder,
+                selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 modelToDelete: $modelToDelete,
-                columnVisibility: $columnVisibility,
                 sortedModels: sortedModels
             )
 #endif
         }
-        .environmentObject(executor)
+        .environment(executor)
         .environmentObject(chatSettings)
         .sheet(isPresented: $showingAddModelsSheet) {
             NavigationStack {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 350)
+            .presentationSizing(.fitted)
+#endif
         }
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
                     .environmentObject(appRefreshTrigger)
             }
+#if os(visionOS)
+            .frame(width: 500, height: 300)
+            .presentationSizing(.fitted)
+#endif
         }
         .alert("Delete Model", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {
@@ -178,18 +145,38 @@ struct ContentView: View {
         }
         .onAppear {
             selection = "server"
+            // 初期値を同期
+            updateSelectedServerForInspector()
+            serverManager.inspectorSelection = selection
+            serverManager.inspectorSelectedModelID = selectedModel
+            serverManager.inspectorSelectedServer = selectedServerForInspector
         }
         .onChange(of: selection) { oldSelection, newSelection in
+            serverManager.inspectorSelection = newSelection
             if newSelection == "server" {
                 updateSelectedServerForInspector()
             }
             if newSelection == "settings" && showingInspector {
+#if os(visionOS)
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showingInspector = false
+                }
+#else
                 showingInspector = false
+#endif
             }
         }
-        .onChange(of: serverManager.selectedServerID) { _, _ in
+        .onChange(of: selectedModel) { _, newValue in
+#if os(visionOS)
+            withAnimation(.easeInOut(duration: 0.3)) {
+                serverManager.inspectorSelectedModelID = newValue
+            }
+#else
+            serverManager.inspectorSelectedModelID = newValue
+#endif
         }
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
+            serverManager.inspectorSelectedServer = newServer
             if newServer != nil {
                 if selection == "server" {
                     appRefreshTrigger.send()
@@ -202,6 +189,14 @@ struct ContentView: View {
                 executor.clearChat()
                 // 状態をリセット
                 shouldClearChat = false
+            }
+        }
+        .onChange(of: shouldClearGeneration) { oldValue, newValue in
+            if newValue {
+                // 画像生成クリアを実行
+                executor.clearImageGeneration()
+                // 状態をリセット
+                shouldClearGeneration = false
             }
         }
         .onChange(of: executor.isPulling) { oldValue, newValue in
@@ -259,6 +254,9 @@ struct ContentView: View {
             }
             
         case "models":
+            // ダウンロード中はリフレッシュを実行しない
+            guard !executor.isPulling else { return }
+            
             try? await Task.sleep(nanoseconds: 100_000_000)
             // モデルリストを再取得
             Task {
@@ -301,6 +299,13 @@ struct ContentView: View {
                 await executor.fetchOllamaModelsFromAPI()
             }
             
+        case "image_generation":
+            // 画像生成でもモデルリストを再取得
+            Task {
+                executor.clearModelInfoCache()
+                await executor.fetchOllamaModelsFromAPI()
+            }
+            
         default:
             break
         }
@@ -310,6 +315,7 @@ struct ContentView: View {
 // MARK: - プレビュー用
 #Preview {
     let previewServerManager = ServerManager()
-    ContentView(serverManager: previewServerManager, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), isPulling: .constant(false))
+    let previewExecutor = CommandExecutor(serverManager: previewServerManager)
+    ContentView(serverManager: previewServerManager, executor: previewExecutor, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
         .environmentObject(RefreshTrigger())
 }

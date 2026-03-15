@@ -22,10 +22,15 @@ struct MocolammaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 #endif
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+    
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
     @StateObject private var serverManager = ServerManager()
     @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @StateObject private var imageSettings = ImageGenerationSettings()
+    @StateObject private var chatSettings = ChatSettings() // ContentViewから昇格させて共有
+    @State private var executor: CommandExecutor
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
     @State private var showingAddModelsSheet = false
@@ -37,6 +42,7 @@ struct MocolammaApp: App {
     
     // チャットクリア要求を伝える状態変数
     @State private var shouldClearChat: Bool = false
+    @State private var shouldClearGeneration: Bool = false
     
     // ダウンロード状態を伝える状態変数
     @State private var isPulling: Bool = false
@@ -44,35 +50,45 @@ struct MocolammaApp: App {
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
         switch selection {
-        case "server", "models", "chat": // サーバー、モデル、チャットのいずれかの画面が開いている場合は有効
+        case "server", "models", "chat", "image_generation": // サーバー、モデル、チャット、画像生成のいずれかの画面が開いている場合は有効
             return false
         default: // "settings" または nil (初期状態など) の場合は無効
             return true
         }
     }
     
-#if os(macOS)
     init() {
+        let sm = ServerManager()
+        _serverManager = StateObject(wrappedValue: sm)
+        _executor = State(wrappedValue: CommandExecutor(serverManager: sm))
+#if os(macOS)
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
-    }
 #endif
+    }
     
     var body: some Scene {
-        WindowGroup() {
+        WindowGroup {
             // ContentViewにrefreshTriggerのPublisherを渡します。
             ContentView(
                 serverManager: serverManager,
+                executor: executor,
                 selection: $selection,
                 showingInspector: $showingInspector,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingAddServerSheet: $showingAddServerSheet,
                 shouldClearChat: $shouldClearChat,
+                shouldClearGeneration: $shouldClearGeneration,
                 isPulling: $isPulling
             )
 #if os(macOS)
             .frame(minWidth: 1000, minHeight: 500)
+#elseif os(visionOS)
+            .frame(minWidth: 700, maxWidth: 1200, minHeight: 500, maxHeight: 900)
 #endif
             .environmentObject(appRefreshTrigger)
+            .environmentObject(imageSettings)
+            .environmentObject(chatSettings)
+            .environment(executor)
             .onAppear {
                 localNetworkChecker.refresh()
             }
@@ -80,6 +96,10 @@ struct MocolammaApp: App {
                 AboutView()
             }
         }
+#if os(visionOS)
+        .defaultSize(width: 900, height: 600)
+        .windowResizability(.contentSize)
+#endif
         .commands {
 #if os(macOS)
             CommandGroup(replacing: .appInfo) {
@@ -104,6 +124,9 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
+                    Label("Image Generation", systemImage: "photo")
+                        .tag("image_generation" as String?)
+                        .keyboardShortcut("4", modifiers: .command)
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
@@ -117,6 +140,34 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
+                
+                Divider()
+                
+                // 画像拡大縮小メニュー
+                Group {
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomIn, object: nil)
+                    }) {
+                        Label("Zoom In", systemImage: "plus.magnifyingglass")
+                    }
+                    .keyboardShortcut("+", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomOut, object: nil)
+                    }) {
+                        Label("Zoom Out", systemImage: "minus.magnifyingglass")
+                    }
+                    .keyboardShortcut("-", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewActualSize, object: nil)
+                    }) {
+                        Label("Actual Size", systemImage: "magnifyingglass")
+                    }
+                    .keyboardShortcut("0", modifiers: .command)
+                }
+                .disabled(executor.previewImage == nil)
+                
                 Divider()
             }
             
@@ -145,10 +196,19 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
+
+                Button(action: {
+                    // 画像生成クリア要求を設定
+                    shouldClearGeneration = true
+                }) {
+                    Label(String(localized: "New Generation"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("r", modifiers: [.option, .command])
+                .disabled(selection != "image_generation")
             }
             
 #else
-            // iPadOSの場合、設定メニュー項目を置き換えてアプリ内設定を開く
+            // macOS以外（iOS / iPadOS / visionOS）
             CommandGroup(replacing: .appSettings) {
                 Button(action: {
                     showingAboutSheet = true
@@ -166,7 +226,7 @@ struct MocolammaApp: App {
             SidebarCommands()
             InspectorCommands()
             
-            // 表示メニュー（iPadOS）
+            // 表示メニュー
             CommandGroup(before: .sidebar) {
                 Picker("View", selection: $selection) {
                     Label("Server", systemImage: "server.rack")
@@ -178,6 +238,9 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
+                    Label("Image Generation", systemImage: "photo")
+                        .tag("image_generation" as String?)
+                        .keyboardShortcut("4", modifiers: .command)
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
@@ -191,10 +254,37 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(isMenuActionDisabled) // ここで無効化を適用
+                
+                Divider()
+                
+                // 画像拡大縮小メニュー
+                Group {
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomIn, object: nil)
+                    }) {
+                        Label("Zoom In", systemImage: "plus.magnifyingglass")
+                    }
+                    .keyboardShortcut("+", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewZoomOut, object: nil)
+                    }) {
+                        Label("Zoom Out", systemImage: "minus.magnifyingglass")
+                    }
+                    .keyboardShortcut("-", modifiers: .command)
+                    
+                    Button(action: {
+                        NotificationCenter.default.post(name: .previewActualSize, object: nil)
+                    }) {
+                        Label("Actual Size", systemImage: "magnifyingglass")
+                    }
+                    .keyboardShortcut("0", modifiers: .command)
+                }
+                .disabled(executor.previewImage == nil)
+                
                 Divider()
             }
             
-            // iPadOSでも「サーバーを追加」メニュー項目を追加
             CommandGroup(after: .newItem) { // 新規ウィンドウのメニュー/ショートカットを無効化
                 Button(action: {
                     showingAddServerSheet = true
@@ -220,6 +310,15 @@ struct MocolammaApp: App {
                 }
                 .keyboardShortcut("n", modifiers: [.option, .command])
                 .disabled(selection != "chat")
+
+                Button(action: {
+                    // 画像生成クリア要求を設定
+                    shouldClearGeneration = true
+                }) {
+                    Label(String(localized: "New Generation"), systemImage: "square.and.pencil")
+                }
+                .keyboardShortcut("r", modifiers: [.option, .command])
+                .disabled(selection != "image_generation")
             }
 #endif
         }

@@ -1,12 +1,21 @@
 import SwiftUI
 
 struct RunningModelsCountView: View {
-    @EnvironmentObject var commandExecutor: CommandExecutor
+    @Environment(CommandExecutor.self) var commandExecutor
     let host: String
     let connectionStatus: ServerConnectionStatus?
     @State private var runningModels: [OllamaRunningModel] = []
     @State private var isLoading: Bool = false
     @State private var isExpanded: Bool = false
+    
+    // 追加のプロパティ
+    var showList: Bool = true
+    var showSummary: Bool = true
+    var externalModels: [OllamaRunningModel]? = nil
+    
+    private var currentModels: [OllamaRunningModel] {
+        externalModels ?? runningModels
+    }
     
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -20,7 +29,7 @@ struct RunningModelsCountView: View {
             return "-"
         } else {
             if case .connected = connectionStatus {
-                return String(runningModels.count)
+                return String(currentModels.count)
             } else {
                 return "-"
             }
@@ -29,37 +38,88 @@ struct RunningModelsCountView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .bottom, spacing: 4) {
-                Text(displayCountText)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.primary)
-                Text("running")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 2)
+            if showSummary {
+                HStack(alignment: .bottom, spacing: 4) {
+                    Text(displayCountText)
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(.primary)
+                    Text("running")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 2)
+                }
             }
             
-            if runningModels.count > 0 {
+            if showList && currentModels.count > 0 {
                 VStack(alignment: .leading, spacing: 4) {
-                    ForEach(runningModels, id: \.name) { model in
-                        VStack(alignment: .leading) {
-                            Text(model.name)
-                                .font(.subheadline)
-                                .bold()
-                                .foregroundColor(.primary)
-                            
-                            if let formattedVRAMSize = model.formattedVRAMSize {
-                                Text("VRAM Size: \(formattedVRAMSize)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                    ForEach(Array(currentModels.enumerated()), id: \.element.name) { index, model in
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading) {
+                                Text(model.name)
+                                    .font(.subheadline)
+                                    .bold()
+                                    .foregroundColor(.primary)
+                                    .help(model.name)
+                                
+                                if let formattedVRAMSize = model.formattedVRAMSize {
+                                    Text("VRAM Size: \(formattedVRAMSize)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                if let expiresAt = model.expires_at {
+                                    Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                             
-                            if let expiresAt = model.expires_at {
-                                Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            Spacer()
+                            
+                            Button(action: {
+                                Task {
+                                    await commandExecutor.unloadModel(modelName: model.name, host: host)
+                                }
+                            }) {
+#if os(visionOS)
+                                Label("Unload", systemImage: "tray.and.arrow.up")
+                                    .labelStyle(.iconOnly)
+                                    .frame(width: 20, height: 20)
+#else
+                                Image(systemName: "tray.and.arrow.up")
+                                    .foregroundStyle(Color.accentColor)
+                                    .frame(width: 20, height: 20)
+#endif
                             }
+#if os(visionOS)
+                            .buttonStyle(.bordered)
+#else
+                            .buttonStyle(.plain)
+#endif
+                            .help("Unload this model from memory.")
+                        }
+                        .contentShape(Rectangle())
+                        .contextMenu {
+                            Button(action: {
+                                Task {
+                                    await commandExecutor.unloadModel(modelName: model.name, host: host)
+                                }
+                            }) {
+                                Label("Unload", systemImage: "tray.and.arrow.up")
+                            }
+                            
+                            Divider()
+                            
+                            Button(action: {
+                                Task { await refresh() }
+                            }) {
+                                Label("Refresh", systemImage: "arrow.clockwise")
+                            }
+                        }
+                        
+                        if index < currentModels.count - 1 {
+                            Divider()
                         }
                     }
                 }
@@ -67,15 +127,14 @@ struct RunningModelsCountView: View {
             }
         }
         .task(id: host) {
-            await refresh()
-        }
-        .contextMenu {
-            Button("Refresh") {
-                Task { await refresh() }
+            if externalModels == nil {
+                await refresh()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("InspectorRefreshRequested"))) { _ in
-            Task { await refresh() }
+            if externalModels == nil {
+                Task { await refresh() }
+            }
         }
     }
     
@@ -98,7 +157,7 @@ struct RunningModelsCountView: View {
 
 #Preview {
     RunningModelsCountView(host: "localhost:11434", connectionStatus: .connected)
-        .environmentObject(CommandExecutor(serverManager: ServerManager()))
+        .environment(CommandExecutor(serverManager: ServerManager()))
         .frame(width: 200)
         .padding()
 }

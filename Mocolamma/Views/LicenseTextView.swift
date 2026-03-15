@@ -9,12 +9,37 @@ struct LicenseTextView: View {
     @State private var isTextWrapped: Bool = true
     @State private var showingLicenseLinkAlert = false
     
+    private var isOS26OrLater: Bool {
+        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    // スクロール軸の決定
+    private var scrollAxes: Axis.Set {
+#if os(visionOS)
+        return .vertical
+#else
+        return isTextWrapped ? .vertical : [.vertical, .horizontal]
+#endif
+    }
+    
+    // 水平方向の固定解除（折り返し）の決定
+    private var horizontalFixed: Bool {
+#if os(visionOS)
+        return false
+#else
+        return !isTextWrapped
+#endif
+    }
+    
     var body: some View {
 #if os(macOS)
         licenseTextViewContent
             .frame(width: 700, height: 500)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay(alignment: .bottom) { // 下部にオーバーレイとしてVisualEffectViewとボタンを配置
+            .safeAreaInset(edge: .bottom, spacing: 0) { // 下部にセーフエリアインセットとしてVisualEffectViewとボタンを配置
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
                         Color.clear
@@ -25,7 +50,7 @@ struct LicenseTextView: View {
                             .edgesIgnoringSafeArea(.horizontal)
                     }
                     HStack {
-                        if let link = licenseLink, let url = URL(string: link) {
+                        if let link = licenseLink, let _ = URL(string: link) {
                             Button {
                                 showingLicenseLinkAlert = true
                             } label: {
@@ -42,13 +67,17 @@ struct LicenseTextView: View {
                             dismiss()
                         }
                         .buttonStyle(.borderedProminent)
+#if os(visionOS)
+                        .tint(.accentColor)
+                        .foregroundStyle(.white)
+#endif
                         .controlSize(.large)
                         .keyboardShortcut(.cancelAction)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                     }
                 }
-                .frame(height: 60) // オーバーレイの固定高さ
+                .frame(height: 60) // インセットの固定高さ
             }
             .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
                 Button("Open") {
@@ -62,8 +91,8 @@ struct LicenseTextView: View {
                 Text("Are you sure you want to open the page with license information?")
             }
 #else
-        NavigationView {
-            licenseTextViewContent
+        NavigationStack {
+            licenseScrollView
                 .navigationTitle("License")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -73,16 +102,21 @@ struct LicenseTextView: View {
                         }
                     }
                     ToolbarItem(placement: .primaryAction) {
-                        if let link = licenseLink, let url = URL(string: link) {
+                        if let link = licenseLink, let _ = URL(string: link) {
                             Button(action: { showingLicenseLinkAlert = true }) {
                                 Image(systemName: "paperclip")
                             }
                         }
                     }
+                    
+#if os(iOS)
                     // iOS 26.0 以降の場合のみ ToolbarSpacer を追加
                     if #available(iOS 26.0, *) {
-                        ToolbarSpacer(.fixed, placement: .primaryAction) // ToolbarItem の外に配置
+                        ToolbarSpacer(.fixed, placement: .primaryAction)
                     }
+#endif
+
+#if !os(visionOS)
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
                             isTextWrapped.toggle()
@@ -91,6 +125,7 @@ struct LicenseTextView: View {
                             Label("Toggle Text Wrapping", systemImage: "arrow.up.and.down.text.horizontal")
                         }
                     }
+#endif
                 }
                 .modifier(NavSubtitleIfAvailable(subtitle: Text(licenseTitle)))
                 .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
@@ -105,28 +140,42 @@ struct LicenseTextView: View {
                     Text("Are you sure you want to open the page with license information?")
                 }
         }
+#if os(visionOS)
+        .frame(width: 800, height: 600)
+#endif
         .onAppear {
             isTextWrapped = true
         }
 #endif
     }
     
+    @ViewBuilder
+    private var licenseScrollView: some View {
+        let scrollView = ScrollView(scrollAxes) {
+            licenseTextViewContent
+        }
+        
+#if os(visionOS)
+        if #available(visionOS 26.0, *) {
+            scrollView
+                .scrollInputBehavior(.enabled, for: .look)
+        } else {
+            scrollView
+        }
+#else
+        scrollView
+#endif
+    }
+    
     private var licenseTextViewContent: some View {
-        ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) {
+        ScrollView(scrollAxes) {
             VStack(alignment: .leading) {
                 Text(licenseText)
-                    .font(.body)
-                    .monospaced()
+                    .font(.callout.monospaced())
                     .padding()
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-#if os(macOS)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            Spacer().frame(height: 60)
-        }
-#endif
     }
 }

@@ -18,11 +18,14 @@ struct LicenseInfoModalView: View {
     @State private var showingQwenCodeLinkAlert = false
     @State private var isQwenCodeLinkHovered: Bool = false
     
-    @State private var showingMarkdownUILinkAlert = false
-    @State private var isMarkdownUILinkHovered: Bool = false
-    
-    @State private var showingOpencodeLinkAlert = false
-    @State private var isOpencodeLinkHovered: Bool = false
+    @State private var showingTextualLinkAlert = false
+    @State private var isTextualLinkHovered: Bool = false
+
+    @State private var showingUniversalSFSymbolsPickerLinkAlert = false
+    @State private var isUniversalSFSymbolsPickerLinkHovered: Bool = false
+
+    @State private var showingOpenCodeLinkAlert = false
+    @State private var isOpenCodeLinkHovered: Bool = false
     
     @State private var showingOllamaLinkAlert = false
     @State private var isOllamaLinkHovered: Bool = false
@@ -36,17 +39,36 @@ struct LicenseInfoModalView: View {
     }
     
     private let compactSliderVersionString: String = "2.0.9"
-    private let markdownUIVersionString: String = "2.4.1"
-    private let geminiCLIVersionString: String = "0.17.1"
-    private let qwenCodeVersionString: String = "0.3.0"
+    private let textualVersionString: String = "0.3.1"
+    private let universalSFSymbolsPickerVersionString: String = "0.1.2"
+    private let geminiCLIVersionString: String = "0.33.1"
+    private let qwenCodeVersionString: String = "0.12.3"
     private let createDmgVersionString: String = "1.2.2"
-    private let opencodeVersionString: String = "0.4.2"
+    private let openCodeVersionString: String = "0.4.2"
+    
+    // スクロール軸の決定
+    private var scrollAxes: Axis.Set {
+#if os(visionOS)
+        return .vertical
+#else
+        return isTextWrapped ? .vertical : [.vertical, .horizontal]
+#endif
+    }
+    
+    // 水平方向の固定解除（折り返し）の決定
+    private var horizontalFixed: Bool {
+#if os(visionOS)
+        return false
+#else
+        return !isTextWrapped
+#endif
+    }
     
     var body: some View {
 #if os(macOS)
         licenseInfoModalViewContent
             .frame(width: 650, height: 450)
-            .overlay(alignment: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 0) {
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
                         Color.clear
@@ -60,6 +82,10 @@ struct LicenseInfoModalView: View {
                         Spacer()
                         Button("Close") { dismiss() }
                             .buttonStyle(.borderedProminent)
+#if os(visionOS)
+                            .tint(.accentColor)
+                            .foregroundStyle(.white)
+#endif
                             .controlSize(.large)
                             .keyboardShortcut(.cancelAction)
                             .padding(.horizontal, 16)
@@ -69,8 +95,8 @@ struct LicenseInfoModalView: View {
                 .frame(height: 60)
             }
 #else
-        NavigationView {
-            licenseInfoModalViewContent
+        NavigationStack {
+            licenseScrollView
                 .navigationTitle("License Information")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -79,6 +105,7 @@ struct LicenseInfoModalView: View {
                             Image(systemName: "xmark")
                         }
                     }
+#if !os(visionOS)
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
                             isTextWrapped.toggle()
@@ -87,16 +114,38 @@ struct LicenseInfoModalView: View {
                             Label("Toggle Text Wrapping", systemImage: "arrow.up.and.down.text.horizontal")
                         }
                     }
+#endif
                 }
         }
+#if os(visionOS)
+        .frame(width: 800, height: 600)
+#endif
         .onAppear {
             isTextWrapped = true
         }
 #endif
     }
     
+    @ViewBuilder
+    private var licenseScrollView: some View {
+        let scrollView = ScrollView(scrollAxes) {
+            licenseInfoModalViewContent
+        }
+        
+#if os(visionOS)
+        if #available(visionOS 26.0, *) {
+            scrollView
+                .scrollInputBehavior(.enabled, for: .look)
+        } else {
+            scrollView
+        }
+#else
+        scrollView
+#endif
+    }
+    
     private var licenseInfoModalViewContent: some View {
-        ScrollView(isTextWrapped ? .vertical : [.vertical, .horizontal]) { // axes を切り替える
+        ScrollView(scrollAxes) { // scrollAxes を使用
             VStack(alignment: .leading) {
                 VStack(alignment: .leading) {
                     Text("Open Source License")
@@ -121,11 +170,11 @@ struct LicenseInfoModalView: View {
                 }
                 .padding([.top, .horizontal])
                 
-                Text(verbatim: "MIT License\n\nCopyright (c) 2025 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                Text(verbatim: "MIT License\n\nCopyright (c) 2026 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 Divider()
                     .padding(.horizontal)
@@ -171,7 +220,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: CompactSlider
                 VStack(alignment: .leading) {
@@ -210,30 +259,30 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
-                // MARK: MarkdownUI
+                // MARK: Textual
                 VStack(alignment: .leading) {
-                    Button(action: { showingMarkdownUILinkAlert = true }) {
-                        Text("MarkdownUI by Guillermo Gonzalez")
+                    Button(action: { showingTextualLinkAlert = true }) {
+                        Text("Textual by Guillermo Gonzalez")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.accentColor)
-                            .underline(isMarkdownUILinkHovered)
+                            .underline(isTextualLinkHovered)
                     }
                     .buttonStyle(.plain)
-                    .help("Open link to the MarkdownUI GitHub page.")
+                    .help("Open link to the Textual GitHub page.")
                     .padding(.bottom, 1)
-                    .onHover { hovered in isMarkdownUILinkHovered = hovered }
-                    .alert("Open Link?", isPresented: $showingMarkdownUILinkAlert) {
+                    .onHover { hovered in isTextualLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingTextualLinkAlert) {
                         Button("Open") {
-                            if let url = URL(string: "https://github.com/gonzalezreal/swift-markdown-ui/tree/main") { openURL(url) }
+                            if let url = URL(string: "https://github.com/gonzalezreal/textual") { openURL(url) }
                         }
                         .keyboardShortcut(.defaultAction)
                         Button("Cancel", role: .cancel) {}
-                    } message: { Text("Are you sure you want to open the MarkdownUI GitHub page?") }
+                    } message: { Text("Are you sure you want to open the Textual GitHub page?") }
                     
-                    Text("Version: \(markdownUIVersionString)")
+                    Text("Version: \(textualVersionString)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 1)
@@ -245,12 +294,51 @@ struct LicenseInfoModalView: View {
                 .padding(.top, 10)
                 .padding(.horizontal)
                 
-                Text(verbatim: "The MIT License (MIT)\n\nCopyright (c) 2020 Guillermo Gonzalez\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                Text(verbatim: "MIT License\n\nCopyright (c) 2024 Guille Gonzalez\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
-                
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
+
+                // MARK: UniversalSFSymbolsPicker
+                VStack(alignment: .leading) {
+                    Button(action: { showingUniversalSFSymbolsPickerLinkAlert = true }) {
+                        Text("UniversalSFSymbolsPicker by Taiga Imaura")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.accentColor)
+                            .underline(isUniversalSFSymbolsPickerLinkHovered)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Open link to the UniversalSFSymbolsPicker GitHub page.")
+                    .padding(.bottom, 1)
+                    .onHover { hovered in isUniversalSFSymbolsPickerLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingUniversalSFSymbolsPickerLinkAlert) {
+                        Button("Open") {
+                            if let url = URL(string: "https://github.com/taikun114/UniversalSFSymbolsPicker") { openURL(url) }
+                        }
+                        .keyboardShortcut(.defaultAction)
+                        Button("Cancel", role: .cancel) {}
+                    } message: { Text("Are you sure you want to open the UniversalSFSymbolsPicker GitHub page?") }
+
+                    Text("Version: \(universalSFSymbolsPickerVersionString)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 1)
+
+                    Text(verbatim: "MIT License")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 10)
+                .padding(.horizontal)
+
+                Text(verbatim: "MIT License\n\nCopyright (c) 2026 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                    .font(.callout.monospaced())
+                    .padding(.horizontal)
+                    .padding(.vertical, 1)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
+
                 // MARK: Gemini CLI
                 VStack(alignment: .leading) {
                     Button(action: { showingGeminiCLILinkAlert = true }) {
@@ -288,7 +376,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: - Qwen Code
                 VStack(alignment: .leading) {
@@ -335,29 +423,29 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
-                // MARK: opencode
+                // MARK: OpenCode
                 VStack(alignment: .leading) {
-                    Button(action: { showingOpencodeLinkAlert = true }) {
-                        Text("opencode by SST")
+                    Button(action: { showingOpenCodeLinkAlert = true }) {
+                        Text("OpenCode by Anomaly")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.accentColor)
-                            .underline(isOpencodeLinkHovered)
+                            .underline(isOpenCodeLinkHovered)
                     }
                     .buttonStyle(.plain)
-                    .help("Open link to the opencode GitHub page.")
+                    .help("Open link to the OpenCode GitHub page.")
                     .padding(.bottom, 1)
-                    .onHover { hovered in isOpencodeLinkHovered = hovered }
-                    .alert("Open Link?", isPresented: $showingOpencodeLinkAlert) {
+                    .onHover { hovered in isOpenCodeLinkHovered = hovered }
+                    .alert("Open Link?", isPresented: $showingOpenCodeLinkAlert) {
                         Button("Open") {
-                            if let url = URL(string: "https://github.com/sst/opencode") { openURL(url) }
+                            if let url = URL(string: "https://github.com/anomalyco/opencode") { openURL(url) }
                         }
                         Button("Cancel", role: .cancel) {}
-                    } message: { Text("Are you sure you want to open the opencode GitHub page?") }
+                    } message: { Text("Are you sure you want to open the OpenCode GitHub page?") }
                     
-                    Text("Version: \(opencodeVersionString)")
+                    Text("Version: \(openCodeVersionString)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 1)
@@ -373,7 +461,7 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
                 // MARK: create-dmg
                 VStack(alignment: .leading) {
@@ -412,18 +500,13 @@ struct LicenseInfoModalView: View {
                     .font(.callout.monospaced())
                     .padding(.horizontal)
                     .padding(.vertical, 1)
-                    .fixedSize(horizontal: !isTextWrapped, vertical: false)
+                    .fixedSize(horizontal: horizontalFixed, vertical: false)
                 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-#if os(macOS)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            Spacer().frame(height: 60)
-        }
-#endif
     }
 }
 

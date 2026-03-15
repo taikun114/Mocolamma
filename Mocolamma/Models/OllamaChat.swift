@@ -1,5 +1,108 @@
 import SwiftUI
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
+
+#if os(macOS)
+typealias PlatformImage = NSImage
+extension Image {
+    init(platformImage: NSImage) {
+        self.init(nsImage: platformImage)
+    }
+}
+#else
+typealias PlatformImage = UIImage
+extension Image {
+    init(platformImage: UIImage) {
+        self.init(uiImage: platformImage)
+    }
+}
+#endif
+
+// MARK: - チャット入力用画像モデル
+
+/// ドラッグ&ドロップやリスト表示を効率化するために、画像データをIDでラップします。
+struct ChatInputImage: Identifiable, Equatable {
+    let id = UUID()
+    let data: Data
+    let thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+    
+    static func == (lhs: ChatInputImage, rhs: ChatInputImage) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+// MARK: - 画像処理ユーティリティ
+
+extension ChatInputImage {
+    /// データからサムネイルを作成します（非同期）
+    static func createThumbnail(from data: Data) async -> PlatformImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false,
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            
+            guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                  let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+                return nil
+            }
+            
+            let width = CGFloat(cgImage.width)
+            let height = CGFloat(cgImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
+                return nil
+            }
+            
+#if os(macOS)
+            return NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+#else
+            return UIImage(cgImage: croppedCGImage)
+#endif
+        }.value
+    }
+    
+    /// 複数の画像をバックグラウンドでPNGに変換し、リサイズします
+    static func processImages(_ imagesData: [Data]) async -> [String] {
+        return await Task.detached(priority: .medium) {
+            var results: [String] = []
+            for data in imagesData {
+                let options: [CFString: Any] = [
+                    kCGImageSourceShouldCache: false
+                ]
+                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
+                
+                let thumbnailOptions: [CFString: Any] = [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true,
+                    kCGImageSourceThumbnailMaxPixelSize: 2048
+                ]
+                
+                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
+                    continue
+                }
+                
+                let outputData = NSMutableData()
+                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                    continue
+                }
+                
+                CGImageDestinationAddImage(destination, cgImage, nil)
+                if CGImageDestinationFinalize(destination) {
+                    results.append((outputData as Data).base64EncodedString())
+                }
+            }
+            return results
+        }.value
+    }
+}
 
 // MARK: - チャットAPI リクエスト/レスポンス モデル
 
@@ -19,12 +122,20 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
     @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
+    @Published var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
+    
+    // 画像生成関連のプロパティ
+    @Published var generatedImage: String? // 生成された画像 (Base64)
+    @Published var imageProgressCompleted: Int? // 現在のステップ数
+    @Published var imageProgressTotal: Int? // 合計ステップ数
+    @Published var isImageGeneration: Bool = false // 画像生成メッセージかどうか
     
     // 新しいプロパティ（やり直し履歴など）
     @Published var revisions: [ChatMessage] = [] // やり直し履歴
     @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
     @Published var originalContent: String? // メッセージの最初の内容を保持
     @Published var latestContent: String? // メッセージの最新のやり直し結果を保持
+    @Published var latestGeneratedImage: String? // 最新の生成画像を保持
     @Published var finalThinking: String? // 最終的な思考内容を保持
     @Published var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
     @Published var finalCreatedAt: String? // 最終的な作成日時
@@ -32,14 +143,6 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
     @Published var finalEvalCount: Int? // 最終的なトークン数
     @Published var finalEvalDuration: Int? // 最終的な評価時間
     @Published var finalIsStopped: Bool = false // 最終的な停止状態
-    
-    // ストリーミング表示最適化向けの分割バッファ
-    // fixed: 確定テキスト（Markdownで描画、ほとんど更新しない）
-    // pending: 差分テキスト（頻繁に更新、1行Textで軽量に表示）
-    @Published var fixedContent: String = ""
-    @Published var pendingContent: String = ""
-    @Published var fixedThinking: String = ""
-    @Published var pendingThinking: String = ""
     
     enum CodingKeys: String, CodingKey {
         case role
@@ -52,6 +155,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         case totalDuration = "total_duration"
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
+        case generatedImage = "generated_image"
     }
     
     required init(from decoder: Decoder) throws {
@@ -66,12 +170,7 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.totalDuration = try container.decodeIfPresent(Int.self, forKey: .totalDuration)
         self.evalCount = try container.decodeIfPresent(Int.self, forKey: .evalCount)
         self.evalDuration = try container.decodeIfPresent(Int.self, forKey: .evalDuration)
-        
-        // 復元時は固定領域に全体を入れておく
-        self.fixedContent = self.content
-        self.pendingContent = ""
-        self.fixedThinking = self.thinking ?? ""
-        self.pendingThinking = ""
+        self.generatedImage = try container.decodeIfPresent(String.self, forKey: .generatedImage)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -86,10 +185,11 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(totalDuration, forKey: .totalDuration)
         try container.encodeIfPresent(evalCount, forKey: .evalCount)
         try container.encodeIfPresent(evalDuration, forKey: .evalDuration)
+        try container.encodeIfPresent(generatedImage, forKey: .generatedImage)
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
-    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false) {
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
         self.role = role
         self.content = content
         self.thinking = thinking
@@ -103,11 +203,8 @@ class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
         self.isStreaming = isStreaming
         self.isStopped = isStopped
         self.isThinkingCompleted = isThinkingCompleted
-        
-        self.fixedContent = content
-        self.pendingContent = ""
-        self.fixedThinking = thinking ?? ""
-        self.pendingThinking = ""
+        self.generatedImage = generatedImage
+        self.isImageGeneration = isImageGeneration
     }
     
     static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
@@ -132,6 +229,7 @@ struct ChatRequest: Codable {
     let messages: [ChatMessage]
     let stream: Bool
     let think: Bool?
+    let keepAlive: JSONValue?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
     
@@ -140,6 +238,7 @@ struct ChatRequest: Codable {
         case messages
         case stream
         case think
+        case keepAlive = "keep_alive"
         case options
         case tools
     }
@@ -150,6 +249,7 @@ struct ChatRequest: Codable {
         try container.encode(messages, forKey: .messages)
         try container.encode(stream, forKey: .stream)
         try container.encodeIfPresent(think, forKey: .think)
+        try container.encodeIfPresent(keepAlive, forKey: .keepAlive)
         try container.encodeIfPresent(options, forKey: .options)
         try container.encodeIfPresent(tools, forKey: .tools)
     }
@@ -165,6 +265,89 @@ enum ThinkingOption: String, CaseIterable, Identifiable {
     
     var localizedName: LocalizedStringKey {
         LocalizedStringKey(rawValue)
+    }
+}
+
+/// 繰り返し参照範囲のオプションを表します。
+enum RepeatLastNOption: String, CaseIterable, Identifiable {
+    case none = "RepeatLastN_None"
+    case disabled = "RepeatLastN_Disabled"
+    case custom = "RepeatLastN_Custom"
+    case max = "RepeatLastN_Max"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+}
+
+/// 最大出力数のオプションを表します。
+enum NumPredictOption: String, CaseIterable, Identifiable {
+    case none = "NumPredict_None"
+    case custom = "NumPredict_Custom"
+    case unlimited = "NumPredict_Unlimited"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+}
+
+/// モデルの保持（Keep Alive）オプションを表します。
+enum KeepAliveOption: String, CaseIterable, Identifiable {
+    case `default` = "KeepAlive_Default"
+    case immediate = "KeepAlive_Immediate"
+    case m1 = "KeepAlive_1m"
+    case m3 = "KeepAlive_3m"
+    case m5 = "KeepAlive_5m"
+    case m10 = "KeepAlive_10m"
+    case m15 = "KeepAlive_15m"
+    case m30 = "KeepAlive_30m"
+    case h1 = "KeepAlive_1h"
+    case indefinite = "KeepAlive_Indefinite"
+    case custom = "KeepAlive_Custom"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        LocalizedStringKey(rawValue)
+    }
+    
+    /// APIに送信するための値を返します。
+    func apiValue(customValue: Int, customUnit: KeepAliveUnit) -> JSONValue? {
+        switch self {
+        case .default: return nil
+        case .immediate: return .int(0)
+        case .m1: return .string("1m")
+        case .m3: return .string("3m")
+        case .m5: return .string("5m")
+        case .m10: return .string("10m")
+        case .m15: return .string("15m")
+        case .m30: return .string("30m")
+        case .h1: return .string("1h")
+        case .indefinite: return .int(-1)
+        case .custom:
+            return .string("\(customValue)\(customUnit.rawValue)")
+        }
+    }
+}
+
+/// Keep Aliveのカスタム単位を表します。
+enum KeepAliveUnit: String, CaseIterable, Identifiable {
+    case seconds = "s"
+    case minutes = "m"
+    case hours = "h"
+    
+    var id: String { self.rawValue }
+    
+    var localizedName: LocalizedStringKey {
+        switch self {
+        case .seconds: return "Seconds"
+        case .minutes: return "Minutes"
+        case .hours: return "Hours"
+        }
     }
 }
 
@@ -203,28 +386,27 @@ struct JSONSchemaProperty: Codable {
 
 /// チャットリクエストのオプションを表します。
 struct ChatRequestOptions: Codable {
-    let numKeep: Int?
-    let seed: Int?
-    let numPredict: Int?
-    let topK: Int?
-    let topP: Double?
-    let minP: Double?
-    let typicalP: Double?
-    let repeatLastN: Int?
+    var numKeep: Int?
+    var seed: Int?
+    var numPredict: Int?
+    var topK: Int?
+    var topP: Double?
+    var minP: Double?
+    var typicalP: Double?
+    var repeatLastN: Int?
     var temperature: Double?
     var numCtx: Int?
-    let repeatPenalty: Double?
-    let presencePenalty: Double?
-    let frequencyPenalty: Double?
-    let penalizeNewline: Bool?
-    let stop: [String]?
-    let numa: Bool?
-    let numBatch: Int?
-    let numGpu: Int?
-    let mainGpu: Int?
-    let useMmap: Bool?
-    let numThread: Int?
-    let keepAlive: String?
+    var repeatPenalty: Double?
+    var presencePenalty: Double?
+    var frequencyPenalty: Double?
+    var penalizeNewline: Bool?
+    var stop: [String]?
+    var numa: Bool?
+    var numBatch: Int?
+    var numGpu: Int?
+    var mainGpu: Int?
+    var useMmap: Bool?
+    var numThread: Int?
     
     enum CodingKeys: String, CodingKey {
         case numKeep = "num_keep"
@@ -248,7 +430,6 @@ struct ChatRequestOptions: Codable {
         case mainGpu = "main_gpu"
         case useMmap = "use_mmap"
         case numThread = "num_thread"
-        case keepAlive = "keep_alive"
     }
     
     init(
@@ -272,8 +453,7 @@ struct ChatRequestOptions: Codable {
         numGpu: Int? = nil,
         mainGpu: Int? = nil,
         useMmap: Bool? = nil,
-        numThread: Int? = nil,
-        keepAlive: String? = nil
+        numThread: Int? = nil
     ) {
         self.numKeep = numKeep
         self.seed = seed
@@ -296,7 +476,6 @@ struct ChatRequestOptions: Codable {
         self.mainGpu = mainGpu
         self.useMmap = useMmap
         self.numThread = numThread
-        self.keepAlive = keepAlive
     }
 }
 
@@ -440,12 +619,25 @@ enum JSONValue: Codable, Hashable {
     }
 }
 
+// MARK: - シード値ユーティリティ
+
+/// Ollama APIで安全に使用できるシード値の最大値（2^53 - 1）。
+let OLLAMA_SEED_SAFE_LIMIT: Int = 9007199254740991
+
+/// シード値を安全な範囲内にクランプします。
+func clampOllamaSeed(_ seed: Int) -> Int {
+    max(-OLLAMA_SEED_SAFE_LIMIT, min(OLLAMA_SEED_SAFE_LIMIT, seed))
+}
+
 @MainActor
 class ChatSettings: ObservableObject {
     @Published var selectedModelID: OllamaModel.ID?
     @Published var selectedModelContextLength: Int?
     @Published var selectedModelCapabilities: [String]?
     @Published var isStreamingEnabled: Bool = true
+    @Published var keepAliveOption: KeepAliveOption = .default
+    @Published var customKeepAliveValue: Int = 5
+    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
     @Published var useCustomChatSettings: Bool = false
     @Published var chatTemperature: Double = 0.8
     @Published var isTemperatureEnabled: Bool = false
@@ -454,4 +646,158 @@ class ChatSettings: ObservableObject {
     @Published var isSystemPromptEnabled: Bool = false
     @Published var systemPrompt: String = ""
     @Published var thinkingOption: ThinkingOption = .none
+    
+    // 追加のカスタム設定
+    @Published var repeatLastNOption: RepeatLastNOption = .none
+    @Published var repeatLastNValue: Int = 64
+    @Published var isRepeatPenaltyEnabled: Bool = false
+    @Published var repeatPenaltyValue: Double = 1.1
+    @Published var numPredictOption: NumPredictOption = .none
+    @Published var numPredictValue: Int = 42
+    @Published var isTopKEnabled: Bool = false
+    @Published var topKValue: Int = 40
+    @Published var isTopPEnabled: Bool = false
+    @Published var topPValue: Double = 0.9
+    @Published var isMinPEnabled: Bool = false
+    @Published var minPValue: Double = 0.0
+    
+    // シード値設定
+    @Published var isSeedEnabled: Bool = false
+    @Published var seed: Int = 0 {
+        didSet {
+            let clamped = clampOllamaSeed(seed)
+            if seed != clamped {
+                seed = clamped
+            }
+        }
+    }
+    
+    var finalKeepAlive: JSONValue? {
+        keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
+    }
+}
+
+// MARK: - 画像生成API リクエスト/レスポンス モデル
+
+/// /api/generate エンドポイントのリクエストボディを表します（画像生成用）。
+struct ImageGenerationRequest: Codable {
+    let model: String
+    let prompt: String
+    let stream: Bool
+    let keepAlive: JSONValue?
+    let width: Int?
+    let height: Int?
+    let steps: Int?
+    let options: ChatRequestOptions? // チャットと共通のオプションも使用可能
+    
+    enum CodingKeys: String, CodingKey {
+        case model
+        case prompt
+        case stream
+        case keepAlive = "keep_alive"
+        case width
+        case height
+        case steps
+        case options
+    }
+}
+
+/// /api/generate エンドポイントからのストリーミング応答チャンクを表します（画像生成用）。
+struct ImageGenerationResponseChunk: Codable {
+    let model: String
+    let createdAt: String?
+    let response: String?
+    let done: Bool
+    let image: String? // Base64でエンコードされた画像
+    let completed: Int? // 現在のステップ数
+    let total: Int? // 合計ステップ数
+    let totalDuration: Int?
+    let loadDuration: Int?
+    let promptEvalCount: Int?
+    let promptEvalDuration: Int?
+    let evalCount: Int?
+    let evalDuration: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case model
+        case createdAt = "created_at"
+        case response
+        case done
+        case image
+        case completed
+        case total
+        case totalDuration = "total_duration"
+        case loadDuration = "load_duration"
+        case promptEvalCount = "prompt_eval_count"
+        case promptEvalDuration = "prompt_eval_duration"
+        case evalCount = "eval_count"
+        case evalDuration = "eval_duration"
+    }
+}
+
+// MARK: - 画像生成設定
+
+@MainActor
+class ImageGenerationSettings: ObservableObject {
+    @Published var selectedModelID: OllamaModel.ID?
+    @Published var isStreamingEnabled: Bool = true
+    @Published var keepAliveOption: KeepAliveOption = .default
+    @Published var customKeepAliveValue: Int = 5
+    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
+    
+    // 基本設定
+    @Published var width: Double = 512 {
+        didSet { customWidth = Int(width) }
+    }
+    @Published var height: Double = 512 {
+        didSet { customHeight = Int(height) }
+    }
+    @Published var steps: Double = 8 {
+        didSet { customSteps = Int(steps) }
+    }
+    
+    // カスタム設定
+    @Published var customWidthEnabled: Bool = false
+    @Published var customWidth: Int = 512
+    @Published var customHeightEnabled: Bool = false
+    @Published var customHeight: Int = 512
+    @Published var customStepsEnabled: Bool = false
+    @Published var customSteps: Int = 8
+    
+    // シード値設定
+    @Published var isSeedEnabled: Bool = false
+    @Published var seed: Int = 0 {
+        didSet {
+            let clamped = clampOllamaSeed(seed)
+            if seed != clamped {
+                seed = clamped
+            }
+        }
+    }
+    
+    // 実際にAPIに送る値を取得するヘルパー
+    var finalWidth: Int {
+        if customWidthEnabled {
+            return customWidth
+        }
+        return Int(width)
+    }
+    
+    var finalHeight: Int {
+        if customHeightEnabled {
+            return customHeight
+        }
+        return Int(height)
+    }
+    
+    var finalSteps: Int {
+        if customStepsEnabled {
+            return customSteps
+        }
+        return Int(steps)
+    }
+    
+    var finalKeepAlive: JSONValue? {
+        keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
+    }
 }
