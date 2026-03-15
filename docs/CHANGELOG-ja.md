@@ -20,7 +20,7 @@
 - IssueやPull Request、Discussionへのリンクを貼る場合は完全なURLを記載すること
 -->
 
-## 1.2.0（開発中）
+## 1.2.0
 ### 新機能
 - **Markdownレンタリングエンジンを刷新**
   - チャットのMarkdownレンダリングエンジンが[**MarkdownUI**](https://github.com/gonzalezreal/swift-markdown-ui)から[**Textual**](https://github.com/gonzalezreal/textual)に刷新され、パフォーマンスの向上、コードブロックのシンタックスハイライト対応などといった改善が取り込まれ、使いやすさが向上しました。

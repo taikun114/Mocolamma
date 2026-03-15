@@ -20,7 +20,7 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.2.0 (under development)
+## 1.2.0
 ### New Features
 - **Revamping the Markdown rendering engine**
   - The Markdown rendering engine for chat has been updated from [**MarkdownUI**](https://github.com/gonzalezreal/swift-markdown-ui) to [**Textual**](https://github.com/gonzalezreal/textual), incorporating improvements such as enhanced performance and syntax highlighting for code blocks, resulting in a more user-friendly experience.
