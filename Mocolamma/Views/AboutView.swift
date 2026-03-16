@@ -22,6 +22,7 @@ struct AboutView: View {
     @State private var showingBugReportAlert = false
     @State private var showingCommunityAlert = false
     @State private var showingGitHubStarAlert = false
+    @State private var showingAppStoreReviewAlert = false
     @State private var showingLicenseInfoModal = false
     
     var body: some View {
@@ -378,6 +379,37 @@ struct AboutView: View {
                     }
                 }
                 .padding(.vertical, 4)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading) {
+                        Text("Leave a Review on App Store")
+                            .font(.body)
+                        Text("I would be so glad if you could leave a review on the App Store!")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Button(action: { showingAppStoreReviewAlert = true }) {
+                        HStack {
+                            Image(systemName: "star.bubble")
+                            Text("Leave Review")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .help("Open link to the App Store review page.")
+                    .alert("Open Review Screen?", isPresented: $showingAppStoreReviewAlert) {
+                        Button("Open") {
+                            if let url = URL(string: "https://apps.apple.com/app/mocolamma/id6753896649?action=write-review") {
+                                openURL(url)
+                            }
+                        }
+                        .keyboardShortcut(.defaultAction)
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("Are you sure you want to go to the App Store and open the review screen?")
+                    }
+                }
+                .padding(.vertical, 4)
 #else
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
@@ -406,6 +438,37 @@ struct AboutView: View {
                         Button("Cancel", role: .cancel) {}
                     } message: {
                         Text("Are you sure you want to open the GitHub repository page?")
+                    }
+                }
+                .padding(.vertical, 4)
+                
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading) {
+                        Text("Leave a Review on App Store")
+                            .font(.body)
+                        Text("I would be so glad if you could leave a review on the App Store!")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button(action: { showingAppStoreReviewAlert = true }) {
+                        HStack {
+                            Image(systemName: "star.bubble")
+                            Text("Leave Review")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .help("Open link to the App Store review page.")
+                    .alert("Open Review Screen?", isPresented: $showingAppStoreReviewAlert) {
+                        Button("Open") {
+                            if let url = URL(string: "https://apps.apple.com/app/mocolamma/id6753896649?action=write-review") {
+                                openURL(url)
+                            }
+                        }
+                        .keyboardShortcut(.defaultAction)
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("Are you sure you want to go to the App Store and open the review screen?")
                     }
                 }
 #endif
