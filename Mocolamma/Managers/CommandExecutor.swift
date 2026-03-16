@@ -66,6 +66,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var imageLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
     private var currentImageTask: URLSessionDataTask? // 現在の画像生成タスクを保持
+    private var loggedTasks: Set<URLSessionTask> = [] // アクションを記録済みのタスク
     
     // Ollama APIのベースURL
     var apiBaseURL: String?
@@ -537,6 +538,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// デモモード用のダウンロードシミュレーションを実行します
     private func simulateDemoDownload(modelName: String) {
         Task {
+            ReviewManager.shared.logAction()
             self.isPulling = true
             self.isPullingErrorHold = false
             self.pullHasError = false
@@ -1081,6 +1083,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
     func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSeedEnabled: Bool, seed: Int, repeatLastN: Int?, repeatPenalty: Double?, numPredict: Int?, topK: Int?, topP: Double?, minP: Double?, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         if isDemoServer() {
+            ReviewManager.shared.logAction()
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
@@ -1320,6 +1323,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
     func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
+            ReviewManager.shared.logAction()
             // ... (demo logic)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
@@ -1587,6 +1591,14 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     do {
                         let response = try JSONDecoder().decode(OllamaPullResponse.self, from: jsonData)
                         
+                        // アクションを記録（タスクごとに1回だけ）
+                        if !self.loggedTasks.contains(dataTask) {
+                            self.loggedTasks.insert(dataTask)
+                            Task { @MainActor in
+                                ReviewManager.shared.logAction()
+                            }
+                        }
+                        
                         // 速度計算のための処理はリアルタイムで行う
                         if let total = response.total {
                             self.pendingPullTotal = total
@@ -1695,6 +1707,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         
                         do {
                             let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                            
+                            // アクションを記録（タスクごとに1回だけ）
+                            if !self.loggedTasks.contains(dataTask) {
+                                self.loggedTasks.insert(dataTask)
+                                ReviewManager.shared.logAction()
+                            }
+                            
                             continuation.yield(chunk)
                         } catch {
                             print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
@@ -1704,6 +1723,15 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     // 非ストリーミングチャットの処理
                     do {
                         let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: data)
+                        
+                        // アクションを記録（タスクごとに1回だけ）
+                        if !self.loggedTasks.contains(dataTask) {
+                            self.loggedTasks.insert(dataTask)
+                            Task { @MainActor in
+                                ReviewManager.shared.logAction()
+                            }
+                        }
+                        
                         continuation.yield(chunk)
                         continuation.finish() // 非ストリーミングなので、一度だけyieldして終了
                     } catch {
@@ -1751,6 +1779,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         
                         do {
                             let chunk = try JSONDecoder().decode(ImageGenerationResponseChunk.self, from: jsonData)
+                            
+                            // アクションを記録（タスクごとに1回だけ）
+                            if !self.loggedTasks.contains(dataTask) {
+                                self.loggedTasks.insert(dataTask)
+                                ReviewManager.shared.logAction()
+                            }
+                            
                             continuation.yield(chunk)
                         } catch {
                             print("Image generation response JSON decode error: \(error.localizedDescription) - Line: \(line)")
@@ -1765,6 +1800,15 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     // 非ストリーミング画像生成の処理
                     do {
                         let chunk = try JSONDecoder().decode(ImageGenerationResponseChunk.self, from: data)
+                        
+                        // アクションを記録（タスクごとに1回だけ）
+                        if !self.loggedTasks.contains(dataTask) {
+                            self.loggedTasks.insert(dataTask)
+                            Task { @MainActor in
+                                ReviewManager.shared.logAction()
+                            }
+                        }
+                        
                         continuation.yield(chunk)
                         continuation.finish()
                     } catch {
@@ -1853,6 +1897,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.chatLineBuffers.removeValue(forKey: task)
             self.imageContinuations.removeValue(forKey: task)
             self.imageLineBuffers.removeValue(forKey: task)
+            self.loggedTasks.remove(task)
             
             if task == self.currentChatTask {
                 self.currentChatTask = nil

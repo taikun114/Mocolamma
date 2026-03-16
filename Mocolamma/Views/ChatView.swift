@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 import Textual
 import ImageIO
 import UniformTypeIdentifiers
@@ -8,6 +9,7 @@ struct ChatView: View {
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @EnvironmentObject var chatSettings: ChatSettings
+    @Environment(\.requestReview) var requestReview
     
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
@@ -409,6 +411,8 @@ struct ChatView: View {
     }
     
     private func sendMessage() {
+        ReviewManager.shared.requestReviewIfAppropriate(requestReviewAction: requestReview)
+        
         generalErrorMessage = nil
         guard let model = currentSelectedModel else {
             generalErrorMessage = "Please select a model first."
@@ -784,6 +788,7 @@ struct ImageGenerationView: View {
     @EnvironmentObject var serverManager: ServerManager
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     @EnvironmentObject var imageSettings: ImageGenerationSettings
+    @Environment(\.requestReview) var requestReview
     
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
@@ -1077,10 +1082,13 @@ struct ImageGenerationView: View {
     }
     
     private func generateImage() {
+        ReviewManager.shared.requestReviewIfAppropriate(requestReviewAction: requestReview)
+
         guard let model = currentSelectedModel else {
             generalErrorMessage = "Please select a model first."
             return
         }
+
         guard !executor.chatInputText.isEmpty || !executor.imageInputImages.isEmpty else { return }
         
         let prompt = executor.chatInputText

@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 #if os(macOS)
 import ServiceManagement
 #endif
@@ -15,6 +16,7 @@ struct SettingsView: View {
     @State private var showingAbout: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.requestReview) var requestReview
     
     var body: some View {
         Form {
@@ -297,6 +299,172 @@ struct SettingsView: View {
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 #endif
         }
+        
+#if DEBUG
+        Section(header: Text(verbatim: "App Store Review Debug")) {
+            HStack {
+                Text(verbatim: "Total Actions")
+                Spacer()
+                Text(verbatim: "\(ReviewManager.shared.totalActionCount)")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text(verbatim: "Daily Actions")
+                Spacer()
+                Text(verbatim: "\(ReviewManager.shared.dailyActionCount)")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text(verbatim: "Update Date")
+                Spacer()
+                Text(ReviewManager.shared.updateDate, format: .dateTime.year().month().day().hour().minute().second())
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text(verbatim: "Last Review Date")
+                Spacer()
+                if let lastDate = ReviewManager.shared.lastReviewRequestDate {
+                    Text(lastDate, format: .dateTime.year().month().day().hour().minute().second())
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(verbatim: "Never")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            HStack {
+                Text(verbatim: "Add Action Counts")
+                Spacer()
+                HStack(spacing: 8) {
+                    Button {
+                        ReviewManager.shared.debugAddActions(count: 1)
+                    } label: {
+                        Text(verbatim: "+1")
+                    }
+                    Button {
+                        ReviewManager.shared.debugAddActions(count: 10)
+                    } label: {
+                        Text(verbatim: "+10")
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
+            
+            Group {
+                if horizontalSizeClass == .compact {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verbatim: "Daily Action Count")
+                        Button {
+                            ReviewManager.shared.debugResetDailyCount()
+                        } label: {
+                            Text(verbatim: "Reset")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verbatim: "All Review Stats")
+                        Button {
+                            ReviewManager.shared.debugResetStats()
+                        } label: {
+                            Text(verbatim: "Reset All")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verbatim: "Last Review Data")
+                        Button {
+                            ReviewManager.shared.debugClearLastReviewDate()
+                        } label: {
+                            Text(verbatim: "Clear")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verbatim: "Version Grace Period")
+                        Button {
+                            ReviewManager.shared.debugSkipUpdateGracePeriod()
+                        } label: {
+                            Text(verbatim: "Skip")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verbatim: "Review Prompt")
+                        Button {
+                            ReviewManager.shared.debugForceRequestReview(requestReviewAction: requestReview)
+                        } label: {
+                            Text(verbatim: "Force Request")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                } else {
+                    HStack {
+                        Text(verbatim: "Daily Action Count")
+                        Spacer()
+                        Button {
+                            ReviewManager.shared.debugResetDailyCount()
+                        } label: {
+                            Text(verbatim: "Reset")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    HStack {
+                        Text(verbatim: "All Review Stats")
+                        Spacer()
+                        Button {
+                            ReviewManager.shared.debugResetStats()
+                        } label: {
+                            Text(verbatim: "Reset All")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    HStack {
+                        Text(verbatim: "Last Review Data")
+                        Spacer()
+                        Button {
+                            ReviewManager.shared.debugClearLastReviewDate()
+                        } label: {
+                            Text(verbatim: "Clear")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    HStack {
+                        Text(verbatim: "Version Grace Period")
+                        Spacer()
+                        Button {
+                            ReviewManager.shared.debugSkipUpdateGracePeriod()
+                        } label: {
+                            Text(verbatim: "Skip")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    HStack {
+                        Text(verbatim: "Review Prompt")
+                        Spacer()
+                        Button {
+                            ReviewManager.shared.debugForceRequestReview(requestReviewAction: requestReview)
+                        } label: {
+                            Text(verbatim: "Force Request")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+#endif
     }
 }
 #if os(macOS)

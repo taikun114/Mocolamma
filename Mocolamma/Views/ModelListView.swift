@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 #if os(macOS)
 import AppKit
 #endif
@@ -40,6 +41,7 @@ struct ModelListView: View {
     @Binding var showingDeleteConfirmation: Bool // 削除確認アラートの表示/非表示を制御するバインディング
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.requestReview) var requestReview
     @State private var inputAreaHeight: CGFloat = 0
     @State private var pullErrorMessage: String? = nil
     @State private var showingPullErrorAlert: Bool = false
@@ -390,6 +392,11 @@ struct ModelListView: View {
             try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled && !executor.isRunning && !executor.isPulling {
                 appRefreshTrigger.send()
+            }
+        }
+        .onChange(of: executor.isPulling) { oldValue, newValue in
+            if oldValue == true && newValue == false && executor.pullProgress >= 1.0 {
+                ReviewManager.shared.requestReviewIfAppropriate(requestReviewAction: requestReview)
             }
         }
         .onChange(of: executor.isPullingErrorHold) { _, newValue in
