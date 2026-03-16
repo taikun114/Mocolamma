@@ -38,6 +38,7 @@
   - [Chat Tab](#chat-tab)
   - [Image Generation Tab](#image-generation-tab)
   - [Privacy and Security](#privacy-and-security)
+  - [App Store Review Requests](#app-store-review-requests)
 - [Support and Feedback](#support-and-feedback)
   - [Bug Reports](#bug-reports)
   - [Feedback](#feedback)
@@ -47,7 +48,7 @@
   - [Donate](#donate)
 - [Credits](#credits)
   - [Ollama by Ollama](#ollama-by-ollama)
-  - [Gemini CLI by Google / Qwen Code by Qwen / OpenCode by Anomaly](#gemini-cli-by-google--qwen-code-by-qwen--opencode-by-anomaly)
+  - [Antigravity and Gemini CLI by Google / Qwen Code by Qwen / OpenCode by Anomaly](#antigravity-and-gemini-cli-by-google--qwen-code-by-qwen--opencode-by-anomaly)
   - [Textual by Guillermo Gonzalez](#textual-by-guillermo-gonzalez)
   - [CompactSlider by Alexey Bukhtin](#compactslider-by-alexey-bukhtin)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
@@ -94,11 +95,20 @@ The system requirements for Mocolamma are as follows:
 > Also, the Ollama server must be configured to be accessible from within your local network.
 
 ### Differences between free and paid versions
-Mocolamma has both a free version (GitHub version, macOS only) and a paid version (App Store version), but both have almost identical functionality. **The only difference is the availability of automatic updates.**\
-The paid version can automatically update and install using App Store functionality, while the free version currently lacks update check and installation features (meaning the app's functionality is entirely unchanged!).\
-Additionally, the App Store version has had the donation link removed from the about the app screen to pass Apple's review process. There are absolutely no other differences!
+Mocolamma has both a free version (GitHub version, macOS only) and a paid version (App Store version), but there are no differences in the app's basic functionality. The App Store version includes several features provided by the App Store, such as the automatic update feature.\
+The differences are as follows:
 
-I would appreciate it if you purchase from the App Store, but feel free to download for free first, and if you find it very useful, please consider purchasing or [**donating**](#donate)! 
+| Feature           | Free Version (GitHub)  | Paid Version (App Store)      |
+|-------------------|------------------------|-------------------------------|
+| Platforms         | macOS                  | macOS, iOS / iPadOS, visionOS |
+| Price             | Free                   | $1.99                         |
+| All App Features  | 〇                     | 〇                             |
+| Automatic Updates | ×                      | 〇 (App Store feature)        |
+| Donation Link     | 〇                     | × (Due to App Store review)   |
+| Review Requests   | ×                      | 〇 (Can be disabled)          |
+| Support Developer | 〇 (via Donation Link) | 〇 (via Purchase)              |
+
+I would appreciate it if you purchase from the App Store, but feel free to download for free first, and if you find it very useful, please consider purchasing or [**donating**](#donate)!
 
 ## Features
 Mocolamma can connect to Ollama servers on networks to manage models and perform simple chats using the models.
@@ -131,6 +141,31 @@ The image generation tab allows you to generate images using image models stored
 ### Privacy and Security
 Mocolamma **does not collect any information about users**.\
 Usage data and crash reports of users who have enabled "Share with App Developers" in the system settings "Analytics & Improvements" may be shared, but **the app itself doesn't have any functionality to collect and send information**. You can安心 use it even if you're concerned about privacy.
+
+### App Store Review Requests
+The App Store version periodically (but very infrequently) displays a screen asking users to review the app on the App Store (Review Request Screen).
+
+This screen appears only when all of the following conditions are met:
+
+- You are using the App Store version.
+- The "Action Count," which represents the number of times major features have been used, is a total of 29 or more.
+  - The Action Count increases with the following operations:
+    - When a model download has successfully started.
+    - When a chat is sent and the first successful response is received.
+    - When an image prompt is sent and the first successful response is received.
+- At least 3 days have passed since the app was updated (since the first launch after the update).
+  - This includes the first installation (3 days after the first launch).
+- The Review Request Screen has not been displayed for the current app version.
+- At least 90 days have passed since the last time the Review Request Screen was displayed.
+- Review requests have not been disabled in the app settings.
+
+The Action Count increases by a maximum of 10 per day, so you need to continue taking 10 or more actions per day for at least 3 days for it to appear. Therefore, this screen will not appear immediately after you start using the app (to ensure a more accurate review).
+
+When the above conditions are met, the Review Request Screen will appear at the following times:
+
+- When a model download has successfully completed.
+- When a chat is sent.
+- When an image prompt is sent.
 
 ## Support and Feedback
 ### Bug Reports
@@ -171,7 +206,7 @@ If you have a PayPal account, you can donate directly through [**PayPal**](https
 ### [Ollama](https://github.com/ollama/ollama) by Ollama
 Mocolamma is an app specialized in managing and operating Ollama servers and models. Without Ollama, Mocolamma would not have emerged.
 
-### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [OpenCode](https://github.com/anomalyco/opencode) by Anomaly
+### [Antigravity](https://antigravity.google/) and [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [OpenCode](https://github.com/anomalyco/opencode) by Anomaly
 These excellent generative AI tools were used in the development of Mocolamma. For someone like me with no knowledge of programming including Swift, I wouldn't have been able to complete this app without the power of generative AI.
 
 ### [Textual](https://github.com/gonzalezreal/textual) by Guillermo Gonzalez

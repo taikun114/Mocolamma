@@ -55,6 +55,12 @@ Notes
   - For advanced users who want to tweak model behavior and conduct tests, added the following options: “Seed,” “Repeat Last N,” “Repeat Penalty,” “Num Predict,” “Top-k,” “Top-p,” and “Min-p.”
 - **Add model download simulation in demo mode**
   - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
+- **Add a feature to request reviews on the App Store (App Store version only)**
+  - A screen asking users to review the app on the App Store will now appear periodically (but very infrequently).
+  - Please rest assured that you can completely disable this feature in the app settings if you do not want the review screen to appear.
+  - Please refer to the [README](/README.md#app-store-review-requests) for details on when the review request screen appears.
+- **Add an App Store review button to the app information screen (App Store version only)**
+  - You can open the App Store review page directly from the button added to the “Support Developer” section.
 - **Add Arabic (`ar`), Chinese (Hong Kong) (`zh-HK`), Chinese (Simplified) (`zh-Hans`), Chinese (Traditional) (`zh-Hant`), Korean (`ko`), Russian (`ru`), Ukrainian (`uk`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
@@ -83,6 +89,8 @@ Notes
 - **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
 - **Improve to also show an alert when an error occurs during model download**
+- **Improve to allow download even when the model name is entered in the `ollama` command format**
+  - Model names can now be properly extracted and downloaded even when the model name is entered in the input field in a format such as `ollama run model_name` or `ollama pull model_name`.
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Improve the appearance of the model picker in the chat screen and image generation screen on iOS / iPadOS**
   - A divider line has been added between options, and model names are now displayed when the model picker is within an overflow menu.

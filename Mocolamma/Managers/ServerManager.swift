@@ -50,6 +50,8 @@ class ServerManager: ObservableObject {
     private let selectedServerIDKey = "selected_ollama_server_id"
     // ユーザーがデフォルトサーバーを削除したかどうかを追跡するUserDefaultsキー
     private let didUserDeleteDefaultServerKey = "did_user_delete_default_server"
+    // ユーザーがデモサーバーを削除したかどうかを追跡するUserDefaultsキー
+    private let didUserDeleteDemoServerKey = "did_user_delete_demo_server"
     
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     @Published var servers: [ServerInfo] {
@@ -107,13 +109,32 @@ class ServerManager: ObservableObject {
             self.servers = []
         }
         
-#if os(macOS)
-        // デフォルトの「ローカル」サーバーが存在するか、またはユーザーが削除したかを確認
-        let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
-        let didUserDeleteDefaultServer = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
         
-        if !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteDefaultServer {
+        // --- 自動サーバー追加ロジック ---
+        
+        // 1. デフォルトの「Local」サーバーの追加
+        let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
+        let didUserDeleteLocal = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
+        
+#if os(macOS) || DEBUG
+        let shouldAddLocal = true
+#else
+        let shouldAddLocal = false
+#endif
+        
+        if shouldAddLocal && !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteLocal {
             servers.insert(localServer, at: 0)
+        }
+        
+        // 2. デバッグ時の「Demo Mode」サーバーの追加
+#if DEBUG
+        let demoServer = ServerInfo(id: ServerInfo.demoServerID, name: "Demo Mode", host: "demo-mode", iconName: "testtube.2", isDemo: true)
+        let didUserDeleteDemo = UserDefaults.standard.bool(forKey: didUserDeleteDemoServerKey)
+        
+        if !servers.contains(where: { $0.id == demoServer.id }) && !didUserDeleteDemo {
+            // ローカルサーバーのすぐ次、あるいは先頭に追加
+            let insertIndex = servers.firstIndex(where: { $0.id == ServerInfo.defaultServerID }).map { $0 + 1 } ?? 0
+            servers.insert(demoServer, at: insertIndex)
         }
 #endif
         
@@ -162,12 +183,27 @@ class ServerManager: ObservableObject {
         if server.id == ServerInfo.defaultServerID {
             UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
         }
+        
+        // 削除されたサーバーがデモサーバーの場合、フラグを設定
+        if server.id == ServerInfo.demoServerID {
+            UserDefaults.standard.set(true, forKey: didUserDeleteDemoServerKey)
+        }
     }
     
     /// 指定されたインデックスセットのサーバーをリストから削除します。
     /// - Parameter offsets: 削除するサーバーのインデックスセット。
     func deleteServers(at offsets: IndexSet) {
         let deletedServerIDs = offsets.map { servers[$0].id }
+        
+        // 削除されるサーバーの中にデフォルトまたはデモサーバーが含まれているか確認し、フラグを設定
+        for id in deletedServerIDs {
+            if id == ServerInfo.defaultServerID {
+                UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
+            } else if id == ServerInfo.demoServerID {
+                UserDefaults.standard.set(true, forKey: didUserDeleteDemoServerKey)
+            }
+        }
+        
         servers.remove(atOffsets: offsets)
         // 削除後に選択状態を調整
         if let selectedID = selectedServerID, !servers.contains(where: { $0.id == selectedID }) {
