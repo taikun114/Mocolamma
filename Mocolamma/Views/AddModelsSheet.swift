@@ -139,9 +139,13 @@ struct AddModelsSheet: View {
                 }) {
                     if #available(iOS 26.0, *) {
 #if os(iOS)
-                        Image(systemName: "plus")
-                            .foregroundStyle(.white)
-                            .opacity(0.8)
+                        if modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || executor.isPulling {
+                            Image(systemName: "plus")
+                        } else {
+                            Image(systemName: "plus")
+                                .foregroundStyle(.white)
+                                .opacity(0.8)
+                        }
 #else
                         Image(systemName: "plus")
 #endif
