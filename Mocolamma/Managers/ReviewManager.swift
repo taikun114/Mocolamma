@@ -18,6 +18,7 @@ class ReviewManager {
         static let lastVersionPrompted = "ReviewManager_lastVersionPrompted"
         static let updateDate = "ReviewManager_updateDate"
         static let lastKnownVersion = "ReviewManager_lastKnownVersion"
+        static let isReviewRequestDisabled = "ReviewManager_isReviewRequestDisabled"
     }
     
     // 定数
@@ -29,6 +30,7 @@ class ReviewManager {
         private init() {
         self.totalActionCount = UserDefaults.standard.integer(forKey: Keys.totalActionCount)
         self.dailyActionCount = UserDefaults.standard.integer(forKey: Keys.dailyActionCount)
+        self.isReviewRequestDisabled = UserDefaults.standard.bool(forKey: Keys.isReviewRequestDisabled)
         self.updateDate = UserDefaults.standard.object(forKey: Keys.updateDate) as? Date ?? Date()
         self.lastReviewRequestDate = UserDefaults.standard.object(forKey: Keys.lastReviewRequestDate) as? Date
         checkVersionUpdate()
@@ -38,6 +40,11 @@ class ReviewManager {
     
     var totalActionCount: Int
     var dailyActionCount: Int
+    var isReviewRequestDisabled: Bool {
+        didSet {
+            userDefaults.set(isReviewRequestDisabled, forKey: Keys.isReviewRequestDisabled)
+        }
+    }
     var updateDate: Date
     var lastReviewRequestDate: Date?
     
@@ -45,6 +52,9 @@ class ReviewManager {
     
     /// アクションを記録します（チャット、画像生成、ダウンロード開始など）。
     func logAction() {
+        // レビュー依頼が無効化されている場合は記録しない
+        guard !isReviewRequestDisabled else { return }
+        
         let now = Date()
         let calendar = Calendar.current
         
@@ -89,6 +99,9 @@ class ReviewManager {
     // MARK: - 判定ロジック
     
     private func canShowReviewRequest() -> Bool {
+        // 0. レビュー依頼が無効化されているか
+        guard !isReviewRequestDisabled else { return false }
+        
         // 1. 最低アクション数
         // アクション開始時に判定するため、累積29回（このアクションで30回になる）から許可する
         guard totalActionCount >= minActions - 1 else { return false }

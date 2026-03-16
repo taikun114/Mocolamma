@@ -17,6 +17,7 @@ struct SettingsView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.requestReview) var requestReview
+    @State private var isReviewRequestDisabled: Bool = ReviewManager.shared.isReviewRequestDisabled
     
     var body: some View {
         Form {
@@ -298,6 +299,20 @@ struct SettingsView: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 #endif
+        }
+        
+        Section("App Store Features") {
+            Toggle(isOn: $isReviewRequestDisabled) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Disable Review Requests")
+                    Text("Prevent the App Store review request screen from appearing periodically.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .onChange(of: isReviewRequestDisabled) { _, newValue in
+                ReviewManager.shared.isReviewRequestDisabled = newValue
+            }
         }
         
 #if DEBUG
