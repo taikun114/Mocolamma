@@ -302,6 +302,7 @@ struct SettingsView: View {
         }
         
         Section("App Store Features") {
+#if os(macOS)
             Toggle(isOn: $isReviewRequestDisabled) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Disable Review Requests")
@@ -313,6 +314,37 @@ struct SettingsView: View {
             .onChange(of: isReviewRequestDisabled) { _, newValue in
                 ReviewManager.shared.isReviewRequestDisabled = newValue
             }
+#elseif os(visionOS)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Disable Review Requests")
+                    Text("Prevent the App Store review request screen from appearing periodically.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Toggle("Disable Review Requests", isOn: $isReviewRequestDisabled)
+                    .labelsHidden()
+            }
+            .onChange(of: isReviewRequestDisabled) { _, newValue in
+                ReviewManager.shared.isReviewRequestDisabled = newValue
+            }
+#else
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Disable Review Requests")
+                    Text("Prevent the App Store review request screen from appearing periodically.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Toggle("Disable Review Requests", isOn: $isReviewRequestDisabled)
+                    .labelsHidden()
+            }
+            .onChange(of: isReviewRequestDisabled) { _, newValue in
+                ReviewManager.shared.isReviewRequestDisabled = newValue
+            }
+#endif
         }
         
 #if DEBUG
