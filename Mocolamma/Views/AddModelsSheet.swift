@@ -164,7 +164,7 @@ struct AddModelsSheet: View {
     
     private func add() {
         if !modelNameInput.isEmpty {
-            let name = modelNameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+            let name = ModelNameParser.parse(input: modelNameInput)
             executor.pullHttpErrorTriggered = false
             executor.pullHttpErrorMessage = ""
             executor.pullModel(modelName: name)

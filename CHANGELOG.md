@@ -87,6 +87,8 @@ Notes
 - **Improve the appearance of model download progress display on iOS / iPadOS 26 and later**
   - On iOS / iPadOS 26.0 or later, the model download progress display is now positioned as a `safeAreaBar`, applying a beautiful, blended blur effect created by the scroll edge effect.
 - **Improve to also show an alert when an error occurs during model download**
+- **Improve to allow download even when the model name is entered in the `ollama` command format**
+  - Model names can now be properly extracted and downloaded even when the model name is entered in the input field in a format such as `ollama run model_name` or `ollama pull model_name`.
 - **Improve the model picker in the chat screen and image generation screen to display icons for models loaded into memory**
 - **Improve the appearance of the model picker in the chat screen and image generation screen on iOS / iPadOS**
   - A divider line has been added between options, and model names are now displayed when the model picker is within an overflow menu.
