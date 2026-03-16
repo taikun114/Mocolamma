@@ -206,13 +206,6 @@ struct ModelListView: View {
         }
 #else
         ToolbarItem(placement: .primaryAction) {
-#if !os(visionOS)
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
-#endif
-            
             Menu {
                 Picker("Sort by", selection: $sortCriterion) {
                     ForEach(SortCriterion.allCases) { criterion in
