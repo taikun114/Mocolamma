@@ -55,6 +55,10 @@ Notes
   - For advanced users who want to tweak model behavior and conduct tests, added the following options: “Seed,” “Repeat Last N,” “Repeat Penalty,” “Num Predict,” “Top-k,” “Top-p,” and “Min-p.”
 - **Add model download simulation in demo mode**
   - When demo mode is enabled, pressing the Add button with `demo-dl` or `demo-dl:0b` entered as the model name in the add model sheet will simulate a one-minute model download.
+- **Add a feature to request reviews on the App Store (App Store version only)**
+  - A screen asking users to review the app on the App Store will now appear periodically (but very infrequently).
+  - Please rest assured that you can completely disable this feature in the app settings if you do not want the review screen to appear.
+  - Please refer to the [README](/README.md#app-store-review-requests) for details on when the review request screen appears.
 - **Add Arabic (`ar`), Chinese (Hong Kong) (`zh-HK`), Chinese (Simplified) (`zh-Hans`), Chinese (Traditional) (`zh-Hant`), Korean (`ko`), Russian (`ru`), Ukrainian (`uk`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
