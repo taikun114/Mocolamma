@@ -553,8 +553,10 @@ struct PullProgressView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     ProgressView(value: executor.pullProgress) {
                         Text(executor.pullStatus)
+                            .animation(nil, value: executor.pullStatus)
                     } currentValueLabel: {
                         progressLabels
+                            .animation(nil, value: executor.pullProgress)
                     }
                     .progressViewStyle(.linear)
                     .animation(.default, value: executor.pullProgress)
@@ -585,6 +587,7 @@ struct PullProgressView: View {
                 ProgressView(value: executor.pullProgress) {
                     HStack(alignment: .bottom) {
                         Text(executor.pullStatus)
+                            .animation(nil, value: executor.pullStatus)
                         Spacer()
                         if executor.isPullingErrorHold && executor.pullHasError {
                             Button(action: {
@@ -603,9 +606,10 @@ struct PullProgressView: View {
                     }
                 } currentValueLabel: {
                     progressLabels
+                        .animation(nil, value: executor.pullProgress)
                 }
                 .progressViewStyle(.linear)
-                .animation(.default, value: executor.pullProgress) // アニメーションを追加
+                .animation(.default, value: executor.pullProgress)
                 
                 if let errorText = parseError(from: executor.output) {
                     MarqueeText(text: errorText)
