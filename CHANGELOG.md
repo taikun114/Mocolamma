@@ -58,7 +58,7 @@ Notes
 - **Add a feature to request reviews on the App Store (App Store version only)**
   - A screen asking users to review the app on the App Store will now appear periodically (but very infrequently).
   - Please rest assured that you can completely disable this feature in the app settings if you do not want the review screen to appear.
-  - Please refer to the [README](/README.md#app-store-review-requests) for details on when the review request screen appears.
+  - Please refer to the [**README**](/README.md#app-store-review-requests) for details on when the review request screen appears.
 - **Add an App Store review button to the app information screen (App Store version only)**
   - You can open the App Store review page directly from the button added to the “Support Developer” section.
 - **Add Arabic (`ar`), Chinese (Hong Kong) (`zh-HK`), Chinese (Simplified) (`zh-Hans`), Chinese (Traditional) (`zh-Hant`), Korean (`ko`), Russian (`ru`), Ukrainian (`uk`) localization by generative AI**
