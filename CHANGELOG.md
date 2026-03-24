@@ -20,6 +20,11 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.2.1
+### Bug Fixes and Improvements
+- **Fix issue where insecure HTTP connections were being blocked**
+  - This may have resolved the issue ([**#3**](https://github.com/taikun114/Mocolamma/issues/3)) where connections to remote servers using VPNs, etc., were being blocked.
+
 ## 1.2.0
 ### New Features
 - **Revamping the Markdown rendering engine**
