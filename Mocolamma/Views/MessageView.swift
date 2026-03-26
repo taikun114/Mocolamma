@@ -1358,7 +1358,7 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
                 .opacity(0.5)
 
             // コード本体
-            Overflow {
+            Overflow(isIntegratedSelection: true) {
                 configuration.label
                     .monospaced()
                     .textual.lineSpacing(.fontScaled(0.39))
