@@ -550,8 +550,10 @@ struct ModelInspectorView: View {
             .id(isLoading)
 #if os(visionOS)
             .transition(.opacity)
-#endif
             .padding(.horizontal)
+#else
+            .padding()
+#endif
         }
 #if os(visionOS)
         .safeAreaInset(edge: .top) {

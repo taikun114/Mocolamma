@@ -136,25 +136,22 @@ struct ModelListView: View {
             models = models.filter { $0.capabilities?.contains(filter) ?? false }
         }
         
-        let ascending = sortOrderOption == .ascending
-        
+        // 全プラットフォームでTable/Menuから供給されるsortOrderに従ってソート
+        return models.sorted(using: sortOrder)
+    }
+    
+    // Menuでの選択内容をsortOrderバインディングに同期するメソッド
+    private func updateSortOrder() {
+        let order: Foundation.SortOrder = sortOrderOption == .ascending ? .forward : .reverse
         switch sortCriterion {
         case .number:
-            return models.sorted {
-                ascending ? $0.originalIndex < $1.originalIndex : $0.originalIndex > $1.originalIndex
-            }
+            sortOrder = [KeyPathComparator(\.originalIndex, order: order)]
         case .name:
-            return models.sorted {
-                ascending ? $0.name < $1.name : $0.name > $1.name
-            }
+            sortOrder = [KeyPathComparator(\.name, order: order)]
         case .size:
-            return models.sorted {
-                ascending ? $0.comparableSize < $1.comparableSize : $0.comparableSize > $1.comparableSize
-            }
+            sortOrder = [KeyPathComparator(\.comparableSize, order: order)]
         case .date:
-            return models.sorted {
-                ascending ? $0.comparableModifiedDate < $1.comparableModifiedDate : $0.comparableModifiedDate > $1.comparableModifiedDate
-            }
+            sortOrder = [KeyPathComparator(\.comparableModifiedDate, order: order)]
         }
     }
     
@@ -400,6 +397,8 @@ struct ModelListView: View {
                 }
             }
         }
+        .onChange(of: sortCriterion) { _, _ in updateSortOrder() }
+        .onChange(of: sortOrderOption) { _, _ in updateSortOrder() }
         .alert("Download Failed", isPresented: $showingPullErrorAlert) {
             Button("OK") { }
         } message: {
