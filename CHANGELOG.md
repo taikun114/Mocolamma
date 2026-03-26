@@ -24,6 +24,8 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix issue where insecure HTTP connections were being blocked**
   - This may have resolved the issue ([**#3**](https://github.com/taikun114/Mocolamma/issues/3)) where connections to remote servers using VPNs, etc., were being blocked.
+- **Fix padding in the model inspector**
+  - An issue where the top and bottom padding was too tight on platforms other than visionOS has been fixed.
 
 ## 1.2.0
 ### New Features
