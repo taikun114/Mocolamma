@@ -1342,15 +1342,18 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
     func makeBody(configuration: Configuration) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // ヘッダー: 言語名
-            HStack {
+            HStack(alignment: .center) {
                 Text(formatLanguageName(configuration.languageHint))
-                    .font(.caption2.monospaced())
+                    .font(.caption.monospaced())
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 
                 Spacer()
+
+                CopyCodeButton(configuration: configuration)
             }
-            .padding(.horizontal, 12)
+            .padding(.leading, 12)
+            .padding(.trailing, 6)
             .padding(.vertical, 6)
             .background(Color.gray.opacity(0.05))
 
@@ -1409,6 +1412,51 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
 
         // それ以外は先頭を大文字にする (例: "swift" -> "Swift", "markdown" -> "Markdown")
         return hint.prefix(1).uppercased() + hint.dropFirst()
+    }
+}
+
+struct CopyCodeButton: View {
+    let configuration: StructuredText.CodeBlockStyle.Configuration
+    @State private var isCopied = false
+
+    var body: some View {
+        Button {
+            configuration.codeBlock.copyToPasteboard()
+            withAnimation {
+                isCopied = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                withAnimation {
+                    isCopied = false
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: isCopied ? "checkmark" : "document.on.document")
+                    .contentTransition(.symbolEffect(.replace))
+                    .font(.caption2)
+                Text(String(localized: "Copy"))
+                    .font(.caption2)
+            }
+            .foregroundColor(.primary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.secondary.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+#if os(macOS)
+            .onHover { isHovering in
+                if isHovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+#endif
+        }
+        .buttonStyle(.plain)
+        .help(String(localized: "Copy"))
+        .accessibilityLabel(String(localized: "Copy"))
+        .textual.excludeFromTextSelection()
     }
 }
 
