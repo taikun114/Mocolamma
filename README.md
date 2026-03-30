@@ -49,7 +49,7 @@
 - [Credits](#credits)
   - [Ollama by Ollama](#ollama-by-ollama)
   - [Antigravity and Gemini CLI by Google / Qwen Code by Qwen / OpenCode by Anomaly](#antigravity-and-gemini-cli-by-google--qwen-code-by-qwen--opencode-by-anomaly)
-  - [Textual by Guillermo Gonzalez](#textual-by-guillermo-gonzalez)
+  - [Textual by Guillermo Gonzalez and Taiga Imaura](#textual-by-guillermo-gonzalez-and-taiga-imaura)
   - [CompactSlider by Alexey Bukhtin](#compactslider-by-alexey-bukhtin)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
@@ -209,8 +209,9 @@ Mocolamma is an app specialized in managing and operating Ollama servers and mod
 ### [Antigravity](https://antigravity.google/) and [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google / [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen / [OpenCode](https://github.com/anomalyco/opencode) by Anomaly
 These excellent generative AI tools were used in the development of Mocolamma. For someone like me with no knowledge of programming including Swift, I wouldn't have been able to complete this app without the power of generative AI.
 
-### [Textual](https://github.com/gonzalezreal/textual) by Guillermo Gonzalez
-The Textual package was used to implement the Markdown rendering in the chat screen. Thanks to this package, I was able to implement beautiful Markdown rendering very easily.
+### [Textual](https://github.com/taikun114/textual) by Guillermo Gonzalez and Taiga Imaura
+The Textual package was used to implement the Markdown rendering in the chat screen. Thanks to this package, I was able to implement beautiful Markdown rendering very easily.\
+Mocolamma uses a custom version that has been optimized for Mocolamma based on the [original version](https://github.com/gonzalezreal/textual).
 
 ### [CompactSlider](https://github.com/buh/CompactSlider) by Alexey Bukhtin
 The CompactSlider package was used to implement the sliders for temperature and context window in chat settings. Thanks to this package, I was able to implement beautiful customized sliders.

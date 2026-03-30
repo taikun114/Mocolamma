@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
-		6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6D80A9482F4725EF00B2D5A4 /* Textual */; };
+		6DBD07DA2F754DFA00F794CE /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6DBD07D92F754DFA00F794CE /* Textual */; };
+		6DBDFCCF2F752E8700F794CE /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6DBDFCCE2F752E8700F794CE /* Textual */; };
 		6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */; };
 		6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */; };
 		6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */; };
@@ -76,11 +77,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D80A9492F4725EF00B2D5A4 /* Textual in Frameworks */,
+				6DBD07DA2F754DFA00F794CE /* Textual in Frameworks */,
 				6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */,
 				6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */,
 				6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */,
 				6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */,
+				6DBDFCCF2F752E8700F794CE /* Textual in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,10 +144,11 @@
 			name = Mocolamma;
 			packageProductDependencies = (
 				6D7D84A02E3B68FA006EDB4D /* CompactSlider */,
-				6D80A9482F4725EF00B2D5A4 /* Textual */,
 				6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */,
 				6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */,
 				6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */,
+				6DBDFCCE2F752E8700F794CE /* Textual */,
+				6DBD07D92F754DFA00F794CE /* Textual */,
 			);
 			productName = Mocolamma;
 			productReference = 6DC81A322E3236B3005F2E03 /* Mocolamma.app */;
@@ -242,8 +245,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */,
-				6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */,
 				6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */,
+				6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DC81A332E3236B3005F2E03 /* Products */;
@@ -458,7 +461,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -491,7 +494,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = design.taikun.Mocolamma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -524,7 +527,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -557,7 +560,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = design.taikun.Mocolamma;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -584,7 +587,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -603,7 +606,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -621,7 +624,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -638,7 +641,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4253;
+				CURRENT_PROJECT_VERSION = 4265;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -701,12 +704,12 @@
 				version = 2.1.0;
 			};
 		};
-		6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */ = {
+		6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/textual";
+			repositoryURL = "https://github.com/taikun114/textual";
 			requirement = {
 				kind = exactVersion;
-				version = 0.3.1;
+				version = 1.0.0;
 			};
 		};
 		6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */ = {
@@ -714,7 +717,7 @@
 			repositoryURL = "https://github.com/taikun114/UniversalSFSymbolsPicker";
 			requirement = {
 				kind = exactVersion;
-				version = 0.1.2;
+				version = 0.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -725,9 +728,13 @@
 			package = 6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */;
 			productName = CompactSlider;
 		};
-		6D80A9482F4725EF00B2D5A4 /* Textual */ = {
+		6DBD07D92F754DFA00F794CE /* Textual */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 6D80A9472F4725EF00B2D5A4 /* XCRemoteSwiftPackageReference "textual" */;
+			package = 6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
+		};
+		6DBDFCCE2F752E8700F794CE /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
 			productName = Textual;
 		};
 		6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */ = {

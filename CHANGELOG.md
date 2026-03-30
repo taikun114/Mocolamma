@@ -20,6 +20,15 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.2.2
+### New Features
+- **Add a copy button to code blocks in the chat screen**
+  - You can copy only the code within the code block.
+
+### Bug Fixes and Improvements
+- **Fix issues where text selection could not cross code blocks and where multiple word selection was not possible by holding down the double-click button in the chat screen ([#4](https://github.com/taikun114/Mocolamma/issues/4))**
+- **Fix issue where text selection could not be released in the chat screen on platforms other than macOS**
+
 ## 1.2.1
 ### Bug Fixes and Improvements
 - **Fix issue where insecure HTTP connections were being blocked**
