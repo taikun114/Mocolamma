@@ -1,5 +1,5 @@
 {
-  "originHash" : "599575ee4b3317e918a10e3cd1c0df7b3f02eaa01a9c1e8b063f464754953676",
+  "originHash" : "600b9d2cd6619530c16d0a145314619a033f682253339dcd07b2b58d2079b616",
   "pins" : [
     {
       "identity" : "compactslider",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/taikun114/UniversalSFSymbolsPicker",
       "state" : {
-        "revision" : "5ff92f616b193663392fb27010a09f67d174b849",
-        "version" : "0.1.2"
+        "revision" : "b929f358fbd47cd19f00299d7a87a5cf5df21887",
+        "version" : "0.2.0"
       }
     }
   ],
