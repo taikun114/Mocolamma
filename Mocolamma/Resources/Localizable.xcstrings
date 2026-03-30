@@ -28242,7 +28242,7 @@
         }
       }
     },
-    "Textual by Guillermo Gonzalez" : {
+    "Textual by Guillermo Gonzalez and Taiga Imaura" : {
       "shouldTranslate" : false
     },
     "The selected model \"%@\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
