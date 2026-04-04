@@ -121,6 +121,14 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         }
         return false
     }
+
+    /// オーディオに対応しているモデルかどうかを判定します。
+    var supportsAudio: Bool {
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "audio" })
+        }
+        return false
+    }
 }
 
 extension OllamaModel {

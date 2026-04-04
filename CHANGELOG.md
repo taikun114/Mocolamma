@@ -20,6 +20,10 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.2.3
+### New Features
+- **Support audio model tag**
+
 ## 1.2.2
 ### New Features
 - **Add a copy button to code blocks in the chat screen**

@@ -108,6 +108,9 @@ struct ModelInspectorView: View {
         case "vision":
             displayText = String(localized: "Vision")
             iconName = "eye"
+        case "audio":
+            displayText = String(localized: "Audio")
+            iconName = "music.note"
         case "tools":
             displayText = String(localized: "Tools")
             iconName = "wrench.and.screwdriver"

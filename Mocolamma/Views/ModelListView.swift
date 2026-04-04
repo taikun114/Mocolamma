@@ -67,8 +67,9 @@ struct ModelListView: View {
         case "thinking": return 2
         case "tools": return 3
         case "vision": return 4
-        case "embedding": return 5
-        case "image": return 6
+        case "audio": return 5
+        case "embedding": return 6
+        case "image": return 7
         default: return 100
         }
     }
@@ -78,6 +79,7 @@ struct ModelListView: View {
         switch tag.lowercased() {
         case "completion": return String(localized: "Completion")
         case "vision": return String(localized: "Vision")
+        case "audio": return String(localized: "Audio")
         case "image": return String(localized: "Image")
         case "embedding": return String(localized: "Embedding")
         case "tools": return String(localized: "Tools")
@@ -91,6 +93,7 @@ struct ModelListView: View {
         switch tag.lowercased() {
         case "completion": return "character.cursor.ibeam"
         case "vision": return "eye"
+        case "audio": return "music.note"
         case "tools": return "wrench.and.screwdriver"
         case "thinking": return "brain.filled.head.profile"
         case "embedding": return "square.stack.3d.up"
