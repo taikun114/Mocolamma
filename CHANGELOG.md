@@ -23,6 +23,7 @@ Notes
 ## 1.2.3
 ### New Features
 - **Support audio model tag**
+- **Add a feature that allows scrolling by dragging tags in the model inspector**
 
 ## 1.2.2
 ### New Features

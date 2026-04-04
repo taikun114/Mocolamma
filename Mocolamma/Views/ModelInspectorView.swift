@@ -17,6 +17,12 @@ struct ModelInspectorView: View {
     
     @State private var showingLicenseSheet = false
     
+    // タグエリアのドラッグスクロール用状態変数
+    @State private var tagsScrollPos: ScrollPosition = .init(point: .zero)
+    @State private var currentTagsOffset: CGPoint = .zero
+    @State private var dragStartOffset: CGPoint = .zero
+    @State private var isDraggingTags = false
+    
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
         return "\(model.size)"
@@ -141,6 +147,7 @@ struct ModelInspectorView: View {
             }
             .font(.caption)
             .bold()
+            .contentShape(Capsule()) // 点击判定范围
 #if !os(macOS)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -167,9 +174,10 @@ struct ModelInspectorView: View {
         .buttonStyle(.plain)
         .onHover { inside in
 #if os(macOS)
-            if inside {
+            if inside && !isDraggingTags {
                 NSCursor.pointingHand.push()
-            } else {
+            } else if !inside && !isDraggingTags {
+                // ドラッグ中ではない場合のみ抜けた時にpop
                 NSCursor.pop()
             }
 #endif
@@ -190,12 +198,49 @@ struct ModelInspectorView: View {
                 
                 // 機能セクション
                 if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
-                    ScrollView(.horizontal) {
+                    ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
                                 tagView(for: capability)
                             }
                         }
+                        .scrollTargetLayout()
+                    }
+                    .scrollPosition($tagsScrollPos)
+                    .onScrollGeometryChange(for: CGPoint.self) { geo in
+                        geo.contentOffset
+                    } action: { _, newValue in
+                        currentTagsOffset = newValue
+                    }
+                    .highPriorityGesture(
+                        DragGesture(minimumDistance: 5)
+                            .onChanged { value in
+                                if !isDraggingTags {
+                                    isDraggingTags = true
+                                    #if os(macOS)
+                                    NSCursor.closedHand.push()
+                                    #endif
+                                    dragStartOffset = currentTagsOffset
+                                }
+                                let deltaX = value.translation.width
+                                // スクロール位置を更新
+                                tagsScrollPos = ScrollPosition(point: CGPoint(x: dragStartOffset.x - deltaX, y: 0))
+                            }
+                            .onEnded { _ in
+                                isDraggingTags = false
+                                #if os(macOS)
+                                NSCursor.pop()
+                                #endif
+                            }
+                    )
+                    .onHover { inside in
+                        #if os(macOS)
+                        if inside {
+                            NSCursor.openHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                        #endif
                     }
                     .scrollClipDisabled() // クリッピングを無効化
                 }
