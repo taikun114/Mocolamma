@@ -23,8 +23,9 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let digest: String
     var details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
+    var statusWeight: Int = 0 // UIでのソート用：0=なし, 1=ロード中, 2=ロード済み, 3=成功フィードバック
     
-    // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)
+    // Codable プロトコルのために必要な CodingKeys (originalIndex, id, statusWeightはデコード対象外)
     enum CodingKeys: String, CodingKey {
         case name
         case model

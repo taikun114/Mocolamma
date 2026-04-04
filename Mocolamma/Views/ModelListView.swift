@@ -10,6 +10,7 @@ enum SortCriterion: String, CaseIterable, Identifiable {
     case name = "Name"
     case size = "Size"
     case date = "Date"
+    case status = "Status"
     
     var id: String { self.rawValue }
 }
@@ -43,6 +44,8 @@ struct ModelListView: View {
     @State private var inputAreaHeight: CGFloat = 0
     @State private var pullErrorMessage: String? = nil
     @State private var showingPullErrorAlert: Bool = false
+    @State private var loadErrorMessage: String? = nil
+    @State private var showingLoadErrorAlert: Bool = false
     let isSelected: Bool // 現在のタブが選択されているか
     
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
@@ -117,6 +120,7 @@ struct ModelListView: View {
         case .number: return "textformat.numbers"
         case .size: return "internaldrive"
         case .date: return "calendar"
+        case .status: return "info.circle"
         }
     }
     
@@ -153,6 +157,8 @@ struct ModelListView: View {
             sortOrder = [KeyPathComparator(\.comparableSize, order: order)]
         case .date:
             sortOrder = [KeyPathComparator(\.comparableModifiedDate, order: order)]
+        case .status:
+            sortOrder = [KeyPathComparator(\.statusWeight, order: order)]
         }
     }
     
@@ -278,6 +284,8 @@ struct ModelListView: View {
                 sortOrder: $sortOrder,
                 modelToDelete: $modelToDelete,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
+                loadErrorMessage: $loadErrorMessage,
+                showingLoadErrorAlert: $showingLoadErrorAlert,
                 copyIconName: copyIconName,
                 bottomInset: inputAreaHeight
             )
@@ -290,6 +298,8 @@ struct ModelListView: View {
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
+                    loadErrorMessage: $loadErrorMessage,
+                    showingLoadErrorAlert: $showingLoadErrorAlert,
                     copyIconName: copyIconName,
                     bottomInset: 0
                 )
@@ -305,6 +315,8 @@ struct ModelListView: View {
                         sortOrder: $sortOrder,
                         modelToDelete: $modelToDelete,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
+                        loadErrorMessage: $loadErrorMessage,
+                        showingLoadErrorAlert: $showingLoadErrorAlert,
                         copyIconName: copyIconName,
                         bottomInset: 0
                     )
@@ -321,6 +333,8 @@ struct ModelListView: View {
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
                     showingDeleteConfirmation: $showingDeleteConfirmation,
+                    loadErrorMessage: $loadErrorMessage,
+                    showingLoadErrorAlert: $showingLoadErrorAlert,
                     copyIconName: copyIconName,
                     bottomInset: 0
                 )
@@ -404,6 +418,15 @@ struct ModelListView: View {
                 Text("An unknown error occurred during model download.")
             }
         }
+        .alert("Load Failed", isPresented: $showingLoadErrorAlert) {
+            Button("OK") { }
+        } message: {
+            if let errorMessage = loadErrorMessage {
+                Text(errorMessage)
+            } else {
+                Text("An unknown error occurred during model load.")
+            }
+        }
     }
 }
 
@@ -418,12 +441,16 @@ struct ModelListContentView: View {
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
     @Binding var modelToDelete: OllamaModel?
     @Binding var showingDeleteConfirmation: Bool
+    @Binding var loadErrorMessage: String?
+    @Binding var showingLoadErrorAlert: Bool
     let copyIconName: String
     var bottomInset: CGFloat = 0
+    @State private var modelForCustomKeepAlive: OllamaModel?
     
     @EnvironmentObject var appRefreshTrigger: RefreshTrigger
     
     var body: some View {
+        Group {
 #if !os(macOS)
         List(selection: $selectedModel) {
             ForEach(sortedModels) { model in
@@ -442,9 +469,24 @@ struct ModelListContentView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    
+                    Spacer()
+                    
+                    loadStatusIcon(for: model.name)
                 }
                 .tag(model.id)
                 .contextMenu {
+                    loadModelMenu(for: model)
+                    
+                    Button("Unload Model", systemImage: "tray.and.arrow.up") {
+                        Task {
+                            await executor.unloadModel(modelName: model.name)
+                        }
+                    }
+                    .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
+                    
+                    Divider()
+                    
                     Button {
                         UIPasteboard.general.string = model.name
                     } label: {
@@ -494,13 +536,13 @@ struct ModelListContentView: View {
                 Text("\(model.originalIndex + 1)")
                     .help("No. \(model.originalIndex + 1)")
             }
-            .width(min: 30, ideal: 50, max: .infinity)
+            .width(min: 20, ideal: 50, max: .infinity)
             
             TableColumn("Name", value: \.name) { model in
                 Text(model.name)
                     .help(model.name)
             }
-            .width(min: 100, ideal: 200, max: .infinity)
+            .width(min: 80, ideal: 150, max: .infinity)
             
             TableColumn("Size", value: \.comparableSize) { model in
                 Text(model.formattedSize)
@@ -512,11 +554,27 @@ struct ModelListContentView: View {
                 Text(model.formattedModifiedAt)
                     .help(model.formattedModifiedAt)
             }
-            .width(min: 100, ideal: 150, max: .infinity)
+            .width(min: 80, ideal: 130, max: .infinity)
+            
+            TableColumn("Status", value: \.statusWeight) { model in
+                loadStatusIcon(for: model.name)
+            }
+            .width(min: 20, ideal: 70, max: .infinity)
         }
         .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
             if let selectedID = selectedIDs.first,
                let model = sortedModels.first(where: { $0.id == selectedID }) {
+                loadModelMenu(for: model)
+                
+                Button("Unload Model", systemImage: "tray.and.arrow.up") {
+                    Task {
+                        await executor.unloadModel(modelName: model.name)
+                    }
+                }
+                .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
+                
+                Divider()
+                
                 Button("Copy Model Name", systemImage: copyIconName) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(model.name, forType: .string)
@@ -529,6 +587,194 @@ struct ModelListContentView: View {
             }
         }
 #endif
+        }
+        .sheet(item: $modelForCustomKeepAlive) { model in
+            CustomKeepAliveSheet(modelName: model.name, modelForCustomKeepAlive: $modelForCustomKeepAlive) { keepAlive in
+                Task {
+                    let success = await executor.loadModel(modelName: model.name, keepAlive: keepAlive)
+                    if !success {
+                        await MainActor.run {
+                            if let errorText = parseError(from: executor.output) {
+                                loadErrorMessage = errorText
+                                showingLoadErrorAlert = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func loadModelMenu(for model: OllamaModel) -> some View {
+        Menu {
+            Button("Load with Default Time") {
+                Task {
+                    let success = await executor.loadModel(modelName: model.name)
+                    if !success {
+                        await MainActor.run {
+                            if let errorText = parseError(from: executor.output) {
+                                loadErrorMessage = errorText
+                                showingLoadErrorAlert = true
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            
+            // プリセット (1m, 3m, 5m, 10m, 15m, 30m, 1h, Indefinite)
+            Group {
+                Button(LocalizedStringKey(KeepAliveOption.m1.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.m3.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("3m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.m5.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("5m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.m10.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("10m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.m15.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("15m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.m30.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("30m"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1h"))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1))
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            
+            Button("Custom...") {
+                modelForCustomKeepAlive = model
+            }
+            
+        } label: {
+            Label("Load Model", systemImage: "tray.and.arrow.down")
+        }
+    }
+    
+    @ViewBuilder
+    private func loadStatusIcon(for modelName: String) -> some View {
+        ZStack {
+            if executor.recentLoadedModelNames.contains(modelName) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+            } else if executor.loadingModelNames.contains(modelName) {
+                ProgressView()
+                    .controlSize(.small)
+                    .transition(.opacity)
+            } else if executor.runningModels.contains(where: { $0.name == modelName || $0.name == "\(modelName):latest" }) {
+                Image(systemName: "tray.and.arrow.down")
+                    .foregroundColor(.secondary)
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: executor.loadingModelNames.contains(modelName))
+        .animation(.easeInOut(duration: 0.3), value: executor.recentLoadedModelNames.contains(modelName))
+        .animation(.easeInOut(duration: 0.3), value: executor.runningModels.contains(where: { $0.name == modelName || $0.name == "\(modelName):latest" }))
+    }
+    
+    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
+        if let data = output.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let err = obj["error"] as? String {
+            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
+        }
+        if output.lowercased().contains("error") {
+            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+        }
+        return nil
     }
 }
 
@@ -685,6 +931,118 @@ struct PullProgressView: View {
             return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
         }
         return nil
+    }
+}
+
+// MARK: - カスタムKeep Alive指定用のシート
+
+struct CustomKeepAliveSheet: View {
+    let modelName: String
+    @Binding var modelForCustomKeepAlive: OllamaModel?
+    @State private var value: Int = 5
+    @State private var unit: KeepAliveUnit = .minutes
+    var onConfirm: (JSONValue) -> Void
+    
+    var body: some View {
+#if os(macOS)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Load with Duration")
+                .font(.title)
+                .bold()
+            
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    TextField("", value: $value, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: .infinity)
+                    
+                    Stepper("", value: $value, in: 1...99999)
+                        .labelsHidden()
+                        .controlSize(.large)
+                    
+                    Picker("", selection: $unit) {
+                        ForEach(KeepAliveUnit.allCases) { unit in
+                            Text(unit.localizedName).tag(unit)
+                        }
+                    }
+                    .labelsHidden()
+                    .controlSize(.large)
+                }
+                
+                Text("Specify how long the model will stay loaded into memory. Models can be unloaded at any time.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 12) {
+                Spacer()
+                Button("Cancel") {
+                    modelForCustomKeepAlive = nil
+                }
+                .controlSize(.large)
+                .keyboardShortcut(.cancelAction)
+                
+                Button("Load") {
+                    let jsonVal = JSONValue.string("\(value)\(unit.rawValue)")
+                    onConfirm(jsonVal)
+                    modelForCustomKeepAlive = nil
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding()
+        .frame(minWidth: 200, maxWidth: 300, minHeight: 100, maxHeight: 250)
+#else
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 20) {
+                HStack(spacing: 12) {
+                    TextField("", value: $value, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.numberPad)
+                        .frame(maxWidth: .infinity)
+                    
+                    Stepper("", value: $value, in: 1...99999)
+                        .labelsHidden()
+                    
+                    Picker("", selection: $unit) {
+                        ForEach(KeepAliveUnit.allCases) { unit in
+                            Text(unit.localizedName).tag(unit)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+                .padding()
+                
+                Text("Specify how long the model will stay loaded into memory. Models can be unloaded at any time.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                
+                Spacer()
+            }
+            .navigationTitle("Load with Duration")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { modelForCustomKeepAlive = nil }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Load") {
+                        let jsonVal = JSONValue.string("\(value)\(unit.rawValue)")
+                        onConfirm(jsonVal)
+                        modelForCustomKeepAlive = nil
+                    }
+                    .bold()
+                }
+            }
+        }
+#endif
     }
 }
 

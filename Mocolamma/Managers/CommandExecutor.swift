@@ -26,6 +26,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var runningModels: [OllamaRunningModel] = []
     var isDraggingFile: Bool = false
     
+    // ロード状態を各モデルごとに追跡するための状態
+    var loadingModelNames: Set<String> = []
+    var recentLoadedModelNames: Set<String> = []
+    
     // システム全体のドラッグ監視用 (deinitからアクセスできるようnonisolatedに)
     @ObservationIgnored
     nonisolated(unsafe) private var dragMonitoringTimer: Timer?
@@ -54,6 +58,22 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var lastSpeedSampleTime: Date? // 速度算出用の前回サンプル時刻
     private var lastSpeedSampleCompleted: Int64 = 0 // 速度算出用の前回完了バイト
     private var pullStatusUpdateTimer: Timer? // プルステータスの更新タイマー
+    
+    /// モデルの表示用の重み付け（ステータス）を更新します。
+    private func updateModelWeights() {
+        for i in 0..<models.count {
+            let modelName = models[i].name
+            if recentLoadedModelNames.contains(modelName) {
+                models[i].statusWeight = 3 // 成功フィードバック
+            } else if runningModels.contains(where: { $0.name == modelName }) {
+                models[i].statusWeight = 2 // ロード済み
+            } else if loadingModelNames.contains(modelName) {
+                models[i].statusWeight = 1 // ロード中
+            } else {
+                models[i].statusWeight = 0 // 未ロード
+            }
+        }
+    }
     private var lastPullStatusUpdate: Date = Date(timeIntervalSince1970: 0) // 最後にプルステータスを更新した時間
     private var pendingPullStatus: String? // 更新待機中のプルステータス
     private var pendingPullTotal: Int64 = 0 // 更新待機中の合計バイト数
@@ -347,6 +367,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 mutableModel.originalIndex = index
                 return mutableModel
             }
+            updateModelWeights() // ステータス更新
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models from demo server. Total: %d", comment: "デモサーバーからモデル情報を取得した場合のメッセージ。"), self.models.count)
             self.output = successMessage
@@ -431,6 +452,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 // 元の順序を維持してソート
                 return updatedModels.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
             }
+            updateModelWeights() // ステータス更新
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "Ollamaサーバー上からモデル情報を取得することができた場合のメッセージ。合計モデル数。"), self.models.count)
             self.output = successMessage
@@ -716,12 +738,113 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
             // 実行中のモデルリストを更新
             _ = await self.fetchRunningModels(host: host)
+            updateModelWeights() // ステータス更新
             // 通知を送ってUIをリフレッシュさせる
             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
             return true
             
         } catch {
             print("Model unload request failed: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    /// モデルをメモリにロードします。
+    /// - Returns: 成功した場合はtrue。
+    @discardableResult
+    func loadModel(modelName: String, keepAlive: JSONValue? = nil) async -> Bool {
+        guard let apiBaseURL = self.apiBaseURL else {
+            print("Ollama API base URL is not set. Skipping model load.")
+            self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "モデルのロードを行おうとした際にサーバーが選択されていなかった場合のエラー。")
+            return false
+        }
+        
+        // デモモードでのロード
+        if isDemoServer() {
+            print("Simulation: Loading model \(modelName) to memory in demo mode.")
+            // シミュレーション: 実行中リストに放り込む
+            self.runningModels = [OllamaRunningModel(name: modelName, expires_at: Date().addingTimeInterval(300), size_vram: 0)]
+            return true
+        }
+        
+        // ロード中状態に追加
+        _ = loadingModelNames.insert(modelName)
+        updateModelWeights() // ステータス更新
+        
+        defer {
+            // 終了時にロード中状態を解除
+            _ = loadingModelNames.remove(modelName)
+            updateModelWeights() // ステータス更新
+        }
+        
+        print("Attempting to load model \(modelName) to \(apiBaseURL) with keep_alive: \(String(describing: keepAlive))")
+        
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/generate") else {
+            let message = NSLocalizedString("Error: Invalid API URL.", comment: "APIのURLが無効だった場合のエラー。")
+            print("Error: \(message)")
+            self.output = message
+            return false
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        var body: [String: Any] = ["model": modelName]
+        if let keepAlive = keepAlive {
+            switch keepAlive {
+            case .int(let i): body["keep_alive"] = i
+            case .string(let s): body["keep_alive"] = s
+            case .double(let d): body["keep_alive"] = d
+            default: break
+            }
+        }
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            let message = NSLocalizedString("Error: Failed to serialize request body.", comment: "リクエストボディのシリアライズに失敗した場合のエラー。") + ": \(error.localizedDescription)"
+            print(message)
+            self.output = message
+            return false
+        }
+        
+        do {
+            let (_, response) = try await urlSession.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                let message = NSLocalizedString("Load Error: HTTP status code ", comment: "モデルのロード中にHTTPエラーが発生した場合のメッセージ。") + "\(code)"
+                print(message)
+                self.output = message
+                return false
+            }
+            
+            print("Successfully requested to load model '\(modelName)'.")
+            // 完了時の視覚フィードバック用状態を更新
+            _ = recentLoadedModelNames.insert(modelName)
+            updateModelWeights() // ステータス更新
+            
+            // 3秒後に「ロード完了」状態を解除
+            Task {
+                try? await Task.sleep(nanoseconds: 3 * 1_000_000_000)
+                await MainActor.run {
+                    _ = recentLoadedModelNames.remove(modelName)
+                    updateModelWeights() // ステータス更新
+                }
+            }
+            // 実行中のモデルリストを更新
+            _ = await self.fetchRunningModels()
+            // 通知を送ってUIをリフレッシュさせる
+            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+            return true
+            
+        } catch {
+            let message = NSLocalizedString("Model load request failed: ", comment: "モデルのロードリクエストに失敗した場合のメッセージ。") + error.localizedDescription
+            print(message)
+            self.output = message
             return false
         }
     }
@@ -1057,6 +1180,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 size_vram: 0 // 0バイト
             )]
             self.runningModels = demoRunningModels
+            updateModelWeights() // ステータス更新
             return demoRunningModels
         }
         
@@ -1069,6 +1193,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
             self.runningModels = ps.models
+            updateModelWeights() // ステータス更新
             return ps.models
         } catch {
             print("Failed to retrieve /api/ps: \(error.localizedDescription)")

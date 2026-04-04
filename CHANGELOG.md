@@ -24,6 +24,8 @@ Notes
 ### New Features
 - **Support audio model tag**
 - **Add a feature that allows scrolling by dragging tags in the model inspector**
+- **Add the ability to load and unload models from the context menu of each model in the model screen**
+  - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
 
 ## 1.2.2
 ### New Features
