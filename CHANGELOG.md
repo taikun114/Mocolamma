@@ -27,6 +27,9 @@ Notes
 - **Add the ability to load and unload models from the context menu of each model in the model screen**
   - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
 
+### Bug Fixes and Improvements
+- **Fix issue where the corner radius of the message input field was shifted**
+
 ## 1.2.2
 ### New Features
 - **Add a copy button to code blocks in the chat screen**

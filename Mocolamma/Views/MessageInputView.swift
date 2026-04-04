@@ -173,21 +173,21 @@ struct MessageInputView: View {
                     if #available(iOS 26, visionOS 26.0, *) {
                         Color.clear
 #if !os(visionOS)
-                            .glassEffect(in: .rect(cornerRadius: 16.0))
+                            .glassEffect(in: .rect(cornerRadius: 24.0))
 #endif
                     } else {
                         VisualEffectView(material: .systemThinMaterial)
-                            .cornerRadius(16)
+                            .cornerRadius(24)
                     }
 #else
                     if #available(macOS 26, *) {
                         Color.clear
 #if !os(visionOS)
-                            .glassEffect(in: .rect(cornerRadius: 16.0))
+                            .glassEffect(in: .rect(cornerRadius: 24.0))
 #endif
                     } else {
                         VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                            .cornerRadius(16)
+                            .cornerRadius(24)
                     }
 #endif
                     TextField(LocalizedStringKey(placeholder), text: $inputText, axis: .vertical)
