@@ -68,6 +68,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 #### Chat
 - **Fix issue where list bullets were not displayed**
+- **Improve the display of the thinking text to use Markdown**
 
 ## 1.2.2
 ### New Features

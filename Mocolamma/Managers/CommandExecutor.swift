@@ -1209,10 +1209,96 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    // チャットストリームを開始
+                    let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
+                    let isMarkdownTest = lastUserMessage == "Test Markdown" || lastUserMessage == "Markdownをテスト" || lastUserMessage == "マークダウンをテスト"
+                    
                     let created_at = Date()
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+                    if isMarkdownTest {
+                        let markdownText = """
+# 1. 大見出し（H1）: Markdownレンダリングの整合性と視覚的デザインを検証するための非常に長くて詳細なタイトルのテスト
+このセクションでは、基本的なテキスト装飾のテストを行います。**太字（Bold）**、*斜体（Italic）*、そして~~打ち消し線（Strikethrough）~~が正しく表示されているか確認してください。  
+文末にバックスラッシュを入れることで強制改行を行います。\\
+このように次の行へ継続されます。
+
+また、これは段落のテストです。2回の改行（空行）を挟むことで、新しい段落として認識される必要があります。
+
+## 2. 中見出し（H2）: リスト構造とネストされた項目のレンダリングに関する包括的なチェック項目
+リスト表示のスタイル（インデントや記号）を確認するためのテキストです。
+
+* 箇条書きの第1項目：リンゴ
+* 箇条書きの第2項目：バナナ
+    * ネストされた項目：モンキーバナナ
+* 箇条書きの第3項目：チェリー
+
+1.  順序付きリストの1番目
+2.  順序付きリストの2番目
+3.  順序付きリストの3番目
+
+### 3. 小見出し（H3）: リンクと画像の埋め込みに関するメディア要素の表示テスト
+外部リソースへの参照が正しく機能するかを確認します。
+
+* 外部リンクのテスト: [**Mocolammaのホームページ**](https://mocolamma.taikun.design/)
+* 画像のレンダリングテスト:
+![Mocolamma Introduction](https://github.com/taikun114/Mocolamma/blob/main/docs/images/Introduction-HP.webp?raw=true)
+
+#### 4. 見出し4（H4）: プログラミング言語 Swift を使用したインラインコードとコードブロックの構文強調テスト
+エンジニアリング向けのドキュメントにおいて、コードの読みやすさは非常に重要です。
+
+インラインで表示されるコードの例は `let message = "Hello, World!"` です。
+
+以下は、Swiftのコードブロックのテストです。
+```swift
+import Foundation
+
+struct User {
+    let id: Int
+    var name: String
+    
+    func greet() {
+        print("こんにちは、\\(name)さん！")
+    }
+}
+
+let developer = User(id: 1, name: "Taikun")
+developer.greet()
+```
+
+##### 5. 見出し5（H5）: 非常に深い階層における見出しのフォントサイズとマージンの適切性を確認するためのテキスト
+階層が深くなった際にも、上位の見出しと区別がつくデザインになっているか、あるいは文字が小さくなりすぎていないかを検証します。
+
+###### 6. 見出し6（H6）: 最小サイズの見出しにおける視認性とアクセシビリティを確保するための最終チェック
+これがMarkdownでサポートされる最小レベルの見出しです。通常、本文に近いサイズになりますが、太字や色などのスタイリングで構造が維持されていることを確認してください。
+"""
+                        
+                        let thinkingResponse = thinkingOption == .on ? markdownText : nil
+                        
+                        let responseChunk = ChatResponseChunk(
+                            model: model,
+                            createdAt: formatter.string(from: created_at),
+                            message: ChatMessage(
+                                role: "assistant",
+                                content: markdownText,
+                                thinking: thinkingResponse
+                            ),
+                            done: true,
+                            totalDuration: 1000000,
+                            loadDuration: 100000,
+                            promptEvalCount: 10,
+                            promptEvalDuration: 100000,
+                            evalCount: 5,
+                            evalDuration: 200000,
+                            doneReason: "stop"
+                        )
+                        
+                        continuation.yield(responseChunk)
+                        continuation.finish()
+                        return
+                    }
+
+                    // チャットストリームを開始
                     
                     if stream {
                         // ストリーミングモード（stream: true）

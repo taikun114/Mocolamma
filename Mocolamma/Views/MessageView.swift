@@ -1140,11 +1140,12 @@ struct MessageView: View {
                 DisclosureGroup {
                     VStack(alignment: .leading, spacing: 4) {
                         if let thinking = message.thinking, !thinking.isEmpty {
-                            Text(thinking)
+                            StructuredText(markdown: thinking)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
+                                .textual.textSelection(.enabled)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .textSelection(.enabled)
                         }
                     }
                 } label: {
@@ -1481,6 +1482,192 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 
 // MARK: - Document Support
 
+// MARK: - Dedicated Style for Thinking Text
+
+struct SimpleThinkingStyle: StructuredText.Style {
+    let message: ChatMessage
+
+    var inlineStyle: InlineStyle {
+        InlineStyle()
+            .strong(.bold)
+            .emphasis(.italic)
+            .link(
+                .foregroundColor(.accentColor.opacity(0.8)),
+                .underlineStyle(.single)
+            )
+            .code(
+                .monospaced,
+                .backgroundColor(Color.secondary.opacity(0.1))
+            )
+    }
+
+    var headingStyle: some StructuredText.HeadingStyle {
+        SimpleThinkingHeadingStyle()
+    }
+
+    var paragraphStyle: some StructuredText.ParagraphStyle {
+        SimpleThinkingParagraphStyle()
+    }
+
+    var blockQuoteStyle: some StructuredText.BlockQuoteStyle {
+        SimpleThinkingBlockQuoteStyle(message: message)
+    }
+
+    var codeBlockStyle: some StructuredText.CodeBlockStyle {
+        SimpleThinkingCodeBlockStyle(message: message)
+    }
+
+    var listItemStyle: some StructuredText.ListItemStyle {
+        SimpleThinkingListItemStyle()
+    }
+
+    var unorderedListMarker: some StructuredText.UnorderedListMarker {
+        StructuredText.SymbolListMarker.disc
+    }
+
+    var orderedListMarker: some StructuredText.OrderedListMarker {
+        MocolammaOrderedListMarker()
+    }
+
+    var tableStyle: some StructuredText.TableStyle {
+        SimpleThinkingTableStyle(message: message)
+    }
+
+    var tableCellStyle: some StructuredText.TableCellStyle {
+        SimpleThinkingTableCellStyle()
+    }
+
+    var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
+        StructuredText.DividerThematicBreakStyle.divider
+    }
+}
+
+struct SimpleThinkingHeadingStyle: StructuredText.HeadingStyle {
+    // シンキングテキスト用により小さいスケールを設定
+    private static let fontScales: [CGFloat] = [1.5, 1.4, 1.3, 1.2, 1.1, 1.0]
+
+    func makeBody(configuration: Configuration) -> some View {
+        let level = min(configuration.headingLevel, 6)
+        let fontScale = Self.fontScales[level - 1]
+
+        configuration.label
+            .textual.fontScale(fontScale)
+            .fontWeight(.bold)
+            .padding(.top, 4)
+            .padding(.bottom, 2)
+    }
+}
+
+struct SimpleThinkingParagraphStyle: StructuredText.ParagraphStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.lineSpacing(.fontScaled(0.2))
+            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.4)) // 余白を狭く
+    }
+}
+
+struct SimpleThinkingBlockQuoteStyle: StructuredText.BlockQuoteStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.leading, 8)
+            .padding(.vertical, 4)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.4))
+                    .frame(width: 3)
+            }
+    }
+}
+
+struct SimpleThinkingCodeBlockStyle: StructuredText.CodeBlockStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // シンキングテキスト内のコードブロックはヘッダーをより目立たなくする
+            HStack(alignment: .center) {
+                Text(hintText(configuration.languageHint))
+                    .font(.system(.caption2, design: .monospaced))
+                    .fontWeight(.bold)
+                    .foregroundColor(.secondary)
+                Spacer()
+                CopyCodeButton(configuration: configuration)
+                    .controlSize(.mini)
+            }
+            .padding(.leading, 10)
+            .padding(.trailing, 4)
+            .padding(.vertical, 4)
+            .background(Color.secondary.opacity(0.05))
+
+            Divider().opacity(0.3)
+
+            Overflow(isIntegratedSelection: true) {
+                configuration.label
+                    .monospaced()
+                    .textual.lineSpacing(.fontScaled(0.2))
+                    .padding(8)
+            }
+        }
+        .background(Color.secondary.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .padding(.vertical, 4)
+        .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.4))
+    }
+
+    private func hintText(_ hint: String?) -> String {
+        guard let hint = hint?.uppercased() else {
+            return String(localized: "Code")
+        }
+        return hint
+    }
+}
+
+struct SimpleThinkingListItemStyle: StructuredText.ListItemStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            configuration.marker
+                .scaleEffect(0.8)
+            configuration.block
+        }
+    }
+}
+
+struct SimpleThinkingTableStyle: StructuredText.TableStyle {
+    let message: ChatMessage
+    private static let borderWidth: CGFloat = 0.5
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
+            .textual.blockSpacing(.fontScaled(top: 1, bottom: 1))
+            .textual.tableOverlay { layout in
+                Canvas { context, _ in
+                    for divider in layout.dividers() {
+                        context.fill(
+                            Path(divider),
+                            with: .style(Color.secondary.opacity(0.3))
+                        )
+                    }
+                }
+            }
+            .padding(Self.borderWidth)
+            .overlay {
+                RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.secondary.opacity(0.3), lineWidth: Self.borderWidth)
+            }
+    }
+}
+
+struct SimpleThinkingTableCellStyle: StructuredText.TableCellStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(4)
+            .textual.textSelection(.enabled)
+    }
+}
+
 struct ImageDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.png] }
     var image: Data
@@ -1501,4 +1688,5 @@ struct ImageDocument: FileDocument {
         return FileWrapper(regularFileWithContents: image)
     }
 }
+
 
