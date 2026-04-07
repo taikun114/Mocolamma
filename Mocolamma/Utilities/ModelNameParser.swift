@@ -15,7 +15,7 @@ struct ModelNameParser {
         if lowercased.contains("ollama") {
             // 正規表現でモデル名を抽出
             // ollama (run|pull|show|push|cp|rm) の後に続く、英数字、ドット、ハイフン、アンダースコア、コロンの組み合わせを抽出
-            let pattern = #"(?i)ollama\s+(?:run|pull|show|push|cp|rm)\s+([a-zA-Z0-9.\-_:]+)"#
+            let pattern = #"(?i)ollama\s+(?:run|pull|show|push|cp|rm)\s+([a-zA-Z0-9.\-_:/]+)"#
             if let regex = try? NSRegularExpression(pattern: pattern, options: []),
                let match = regex.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)) {
                 if let range = Range(match.range(at: 1), in: trimmed) {

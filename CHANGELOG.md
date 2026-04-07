@@ -2,7 +2,37 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 <!--
-The order of listing is as follows.
+The order of listing is as follows (1.2.3 or later):
+- New Features
+  - General
+  - Server
+  - Model
+  - Chat and Image Generation
+  - Chat
+  - Image Generation
+- Bug Fixes and Improvements
+  - General
+  - Server
+  - Model
+  - Chat and Image Generation
+  - Chat
+  - Image Generation
+
+Each section lists items in the following order:
+- Notable Information
+- Support
+- Additions
+- Fixes
+- Improvements
+- Changes
+- Removals
+
+Notes
+- Make the first level of the list bold
+- Make links bold
+- When linking to Issues, Pull Requests, or Discussions, include the full URL
+
+In version 1.2.2 or earlier, it was listed as follows:
 - New Features
   - Notable Information
   - Support
@@ -13,23 +43,26 @@ The order of listing is as follows.
   - Changes
   - Additions
   - Removals
-
-Notes
-- Make the first level of the list bold
-- Make links bold
-- When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
 ## 1.2.3
 ### New Features
+#### Model
 - **Support audio model tag**
 - **Add a feature that allows scrolling by dragging tags in the model inspector**
-- **Add the ability to load and unload models from the context menu of each model in the model screen**
+- **Add the ability to load and unload models from the context menu of each model**
   - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
 
 ### Bug Fixes and Improvements
+#### Server
 - **Improve the display of connection status in server inspector**
+
+#### Model
 - **Fix issue where the model filter icon was not displayed in macOS Sequoia**
+- **Fix issue where models could not be added in a specific format**
+  - Fixed an issue where models could not be downloaded if the model name contained a `/` in the `ollama` command format.
+
+#### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**
 
 ## 1.2.2
