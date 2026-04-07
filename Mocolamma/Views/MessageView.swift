@@ -1251,7 +1251,7 @@ struct SimpleStyle: StructuredText.Style {
     }
 
     var orderedListMarker: some StructuredText.OrderedListMarker {
-        StructuredText.DecimalListMarker.decimal
+        MocolammaOrderedListMarker()
     }
 
     var tableStyle: some StructuredText.TableStyle {
@@ -1269,7 +1269,17 @@ struct SimpleStyle: StructuredText.Style {
 
 struct SimpleListItemStyle: StructuredText.ListItemStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.block
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            configuration.marker
+            configuration.block
+        }
+    }
+}
+
+struct MocolammaOrderedListMarker: StructuredText.OrderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        Text(verbatim: "\(configuration.ordinal).")
+            .monospacedDigit()
     }
 }
 

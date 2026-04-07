@@ -65,6 +65,9 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**
 
+#### Chat
+- **Fix issue where list bullets were not displayed**
+
 ## 1.2.2
 ### New Features
 - **Add a copy button to code blocks in the chat screen**
