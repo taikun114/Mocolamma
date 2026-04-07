@@ -204,6 +204,7 @@ struct ModelListView: View {
                         Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
                     }
                 }
+                .labelStyle(.titleAndIcon)
                 .pickerStyle(.inline)
             } label: {
                 Label("Filter", systemImage: filterIconName)
@@ -226,6 +227,7 @@ struct ModelListView: View {
                             Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
                         }
                     }
+                    .labelStyle(.titleAndIcon)
                     .pickerStyle(.inline)
                 } label: {
                     Label("Filter", systemImage: filterIconName)
