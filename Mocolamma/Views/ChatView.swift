@@ -302,9 +302,15 @@ struct ChatView: View {
                 }
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Divider()
-                    Text(LocalizedStringKey("No models available"))
-                        .tag("no-models-available-tag" as OllamaModel.ID?)
-                        .selectionDisabled(true)
+                    if executor.isRunning {
+                        Text("Loading models...")
+                            .tag("loading-models-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    } else {
+                        Text("No models available")
+                            .tag("no-models-available-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    }
                 }
             }
             .pickerStyle(.menu)
@@ -356,7 +362,11 @@ struct ChatView: View {
                 }
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Section {
-                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
+                        if executor.isRunning {
+                            Button(action: {}) { Text("Loading models...") }.disabled(true)
+                        } else {
+                            Button(action: {}) { Text("No models available") }.disabled(true)
+                        }
                     }
                 }
             } label: {
@@ -986,9 +996,15 @@ struct ImageGenerationView: View {
                 }
                 if executor.models.filter({ $0.isImageModel }).isEmpty {
                     Divider()
-                    Text(LocalizedStringKey("No models available"))
-                        .tag("no-image-models-available-tag" as OllamaModel.ID?)
-                        .selectionDisabled(true)
+                    if executor.isRunning {
+                        Text("Loading models...")
+                            .tag("loading-image-models-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    } else {
+                        Text("No models available")
+                            .tag("no-image-models-available-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    }
                 }
             }
             .pickerStyle(.menu)
@@ -1023,7 +1039,11 @@ struct ImageGenerationView: View {
                 }
                 if executor.models.filter({ $0.isImageModel }).isEmpty {
                     Section {
-                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
+                        if executor.isRunning {
+                            Button(action: {}) { Text("Loading models...") }.disabled(true)
+                        } else {
+                            Button(action: {}) { Text("No models available") }.disabled(true)
+                        }
                     }
                 }
             } label: {
