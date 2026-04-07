@@ -26,6 +26,9 @@ enum ServerConnectionStatus {
         case .connected:
             return String(localized: "Connected successfully.")
         case .notConnected(let code):
+            if code == -1004 {
+                return String(localized: "Connection failed. Please check if the Ollama server is running.")
+            }
             return String(localized: "Failed to connect. (HTTP \(code))")
         case .errorWithMessage(_, let message):
             return message ?? String(localized: "An unknown error occurred.")
