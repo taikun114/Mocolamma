@@ -1209,7 +1209,7 @@ struct SimpleStyle: StructuredText.Style {
 
     var inlineStyle: InlineStyle {
         InlineStyle()
-            .strong(.bold)
+            .strong(.fontWeight(.black))
             .emphasis(.italic)
             .link(
                 .foregroundColor(message.role == "user" ? Color.white : Color.accentColor),
@@ -1248,7 +1248,7 @@ struct SimpleStyle: StructuredText.Style {
     }
 
     var unorderedListMarker: some StructuredText.UnorderedListMarker {
-        StructuredText.SymbolListMarker.disc
+        MocolammaUnorderedListMarker()
     }
 
     var orderedListMarker: some StructuredText.OrderedListMarker {
@@ -1271,9 +1271,30 @@ struct SimpleStyle: StructuredText.Style {
 struct SimpleListItemStyle: StructuredText.ListItemStyle {
     func makeBody(configuration: Configuration) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            configuration.marker
+            ZStack(alignment: .trailing) {
+                Color.clear
+                    .frame(width: 20, height: 1)
+                configuration.marker
+            }
             configuration.block
         }
+        .padding(.leading, -4)
+    }
+}
+
+struct MocolammaUnorderedListMarker: StructuredText.UnorderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        StructuredText.SymbolListMarker.disc
+            .makeBody(configuration: configuration)
+            .offset(y: -3.5)
+    }
+}
+
+struct MocolammaThinkingUnorderedListMarker: StructuredText.UnorderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        StructuredText.SymbolListMarker.disc
+            .makeBody(configuration: configuration)
+            .offset(y: -2.0)
     }
 }
 
@@ -1311,7 +1332,7 @@ struct SimpleTableStyle: StructuredText.TableStyle {
 }
 
 struct SimpleHeadingStyle: StructuredText.HeadingStyle {
-    private static let fontScales: [CGFloat] = [2.0, 1.75, 1.5, 1.25, 1.0, 0.8]
+    private static let fontScales: [CGFloat] = [2.0, 1.8, 1.6, 1.4, 1.2, 1.0]
 
     func makeBody(configuration: Configuration) -> some View {
         let level = min(configuration.headingLevel, 6)
@@ -1320,8 +1341,8 @@ struct SimpleHeadingStyle: StructuredText.HeadingStyle {
         configuration.label
             .textual.fontScale(fontScale)
             .fontWeight(.bold)
-            .padding(.top, 8)
-            .padding(.bottom, 4)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
     }
 }
 
@@ -1338,7 +1359,8 @@ struct SimpleBlockQuoteStyle: StructuredText.BlockQuoteStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
             .overlay(alignment: .leading) {
                 Rectangle()
                     .fill(message.role == "user" ? Color.white : Color.gray)
@@ -1374,6 +1396,7 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
             // コード本体
             Overflow(isIntegratedSelection: true) {
                 configuration.label
+                    .textual.fontScale(0.9)
                     .monospaced()
                     .textual.lineSpacing(.fontScaled(0.39))
                     .padding()
@@ -1489,7 +1512,7 @@ struct SimpleThinkingStyle: StructuredText.Style {
 
     var inlineStyle: InlineStyle {
         InlineStyle()
-            .strong(.bold)
+            .strong(.fontWeight(.black))
             .emphasis(.italic)
             .link(
                 .foregroundColor(.accentColor.opacity(0.8)),
@@ -1522,7 +1545,7 @@ struct SimpleThinkingStyle: StructuredText.Style {
     }
 
     var unorderedListMarker: some StructuredText.UnorderedListMarker {
-        StructuredText.SymbolListMarker.disc
+        MocolammaThinkingUnorderedListMarker()
     }
 
     var orderedListMarker: some StructuredText.OrderedListMarker {
@@ -1553,8 +1576,8 @@ struct SimpleThinkingHeadingStyle: StructuredText.HeadingStyle {
         configuration.label
             .textual.fontScale(fontScale)
             .fontWeight(.bold)
-            .padding(.top, 4)
-            .padding(.bottom, 2)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
     }
 }
 
@@ -1572,7 +1595,7 @@ struct SimpleThinkingBlockQuoteStyle: StructuredText.BlockQuoteStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(.leading, 8)
-            .padding(.vertical, 4)
+            .padding(.vertical, 2)
             .overlay(alignment: .leading) {
                 Rectangle()
                     .fill(Color.secondary.opacity(0.4))
@@ -1605,6 +1628,7 @@ struct SimpleThinkingCodeBlockStyle: StructuredText.CodeBlockStyle {
 
             Overflow(isIntegratedSelection: true) {
                 configuration.label
+                    .textual.fontScale(0.9)
                     .monospaced()
                     .textual.lineSpacing(.fontScaled(0.2))
                     .padding(8)
@@ -1627,8 +1651,11 @@ struct SimpleThinkingCodeBlockStyle: StructuredText.CodeBlockStyle {
 struct SimpleThinkingListItemStyle: StructuredText.ListItemStyle {
     func makeBody(configuration: Configuration) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
-            configuration.marker
-                .scaleEffect(0.8)
+            ZStack(alignment: .trailing) {
+                Color.clear
+                    .frame(width: 16, height: 1)
+                configuration.marker
+            }
             configuration.block
         }
     }
