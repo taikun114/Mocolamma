@@ -1241,7 +1241,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
 外部リソースへの参照が正しく機能するかを確認します。
 
 * 外部リンクのテスト: [**Mocolammaのホームページ**](https://mocolamma.taikun.design/)
-* 画像のレンダリングテスト:
+*   画像のレンダリングテスト（インデントあり）:
+        ![Mocolamma Introduction Indented](https://github.com/taikun114/Mocolamma/blob/main/docs/images/Introduction-HP.webp?raw=true)
+
+画像のレンダリングテスト（インデントなし）：
 ![Mocolamma Introduction](https://github.com/taikun114/Mocolamma/blob/main/docs/images/Introduction-HP.webp?raw=true)
 
 #### 4. 見出し4（H4）: プログラミング言語 Swift を使用したインラインコードとコードブロックの構文強調テスト
@@ -1251,19 +1254,38 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
 
 以下は、Swiftのコードブロックのテストです。
 ```swift
-import Foundation
+import SwiftUI
 
-struct User {
-    let id: Int
-    var name: String
+struct MarkdownTestView: View {
+    @State private var isScrolling: Bool = false
     
-    func greet() {
-        print("こんにちは、\\(name)さん！")
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: true) {
+            HStack(spacing: 20) {
+                ForEach(0..<100) { index in
+                    VStack {
+                        Image(systemName: "swift")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .foregroundStyle(.orange)
+                        
+                        Text("Item \(index)")
+                            .font(.caption)
+                            .bold()
+                    }
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.2), lineWidth: 1))
+                }
+            }
+            .padding()
+        }
+        .frame(height: 150)
+        .background(Material.thin)
+        .navigationTitle("This is an extremely long title designed to test horizontal scrolling in the code block container.")
     }
 }
-
-let developer = User(id: 1, name: "Taikun")
-developer.greet()
 ```
 
 ##### 5. 見出し5（H5）: 非常に深い階層における見出しのフォントサイズとマージンの適切性を確認するためのテキスト
