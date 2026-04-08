@@ -105,10 +105,8 @@ struct MessageView: View {
 
                 .lineSpacing(4)
             
-            HStack {
-                EmptyView()
-            }
-            .id(isStreamingAny)
+            Spacer()
+                .frame(height: 0)
             
 #if !os(macOS)
             Spacer().frame(height: 8)
@@ -770,8 +768,7 @@ struct MessageView: View {
             .help("Edit")
             .disabled(isStreamingAny)
         }
-        .id(isStreamingAny)
-    }
+        }
     
     @ViewBuilder
     private var cancelButton: some View {
@@ -841,7 +838,6 @@ struct MessageView: View {
         .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
-        .id(isStreamingAny ? "on" : "off")
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
             Button("Send") {
                 performDone(skipImages: true)

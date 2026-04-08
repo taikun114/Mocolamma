@@ -152,20 +152,21 @@ struct ChatMessagesScrollView: View {
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 geometry.contentSize.height
             } action: { oldHeight, newHeight in
-                // ストリーミング中で、かつユーザーが底付近にいる場合に、コンテンツが伸びたらスクロール
-                if isOverallStreaming && isNearBottom && newHeight > oldHeight {
+                // ユーザーが底付近にいる場合のみ、コンテンツが伸びたらスクロール追従
+                if isNearBottom && newHeight > oldHeight {
                     scrollBottom(proxy: proxy)
                 }
             }
             .onChange(of: messages.count) { oldCount, newCount in
                 if newCount > oldCount {
-                    // 新しいメッセージが追加されたときのみスクロール
+                    // 新しいメッセージが追加されたときは、現在の位置に関わらず底に移動（UX上の期待値）
                     scrollBottom(proxy: proxy)
                 }
             }
-            // 最後のメッセージの内容（ストリーミング）が更新された時も追従したい場合
-            .onChange(of: isOverallStreaming) { _, newValue in
-                if newValue {
+            // 最後のメッセージの内容（ストリーミング）が開始・終了した際
+            .onChange(of: isOverallStreaming) { _, _ in
+                // ユーザーが底付近にいる場合のみ、完了時などのレイアウト変更に追従
+                if isNearBottom {
                     scrollBottom(proxy: proxy)
                 }
             }
@@ -174,8 +175,15 @@ struct ChatMessagesScrollView: View {
     
     private func scrollBottom(proxy: ScrollViewProxy) {
         Task {
-            // レイアウト確定を待つための最小限の遅延
-            try? await Task.sleep(nanoseconds: 50_000_000) 
+            // 1回目のスクロール：即応性を重視
+            try? await Task.sleep(nanoseconds: 10_000_000) // 10ms
+            withAnimation(reduceMotionEnabled ? .none : .default) {
+                proxy.scrollTo("bottom-spacer", anchor: .bottom)
+            }
+            
+            // 2回目のスクロール：レイアウトが完全に落ち着いた後の微調整用
+            // 50ms〜100ms程度待つことで、複雑なレイアウト変更（ボタンの出現など）後の位置を確定させる
+            try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
             withAnimation(reduceMotionEnabled ? .none : .default) {
                 proxy.scrollTo("bottom-spacer", anchor: .bottom)
             }
