@@ -1217,10 +1217,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
                     if isMarkdownTest {
-                        let markdownText = """
+                    let markdownText = #"""
 # 1. 大見出し（H1）: Markdownレンダリングの整合性と視覚的デザインを検証するための非常に長くて詳細なタイトルのテスト
 このセクションでは、基本的なテキスト装飾のテストを行います。**太字（Bold）**、*斜体（Italic）*、そして~~打ち消し線（Strikethrough）~~が正しく表示されているか確認してください。  
-文末にバックスラッシュを入れることで強制改行を行います。\\
+文末にバックスラッシュを入れることで強制改行を行います。\
 このように次の行へ継続されます。
 
 また、これは段落のテストです。2回の改行（空行）を挟むことで、新しい段落として認識される必要があります。
@@ -1323,7 +1323,7 @@ struct MarkdownTestView: View {
 
 ###### 7. 見出し6（H6）: 最小サイズの見出しにおける視認性とアクセシビリティを確保するための最終チェック
 これがMarkdownでサポートされる最小レベルの見出しです。通常、本文に近いサイズになりますが、太字や色などのスタイリングで構造が維持されていることを確認してください。
-"""
+"""#
                         
                         let thinkingResponse = thinkingOption == .on ? markdownText : nil
                         

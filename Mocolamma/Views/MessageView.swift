@@ -34,6 +34,7 @@ struct MessageView: View {
     @State private var showingSaveOptions = false
     @State private var showingFileExporter = false
     @State private var imageDocument: ImageDocument?
+    @State private var isThinkingExpanded: Bool = false
     
     private var isDownloadSuccessful: Bool {
         executor.successfullyDownloadedIDs.contains(message.id)
@@ -1117,13 +1118,12 @@ struct MessageView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if !message.content.isEmpty {
-                    let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
-                        ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
-                        : message.content
+                    let displayContent = message.content
                     StructuredText(markdown: displayContent)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
                         .textual.textSelection(.enabled)
+                        .textual.syntaxHighlightingEnabled(!message.isStreaming)
                         .textual.overflowMode(.scroll)
                         .compositingGroup() // 描画を最適化
                 } else {
@@ -1133,23 +1133,41 @@ struct MessageView: View {
             }
         } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
-                DisclosureGroup {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let thinking = message.thinking, !thinking.isEmpty {
-                            StructuredText(markdown: thinking)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                                .textual.textSelection(.enabled)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isThinkingExpanded.toggle()
                     }
-                } label: {
-                    Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
-                        .foregroundColor(.secondary)
-                        .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
+                }) {
+                    HStack {
+                        Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
+                            .foregroundColor(.secondary)
+                            .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .rotationEffect(.degrees(isThinkingExpanded ? 90 : 0))
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .help(isThinkingExpanded ? "Collapse thinking process" : "Expand thinking process")
                 .padding(.bottom, 4)
+                
+                if isThinkingExpanded {
+                    if let thinking = message.thinking, !thinking.isEmpty {
+                        StructuredText(markdown: thinking)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
+                            .textual.textSelection(.enabled)
+                            .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .compositingGroup() // 描画を最適化
+                    }
+                }
                 
                 streamingContentBody
             }
@@ -1175,13 +1193,12 @@ struct MessageView: View {
                 .foregroundColor(.secondary)
         } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
-                let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
-                    ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
-                    : message.content
+                let displayContent = message.content
                 StructuredText(markdown: displayContent)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
                     .textual.textSelection(.enabled)
+                    .textual.syntaxHighlightingEnabled(!message.isStreaming)
                     .textual.overflowMode(.scroll)
                     .compositingGroup() // 描画を最適化
             }

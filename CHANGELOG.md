@@ -71,6 +71,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Fix issue where auto-follow scrolling would sometimes jumps**
 - **Improve the display of the thinking text to use Markdown**
 - **Improve Markdown styling**
+- **Improve the performance of the thinking process**
 
 ## 1.2.2
 ### New Features
