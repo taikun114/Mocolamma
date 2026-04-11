@@ -5,9 +5,9 @@ import SwiftUI
 /// アプリケーションのメインサイドバーからアクセスされるサーバーコンテンツのUIを定義するSwiftUIビューです。
 /// サーバーのリストを表示し、新しいサーバーの追加、既存サーバーの編集を管理します。
 struct ServerView: View {
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     var executor: CommandExecutor
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     
     @State private var showingAddServerSheet = false
     @State private var serverToEdit: ServerInfo?
@@ -86,7 +86,7 @@ struct ServerView: View {
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
 #if os(visionOS)
             .frame(width: 500, height: 300)
@@ -96,7 +96,7 @@ struct ServerView: View {
         .sheet(item: $serverToEdit) { server in
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
 #if os(visionOS)
             .frame(width: 500, height: 300)
@@ -186,13 +186,13 @@ struct ServerView: View {
 }
 
 private struct ServerListViewContent: View {
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     var executor: CommandExecutor
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
-    @ObservedObject var appRefreshTrigger: RefreshTrigger
+    var appRefreshTrigger: RefreshTrigger
     
     var body: some View {
         List(selection: $listSelection) {
@@ -257,7 +257,7 @@ private struct ServerListViewContent: View {
 
 private struct ServerRowContent: View {
     let server: ServerInfo
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
@@ -297,21 +297,23 @@ private struct ServerRowContent: View {
 // MARK: - プレビュー
 
 #Preview {
-    let previewServerManager = ServerManager()
+    let previewServerManager: ServerManager = {
+        let sm = ServerManager()
+        sm.servers = [
+            ServerInfo(name: "Local", host: "localhost:11434"),
+            ServerInfo(name: "Remote Server 1", host: "192.168.1.50:11434"),
+            ServerInfo(name: "Remote Server 2", host: "api.example.com:11434")
+        ]
+        sm.selectedServerID = sm.servers.first?.id
+        return sm
+    }()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
     
-    previewServerManager.servers = [
-        ServerInfo(name: "Local", host: "localhost:11434"),
-        ServerInfo(name: "Remote Server 1", host: "192.168.1.50:11434"),
-        ServerInfo(name: "Remote Server 2", host: "api.example.com:11434")
-    ]
-    previewServerManager.selectedServerID = previewServerManager.servers.first?.id
-    
-    return ServerView(
+    ServerView(
         serverManager: previewServerManager,
         executor: previewCommandExecutor,
         onTogglePreview: { print("ServerView_Preview: Dummy onTogglePreview called.") },
         selectedServerForInspector: .constant(previewServerManager.servers.first)
     )
-    .environmentObject(RefreshTrigger())
+    .environment(RefreshTrigger())
 }

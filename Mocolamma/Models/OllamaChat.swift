@@ -2,6 +2,7 @@ import SwiftUI
 import Foundation
 import ImageIO
 import UniformTypeIdentifiers
+import Observation
 
 #if os(macOS)
 typealias PlatformImage = NSImage
@@ -107,42 +108,43 @@ extension ChatInputImage {
 // MARK: - チャットAPI リクエスト/レスポンス モデル
 
 /// チャット会話における単一のメッセージを表します。
-class ChatMessage: ObservableObject, Identifiable, Codable, Equatable {
+@Observable
+class ChatMessage: Identifiable, Codable, Equatable {
     let id = UUID()
-    @Published var role: String
-    @Published var content: String
-    @Published var thinking: String?
-    @Published var images: [String]? // Base64でエンコードされた画像
-    @Published var toolCalls: [ToolCall]?
-    @Published var toolName: String?
-    @Published var createdAt: String? // メッセージが作成された日時
-    @Published var totalDuration: Int? // 応答生成にかかった合計時間 (ナノ秒)
-    @Published var evalCount: Int? // 応答内のトークン数
-    @Published var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
-    @Published var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
-    @Published var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
-    @Published var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
-    @Published var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
+    var role: String
+    var content: String
+    var thinking: String?
+    var images: [String]? // Base64でエンコードされた画像
+    var toolCalls: [ToolCall]?
+    var toolName: String?
+    var createdAt: String? // メッセージが作成された日時
+    var totalDuration: Int? // 応答生成にかかった合計時間 (ナノ秒)
+    var evalCount: Int? // 応答内のトークン数
+    var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
+    var isStreaming: Bool = false // ストリーミング中かどうかを示すフラグ
+    var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
+    var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
+    var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
     
     // 画像生成関連のプロパティ
-    @Published var generatedImage: String? // 生成された画像 (Base64)
-    @Published var imageProgressCompleted: Int? // 現在のステップ数
-    @Published var imageProgressTotal: Int? // 合計ステップ数
-    @Published var isImageGeneration: Bool = false // 画像生成メッセージかどうか
+    var generatedImage: String? // 生成された画像 (Base64)
+    var imageProgressCompleted: Int? // 現在のステップ数
+    var imageProgressTotal: Int? // 合計ステップ数
+    var isImageGeneration: Bool = false // 画像生成メッセージかどうか
     
     // 新しいプロパティ（やり直し履歴など）
-    @Published var revisions: [ChatMessage] = [] // やり直し履歴
-    @Published var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
-    @Published var originalContent: String? // メッセージの最初の内容を保持
-    @Published var latestContent: String? // メッセージの最新のやり直し結果を保持
-    @Published var latestGeneratedImage: String? // 最新の生成画像を保持
-    @Published var finalThinking: String? // 最終的な思考内容を保持
-    @Published var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
-    @Published var finalCreatedAt: String? // 最終的な作成日時
-    @Published var finalTotalDuration: Int? // 最終的な合計時間
-    @Published var finalEvalCount: Int? // 最終的なトークン数
-    @Published var finalEvalDuration: Int? // 最終的な評価時間
-    @Published var finalIsStopped: Bool = false // 最終的な停止状態
+    var revisions: [ChatMessage] = [] // やり直し履歴
+    var currentRevisionIndex: Int = 0 // 現在の履歴インデックス
+    var originalContent: String? // メッセージの最初の内容を保持
+    var latestContent: String? // メッセージの最新のやり直し結果を保持
+    var latestGeneratedImage: String? // 最新の生成画像を保持
+    var finalThinking: String? // 最終的な思考内容を保持
+    var finalIsThinkingCompleted: Bool = false // 最終的な思考完了状態を保持
+    var finalCreatedAt: String? // 最終的な作成日時
+    var finalTotalDuration: Int? // 最終的な合計時間
+    var finalEvalCount: Int? // 最終的なトークン数
+    var finalEvalDuration: Int? // 最終的な評価時間
+    var finalIsStopped: Bool = false // 最終的な停止状態
     
     enum CodingKeys: String, CodingKey {
         case role
@@ -629,48 +631,42 @@ func clampOllamaSeed(_ seed: Int) -> Int {
     max(-OLLAMA_SEED_SAFE_LIMIT, min(OLLAMA_SEED_SAFE_LIMIT, seed))
 }
 
+@Observable
 @MainActor
-class ChatSettings: ObservableObject {
-    @Published var selectedModelID: OllamaModel.ID?
-    @Published var selectedModelContextLength: Int?
-    @Published var selectedModelCapabilities: [String]?
-    @Published var isStreamingEnabled: Bool = true
-    @Published var keepAliveOption: KeepAliveOption = .default
-    @Published var customKeepAliveValue: Int = 5
-    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
-    @Published var useCustomChatSettings: Bool = false
-    @Published var chatTemperature: Double = 0.8
-    @Published var isTemperatureEnabled: Bool = false
-    @Published var isContextWindowEnabled: Bool = false
-    @Published var contextWindowValue: Double = 2048.0
-    @Published var isSystemPromptEnabled: Bool = false
-    @Published var systemPrompt: String = ""
-    @Published var thinkingOption: ThinkingOption = .none
+class ChatSettings {
+    var selectedModelID: OllamaModel.ID?
+    var selectedModelContextLength: Int?
+    var selectedModelCapabilities: [String]?
+    var isStreamingEnabled: Bool = true
+    var keepAliveOption: KeepAliveOption = .default
+    var customKeepAliveValue: Int = 5
+    var customKeepAliveUnit: KeepAliveUnit = .minutes
+    var useCustomChatSettings: Bool = false
+    var chatTemperature: Double = 0.8
+    var isTemperatureEnabled: Bool = false
+    var isContextWindowEnabled: Bool = false
+    var contextWindowValue: Double = 2048.0
+    var isSystemPromptEnabled: Bool = false
+    var systemPrompt: String = ""
+    var thinkingOption: ThinkingOption = .none
     
     // 追加のカスタム設定
-    @Published var repeatLastNOption: RepeatLastNOption = .none
-    @Published var repeatLastNValue: Int = 64
-    @Published var isRepeatPenaltyEnabled: Bool = false
-    @Published var repeatPenaltyValue: Double = 1.1
-    @Published var numPredictOption: NumPredictOption = .none
-    @Published var numPredictValue: Int = 42
-    @Published var isTopKEnabled: Bool = false
-    @Published var topKValue: Int = 40
-    @Published var isTopPEnabled: Bool = false
-    @Published var topPValue: Double = 0.9
-    @Published var isMinPEnabled: Bool = false
-    @Published var minPValue: Double = 0.0
+    var repeatLastNOption: RepeatLastNOption = .none
+    var repeatLastNValue: Int = 64
+    var isRepeatPenaltyEnabled: Bool = false
+    var repeatPenaltyValue: Double = 1.1
+    var numPredictOption: NumPredictOption = .none
+    var numPredictValue: Int = 42
+    var isTopKEnabled: Bool = false
+    var topKValue: Int = 40
+    var isTopPEnabled: Bool = false
+    var topPValue: Double = 0.9
+    var isMinPEnabled: Bool = false
+    var minPValue: Double = 0.0
     
     // シード値設定
-    @Published var isSeedEnabled: Bool = false
-    @Published var seed: Int = 0 {
-        didSet {
-            let clamped = clampOllamaSeed(seed)
-            if seed != clamped {
-                seed = clamped
-            }
-        }
-    }
+    var isSeedEnabled: Bool = false
+    var seed: Int = 0
     
     var finalKeepAlive: JSONValue? {
         keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
@@ -737,43 +733,31 @@ struct ImageGenerationResponseChunk: Codable {
 
 // MARK: - 画像生成設定
 
+@Observable
 @MainActor
-class ImageGenerationSettings: ObservableObject {
-    @Published var selectedModelID: OllamaModel.ID?
-    @Published var isStreamingEnabled: Bool = true
-    @Published var keepAliveOption: KeepAliveOption = .default
-    @Published var customKeepAliveValue: Int = 5
-    @Published var customKeepAliveUnit: KeepAliveUnit = .minutes
+class ImageGenerationSettings {
+    var selectedModelID: OllamaModel.ID?
+    var isStreamingEnabled: Bool = true
+    var keepAliveOption: KeepAliveOption = .default
+    var customKeepAliveValue: Int = 5
+    var customKeepAliveUnit: KeepAliveUnit = .minutes
     
     // 基本設定
-    @Published var width: Double = 512 {
-        didSet { customWidth = Int(width) }
-    }
-    @Published var height: Double = 512 {
-        didSet { customHeight = Int(height) }
-    }
-    @Published var steps: Double = 8 {
-        didSet { customSteps = Int(steps) }
-    }
+    var width: Double = 512
+    var height: Double = 512
+    var steps: Double = 8
     
     // カスタム設定
-    @Published var customWidthEnabled: Bool = false
-    @Published var customWidth: Int = 512
-    @Published var customHeightEnabled: Bool = false
-    @Published var customHeight: Int = 512
-    @Published var customStepsEnabled: Bool = false
-    @Published var customSteps: Int = 8
+    var customWidthEnabled: Bool = false
+    var customWidth: Int = 512
+    var customHeightEnabled: Bool = false
+    var customHeight: Int = 512
+    var customStepsEnabled: Bool = false
+    var customSteps: Int = 8
     
     // シード値設定
-    @Published var isSeedEnabled: Bool = false
-    @Published var seed: Int = 0 {
-        didSet {
-            let clamped = clampOllamaSeed(seed)
-            if seed != clamped {
-                seed = clamped
-            }
-        }
-    }
+    var isSeedEnabled: Bool = false
+    var seed: Int = 0
     
     // 実際にAPIに送る値を取得するヘルパー
     var finalWidth: Int {

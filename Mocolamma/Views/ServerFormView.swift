@@ -7,8 +7,8 @@ import UniversalSFSymbolsPicker
 /// サーバー名とホストURLの入力欄を提供し、保存時に接続確認を行います。
 struct ServerFormView: View {
     @Environment(\.dismiss) var dismiss // シートを閉じるための環境変数
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @ObservedObject var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
     var executor: CommandExecutor // @ObservedObjectを削除
     
     @State private var serverNameInput: String

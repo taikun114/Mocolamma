@@ -1,16 +1,15 @@
 import SwiftUI
 #if os(macOS)
 import ServiceManagement
-#endif
-#if os(macOS)
 import AppKit
 #endif
 import Network
+import Observation
 
 struct SettingsView: View {
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
-    @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @State private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var showingInstructions: Bool = false
     @State private var showingAbout: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
@@ -324,8 +323,9 @@ final class LoginItemManager {
 }
 #endif
 
-final class LocalNetworkPermissionChecker: ObservableObject {
-    @Published var isAllowed: Bool = false
+@Observable
+final class LocalNetworkPermissionChecker {
+    var isAllowed: Bool = false
     
     private let authorizer = LocalNetworkAuthorization()
     

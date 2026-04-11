@@ -30,9 +30,9 @@ enum SortOrder: String, CaseIterable, Identifiable {
 /// モデルリストに関連するUIとロジックをカプセル化したビューです。
 /// ContentViewから必要なデータとバインディングを受け取って表示を更新します。
 struct ModelListView: View {
-    var executor: CommandExecutor // @ObservedObjectを削除
-    @EnvironmentObject var serverManager: ServerManager
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    var executor: CommandExecutor
+    @Environment(ServerManager.self) var serverManager
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     @Binding var selectedModel: OllamaModel.ID? // 選択されたモデルのIDをバインディングで受け取ります
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>] // ソート順をバインディングで受け取ります
     
@@ -449,7 +449,7 @@ struct ModelListContentView: View {
     var bottomInset: CGFloat = 0
     @State private var modelForCustomKeepAlive: OllamaModel?
     
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     
     var body: some View {
         Group {

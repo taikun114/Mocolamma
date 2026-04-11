@@ -6,8 +6,8 @@ import PhotosUI
 
 struct MessageView: View {
     @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var chatSettings: ChatSettings
-    @ObservedObject var message: ChatMessage
+    @Environment(ChatSettings.self) var chatSettings
+    var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
@@ -56,6 +56,7 @@ struct MessageView: View {
     
     var body: some View {
         @Bindable var executor = executor
+        @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
                 .padding(10)
@@ -881,6 +882,7 @@ struct MessageView: View {
     
     @ViewBuilder
     private var messageContentView: some View {
+        @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
             if message.isProcessingImages {
                 HStack(spacing: 8) {

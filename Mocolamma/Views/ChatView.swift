@@ -5,9 +5,9 @@ import UniformTypeIdentifiers
 
 struct ChatView: View {
     @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var serverManager: ServerManager
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @EnvironmentObject var chatSettings: ChatSettings
+    @Environment(ServerManager.self) var serverManager
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    @Environment(ChatSettings.self) var chatSettings
     
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
@@ -280,6 +280,8 @@ struct ChatView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        @Bindable var chatSettings = chatSettings
+        @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
@@ -791,9 +793,9 @@ struct ChatView: View {
 
 struct ImageGenerationView: View {
     @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var serverManager: ServerManager
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @EnvironmentObject var imageSettings: ImageGenerationSettings
+    @Environment(ServerManager.self) var serverManager
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    @Environment(ImageGenerationSettings.self) var imageSettings
     
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
@@ -974,6 +976,8 @@ struct ImageGenerationView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        @Bindable var imageSettings = imageSettings
+        @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {

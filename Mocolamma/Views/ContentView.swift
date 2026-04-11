@@ -9,7 +9,7 @@ import Combine
 /// プラットフォームに応じて、NavigationSplitViewまたはTabViewを使用してUIを構築します。
 struct ContentView: View {
     // ServerManagerのインスタンスをAppStateに保持し、ライフサイクル全体で利用可能にする
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     // CommandExecutorはServerManagerに依存するため、後から初期化
     @State var executor: CommandExecutor
     
@@ -21,7 +21,7 @@ struct ContentView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
     
     @Binding var showingInspector: Bool
-    @EnvironmentObject var chatSettings: ChatSettings
+    @Environment(ChatSettings.self) var chatSettings
     
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -44,7 +44,7 @@ struct ContentView: View {
     
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     
     // ContentViewの初期化子を更新
     init(serverManager: ServerManager, executor: CommandExecutor, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
@@ -99,11 +99,11 @@ struct ContentView: View {
 #endif
         }
         .environment(executor)
-        .environmentObject(chatSettings)
+        .environment(chatSettings)
         .sheet(isPresented: $showingAddModelsSheet) {
             NavigationStack {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
 #if os(visionOS)
             .frame(width: 500, height: 350)
@@ -113,7 +113,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
 #if os(visionOS)
             .frame(width: 500, height: 300)
@@ -317,5 +317,5 @@ struct ContentView: View {
     let previewServerManager = ServerManager()
     let previewExecutor = CommandExecutor(serverManager: previewServerManager)
     ContentView(serverManager: previewServerManager, executor: previewExecutor, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
-        .environmentObject(RefreshTrigger())
+        .environment(RefreshTrigger())
 }

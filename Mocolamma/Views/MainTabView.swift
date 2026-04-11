@@ -6,12 +6,12 @@ import CompactSlider
 struct MainTabView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @EnvironmentObject var chatSettings: ChatSettings
-    @EnvironmentObject var imageSettings: ImageGenerationSettings
+    @Environment(ChatSettings.self) var chatSettings
+    @Environment(ImageGenerationSettings.self) var imageSettings
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     var executor: CommandExecutor
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
@@ -32,7 +32,7 @@ struct MainTabView: View {
                     selectedServerForInspector: $selectedServerForInspector
                 )
             }
-            .environmentObject(serverManager)
+            .environment(serverManager)
             .environment(executor)
             .tabItem { Label("Server", systemImage: "server.rack") }
             .tag("server")
@@ -50,7 +50,7 @@ struct MainTabView: View {
                     onTogglePreview: toggleInspector
                 )
             }
-            .environmentObject(serverManager)
+            .environment(serverManager)
             .environment(executor)
             .tabItem { Label("Models", systemImage: "tray.full") }
             .tag("models")
@@ -61,7 +61,7 @@ struct MainTabView: View {
                     onToggleInspector: toggleInspector
                 )
             }
-            .environmentObject(serverManager)
+            .environment(serverManager)
             .environment(executor)
             .tabItem { Label("Chat", systemImage: "message") }
             .tag("chat")
@@ -72,7 +72,7 @@ struct MainTabView: View {
                     onToggleInspector: toggleInspector
                 )
             }
-            .environmentObject(serverManager)
+            .environment(serverManager)
             .environment(executor)
             .tabItem { Label("Image Generation", systemImage: "photo") }
             .tag("image_generation")
@@ -196,8 +196,8 @@ struct MainTabView: View {
             showingInspector: $showingInspector,
             selectedFilterTag: $selectedFilterTag
         )
-        .environmentObject(chatSettings)
-        .environmentObject(imageSettings)
+        .environment(chatSettings)
+        .environment(imageSettings)
         .environment(executor)
     }
     

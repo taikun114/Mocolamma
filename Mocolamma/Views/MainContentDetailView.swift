@@ -4,7 +4,7 @@ struct MainContentDetailView: View {
     @Binding var sidebarSelection: String?
     @Binding var selectedModel: OllamaModel.ID?
     var executor: CommandExecutor
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
@@ -30,7 +30,7 @@ struct MainContentDetailView: View {
                         onTogglePreview: { showingInspector.toggle() }
                     )
                 }
-                .environmentObject(serverManager)
+                .environment(serverManager)
                 .environment(executor)
             } else if sidebarSelection == "server" {
                 NavigationStack {
@@ -49,7 +49,7 @@ struct MainContentDetailView: View {
                         onToggleInspector: { showingInspector.toggle() }
                     )
                 }
-                .environmentObject(serverManager)
+                .environment(serverManager)
                 .environment(executor)
             } else if sidebarSelection == "image_generation" {
                 NavigationStack {
@@ -58,7 +58,7 @@ struct MainContentDetailView: View {
                         onToggleInspector: { showingInspector.toggle() }
                     )
                 }
-                .environmentObject(serverManager)
+                .environment(serverManager)
                 .environment(executor)
             } else {
                 ZStack {

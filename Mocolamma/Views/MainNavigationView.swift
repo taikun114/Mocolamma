@@ -5,7 +5,7 @@ struct MainNavigationView: View {
     @Binding var selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     var executor: CommandExecutor
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var selectedServerForInspector: ServerInfo?
     @Binding var showingInspector: Bool
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]

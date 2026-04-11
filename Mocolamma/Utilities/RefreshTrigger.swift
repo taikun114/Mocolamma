@@ -1,7 +1,10 @@
 import Foundation
 import Combine
+import Observation
 
-class RefreshTrigger: ObservableObject {
+@Observable
+class RefreshTrigger {
+    @ObservationIgnored
     let publisher = PassthroughSubject<Void, Never>()
     
     func send() {

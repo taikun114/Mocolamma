@@ -83,14 +83,21 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var imageContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ImageGenerationResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
+    
+    // ServerManagerのインスタンスを保持します
+    var serverManager: ServerManager
     private var imageLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
     private var currentImageTask: URLSessionDataTask? // 現在の画像生成タスクを保持
     
     // Ollama APIのベースURL
-    var apiBaseURL: String?
-    
-    private var cancellables = Set<AnyCancellable>()
+    var apiBaseURL: String? {
+        if let selectedID = serverManager.selectedServerID,
+           let selectedServer = serverManager.servers.first(where: { $0.id == selectedID }) {
+            return selectedServer.host
+        }
+        return nil
+    }
     
     // MARK: - デモモード用
     private var hasDownloadedDemoModel: Bool = false
@@ -219,8 +226,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
     init(serverManager: ServerManager) {
-        // 初期化時にServerManagerから現在のホストURLを設定
-        self.apiBaseURL = serverManager.currentServerHost
+        self.serverManager = serverManager
         super.init()
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
         let configuration = URLSessionConfiguration.default
@@ -238,30 +244,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         // ドラッグ監視のセットアップ (ポーリング方式)
         setupDragMonitoring()
         
-        // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
-        serverManager.$servers
-            .map { servers in
-                // serversリストが変更された場合、selectedServerIDに基づき新しいcurrentServerHostを計算
-                if let selectedID = serverManager.selectedServerID,
-                   let selectedServer = servers.first(where: { $0.id == selectedID }) {
-                    return selectedServer.host
-                }
-                return nil
-            }
-            .sink { [weak self] host in
-                self?.apiBaseURL = host
-            }
-            .store(in: &cancellables)
-        
-        serverManager.$selectedServerID
-            .compactMap { selectedID in
-                // selectedIDが変更された場合、対応するサーバーのホストを返す
-                serverManager.servers.first(where: { $0.id == selectedID })?.host
-            }
-            .sink { [weak self] host in
-                self?.apiBaseURL = host
-            }
-            .store(in: &cancellables)
+        // apiBaseURLは計算プロパティとしてServerManagerの状態を直接参照するため、監視は不要。
         
         NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in
             guard let self = self else { return }
