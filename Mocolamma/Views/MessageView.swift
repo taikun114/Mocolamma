@@ -1121,10 +1121,10 @@ struct MessageView: View {
                         .foregroundColor(.secondary)
                 } else if !message.content.isEmpty {
                     let displayContent = message.content
-                    StructuredText(markdown: displayContent)
+                    StructuredText.Streaming(markdown: displayContent)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textual.textSelection(.enabled)
+                        .textualSelection(enabled: !message.isStreaming)
                         .textual.syntaxHighlightingEnabled(!message.isStreaming)
                         .textual.overflowMode(.scroll)
                         .compositingGroup() // 描画を最適化
@@ -1160,11 +1160,11 @@ struct MessageView: View {
                 
                 if isThinkingExpanded {
                     if let thinking = message.thinking, !thinking.isEmpty {
-                        StructuredText(markdown: thinking)
+                        StructuredText.Streaming(markdown: thinking)
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textual.textSelection(.enabled)
+                            .textualSelection(enabled: !(message.isStreaming && !message.isThinkingCompleted))
                             .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .compositingGroup() // 描画を最適化
@@ -1196,10 +1196,10 @@ struct MessageView: View {
         } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
                 let displayContent = message.content
-                StructuredText(markdown: displayContent)
+                StructuredText.Streaming(markdown: displayContent)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
-                    .textual.textSelection(.enabled)
+                    .textualSelection(enabled: !message.isStreaming)
                     .textual.syntaxHighlightingEnabled(!message.isStreaming)
                     .textual.overflowMode(.scroll)
                     .compositingGroup() // 描画を最適化
@@ -1214,6 +1214,18 @@ struct MessageView: View {
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
         return formatter
+    }
+}
+
+// MARK: - View Helper for Textual Selection
+extension View {
+    @ViewBuilder
+    func textualSelection(enabled: Bool) -> some View {
+        if enabled {
+            self.textual.textSelection(.enabled)
+        } else {
+            self.textual.textSelection(.disabled)
+        }
     }
 }
 
