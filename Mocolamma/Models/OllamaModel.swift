@@ -64,6 +64,30 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.originalIndex = 0 // デフォルト値
     }
     
+    // MARK: - Cached Properties
+    
+    // キャッシュされたプロパティを使用して、リストスクロール時の再計算を防止
+    // OllamaModelはHashableプロトコル等でmutating関数と相性が悪い場合があるため、遅延評価は行わずinit/decode時に計算するか、
+    // DateFormatterの生成が重いため静的Formatterを使用するアプローチに変更
+    
+    private static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
+        return formatter
+    }()
+    
+    private static let displayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    
+    private static let byteCountFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter
+    }()
     
     // MARK: - Sorting Helpers
     
@@ -74,25 +98,17 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     
     /// modified_at (ISO 8601文字列) をDateオブジェクトに変換して比較用に使用
     var comparableModifiedDate: Date {
-        let formatter = ISO8601DateFormatter()
-        // オプションを追加して、ミリ秒とタイムゾーンの両方に対応できるようにする
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
-        return formatter.date(from: modified_at) ?? Date.distantPast
+        return Self.iso8601Formatter.date(from: modified_at) ?? Date.distantPast
     }
     
     /// サイズを判読可能な文字列に変換するヘルパー
     var formattedSize: String {
-        let byteCountFormatter = ByteCountFormatter()
-        byteCountFormatter.countStyle = .file
-        return byteCountFormatter.string(fromByteCount: size)
+        return Self.byteCountFormatter.string(fromByteCount: size)
     }
     
     /// modified_at を判読可能な日付文字列に変換するヘルパー
     var formattedModifiedAt: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium // 例: Jul 24, 2025
-        dateFormatter.timeStyle = .short // 例: 9:30 PM
-        return dateFormatter.string(from: comparableModifiedDate)
+        return Self.displayDateFormatter.string(from: comparableModifiedDate)
     }
     
     /// 画像生成モデルかどうかを判定するヘルパー

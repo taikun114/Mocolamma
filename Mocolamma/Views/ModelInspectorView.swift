@@ -207,6 +207,7 @@ struct ModelInspectorView: View {
                         .scrollTargetLayout()
                     }
                     .scrollPosition($tagsScrollPos)
+#if os(macOS)
                     .onScrollGeometryChange(for: CGPoint.self) { geo in
                         geo.contentOffset
                     } action: { _, newValue in
@@ -217,9 +218,7 @@ struct ModelInspectorView: View {
                             .onChanged { value in
                                 if !isDraggingTags {
                                     isDraggingTags = true
-                                    #if os(macOS)
                                     NSCursor.closedHand.push()
-                                    #endif
                                     dragStartOffset = currentTagsOffset
                                 }
                                 let deltaX = value.translation.width
@@ -228,11 +227,10 @@ struct ModelInspectorView: View {
                             }
                             .onEnded { _ in
                                 isDraggingTags = false
-                                #if os(macOS)
                                 NSCursor.pop()
-                                #endif
                             }
                     )
+#endif
                     .onHover { inside in
                         #if os(macOS)
                         if inside {

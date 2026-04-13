@@ -347,17 +347,6 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                inspectorWidth = geometry.size.width
-                            }
-                            .onChange(of: geometry.size.width) { _, newWidth in
-                                inspectorWidth = newWidth
-                            }
-                    }
-                )
 #if !os(macOS)
                 .onTapGesture {
                     isCustomWidthFocused = false
@@ -374,6 +363,19 @@ struct InspectorContentView: View {
                     .padding()
             }
         }
+        .background(
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        inspectorWidth = geometry.size.width
+                    }
+                    .onChange(of: geometry.size.width) { _, newWidth in
+                        if abs(inspectorWidth - newWidth) > 1.0 {
+                            inspectorWidth = newWidth
+                        }
+                    }
+            }
+        )
 #if os(macOS)
         .toolbar {
             Spacer()

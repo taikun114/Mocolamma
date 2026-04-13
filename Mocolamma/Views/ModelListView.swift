@@ -456,26 +456,8 @@ struct ModelListContentView: View {
 #if !os(macOS)
         List(selection: $selectedModel) {
             ForEach(sortedModels) { model in
-                HStack(alignment: .center, spacing: 16) {
-                    Text("\(model.originalIndex + 1)")
-                        .foregroundColor(.secondary)
-                        .frame(minWidth: 20, alignment: .center)
-                        .help("No. \(model.originalIndex + 1)")
-                    
-                    VStack(alignment: .leading) {
-                        Text(model.name)
-                            .fontWeight(.bold)
-                            .lineLimit(1)
-                            .help(model.name)
-                        Text("\(model.formattedSize), \(model.formattedModifiedAt)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Spacer()
-                    
-                    loadStatusIcon(for: model.name)
-                }
+                ModelListRowView(model: model, copyIconName: copyIconName)
+                    .equatable()
                 .tag(model.id)
                 .contextMenu {
                     loadModelMenu(for: model)
@@ -559,7 +541,7 @@ struct ModelListContentView: View {
             .width(min: 80, ideal: 130, max: .infinity)
             
             TableColumn("Status", value: \.statusWeight) { model in
-                loadStatusIcon(for: model.name)
+                ModelLoadStatusIconView(modelName: model.name)
             }
             .width(min: 20, ideal: 70, max: .infinity)
         }
@@ -745,8 +727,67 @@ struct ModelListContentView: View {
         }
     }
     
-    @ViewBuilder
-    private func loadStatusIcon(for modelName: String) -> some View {
+    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
+        if let data = output.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let err = obj["error"] as? String {
+            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
+        }
+        if output.lowercased().contains("error") {
+            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+        }
+        return nil
+    }
+}
+
+// MARK: - モデルリスト行ビュー
+
+/// 各モデル行を表示するビュー。行ごとの不必要な再描画を防ぐために独立させています。
+struct ModelListRowView: View, Equatable {
+    let model: OllamaModel
+    let copyIconName: String
+    
+    // ModelListRowViewはmodelの内容が変わらない限り再描画されません
+    static func == (lhs: ModelListRowView, rhs: ModelListRowView) -> Bool {
+        lhs.model.id == rhs.model.id && 
+        lhs.model.statusWeight == rhs.model.statusWeight &&
+        lhs.model.size == rhs.model.size &&
+        lhs.model.modified_at == rhs.model.modified_at
+    }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            Text("\(model.originalIndex + 1)")
+                .foregroundColor(.secondary)
+                .frame(minWidth: 20, alignment: .center)
+                .help("No. \(model.originalIndex + 1)")
+            
+            VStack(alignment: .leading) {
+                Text(model.name)
+                    .fontWeight(.bold)
+                    .lineLimit(1)
+                    .help(model.name)
+                Text("\(model.formattedSize), \(model.formattedModifiedAt)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            ModelLoadStatusIconView(modelName: model.name)
+        }
+    }
+}
+
+// MARK: - モデルステータスアイコン用のサブビュー
+
+/// モデルのロード状態を示すアイコンを表示する独立したビュー。
+/// CommandExecutorを独自に監視することで、親ビューの再描画を防ぎ、リストスクロール時のCPU負荷を低減します。
+struct ModelLoadStatusIconView: View {
+    @Environment(CommandExecutor.self) var executor
+    let modelName: String
+    
+    var body: some View {
         ZStack {
             if executor.recentLoadedModelNames.contains(modelName) {
                 Image(systemName: "checkmark.circle.fill")
@@ -765,18 +806,6 @@ struct ModelListContentView: View {
         .animation(.easeInOut(duration: 0.3), value: executor.loadingModelNames.contains(modelName))
         .animation(.easeInOut(duration: 0.3), value: executor.recentLoadedModelNames.contains(modelName))
         .animation(.easeInOut(duration: 0.3), value: executor.runningModels.contains(where: { $0.name == modelName || $0.name == "\(modelName):latest" }))
-    }
-    
-    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
-        if let data = output.data(using: .utf8),
-           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let err = obj["error"] as? String {
-            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
-        }
-        if output.lowercased().contains("error") {
-            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
-        }
-        return nil
     }
 }
 
