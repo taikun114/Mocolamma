@@ -34,6 +34,12 @@ struct ModelInspectorDetailView: View {
     }
     
     private func loadModelInfo() {
+        // すでにキャッシュがある場合はそれを使用
+        if let cached = commandExecutor.getCachedModelInfo(modelName: model.name) {
+            applyResponse(cached)
+            return
+        }
+
 #if os(visionOS)
         withAnimation(.easeInOut(duration: 0.3)) {
             isLoadingInfo = true
@@ -44,34 +50,38 @@ struct ModelInspectorDetailView: View {
         Task {
             let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
             await MainActor.run {
-#if os(visionOS)
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    self.modelInfo = fetchedResponse?.model_info
-                    self.licenseBody = fetchedResponse?.license
-                    // デモモデルの場合はテスト用ライセンスURLを設定
-                    if model.name == "demo:0b" || model.name == "demo2:0b" {
-                        self.licenseLink = "https://example.com/"
-                    } else {
-                        // 通常のモデルでは、model_infoからライセンスリンクを取得
-                        self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
-                    }
-                    self.fetchedCapabilities = fetchedResponse?.capabilities
-                    self.isLoadingInfo = false
-                }
-#else
-                self.modelInfo = fetchedResponse?.model_info
-                self.licenseBody = fetchedResponse?.license
-                // デモモデルの場合はテスト用ライセンスURLを設定
-                if model.name == "demo:0b" || model.name == "demo2:0b" {
-                    self.licenseLink = "https://example.com/"
-                } else {
-                    // 通常のモデルでは、model_infoからライセンスリンクを取得
-                    self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
-                }
-                self.fetchedCapabilities = fetchedResponse?.capabilities
-                self.isLoadingInfo = false
-#endif
+                applyResponse(fetchedResponse)
             }
         }
+    }
+    
+    private func applyResponse(_ fetchedResponse: OllamaShowResponse?) {
+#if os(visionOS)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            self.modelInfo = fetchedResponse?.model_info
+            self.licenseBody = fetchedResponse?.license
+            // デモモデルの場合はテスト用ライセンスURLを設定
+            if model.name == "demo:0b" || model.name == "demo2:0b" {
+                self.licenseLink = "https://example.com/"
+            } else {
+                // 通常のモデルでは、model_infoからライセンスリンクを取得
+                self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+            }
+            self.fetchedCapabilities = fetchedResponse?.capabilities
+            self.isLoadingInfo = false
+        }
+#else
+        self.modelInfo = fetchedResponse?.model_info
+        self.licenseBody = fetchedResponse?.license
+        // デモモデルの場合はテスト用ライセンスURLを設定
+        if model.name == "demo:0b" || model.name == "demo2:0b" {
+            self.licenseLink = "https://example.com/"
+        } else {
+            // 通常のモデルでは、model_infoからライセンスリンクを取得
+            self.licenseLink = fetchedResponse?.model_info?["general.license.link"]?.stringValue
+        }
+        self.fetchedCapabilities = fetchedResponse?.capabilities
+        self.isLoadingInfo = false
+#endif
     }
 }

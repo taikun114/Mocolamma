@@ -832,6 +832,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
     }
     
+    /// キャッシュされたモデルの詳細情報を取得します（同期的）。
+    func getCachedModelInfo(modelName: String) -> OllamaShowResponse? {
+        return modelInfoCache[modelName]
+    }
+    
     /// モデルの詳細情報を取得します
     func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
         if isDemoServer() {
