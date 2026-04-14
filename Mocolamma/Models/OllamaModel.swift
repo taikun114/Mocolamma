@@ -89,6 +89,13 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         return formatter
     }()
     
+    private static let decimalFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }()
+    
     // MARK: - Sorting Helpers
     
     /// サイズ (バイト単位の数値) をGB単位のDoubleに変換して比較用に使用
@@ -145,6 +152,11 @@ struct OllamaModel: Identifiable, Hashable, Codable {
             return caps.contains(where: { $0.lowercased() == "audio" })
         }
         return false
+    }
+
+    /// 数値をカンマ区切りの文字列にフォーマットするヘルパー
+    static func formatDecimal(_ value: Int) -> String {
+        return decimalFormatter.string(from: NSNumber(value: value)) ?? String(value)
     }
 }
 

@@ -9,7 +9,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var isRunning: Bool = false
     var pullHttpErrorTriggered: Bool = false
     var pullHttpErrorMessage: String = ""
-    var models: [OllamaModel] = []
+    var models: [OllamaModel] = [] {
+        didSet {
+            // modelsが更新されたら、検索用の辞書も更新
+            modelsByID = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0) })
+        }
+    }
+    var modelsByID: [String: OllamaModel] = [:] // IDからモデルを高速に検索するための辞書
     var apiConnectionError: Bool = false
     var specificConnectionErrorMessage: String?
         var chatMessages: [ChatMessage] = []
@@ -2121,7 +2127,6 @@ struct OllamaAPIModelsResponse: Decodable {
     let models: [OllamaModel]
 }
 
-/// /api/show エンドポイントからのレスポンス
 struct OllamaShowResponse: Decodable {
     let license: String?
     let modelfile: String?
@@ -2130,7 +2135,24 @@ struct OllamaShowResponse: Decodable {
     let details: OllamaModelDetails?
     let model_info: [String: JSONValue]?
     let capabilities: [String]?
+}
+
+extension OllamaShowResponse {
+    var parameterCount: Int? {
+        model_info?["general.parameter_count"]?.intValue
+    }
     
+    var contextLength: Int? {
+        guard let info = model_info,
+              let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) else { return nil }
+        return info[key]?.intValue
+    }
+    
+    var embeddingLength: Int? {
+        guard let info = model_info,
+              let key = info.keys.first(where: { $0.hasSuffix(".embedding_length") }) else { return nil }
+        return info[key]?.intValue
+    }
 }
 
 struct OllamaPullResponse: Decodable {

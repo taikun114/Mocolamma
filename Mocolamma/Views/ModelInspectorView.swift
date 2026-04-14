@@ -8,11 +8,8 @@ import AppKit
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
 struct ModelInspectorView: View {
     let model: OllamaModel
-    let modelInfo: [String: JSONValue]?
+    let response: OllamaShowResponse?
     let isLoading: Bool
-    let fetchedCapabilities: [String]?
-    let licenseBody: String?
-    let licenseLink: String?
     @Binding var selectedFilterTag: String?
     
     @State private var showingLicenseSheet = false
@@ -35,48 +32,38 @@ struct ModelInspectorView: View {
     
     // modelInfoからパラメーターカウントを取得するヘルパー
     private var parameterCount: (formatted: String, raw: Int)? {
-        guard let count = modelInfo?["general.parameter_count"]?.intValue else { return nil }
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-        let formattedCount = numberFormatter.string(from: NSNumber(value: count)) ?? String(count)
-        return (formattedCount, count)
+        guard let count = response?.parameterCount else { return nil }
+        return (OllamaModel.formatDecimal(count), count)
     }
     
     // modelInfoからコンテキスト長を取得するヘルパー
     private var contextLength: (formatted: String, raw: Int)? {
-        guard let info = modelInfo else { return nil }
-        // ".context_length"で終わるキーを探す
-        if let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) {
-            guard let length = info[key]?.intValue else { return nil }
-            let numberFormatter = NumberFormatter()
-            numberFormatter.numberStyle = .decimal
-            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
-            return (formattedLength, length)
-        }
-        return nil
+        guard let length = response?.contextLength else { return nil }
+        return (OllamaModel.formatDecimal(length), length)
     }
     
     // modelInfoからエンベディング長を取得するヘルパー
     private var embeddingLength: (formatted: String, raw: Int)? {
-        guard let info = modelInfo else { return nil }
-        // ".embedding_length"で終わるキーを探す
-        if let key = info.keys.first(where: { $0.hasSuffix(".embedding_length") }) {
-            guard let length = info[key]?.intValue else { return nil }
-            let numberFormatter = NumberFormatter()
-            numberFormatter.numberStyle = .decimal
-            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
-            return (formattedLength, length)
-        }
-        return nil
+        guard let length = response?.embeddingLength else { return nil }
+        return (OllamaModel.formatDecimal(length), length)
     }
     
     
+    private var licenseBody: String? {
+        response?.license
+    }
+    
+    private var licenseLink: String? {
+        // デモモデルの場合はテスト用ライセンスURLを設定
+        if model.name == "demo:0b" || model.name == "demo2:0b" {
+            return "https://example.com/"
+        }
+        return response?.model_info?["general.license.link"]?.stringValue
+    }
+    
     private var licenseName: String {
-        // 1. modelInfoに明示的なライセンス名がある場合
-        if let rawLicense = modelInfo?["general.license"]?.stringValue {
+        // 1. model_infoに明示的なライセンス名がある場合
+        if let rawLicense = response?.model_info?["general.license"]?.stringValue {
             switch rawLicense.lowercased() {
             case "mit":
                 return "MIT License"
@@ -197,7 +184,7 @@ struct ModelInspectorView: View {
                     .help(model.name) // モデル名のフルテキストをツールチップに表示
                 
                 // 機能セクション
-                if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
+                if let capabilities = response?.capabilities, !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
@@ -484,12 +471,12 @@ struct ModelInspectorView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
-                } else if modelInfo != nil {
+                } else if response != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         
                         // ライセンス情報がある場合のみ表示
-                        // modelInfoにlicenseキーがあるか、licenseBodyがある場合
-                        if modelInfo?["general.license"] != nil || licenseBody != nil {
+                        // model_infoにlicenseキーがあるか、licenseBodyがある場合
+                        if response?.model_info?["general.license"] != nil || licenseBody != nil {
                             VStack(alignment: .leading) {
                                 Text("License:") // ライセンス
                                 if licenseBody != nil {
@@ -575,7 +562,7 @@ struct ModelInspectorView: View {
                         }
                         
                         // 全ての詳細項目が空の場合のみ「モデル情報がありません」を表示
-                        let hasLicense = modelInfo?["general.license"] != nil || licenseBody != nil
+                        let hasLicense = response?.model_info?["general.license"] != nil || licenseBody != nil
                         let hasAnyInfo = parameterCount != nil || contextLength != nil || embeddingLength != nil || hasLicense
                         
                         if !hasAnyInfo {
