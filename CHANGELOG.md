@@ -54,6 +54,9 @@ In version 1.2.2 or earlier, it was listed as follows:
   - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
 
 ### Bug Fixes and Improvements
+#### General
+- **Fix issue where sheet backgrounds appear slightly green in iPadOS 26 Dark Mode**
+
 #### Server
 - **Improve the display of connection status in server inspector**
 

@@ -148,6 +148,7 @@ struct LicenseTextView: View {
         .onAppear {
             isTextWrapped = true
         }
+        .presentationBackground(Color(uiColor: .systemBackground))
 #endif
     }
     

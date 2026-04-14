@@ -88,6 +88,7 @@ struct ServerView: View {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
                     .environment(appRefreshTrigger)
             }
+            .presentationBackground(Color(uiColor: .systemBackground))
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
@@ -98,6 +99,7 @@ struct ServerView: View {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
                     .environment(appRefreshTrigger)
             }
+            .presentationBackground(Color(uiColor: .systemBackground))
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
