@@ -176,9 +176,12 @@ struct ChatView: View {
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
         .task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: executor.models) { _, newModels in

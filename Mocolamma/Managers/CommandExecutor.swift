@@ -16,6 +16,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
     }
     var modelsByID: [String: OllamaModel] = [:] // IDからモデルを高速に検索するための辞書
+    var initialFetchCompleted: Bool = false // サーバー選択後に一度でもモデル取得が完了したかどうかのフラグ
     var apiConnectionError: Bool = false
     var specificConnectionErrorMessage: String?
         var chatMessages: [ChatMessage] = []
@@ -439,6 +440,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     updatedModels.append(result)
                 }
                 // 元の順序を維持してソート
+                self.initialFetchCompleted = true
                 return updatedModels.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
             }
             updateModelWeights() // ステータス更新
@@ -841,6 +843,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// キャッシュされたモデルの詳細情報を取得します（同期的）。
     func getCachedModelInfo(modelName: String) -> OllamaShowResponse? {
         return modelInfoCache[modelName]
+    }
+    
+    /// 初期フェッチフラグをリセットします
+    func resetInitialFetchFlag() {
+        initialFetchCompleted = false
     }
     
     /// モデルの詳細情報を取得します

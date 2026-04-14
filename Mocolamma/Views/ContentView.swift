@@ -178,8 +178,11 @@ struct ContentView: View {
         .onChange(of: selectedServerForInspector) { oldServer, newServer in
             serverManager.inspectorSelectedServer = newServer
             if newServer != nil {
-                if selection == "server" {
-                    appRefreshTrigger.send()
+                // サーバーが変更されたらフェッチフラグをリセット
+                executor.resetInitialFetchFlag()
+                // サーバー変更時に、どのタブにいてもモデル取得を裏で開始する
+                Task {
+                    await executor.fetchOllamaModelsFromAPI()
                 }
             }
         }
@@ -274,6 +277,7 @@ struct ContentView: View {
                     }
                 }
                 
+                // 明示的なリフレッシュ（ボタン押しなど）の場合はフラグを無視して取得
                 await executor.fetchOllamaModelsFromAPI()
                 
                 if let sid = selectedServerID, let host = serverManager.servers.first(where: { $0.id == sid })?.host {
@@ -293,14 +297,14 @@ struct ContentView: View {
             }
             
         case "chat":
-            // チャットではモデルリストを再取得
+            // チャット画面でのリフレッシュ要請
             Task {
                 executor.clearModelInfoCache()
                 await executor.fetchOllamaModelsFromAPI()
             }
             
         case "image_generation":
-            // 画像生成でもモデルリストを再取得
+            // 画像生成画面でのリフレッシュ要請
             Task {
                 executor.clearModelInfoCache()
                 await executor.fetchOllamaModelsFromAPI()

@@ -61,6 +61,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Fix issue where the model filter icon was not displayed in macOS Sequoia**
 - **Fix issue where models could not be added in a specific format**
   - Fixed an issue where models could not be downloaded if the model name contained a `/` in the `ollama` command format.
+- **Improve model loading process**
+  - Performance has improved by automatically loading models when the app launches and when the server changes, thereby eliminating unnecessary model loading.
 
 #### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**

@@ -396,9 +396,13 @@ struct ModelListView: View {
             modelToolbarContent
         }
         .task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled && !executor.isRunning && !executor.isPulling {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            // これにより、タブ切り替えのたびにリロードが走るのを防ぎ、UIの快適性を向上させる
+            if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: executor.isPullingErrorHold) { _, newValue in
