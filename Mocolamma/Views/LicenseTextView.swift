@@ -37,9 +37,11 @@ struct LicenseTextView: View {
     
     var body: some View {
 #if os(macOS)
-        licenseTextViewContent
-            .frame(width: 700, height: 500)
-            .safeAreaInset(edge: .bottom, spacing: 0) { // 下部にセーフエリアインセットとしてVisualEffectViewとボタンを配置
+        ScrollView(scrollAxes) {
+            licenseTextViewContent
+        }
+        .frame(width: 700, height: 500)
+        .safeAreaInset(edge: .bottom, spacing: 0) { // 下部にセーフエリアインセットとしてVisualEffectViewとボタンを配置
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
                         Color.clear
@@ -168,14 +170,12 @@ struct LicenseTextView: View {
     }
     
     private var licenseTextViewContent: some View {
-        ScrollView(scrollAxes) {
-            VStack(alignment: .leading) {
-                Text(licenseText)
-                    .font(.callout.monospaced())
-                    .padding()
-                    .fixedSize(horizontal: horizontalFixed, vertical: false)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading) {
+            Text(licenseText)
+                .font(.callout.monospaced())
+                .padding()
+                .fixedSize(horizontal: horizontalFixed, vertical: false)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
