@@ -465,43 +465,17 @@ struct ModelListContentView: View {
 #if !os(macOS)
         List(selection: $selectedModel) {
             ForEach(sortedModels) { model in
-                ModelListRowView(model: model, copyIconName: copyIconName)
-                    .equatable()
+                ModelListRowView(
+                    model: model,
+                    copyIconName: copyIconName,
+                    modelToDelete: $modelToDelete,
+                    showingDeleteConfirmation: $showingDeleteConfirmation,
+                    loadErrorMessage: $loadErrorMessage,
+                    showingLoadErrorAlert: $showingLoadErrorAlert,
+                    modelForCustomKeepAlive: $modelForCustomKeepAlive
+                )
+                .equatable()
                 .tag(model.id)
-                .contextMenu {
-                    loadModelMenu(for: model)
-                    
-                    Button("Unload Model", systemImage: "tray.and.arrow.up") {
-                        Task {
-                            await executor.unloadModel(modelName: model.name)
-                        }
-                    }
-                    .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
-                    
-                    Divider()
-                    
-                    Button {
-                        UIPasteboard.general.string = model.name
-                    } label: {
-                        Label("Copy Model Name", systemImage: copyIconName)
-                    }
-                    
-                    Button(role: .destructive) {
-                        modelToDelete = model
-                        showingDeleteConfirmation = true
-                    } label: {
-                        Label("Delete...", systemImage: "trash")
-                    }
-                }
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        modelToDelete = model
-                        showingDeleteConfirmation = true
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    .labelStyle(.iconOnly)
-                }
             }
             .onDelete { offsets in
                 let modelsToDelete = offsets.map { sortedModels[$0] }
@@ -756,6 +730,14 @@ struct ModelListRowView: View, Equatable {
     let model: OllamaModel
     let copyIconName: String
     
+    @Binding var modelToDelete: OllamaModel?
+    @Binding var showingDeleteConfirmation: Bool
+    @Binding var loadErrorMessage: String?
+    @Binding var showingLoadErrorAlert: Bool
+    @Binding var modelForCustomKeepAlive: OllamaModel?
+    
+    @Environment(CommandExecutor.self) var executor
+    
     // ModelListRowViewはmodelの内容が変わらない限り再描画されません
     static func == (lhs: ModelListRowView, rhs: ModelListRowView) -> Bool {
         lhs.model.id == rhs.model.id && 
@@ -785,6 +767,111 @@ struct ModelListRowView: View, Equatable {
             
             ModelLoadStatusIconView(modelName: model.name)
         }
+        .contextMenu {
+            Menu {
+                Button("Load with Default Time") {
+                    Task {
+                        let success = await executor.loadModel(modelName: model.name)
+                        if !success {
+                            await MainActor.run {
+                                if let errorText = parseError(from: executor.output) {
+                                    loadErrorMessage = errorText
+                                    showingLoadErrorAlert = true
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Divider()
+                
+                Group {
+                    Button(LocalizedStringKey(KeepAliveOption.m1.rawValue)) { loadWithTime("1m") }
+                    Button(LocalizedStringKey(KeepAliveOption.m3.rawValue)) { loadWithTime("3m") }
+                    Button(LocalizedStringKey(KeepAliveOption.m5.rawValue)) { loadWithTime("5m") }
+                    Button(LocalizedStringKey(KeepAliveOption.m10.rawValue)) { loadWithTime("10m") }
+                    Button(LocalizedStringKey(KeepAliveOption.m15.rawValue)) { loadWithTime("15m") }
+                    Button(LocalizedStringKey(KeepAliveOption.m30.rawValue)) { loadWithTime("30m") }
+                    Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) { loadWithTime("1h") }
+                    Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) { loadWithTime("-1") }
+                }
+                
+                Divider()
+                
+                Button("Custom...") {
+                    modelForCustomKeepAlive = model
+                }
+            } label: {
+                Label("Load Model", systemImage: "tray.and.arrow.down")
+            }
+            
+            Button("Unload Model", systemImage: "tray.and.arrow.up") {
+                Task {
+                    await executor.unloadModel(modelName: model.name)
+                }
+            }
+            .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
+            
+            Divider()
+            
+            Button {
+                #if os(macOS)
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(model.name, forType: .string)
+                #else
+                UIPasteboard.general.string = model.name
+                #endif
+            } label: {
+                Label("Copy Model Name", systemImage: copyIconName)
+            }
+            
+            Button(role: .destructive) {
+                modelToDelete = model
+                showingDeleteConfirmation = true
+            } label: {
+                Label("Delete...", systemImage: "trash")
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                modelToDelete = model
+                showingDeleteConfirmation = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+            .labelStyle(.iconOnly)
+        }
+    }
+    
+    private func loadWithTime(_ time: String) {
+        Task {
+            let success: Bool
+            if time == "-1" {
+                success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1))
+            } else {
+                success = await executor.loadModel(modelName: model.name, keepAlive: .string(time))
+            }
+            if !success {
+                await MainActor.run {
+                    if let errorText = parseError(from: executor.output) {
+                        loadErrorMessage = errorText
+                        showingLoadErrorAlert = true
+                    }
+                }
+            }
+        }
+    }
+    
+    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
+        if let data = output.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let err = obj["error"] as? String {
+            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
+        }
+        if output.lowercased().contains("error") {
+            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+        }
+        return nil
     }
 }
 
