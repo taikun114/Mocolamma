@@ -12,7 +12,6 @@ struct MessageView: View {
     let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isStreamingAny: Bool
-    @Binding var allMessages: [ChatMessage]
     let isModelSelected: Bool
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
@@ -1167,7 +1166,7 @@ struct MessageView: View {
                             .textualSelection(enabled: !(message.isStreaming && !message.isThinkingCompleted))
                             .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted))
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .compositingGroup() // 描画を最適化
+                            .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
                     }
                 }
                 
@@ -1202,7 +1201,7 @@ struct MessageView: View {
                     .textualSelection(enabled: !message.isStreaming)
                     .textual.syntaxHighlightingEnabled(!message.isStreaming)
                     .textual.overflowMode(.scroll)
-                    .compositingGroup() // 描画を最適化
+                    .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
             }
         } else {
             EmptyView()

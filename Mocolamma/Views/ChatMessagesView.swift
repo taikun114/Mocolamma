@@ -108,11 +108,16 @@ struct ChatMessagesScrollView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 // LazyVStackからVStackに変更してレイアウトの安定性を確保
+                // LazyVStackでは急激なスクロールや表示エリア変更時にCPU使用率が100%に張り付いて無限にフリーズしてしまう問題が発生するため
                 VStack(alignment: .leading, spacing: 10) {
+                    let lastAssistantId = messages.last(where: { $0.role == "assistant" })?.id
+                    let lastUserId = messages.last(where: { $0.role == "user" })?.id
+                    
                     ForEach(messages) { message in
                         MessageViewWrapper(
                             message: message,
-                            messages: $messages,
+                            isLastAssistantMessage: message.id == lastAssistantId,
+                            isLastOwnUserMessage: message.id == lastUserId,
                             onRetry: onRetry,
                             isOverallStreaming: $isOverallStreaming,
                             isModelSelected: isModelSelected
@@ -193,18 +198,11 @@ struct ChatMessagesScrollView: View {
 
 struct MessageViewWrapper: View {
     let message: ChatMessage
-    @Binding var messages: [ChatMessage]
+    let isLastAssistantMessage: Bool
+    let isLastOwnUserMessage: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
-    
-    private var isLastAssistantMessage: Bool {
-        message.role == "assistant" && messages.last?.id == message.id
-    }
-    
-    private var isLastOwnUserMessage: Bool {
-        message.role == "user" && messages.last(where: { $0.role == "user" })?.id == message.id
-    }
     
     var body: some View {
         MessageView(
@@ -213,7 +211,6 @@ struct MessageViewWrapper: View {
             isLastOwnUserMessage: isLastOwnUserMessage,
             onRetry: onRetry,
             isStreamingAny: $isOverallStreaming,
-            allMessages: $messages,
             isModelSelected: isModelSelected
         )
     }
