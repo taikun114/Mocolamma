@@ -66,9 +66,9 @@ struct MessageView: View {
                             Color.accentColor
                         } else {
 #if os(visionOS)
-                            AnyView(Rectangle().fill(.regularMaterial))
+                            Rectangle().fill(.regularMaterial)
 #else
-                            AnyView(Color.gray.opacity(0.1))
+                            Color.gray.opacity(0.1)
 #endif
                         }
                     }
