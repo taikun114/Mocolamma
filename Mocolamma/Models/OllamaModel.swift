@@ -23,7 +23,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let digest: String
     var details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
-    var statusWeight: Int = 0 // UIでのソート用：0=なし, 1=ロード中, 2=ロード済み, 3=成功フィードバック
+    var statusWeight: Int = 3 // UIでのソート用：0=成功フィードバック, 1=ロード中, 2=ロード済み, 3=未ロード
     
     // 事前計算されたプロパティ
     let comparableModifiedDate: Date

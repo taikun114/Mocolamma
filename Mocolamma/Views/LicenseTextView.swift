@@ -148,7 +148,9 @@ struct LicenseTextView: View {
         .onAppear {
             isTextWrapped = true
         }
+#if os(iOS)
         .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #endif
     }
     

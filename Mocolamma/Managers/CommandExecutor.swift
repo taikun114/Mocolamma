@@ -71,13 +71,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         for i in 0..<models.count {
             let modelName = models[i].name
             if recentLoadedModelNames.contains(modelName) {
-                models[i].statusWeight = 3 // 成功フィードバック
-            } else if runningModels.contains(where: { $0.name == modelName }) {
-                models[i].statusWeight = 2 // ロード済み
+                models[i].statusWeight = 0 // 成功フィードバック
             } else if loadingModelNames.contains(modelName) {
                 models[i].statusWeight = 1 // ロード中
+            } else if runningModels.contains(where: { $0.name == modelName }) {
+                models[i].statusWeight = 2 // ロード済み
             } else {
-                models[i].statusWeight = 0 // 未ロード
+                models[i].statusWeight = 3 // 未ロード
             }
         }
     }

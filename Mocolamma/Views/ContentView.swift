@@ -105,7 +105,9 @@ struct ContentView: View {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
                     .environment(appRefreshTrigger)
             }
+#if os(iOS)
             .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 350)
             .presentationSizing(.fitted)
@@ -116,7 +118,9 @@ struct ContentView: View {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
                     .environment(appRefreshTrigger)
             }
+#if os(iOS)
             .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
