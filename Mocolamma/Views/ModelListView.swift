@@ -42,6 +42,7 @@ struct ModelListView: View {
     @Binding var modelToDelete: OllamaModel? // 削除対象のモデルを保持するバインディング
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var inputAreaHeight: CGFloat = 0
+    @State private var sortedAndFilteredModels: [OllamaModel] = [] // メモ化用の状態
     @State private var pullErrorMessage: String? = nil
     @State private var showingPullErrorAlert: Bool = false
     @State private var loadErrorMessage: String? = nil
@@ -132,8 +133,8 @@ struct ModelListView: View {
         }
     }
     
-    // 現在のソート順とフィルターに基づいてモデルリストを返すComputed Property
-    var sortedModels: [OllamaModel] {
+    // 現在のソート順とフィルターに基づいてモデルリストを更新するメソッド
+    private func updateSortedAndFilteredModels() {
         var models = executor.models
         
         // フィルタリング適用
@@ -142,7 +143,7 @@ struct ModelListView: View {
         }
         
         // 全プラットフォームでTable/Menuから供給されるsortOrderに従ってソート
-        return models.sorted(using: sortOrder)
+        sortedAndFilteredModels = models.sorted(using: sortOrder)
     }
     
     // Menuでの選択内容をsortOrderバインディングに同期するメソッド
@@ -281,7 +282,7 @@ struct ModelListView: View {
         Group {
 #if os(visionOS)
             ModelListContentView(
-                sortedModels: sortedModels,
+                sortedModels: sortedAndFilteredModels,
                 selectedModel: $selectedModel,
                 sortOrder: $sortOrder,
                 modelToDelete: $modelToDelete,
@@ -295,7 +296,7 @@ struct ModelListView: View {
             if #available(iOS 26.0, *) {
                 // iOS 26.0以降：safeAreaBarを使用して進捗を表示
                 ModelListContentView(
-                    sortedModels: sortedModels,
+                    sortedModels: sortedAndFilteredModels,
                     selectedModel: $selectedModel,
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
@@ -312,7 +313,7 @@ struct ModelListView: View {
                 // iOS 26.0未満：VStack内に配置
                 VStack(spacing: 0) {
                     ModelListContentView(
-                        sortedModels: sortedModels,
+                        sortedModels: sortedAndFilteredModels,
                         selectedModel: $selectedModel,
                         sortOrder: $sortOrder,
                         modelToDelete: $modelToDelete,
@@ -330,7 +331,7 @@ struct ModelListView: View {
             // macOS：常にVStack内に配置（TableではsafeAreaBarのボケが機能しないため）
             VStack(spacing: 0) {
                 ModelListContentView(
-                    sortedModels: sortedModels,
+                    sortedModels: sortedAndFilteredModels,
                     selectedModel: $selectedModel,
                     sortOrder: $sortOrder,
                     modelToDelete: $modelToDelete,
@@ -404,7 +405,11 @@ struct ModelListView: View {
                     appRefreshTrigger.send()
                 }
             }
+            updateSortedAndFilteredModels()
         }
+        .onChange(of: executor.models) { _, _ in updateSortedAndFilteredModels() }
+        .onChange(of: selectedFilterTag) { _, _ in updateSortedAndFilteredModels() }
+        .onChange(of: sortOrder) { _, _ in updateSortedAndFilteredModels() }
         .onChange(of: executor.isPullingErrorHold) { _, newValue in
             if newValue && executor.pullHasError {
                 if let errorText = parseError(from: executor.output, replaceNewline: false) {

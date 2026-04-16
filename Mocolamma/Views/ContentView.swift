@@ -146,69 +146,76 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            selection = "server"
-            // 初期値を同期
-            updateSelectedServerForInspector()
-            serverManager.inspectorSelection = selection
-            serverManager.inspectorSelectedModelID = selectedModel
-            serverManager.inspectorSelectedServer = selectedServerForInspector
+            handleOnAppear()
         }
-        .onChange(of: selection) { oldSelection, newSelection in
-            serverManager.inspectorSelection = newSelection
-            if newSelection == "server" {
-                updateSelectedServerForInspector()
-            }
-            if newSelection == "settings" && showingInspector {
-#if os(visionOS)
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    showingInspector = false
-                }
-#else
-                showingInspector = false
-#endif
-            }
-        }
-        .onChange(of: selectedModel) { _, newValue in
-#if os(visionOS)
-            withAnimation(.easeInOut(duration: 0.3)) {
-                serverManager.inspectorSelectedModelID = newValue
-            }
-#else
-            serverManager.inspectorSelectedModelID = newValue
-#endif
-        }
-        .onChange(of: selectedServerForInspector) { oldServer, newServer in
-            serverManager.inspectorSelectedServer = newServer
-            if newServer != nil {
-                // サーバーが変更されたらフェッチフラグをリセット
-                executor.resetInitialFetchFlag()
-                // サーバー変更時に、どのタブにいてもモデル取得を裏で開始する
-                Task {
-                    await executor.fetchOllamaModelsFromAPI()
-                }
-            }
-        }
-        .onChange(of: shouldClearChat) { oldValue, newValue in
-            if newValue {
-                // チャットクリアを実行
-                executor.clearChat()
-                // 状態をリセット
-                shouldClearChat = false
-            }
-        }
-        .onChange(of: shouldClearGeneration) { oldValue, newValue in
-            if newValue {
-                // 画像生成クリアを実行
-                executor.clearImageGeneration()
-                // 状態をリセット
-                shouldClearGeneration = false
-            }
-        }
-        .onChange(of: executor.isPulling) { oldValue, newValue in
-            isPulling = newValue
-        }
+        .onChange(of: selection) { _, newValue in handleSelectionChange(newValue) }
+        .onChange(of: selectedModel) { _, newValue in handleModelSelectionChange(newValue) }
+        .onChange(of: selectedServerForInspector) { _, newValue in handleServerSelectionChange(newValue) }
+        .onChange(of: shouldClearChat) { _, newValue in handleClearChatChange(newValue) }
+        .onChange(of: shouldClearGeneration) { _, newValue in handleClearGenerationChange(newValue) }
+        .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
+        }
+    }
+    
+    // MARK: - Event Handlers
+    
+    private func handleOnAppear() {
+        selection = "server"
+        updateSelectedServerForInspector()
+        serverManager.inspectorSelection = selection
+        serverManager.inspectorSelectedModelID = selectedModel
+        serverManager.inspectorSelectedServer = selectedServerForInspector
+    }
+    
+    private func handleSelectionChange(_ newSelection: String?) {
+        serverManager.inspectorSelection = newSelection
+        if newSelection == "server" {
+            updateSelectedServerForInspector()
+        }
+        if newSelection == "settings" && showingInspector {
+#if os(visionOS)
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showingInspector = false
+            }
+#else
+            showingInspector = false
+#endif
+        }
+    }
+    
+    private func handleModelSelectionChange(_ newValue: OllamaModel.ID?) {
+#if os(visionOS)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            serverManager.inspectorSelectedModelID = newValue
+        }
+#else
+        serverManager.inspectorSelectedModelID = newValue
+#endif
+    }
+    
+    private func handleServerSelectionChange(_ newServer: ServerInfo?) {
+        serverManager.inspectorSelectedServer = newServer
+        if newServer != nil {
+            executor.resetInitialFetchFlag()
+            Task {
+                await executor.fetchOllamaModelsFromAPI()
+            }
+        }
+    }
+    
+    private func handleClearChatChange(_ newValue: Bool) {
+        if newValue {
+            executor.clearChat()
+            shouldClearChat = false
+        }
+    }
+    
+    private func handleClearGenerationChange(_ newValue: Bool) {
+        if newValue {
+            executor.clearImageGeneration()
+            shouldClearGeneration = false
         }
     }
     

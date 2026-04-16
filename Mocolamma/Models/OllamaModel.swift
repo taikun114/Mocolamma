@@ -25,7 +25,12 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     var capabilities: [String]?
     var statusWeight: Int = 0 // UIでのソート用：0=なし, 1=ロード中, 2=ロード済み, 3=成功フィードバック
     
-    // Codable プロトコルのために必要な CodingKeys (originalIndex, id, statusWeightはデコード対象外)
+    // 事前計算されたプロパティ
+    let comparableModifiedDate: Date
+    let formattedSize: String
+    let formattedModifiedAt: String
+    
+    // Codable プロトコルのために必要な CodingKeys (originalIndex, id, statusWeight, 事前計算済みプロパティはデコード対象外)
     enum CodingKeys: String, CodingKey {
         case name
         case model
@@ -46,6 +51,12 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.details = details
         self.capabilities = capabilities
         self.originalIndex = originalIndex
+        
+        // 初期化時に事前計算
+        let date = Self.iso8601Formatter.date(from: modifiedAt) ?? Date.distantPast
+        self.comparableModifiedDate = date
+        self.formattedSize = Self.byteCountFormatter.string(fromByteCount: size)
+        self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
     }
     
     // Decodable のカスタムイニシャライザ
@@ -58,6 +69,12 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.digest = try container.decode(String.self, forKey: .digest)
         self.details = try container.decodeIfPresent(OllamaModelDetails.self, forKey: .details)
         self.capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities)
+        
+        // 初期化時に事前計算
+        let date = Self.iso8601Formatter.date(from: self.modified_at) ?? Date.distantPast
+        self.comparableModifiedDate = date
+        self.formattedSize = Self.byteCountFormatter.string(fromByteCount: self.size)
+        self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
         
         // originalIndex は API レスポンスに含まれないため、ここでは初期化しない
         // CommandExecutor で API 応答後に設定する
@@ -98,25 +115,16 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     
     // MARK: - Sorting Helpers
     
-    /// サイズ (バイト単位の数値) をGB単位のDoubleに変換して比較用に使用
+    /// サイズ (バイト単位の数値) をDoubleに変換して比較用に使用
     var comparableSize: Double {
-        return Double(size) // sizeがInt64なので直接Doubleに変換
+        return Double(size)
     }
     
-    /// modified_at (ISO 8601文字列) をDateオブジェクトに変換して比較用に使用
-    var comparableModifiedDate: Date {
-        return Self.iso8601Formatter.date(from: modified_at) ?? Date.distantPast
-    }
+    // comparableModifiedDate は Stored Property に移行しました
     
-    /// サイズを判読可能な文字列に変換するヘルパー
-    var formattedSize: String {
-        return Self.byteCountFormatter.string(fromByteCount: size)
-    }
+    // formattedSize は Stored Property に移行しました
     
-    /// modified_at を判読可能な日付文字列に変換するヘルパー
-    var formattedModifiedAt: String {
-        return Self.displayDateFormatter.string(from: comparableModifiedDate)
-    }
+    // formattedModifiedAt は Stored Property に移行しました
     
     /// 画像生成モデルかどうかを判定するヘルパー
     var isImageModel: Bool {
