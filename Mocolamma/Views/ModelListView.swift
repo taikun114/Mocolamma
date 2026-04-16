@@ -56,13 +56,7 @@ struct ModelListView: View {
     @State private var sortOrderOption: SortOrder = .ascending
     
     
-    // 利用可能な全てのタグ（能力）を抽出して指定された順序でソートしたリスト
-    private var availableTags: [String] {
-        let tags = executor.models.compactMap { $0.capabilities }.flatMap { $0 }
-        return Array(Set(tags)).sorted { tag1, tag2 in
-            tagWeight(tag1) < tagWeight(tag2)
-        }
-    }
+    @State private var cachedAvailableTags: [String] = [] // タグ一覧のキャッシュ用ステータス
     
     // タグの表示順序を制御するための重み付け
     private func tagWeight(_ tag: String) -> Int {
@@ -135,7 +129,8 @@ struct ModelListView: View {
     
     // 現在のソート順とフィルターに基づいてモデルリストを更新するメソッド
     private func updateSortedAndFilteredModels() {
-        var models = executor.models
+        let allModels = executor.models
+        var models = allModels
         
         // フィルタリング適用
         if let filter = selectedFilterTag {
@@ -144,6 +139,12 @@ struct ModelListView: View {
         
         // 全プラットフォームでTable/Menuから供給されるsortOrderに従ってソート
         sortedAndFilteredModels = models.sorted(using: sortOrder)
+        
+        // タグ一覧のキャッシュを更新
+        let tags = allModels.compactMap { $0.capabilities }.flatMap { $0 }
+        cachedAvailableTags = Array(Set(tags)).sorted { tag1, tag2 in
+            tagWeight(tag1) < tagWeight(tag2)
+        }
     }
     
     // Menuでの選択内容をsortOrderバインディングに同期するメソッド
@@ -201,7 +202,7 @@ struct ModelListView: View {
             Menu {
                 Picker("Filter", selection: $selectedFilterTag) {
                     Label("All Models", systemImage: "tray.full").tag(nil as String?)
-                    ForEach(availableTags, id: \.self) { tag in
+                    ForEach(cachedAvailableTags, id: \.self) { tag in
                         Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
                     }
                 }
@@ -224,7 +225,7 @@ struct ModelListView: View {
                 Menu {
                     Picker("Filter", selection: $selectedFilterTag) {
                         Label("All Models", systemImage: "tray.full").tag(nil as String?)
-                        ForEach(availableTags, id: \.self) { tag in
+                        ForEach(cachedAvailableTags, id: \.self) { tag in
                             Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
                         }
                     }
@@ -447,6 +448,7 @@ struct ModelListView: View {
 /// 進捗更新などの頻繁な変更から隔離するため、表示に必要な最小限のデータのみを受け取ります。
 struct ModelListContentView: View {
     @Environment(CommandExecutor.self) var executor
+    @Environment(ServerManager.self) var serverManager
     let sortedModels: [OllamaModel]
     @Binding var selectedModel: OllamaModel.ID?
     @Binding var sortOrder: [KeyPathComparator<OllamaModel>]
@@ -467,12 +469,23 @@ struct ModelListContentView: View {
             ForEach(sortedModels) { model in
                 ModelListRowView(
                     model: model,
+                    isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil,
                     copyIconName: copyIconName,
-                    modelToDelete: $modelToDelete,
-                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                    loadErrorMessage: $loadErrorMessage,
-                    showingLoadErrorAlert: $showingLoadErrorAlert,
-                    modelForCustomKeepAlive: $modelForCustomKeepAlive
+                    loadModel: { await executor.loadModel(modelName: $0, keepAlive: $1) },
+                    unloadModel: { await executor.unloadModel(modelName: $0) },
+                    onDelete: { modelToDelete = $0; showingDeleteConfirmation = true },
+                    onCustomKeepAlive: { modelForCustomKeepAlive = $0 },
+                    onCopy: { text in
+#if os(macOS)
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(text, forType: .string)
+#else
+                        UIPasteboard.general.string = text
+#endif
+                    },
+                    onError: { error in loadErrorMessage = error; showingLoadErrorAlert = true },
+                    parseError: { parseError(from: $0) },
+                    getExecutorOutput: { executor.output }
                 )
                 .equatable()
                 .tag(model.id)
@@ -524,7 +537,7 @@ struct ModelListContentView: View {
             .width(min: 80, ideal: 130, max: .infinity)
             
             TableColumn("Status", value: \.statusWeight) { model in
-                ModelLoadStatusIconView(modelName: model.name)
+                ModelLoadStatusIconView(statusWeight: model.statusWeight)
             }
             .width(min: 20, ideal: 70, max: .infinity)
         }
@@ -728,22 +741,26 @@ struct ModelListContentView: View {
 /// 各モデル行を表示するビュー。行ごとの不必要な再描画を防ぐために独立させています。
 struct ModelListRowView: View, Equatable {
     let model: OllamaModel
+    let isActionsDisabled: Bool
     let copyIconName: String
     
-    @Binding var modelToDelete: OllamaModel?
-    @Binding var showingDeleteConfirmation: Bool
-    @Binding var loadErrorMessage: String?
-    @Binding var showingLoadErrorAlert: Bool
-    @Binding var modelForCustomKeepAlive: OllamaModel?
-    
-    @Environment(CommandExecutor.self) var executor
+    var loadModel: (String, JSONValue?) async -> Bool
+    var unloadModel: (String) async -> Bool
+    var onDelete: (OllamaModel) -> Void
+    var onCustomKeepAlive: (OllamaModel) -> Void
+    var onCopy: (String) -> Void
+    var onError: (String) -> Void
+    var parseError: (String) -> String?
+    var getExecutorOutput: () -> String
     
     // ModelListRowViewはmodelの内容が変わらない限り再描画されません
+    // 依存関係が明確なプロパティのみを比較対象にします
     static func == (lhs: ModelListRowView, rhs: ModelListRowView) -> Bool {
         lhs.model.id == rhs.model.id && 
         lhs.model.statusWeight == rhs.model.statusWeight &&
         lhs.model.size == rhs.model.size &&
-        lhs.model.modified_at == rhs.model.modified_at
+        lhs.model.modified_at == rhs.model.modified_at &&
+        lhs.isActionsDisabled == rhs.isActionsDisabled
     }
 
     var body: some View {
@@ -765,23 +782,23 @@ struct ModelListRowView: View, Equatable {
             
             Spacer()
             
-            ModelLoadStatusIconView(modelName: model.name)
+            ModelLoadStatusIconView(statusWeight: model.statusWeight)
         }
         .contextMenu {
             Menu {
                 Button("Load with Default Time") {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name)
+                        let success = await loadModel(model.name, nil)
                         if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
+                            if let errorText = parseError(getExecutorOutput()) {
+                                await MainActor.run {
+                                    onError(errorText)
                                 }
                             }
                         }
                     }
                 }
+                .disabled(isActionsDisabled)
                 
                 Divider()
                 
@@ -795,51 +812,48 @@ struct ModelListRowView: View, Equatable {
                     Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) { loadWithTime("1h") }
                     Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) { loadWithTime("-1") }
                 }
+                .disabled(isActionsDisabled)
                 
                 Divider()
                 
                 Button("Custom...") {
-                    modelForCustomKeepAlive = model
+                    onCustomKeepAlive(model)
                 }
+                .disabled(isActionsDisabled)
             } label: {
                 Label("Load Model", systemImage: "tray.and.arrow.down")
             }
             
             Button("Unload Model", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await executor.unloadModel(modelName: model.name)
+                    await unloadModel(model.name)
                 }
             }
-            .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
+            .disabled(isActionsDisabled || model.statusWeight == 3) // ロード中でない場合は無効化
             
             Divider()
             
             Button {
-                #if os(macOS)
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(model.name, forType: .string)
-                #else
-                UIPasteboard.general.string = model.name
-                #endif
+                onCopy(model.name)
             } label: {
                 Label("Copy Model Name", systemImage: copyIconName)
             }
             
             Button(role: .destructive) {
-                modelToDelete = model
-                showingDeleteConfirmation = true
+                onDelete(model)
             } label: {
                 Label("Delete...", systemImage: "trash")
             }
+            .disabled(isActionsDisabled)
         }
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
-                modelToDelete = model
-                showingDeleteConfirmation = true
+                onDelete(model)
             } label: {
                 Label("Delete", systemImage: "trash")
             }
             .labelStyle(.iconOnly)
+            .disabled(isActionsDisabled)
         }
     }
     
@@ -847,32 +861,32 @@ struct ModelListRowView: View, Equatable {
         Task {
             let success: Bool
             if time == "-1" {
-                success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1))
+                success = await loadModel(model.name, .int(-1))
             } else {
-                success = await executor.loadModel(modelName: model.name, keepAlive: .string(time))
+                success = await loadModel(model.name, .string(time))
             }
+            
             if !success {
-                await MainActor.run {
-                    if let errorText = parseError(from: executor.output) {
-                        loadErrorMessage = errorText
-                        showingLoadErrorAlert = true
+                if let errorText = parseError(getExecutorOutput()) {
+                    await MainActor.run {
+                        onError(errorText)
                     }
                 }
             }
         }
     }
-    
-    private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
-        if let data = output.data(using: .utf8),
-           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let err = obj["error"] as? String {
-            return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
-        }
-        if output.lowercased().contains("error") {
-            return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
-        }
-        return nil
+}
+
+private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
+    if let data = output.data(using: .utf8),
+       let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+       let err = obj["error"] as? String {
+        return replaceNewline ? err.replacingOccurrences(of: "\n", with: " ") : err
     }
+    if output.lowercased().contains("error") {
+        return replaceNewline ? output.replacingOccurrences(of: "\n", with: " ") : output
+    }
+    return nil
 }
 
 // MARK: - モデルステータスアイコン用のサブビュー
@@ -880,28 +894,25 @@ struct ModelListRowView: View, Equatable {
 /// モデルのロード状態を示すアイコンを表示する独立したビュー。
 /// CommandExecutorを独自に監視することで、親ビューの再描画を防ぎ、リストスクロール時のCPU負荷を低減します。
 struct ModelLoadStatusIconView: View {
-    @Environment(CommandExecutor.self) var executor
-    let modelName: String
+    let statusWeight: Int
     
     var body: some View {
         ZStack {
-            if executor.recentLoadedModelNames.contains(modelName) {
+            if statusWeight == 0 {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
                     .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
-            } else if executor.loadingModelNames.contains(modelName) {
+            } else if statusWeight == 1 {
                 ProgressView()
                     .controlSize(.small)
                     .transition(.opacity)
-            } else if executor.runningModels.contains(where: { $0.name == modelName || $0.name == "\(modelName):latest" }) {
+            } else if statusWeight == 2 {
                 Image(systemName: "tray.and.arrow.down")
                     .foregroundColor(.secondary)
                     .transition(.opacity)
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: executor.loadingModelNames.contains(modelName))
-        .animation(.easeInOut(duration: 0.3), value: executor.recentLoadedModelNames.contains(modelName))
-        .animation(.easeInOut(duration: 0.3), value: executor.runningModels.contains(where: { $0.name == modelName || $0.name == "\(modelName):latest" }))
+        .animation(.easeInOut(duration: 0.3), value: statusWeight)
     }
 }
 
