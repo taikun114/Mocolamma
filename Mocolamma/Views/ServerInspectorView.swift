@@ -174,6 +174,7 @@ struct ServerInspectorView: View {
                             }
                         }
                 }
+                .accessibilityElement(children: .combine)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollamaバージョン情報

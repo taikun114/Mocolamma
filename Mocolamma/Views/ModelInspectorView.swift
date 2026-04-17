@@ -252,6 +252,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Size:") // サイズ。
                         Text(model.formattedSize)
@@ -271,6 +272,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Modified At:") // 変更日
                         Text(model.formattedModifiedAt)
@@ -290,6 +292,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Digest:") // ダイジェスト。
                         Text(model.digest)
@@ -309,6 +312,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                 }
                 .font(.body)
                 .frame(maxWidth: .infinity, alignment: .leading)

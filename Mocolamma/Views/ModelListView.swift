@@ -211,6 +211,7 @@ struct ModelListView: View {
             } label: {
                 Label("Filter", systemImage: filterIconName)
             }
+            .accessibilityLabel("Filter")
             .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
 #else
@@ -243,6 +244,7 @@ struct ModelListView: View {
             } label: {
                 Label("Sort", systemImage: filterIconName)
             }
+            .accessibilityLabel("Sort and Filter")
             .help(String(localized: "Sort and Filter"))
             .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
@@ -258,6 +260,7 @@ struct ModelListView: View {
             Button(action: { showingAddSheet = true }) {
                 Label("Add New", systemImage: "plus")
             }
+            .accessibilityLabel("Add New Model")
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
         
@@ -272,6 +275,7 @@ struct ModelListView: View {
                 Button(action: { onTogglePreview() }) {
                     Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
                 }
+                .accessibilityLabel("Inspector")
             }
         }
 #endif
@@ -499,6 +503,9 @@ struct ModelListContentView: View {
                 }
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Model List")
+        .accessibilityIdentifier("model_list")
 #if os(visionOS)
         .safeAreaInset(edge: .bottom) {
             if bottomInset > 0 {
@@ -542,6 +549,9 @@ struct ModelListContentView: View {
             }
             .width(min: 20, ideal: 70, max: .infinity)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Model Table")
+        .accessibilityIdentifier("model_table_macos")
         .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
             if let selectedID = selectedIDs.first,
                let model = sortedModels.first(where: { $0.id == selectedID }) {
@@ -800,6 +810,19 @@ struct ModelListRowView: View, Equatable {
         .accessibilityElement()
         .accessibilityLabel(model.name)
         .accessibilityValue(getAccessibilityValue())
+        .accessibilityIdentifier("model_row_\(model.id)")
+        .accessibilityInputLabels([model.name])
+        .accessibilityAction(named: String(localized: "Load Model")) {
+            Task {
+                await loadModel(model.name, nil)
+            }
+        }
+        .accessibilityAction(named: String(localized: "Copy Model Name")) {
+            onCopy(model.name)
+        }
+        .accessibilityAction(named: String(localized: "Delete Model")) {
+            onDelete(model)
+        }
         .contextMenu {
             Menu {
                 Button("Load with Default Time") {

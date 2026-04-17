@@ -249,6 +249,9 @@ private struct ServerListViewContent: View {
             }
             .onMove(perform: serverManager.moveServer)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Server List")
+        .accessibilityIdentifier("server_list")
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
 #if os(macOS)
             if let selectedID = selectedIDs.first {
@@ -279,6 +282,18 @@ private struct ServerRowContent: View {
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
+        .accessibilityIdentifier("server_row_\(server.id)")
+        .accessibilityInputLabels([server.name, server.host])
+        .accessibilityAction(named: String(localized: "Select Server")) {
+            serverManager.selectedServerID = server.id
+        }
+        .accessibilityAction(named: String(localized: "Edit Server")) {
+            serverToEdit = server
+        }
+        .accessibilityAction(named: String(localized: "Delete Server")) {
+            serverToDelete = server
+            showingDeleteConfirmationServer = true
+        }
 #if !os(macOS)
         .contentShape(Rectangle())
         
