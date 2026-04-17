@@ -947,11 +947,11 @@ struct PullProgressView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var pullProgressString: String {
+        let percentString = executor.pullProgress.formatted(.percent.precision(.fractionLength(1)))
         let completed = ByteCountFormatter().string(fromByteCount: executor.pullCompleted)
         let total = ByteCountFormatter().string(fromByteCount: executor.pullTotal)
-        let percent = executor.pullProgress * 100
-        return String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                      percent as CVarArg, completed as CVarArg, total as CVarArg)
+        return String(localized: "\(percentString) completed (\(completed) / \(total))",
+                      comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)")
     }
     
     var body: some View {

@@ -12,83 +12,6 @@
       },
       "shouldTranslate" : false
     },
-    " %.1f%% completed (%@ / %@)" : {
-      "comment" : "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم اكتمال %1$.1f%% (%2$@ / %3$@)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% abgeschlossen (%2$@ / %3$@)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% completed (%2$@ / %3$@)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% completado (%2$@ / %3$@)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% terminé (%2$@ / %3$@)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 完了 (%2$@ / %3$@)"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 완료 (%2$@ / %3$@)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% завершено (%2$@ / %3$@)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% завершено (%2$@ / %3$@)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 已完成 (%2$@ / %3$@)"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 已完成 (%2$@ / %3$@)"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$.1f%% 已完成 (%2$@ / %3$@)"
-          }
-        }
-      }
-    },
     "-" : {
       "localizations" : {
         "de" : {
@@ -479,6 +402,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*沒有訊息*"
+          }
+        }
+      }
+    },
+    "%@ completed (%@ / %@)" : {
+      "comment" : "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم اكتمال %1$@ (%2$@ / %3$@)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ abgeschlossen (%2$@ / %3$@)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ completed (%2$@ / %3$@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ completado (%2$@ / %3$@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ terminé (%2$@ / %3$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 完了 (%2$@ / %3$@)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 완료 (%2$@ / %3$@)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ завершено (%2$@ / %3$@)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ завершено (%2$@ / %3$@)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 已完成 (%2$@ / %3$@)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 已完成 (%2$@ / %3$@)"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 已完成 (%2$@ / %3$@)"
           }
         }
       }
