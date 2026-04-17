@@ -58,6 +58,9 @@ struct MessageView: View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(message.role == "user" ? "User message" : "Assistant message")
+                .accessibilityValue(message.content)
                 .padding(10)
                 .background(
                     Group {
@@ -369,6 +372,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Previous Revision")
 #if !os(macOS)
             .font(.body)
 #else
@@ -423,6 +427,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Next Revision")
 #if !os(macOS)
             .font(.body)
 #else
@@ -450,6 +455,7 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        .accessibilityLabel("Retry")
 #if !os(macOS)
         .font(.body)
 #else
@@ -477,6 +483,7 @@ struct MessageView: View {
                 .symbolVariant(isDownloadSuccessful ? .none : .none) // 整合性のための指定
                 .contentTransition(.symbolEffect(.replace))
         }
+        .accessibilityLabel("Download Image")
 #if !os(macOS)
         .font(.body)
 #else
@@ -635,6 +642,7 @@ struct MessageView: View {
                 .padding(5)
                 .contentTransition(.symbolEffect(.replace))
         }
+        .accessibilityLabel("Copy")
 #if !os(macOS)
         .font(.body)
 #else
@@ -754,6 +762,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Edit")
 #if !os(macOS)
             .font(.body)
 #else

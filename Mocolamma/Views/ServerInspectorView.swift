@@ -220,6 +220,7 @@ struct ServerInspectorView: View {
                                 .frame(width: 20, height: 20)
 #endif
                         }
+                        .accessibilityLabel("Refresh")
 #if os(visionOS)
                         .buttonStyle(.bordered)
 #else

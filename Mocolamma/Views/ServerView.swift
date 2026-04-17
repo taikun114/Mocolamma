@@ -35,6 +35,7 @@ struct ServerView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
+            .accessibilityLabel("Refresh")
         }
 #endif
         
@@ -42,6 +43,7 @@ struct ServerView: View {
             Button(action: { showingAddServerSheet = true }) {
                 Label("Add Server", systemImage: "plus")
             }
+            .accessibilityLabel("Add Server")
         }
 
 #if os(iOS)
@@ -55,6 +57,7 @@ struct ServerView: View {
             Button(action: { onTogglePreview() }) {
                 Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
+            .accessibilityLabel("Inspector")
         }
 #endif
     }

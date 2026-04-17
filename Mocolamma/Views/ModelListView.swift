@@ -469,6 +469,7 @@ struct ModelListContentView: View {
             ForEach(sortedModels) { model in
                 ModelListRowView(
                     model: model,
+                    isSelected: selectedModel == model.id,
                     isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil,
                     copyIconName: copyIconName,
                     loadModel: { await executor.loadModel(modelName: $0, keepAlive: $1) },
@@ -741,6 +742,7 @@ struct ModelListContentView: View {
 /// 各モデル行を表示するビュー。行ごとの不必要な再描画を防ぐために独立させています。
 struct ModelListRowView: View, Equatable {
     let model: OllamaModel
+    let isSelected: Bool
     let isActionsDisabled: Bool
     let copyIconName: String
     
@@ -760,7 +762,18 @@ struct ModelListRowView: View, Equatable {
         lhs.model.statusWeight == rhs.model.statusWeight &&
         lhs.model.size == rhs.model.size &&
         lhs.model.modified_at == rhs.model.modified_at &&
-        lhs.isActionsDisabled == rhs.isActionsDisabled
+        lhs.isActionsDisabled == rhs.isActionsDisabled &&
+        lhs.isSelected == rhs.isSelected
+    }
+    
+    // アクセシビリティ用のステータステキスト
+    private var statusText: String {
+        switch model.statusWeight {
+        case 0: return String(localized: "Loaded", comment: "Accessibility status: Model is successfully loaded")
+        case 1: return String(localized: "Loading", comment: "Accessibility status: Model is currently loading")
+        case 2: return String(localized: "Loaded", comment: "Accessibility status: Model is already loaded")
+        default: return String(localized: "Not Loaded", comment: "Accessibility status: Model is not loaded")
+        }
     }
 
     var body: some View {
@@ -784,6 +797,9 @@ struct ModelListRowView: View, Equatable {
             
             ModelLoadStatusIconView(statusWeight: model.statusWeight)
         }
+        .accessibilityElement()
+        .accessibilityLabel(model.name)
+        .accessibilityValue(getAccessibilityValue())
         .contextMenu {
             Menu {
                 Button("Load with Default Time") {
@@ -875,6 +891,11 @@ struct ModelListRowView: View, Equatable {
             }
         }
     }
+    
+    private func getAccessibilityValue() -> String {
+        let activeSuffix = isSelected ? String(localized: ", Active Model") : ""
+        return String(localized: "\(model.formattedSize), \(model.formattedModifiedAt), \(statusText)\(activeSuffix)")
+    }
 }
 
 private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
@@ -925,6 +946,14 @@ struct PullProgressView: View {
     let isSelected: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
+    private var pullProgressString: String {
+        let completed = ByteCountFormatter().string(fromByteCount: executor.pullCompleted)
+        let total = ByteCountFormatter().string(fromByteCount: executor.pullTotal)
+        let percent = executor.pullProgress * 100
+        return String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
+                      percent as CVarArg, completed as CVarArg, total as CVarArg)
+    }
+    
     var body: some View {
         if (executor.isPulling || executor.isPullingErrorHold) && isSelected {
 #if os(visionOS)
@@ -955,12 +984,15 @@ struct PullProgressView: View {
                         }
                     }) {
                         Image(systemName: "arrow.clockwise")
-                            .help("Retry")
                     }
+                    .accessibilityLabel("Retry")
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.circle)
                 }
             }
+            .accessibilityElement()
+            .accessibilityLabel(String(localized: "Download Progress: \(executor.pullStatus)"))
+            .accessibilityValue(pullProgressString)
 #else
             VStack(alignment: .center, spacing: 8) {
                 ProgressView(value: executor.pullProgress) {
@@ -975,8 +1007,8 @@ struct PullProgressView: View {
                                 }
                             }) {
                                 Image(systemName: "arrow.clockwise")
-                                    .help("Retry")
                             }
+                            .accessibilityLabel("Retry")
                             .buttonStyle(.plain)
                             .padding(.top, 4)
                             .padding(.bottom, 2)
@@ -1000,22 +1032,18 @@ struct PullProgressView: View {
             .padding(.horizontal, 12)
             .padding(.top, !(executor.isPullingErrorHold && executor.pullHasError) ? 6 : 0)
             .padding(.bottom, 12)
+            .accessibilityElement()
+            .accessibilityLabel(String(localized: "Download Progress: \(executor.pullStatus)"))
+            .accessibilityValue(pullProgressString)
 #endif
         }
     }
     
     @ViewBuilder
     private var progressLabels: some View {
-        let completed = ByteCountFormatter().string(fromByteCount: executor.pullCompleted)
-        let total = ByteCountFormatter().string(fromByteCount: executor.pullTotal)
-        let percent = executor.pullProgress * 100
-        
-        let progressString = String(format: NSLocalizedString(" %.1f%% completed (%@ / %@)", comment: "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)"),
-                                    percent as CVarArg, completed as CVarArg, total as CVarArg)
-        
 #if os(visionOS)
         HStack {
-            Text(progressString)
+            Text(pullProgressString)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer()
             if executor.pullSpeedBytesPerSec > 0 {
@@ -1025,7 +1053,7 @@ struct PullProgressView: View {
 #else
         if horizontalSizeClass == .compact {
             VStack(alignment: .leading) {
-                Text(progressString)
+                Text(pullProgressString)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if executor.pullSpeedBytesPerSec > 0 {
                     speedAndETASection
@@ -1033,7 +1061,7 @@ struct PullProgressView: View {
             }
         } else {
             HStack {
-                Text(progressString)
+                Text(pullProgressString)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
                 if executor.pullSpeedBytesPerSec > 0 {

@@ -26,6 +26,15 @@ struct ServerRowView: View {
 #endif
     }
     
+    private var statusText: String {
+        switch connectionStatus {
+        case .connected: return String(localized: "Connected")
+        case .notConnected, .unknownHost, .timedOut: return String(localized: "Disconnected")
+        case .checking, .none: return String(localized: "Checking connection...")
+        case .some(.errorWithMessage): return String(localized: "Error")
+        }
+    }
+    
     var body: some View {
         HStack {
             // 接続状態を示すインジケーター
@@ -113,6 +122,14 @@ struct ServerRowView: View {
             }
         }
         .padding(.vertical, 4) // 行に垂直方向のパディングを追加
+        .accessibilityElement()
+        .accessibilityLabel(server.name)
+        .accessibilityValue(getAccessibilityValue())
+    }
+    
+    private func getAccessibilityValue() -> String {
+        let activeSuffix = isSelected ? String(localized: ", Active Server") : ""
+        return String(localized: "\(server.host), \(statusText)\(activeSuffix)")
     }
 }
 

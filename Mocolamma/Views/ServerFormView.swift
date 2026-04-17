@@ -70,6 +70,7 @@ struct ServerFormView: View {
                     }
                     .buttonStyle(.plain)
                     .help(String(localized: "Select Icon"))
+                    .accessibilityLabel("Select Icon")
                     .symbolPicker(isPresented: $isShowingSymbolPicker, selection: $serverIconInput)
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -168,6 +169,7 @@ struct ServerFormView: View {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Close")
             }
             ToolbarItem(placement: .primaryAction) {
                 if #available(iOS 26.0, visionOS 26.0, *) {
@@ -183,6 +185,7 @@ struct ServerFormView: View {
                     }) {
                         Image(systemName: "checkmark")
                     }
+                    .accessibilityLabel("Save")
                     .keyboardShortcut(.defaultAction)
                     .disabled(isSaveButtonDisabled)
                     .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)
