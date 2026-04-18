@@ -58,7 +58,7 @@ struct MessageView: View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .contain)
                 .accessibilityLabel(message.role == "user" ? "User message" : "Assistant message")
                 .accessibilityValue(message.content)
                 .padding(10)
@@ -1129,13 +1129,12 @@ struct MessageView: View {
                         .foregroundColor(.secondary)
                 } else if !message.content.isEmpty {
                     let displayContent = message.content
-                    StructuredText.Streaming(markdown: displayContent)
+                    StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textualSelection(enabled: !message.isStreaming)
-                        .textual.syntaxHighlightingEnabled(!message.isStreaming)
+                        .textualSelection(enabled: !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
+                        .textual.syntaxHighlightingEnabled(!message.isStreaming && !isStreamingAny)
                         .textual.overflowMode(.scroll)
-                        .compositingGroup() // 描画を最適化
                 } else {
                     Text("Failed to generate image.")
                         .foregroundColor(.red)
@@ -1168,12 +1167,12 @@ struct MessageView: View {
                 
                 if isThinkingExpanded {
                     if let thinking = message.thinking, !thinking.isEmpty {
-                        StructuredText.Streaming(markdown: thinking)
+                        StructuredText.Streaming(markdown: thinking, isStreaming: message.isStreaming && !message.isThinkingCompleted)
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textualSelection(enabled: !(message.isStreaming && !message.isThinkingCompleted))
-                            .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted))
+                            .textualSelection(enabled: !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
                     }
@@ -1204,7 +1203,7 @@ struct MessageView: View {
         } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
                 let displayContent = message.content
-                StructuredText.Streaming(markdown: displayContent)
+                StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
                     .textualSelection(enabled: !message.isStreaming)
@@ -1227,13 +1226,8 @@ struct MessageView: View {
 
 // MARK: - View Helper for Textual Selection
 extension View {
-    @ViewBuilder
     func textualSelection(enabled: Bool) -> some View {
-        if enabled {
-            self.textual.textSelection(.enabled)
-        } else {
-            self.textual.textSelection(.disabled)
-        }
+        self.textual.textSelection(enabled)
     }
 }
 

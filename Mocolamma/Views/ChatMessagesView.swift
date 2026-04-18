@@ -92,6 +92,11 @@ struct ChatMessagesView: View {
     }
 }
 
+struct ScrollState: Equatable {
+    let nearBottom: Bool
+    let contentHeight: CGFloat
+}
+
 struct ChatMessagesScrollView: View {
     @Binding var messages: [ChatMessage]
     let onRetry: ((UUID, ChatMessage) -> Void)?
@@ -103,6 +108,10 @@ struct ChatMessagesScrollView: View {
     var bottomInset: CGFloat = 0
     
     @State private var isNearBottom: Bool = true
+    @State private var lastScrollTime: Date = .distantPast
+    @State private var isUserInteracting: Bool = false
+    @GestureState private var isTouching: Bool = false
+    @State private var latestScrollState: ScrollState? = nil
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -125,6 +134,8 @@ struct ChatMessagesScrollView: View {
                         .id(message.id)
                     }
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Chat messages")
                 .padding()
                 .if(!isUsingSafeAreaBar) { view in
                     view.padding(.bottom, 50)
@@ -140,55 +151,81 @@ struct ChatMessagesScrollView: View {
             .scrollDismissesKeyboard(.interactively)
 #endif
             .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
-            .onScrollGeometryChange(for: Bool.self) { geometry in
+            .onScrollPhaseChange { oldPhase, newPhase in
+                if newPhase == .interacting || newPhase == .decelerating {
+                    isUserInteracting = true
+                } else if newPhase == .idle {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isUserInteracting = false
+                    }
+                }
+            }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .updating($isTouching) { _, state, _ in
+                        state = true
+                    }
+            )
+            .onScrollGeometryChange(for: ScrollState.self) { geometry in
                 let contentHeight = geometry.contentSize.height
                 let visibleHeight = geometry.containerSize.height
                 let scrollOffset = geometry.contentOffset.y
-                
-                // iOSでのバウンスやセーフエリアを考慮した計算
                 let maxOffset = max(0, contentHeight - visibleHeight)
                 let distanceFromBottom = maxOffset - scrollOffset
                 
-                // 200px以内なら「底に近い」と判定（安定性と手動操作のバランスを考慮）
-                return distanceFromBottom < 200 || scrollOffset > maxOffset - 5
+                let threshold: CGFloat = 800 // より広めに設定
+                let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
+                
+                return ScrollState(nearBottom: nearBottom, contentHeight: contentHeight)
             } action: { _, newValue in
-                isNearBottom = newValue
-            }
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                geometry.contentSize.height
-            } action: { oldHeight, newHeight in
-                // ユーザーが底付近にいる場合のみ、コンテンツが伸びたらスクロール追従
-                if isNearBottom && newHeight > oldHeight {
-                    scrollBottom(proxy: proxy)
+                // 変更があった時のみシグナルを送る
+                if latestScrollState != newValue {
+                    latestScrollState = newValue
                 }
+            }
+            .task(id: latestScrollState) {
+                guard let state = latestScrollState else { return }
+                do {
+                    // ループを止める最小限のディレイ。1.5フレーム分（約25ms）程度待つことで
+                    // OS側のジオメトリ計算が完全に落ち着くのを待ちます。
+                    try await Task.sleep(nanoseconds: 25_000_000)
+                    
+                    await MainActor.run {
+                        // 状態の不一致がある場合のみ更新
+                        if isNearBottom != state.nearBottom {
+                            isNearBottom = state.nearBottom
+                        }
+                        
+                        let now = Date()
+                        // 追従頻度をさらに最適化（0.15秒）
+                        if state.nearBottom && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.15 {
+                            lastScrollTime = now
+                            scrollBottom(proxy: proxy)
+                        }
+                    }
+                } catch {}
             }
             .onChange(of: messages.count) { oldCount, newCount in
                 if newCount > oldCount {
-                    // 新しいメッセージが追加されたときは、現在の位置に関わらず底に移動（UX上の期待値）
-                    scrollBottom(proxy: proxy)
+                    DispatchQueue.main.async {
+                        scrollBottom(proxy: proxy)
+                    }
                 }
             }
-            // 最後のメッセージの内容（ストリーミング）が開始・終了した際
             .onChange(of: isOverallStreaming) { _, _ in
-                // ユーザーが底付近にいる場合のみ、完了時などのレイアウト変更に追従
                 if isNearBottom {
-                    scrollBottom(proxy: proxy)
+                    DispatchQueue.main.async {
+                        scrollBottom(proxy: proxy)
+                    }
                 }
             }
         }
     }
     
     private func scrollBottom(proxy: ScrollViewProxy) {
-        Task {
-            // 1回目のスクロール：即応性を重視
-            try? await Task.sleep(nanoseconds: 10_000_000) // 10ms
-            withAnimation(reduceMotionEnabled ? .none : .default) {
-                proxy.scrollTo("bottom-spacer", anchor: .bottom)
-            }
-            
-            // 2回目のスクロール：レイアウトが完全に落ち着いた後の微調整用
-            // 50ms〜100ms程度待つことで、複雑なレイアウト変更（ボタンの出現など）後の位置を確定させる
-            try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+        // すでに実行中のスクロールタスクがある場合は無視されるように設計
+        // レイアウト変更（選択ボタン出現など）が完全に完了するまで少し待つ
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(reduceMotionEnabled ? .none : .default) {
                 proxy.scrollTo("bottom-spacer", anchor: .bottom)
             }
