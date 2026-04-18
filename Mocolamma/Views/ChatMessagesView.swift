@@ -212,8 +212,15 @@ struct ChatMessagesScrollView: View {
                     }
                 }
             }
-            .onChange(of: isOverallStreaming) { _, _ in
-                if isNearBottom {
+            .onChange(of: isOverallStreaming) { old, new in
+                if old && !new {
+                    // ストリーミング完了時は、レイアウト（選択ボタンの出現など）の確定を待つためにさらに少し遅延させる
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if isNearBottom {
+                            scrollBottom(proxy: proxy)
+                        }
+                    }
+                } else if isNearBottom {
                     DispatchQueue.main.async {
                         scrollBottom(proxy: proxy)
                     }

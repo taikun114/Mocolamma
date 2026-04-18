@@ -831,6 +831,7 @@ struct ChatView: View {
                 }
             }
         }
+        await dispenserTask.value
         executor.isChatStreaming = false
     }
 }
