@@ -619,15 +619,106 @@ struct ChatView: View {
         }
     }
     
-    /// ストリーミング応答を処理し、UIをバッファリングしながら更新
+    /// ストリーミング応答を処理し、UIの更新負荷に応じて動的に頻度と排出量を調整
+    @MainActor
     private func streamAssistantResponse(for messageId: UUID, with apiMessages: [ChatMessage], model: OllamaModel) async {
-        var lastUIUpdateTime = Date()
-        let throttleInterval = 0.03 // 約30fpsで更新
         var isFirstChunk = true
         var isInsideThinkingBlock = false
         
-        var fullContent = ""
-        var fullThinking = ""
+        // --- 排出システムの管理用状態 ---
+        class StreamBuffer {
+            var rawContent = ""
+            var rawThinking = ""
+            var isThinkingCompleted = false
+            var isStreamingFinished = false
+            var finalChunk: ChatResponseChunk? = nil
+        }
+        
+        let buffer = StreamBuffer()
+        var displayedContentLength = 0
+        var displayedThinkingLength = 0
+        
+        // --- ディスペンサー（排出）ループ ---
+        // メインスレッドの負荷を計測しながら、バッファからUIへ少しずつ流し込む
+        let dispenserTask = Task {
+            var currentInterval: TimeInterval = 0.033 // 目標 30fps
+            var charsPerTick: Int = 30 // 1回あたりに追加する文字数（ベース）
+            
+            while true {
+                // ストリーミング終了＆バッファ排出済みならループを抜ける
+                if buffer.isStreamingFinished && 
+                   buffer.rawContent.count <= displayedContentLength && 
+                   buffer.rawThinking.count <= displayedThinkingLength {
+                    break
+                }
+                
+                let tickStart = Date()
+                
+                // バッファが大量に溜まっている（渋滞）場合は、排出量を増やして追いつく
+                let lag = (buffer.rawContent.count - displayedContentLength) + (buffer.rawThinking.count - displayedThinkingLength)
+                let adaptiveChars = charsPerTick + (lag > 200 ? (lag / 100) * 10 : 0) // 200文字以上のラグでさらに加速
+                
+                // 次の排出目標
+                let targetC = min(buffer.rawContent.count, displayedContentLength + adaptiveChars)
+                let targetT = min(buffer.rawThinking.count, displayedThinkingLength + adaptiveChars)
+                
+                let nextC = String(buffer.rawContent.prefix(targetC))
+                let nextT = String(buffer.rawThinking.prefix(targetT))
+                
+                // UI更新
+                if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }) {
+                    executor.chatMessages[index].content = nextC
+                    executor.chatMessages[index].latestContent = nextC
+                    executor.chatMessages[index].thinking = nextT.isEmpty ? nil : nextT
+                    executor.chatMessages[index].isThinkingCompleted = buffer.isThinkingCompleted
+                    
+                    displayedContentLength = targetC
+                    displayedThinkingLength = targetT
+                } else {
+                    break // メッセージが削除された場合など
+                }
+                
+                let tickEnd = Date()
+                let updateDuration = tickEnd.timeIntervalSince(tickStart)
+                
+                // --- メインスレッド負荷に応じた適応的調整 ---
+                if updateDuration > 0.016 {
+                    // 重い場合：更新頻度を下げ、1回あたりの排出量を減らして描画負荷を抑える
+                    currentInterval = min(0.25, currentInterval + 0.02)
+                    charsPerTick = max(5, charsPerTick - 1)
+                } else if updateDuration < 0.008 && lag > 0 {
+                    // 余裕がある：更新頻度を上げ、排出量を増やしてスムーズに見せる
+                    currentInterval = max(0.01, currentInterval - 0.005)
+                    charsPerTick = min(300, charsPerTick + 5)
+                }
+                
+                try? await Task.sleep(nanoseconds: UInt64(currentInterval * 1_000_000_000))
+                if Task.isCancelled { break }
+            }
+            
+            // 最終確定処理
+            if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
+               let chunk = buffer.finalChunk {
+                executor.chatMessages[index].content = buffer.rawContent
+                executor.chatMessages[index].thinking = buffer.rawThinking.isEmpty ? nil : buffer.rawThinking
+                executor.chatMessages[index].totalDuration = chunk.totalDuration
+                executor.chatMessages[index].evalCount = chunk.evalCount
+                executor.chatMessages[index].evalDuration = chunk.evalDuration
+                executor.chatMessages[index].isStreaming = false
+                
+                if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil {
+                    executor.chatMessages[index].isThinkingCompleted = true
+                }
+                
+                executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
+                executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
+                executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
+                executor.chatMessages[index].finalTotalDuration = executor.chatMessages[index].totalDuration
+                executor.chatMessages[index].finalEvalCount = executor.chatMessages[index].evalCount
+                executor.chatMessages[index].finalEvalDuration = executor.chatMessages[index].evalDuration
+                executor.chatMessages[index].finalIsStopped = executor.chatMessages[index].isStopped
+            }
+        }
         
         do {
             // パラメータの計算
@@ -675,36 +766,30 @@ struct ChatView: View {
                 
                 if let messageChunk = chunk.message {
                     if chatSettings.thinkingOption == .on {
-                        if let apiThinking = messageChunk.thinking { fullThinking += apiThinking }
-                        fullContent += messageChunk.content
+                        if let apiThinking = messageChunk.thinking { buffer.rawThinking += apiThinking }
+                        buffer.rawContent += messageChunk.content
                     } else {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
                             isInsideThinkingBlock = true
-                            fullContent += String(current[..<start.lowerBound])
+                            buffer.rawContent += String(current[..<start.lowerBound])
                             current = String(current[start.upperBound...])
                         }
                         if let end = current.range(of: "</think>") {
                             isInsideThinkingBlock = false
-                            fullThinking += String(current[..<end.lowerBound])
-                            fullContent += String(current[end.upperBound...])
-                            await MainActor.run {
-                                if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
-                                }
-                            }
+                            buffer.rawThinking += String(current[..<end.lowerBound])
+                            buffer.rawContent += String(current[end.upperBound...])
+                            buffer.isThinkingCompleted = true
                         } else if isInsideThinkingBlock {
-                            fullThinking += current
+                            buffer.rawThinking += current
                         } else {
-                            fullContent += current
+                            buffer.rawContent += current
                         }
                     }
                     
                     if isFirstChunk {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
-                            }
+                        if executor.chatMessages.indices.contains(assistantMessageIndex) {
+                            executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
                         }
                         // 最初のレスポンスが来た = モデルがメモリにロードされたので実行中リストを更新
                         Task {
@@ -712,87 +797,44 @@ struct ChatView: View {
                         }
                         isFirstChunk = false
                     }
-                    
-                    let now = Date()
-                    if now.timeIntervalSince(lastUIUpdateTime) > throttleInterval || chunk.done {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                // プロパティを直接更新して即座にMarkdownに反映
-                                executor.chatMessages[assistantMessageIndex].content = fullContent
-                                executor.chatMessages[assistantMessageIndex].thinking = fullThinking.isEmpty ? nil : fullThinking
-                                
-                                executor.chatMessages[assistantMessageIndex].latestContent = fullContent
-                                
-                                if chatSettings.thinkingOption == .on &&
-                                    !fullThinking.isEmpty &&
-                                    !fullContent.isEmpty &&
-                                    !executor.chatMessages[assistantMessageIndex].isThinkingCompleted {
-                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
-                                }
-                            }
-                        }
-                        lastUIUpdateTime = now
-                    }
                 }
                 
                 if chunk.done {
-                    if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(index) {
-                                executor.chatMessages[index].content = fullContent
-                                executor.chatMessages[index].thinking = fullThinking.isEmpty ? nil : fullThinking
-                                executor.chatMessages[index].totalDuration = chunk.totalDuration
-                                executor.chatMessages[index].evalCount = chunk.evalCount
-                                executor.chatMessages[index].evalDuration = chunk.evalDuration
-                                executor.chatMessages[index].isStreaming = false
-                                
-                                if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
-                                    executor.chatMessages[index].isThinkingCompleted = true
-                                }
-                                
-                                executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
-                                executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
-                                executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
-                                executor.chatMessages[index].finalTotalDuration = executor.chatMessages[index].totalDuration
-                                executor.chatMessages[index].finalEvalCount = executor.chatMessages[index].evalCount
-                                executor.chatMessages[index].finalEvalDuration = executor.chatMessages[index].evalDuration
-                                executor.chatMessages[index].finalIsStopped = executor.chatMessages[index].isStopped
-                            }
-                        }
-                    }
+                    buffer.isStreamingFinished = true
+                    buffer.finalChunk = chunk
                 }
             }
         } catch {
             print("Chat streaming error or cancelled: \(error)")
+            dispenserTask.cancel()
             if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
-                await MainActor.run {
-                    executor.chatMessages[index].isStreaming = false
+                executor.chatMessages[index].isStreaming = false
+                
+                let isCancelled = (error as? URLError)?.code == .cancelled || 
+                                 (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
+                
+                if isCancelled {
+                    executor.chatMessages[index].isStopped = true
+                } else {
+                    executor.chatMessages[index].isStopped = false
                     
-                    let isCancelled = (error as? URLError)?.code == .cancelled || 
-                                     (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
-                    
-                    if isCancelled {
-                        executor.chatMessages[index].isStopped = true
-                    } else {
-                        executor.chatMessages[index].isStopped = false
-                        
-                        var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
-                        if (error as? URLError)?.code == .timedOut {
-                            fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
-                        }
-                        
-                        if executor.chatMessages[index].content.isEmpty {
-                            executor.chatMessages[index].content = fullErrorMessage
-                        }
-                        
-                        generalErrorMessage = fullErrorMessage
+                    var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
+                    if (error as? URLError)?.code == .timedOut {
+                        fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
                     }
+                    
+                    if executor.chatMessages[index].content.isEmpty {
+                        executor.chatMessages[index].content = fullErrorMessage
+                    }
+                    
+                    generalErrorMessage = fullErrorMessage
                 }
             }
         }
-        await MainActor.run { executor.isChatStreaming = false }
+        executor.isChatStreaming = false
     }
 }
+
 
 struct ImageGenerationView: View {
     @Environment(CommandExecutor.self) var executor
