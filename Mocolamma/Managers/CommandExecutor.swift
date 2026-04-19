@@ -28,8 +28,6 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var imageInputImages: [ChatInputImage] = []
         var isImageStreaming: Bool = false
         var previewImage: PlatformImage? = nil
-    var successfullyDownloadedIDs: Set<UUID> = []
-    var successfullyCopiedIDs: Set<UUID> = []
     var runningModels: [OllamaRunningModel] = []
     var isDraggingFile: Bool = false
     

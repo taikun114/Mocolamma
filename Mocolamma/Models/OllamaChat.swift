@@ -146,6 +146,10 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalEvalDuration: Int? // 最終的な評価時間
     var finalIsStopped: Bool = false // 最終的な停止状態
     
+    // 表示状態管理用（Observationの局所化のため）
+    var isCopied: Bool = false
+    var isDownloadSuccessful: Bool = false
+    
     enum CodingKeys: String, CodingKey {
         case role
         case content

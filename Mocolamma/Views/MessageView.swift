@@ -5,12 +5,13 @@ import Photos
 import PhotosUI
 
 struct MessageView: View {
-    @Environment(CommandExecutor.self) var executor
     @Environment(ChatSettings.self) var chatSettings
     var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
+    let selectedModelName: String?
     let onRetry: ((UUID, ChatMessage) -> Void)?
+    let onPreviewImage: ((PlatformImage) -> Void)?
     @Binding var isStreamingAny: Bool
     let isModelSelected: Bool
     @State private var isHovering: Bool = false
@@ -36,11 +37,11 @@ struct MessageView: View {
     @State private var isThinkingExpanded: Bool = false
     
     private var isDownloadSuccessful: Bool {
-        executor.successfullyDownloadedIDs.contains(message.id)
+        message.isDownloadSuccessful
     }
     
     private var isCopied: Bool {
-        executor.successfullyCopiedIDs.contains(message.id)
+        message.isCopied
     }
 
     private var supportsVision: Bool {
@@ -54,7 +55,6 @@ struct MessageView: View {
     }()
     
     var body: some View {
-        @Bindable var executor = executor
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
@@ -97,7 +97,7 @@ struct MessageView: View {
                         }
                     }
                 }
-                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: supportsVision, onURLsDropped: { urls in
+                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: supportsVision, onURLsDropped: { urls in
                     if isEditing && supportsVision {
                         addImages(from: urls)
                     }
@@ -527,11 +527,11 @@ struct MessageView: View {
     private func showSuccessFeedback() {
         Task { @MainActor in
             withAnimation(.spring()) {
-                _ = executor.successfullyDownloadedIDs.insert(message.id)
+                message.isDownloadSuccessful = true
             }
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             withAnimation(.spring()) {
-                _ = executor.successfullyDownloadedIDs.remove(message.id)
+                message.isDownloadSuccessful = false
             }
         }
     }
@@ -703,11 +703,11 @@ struct MessageView: View {
     private func showCopyFeedback() {
         Task { @MainActor in
             withAnimation(.spring()) {
-                _ = executor.successfullyCopiedIDs.insert(message.id)
+                message.isCopied = true
             }
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             withAnimation(.spring()) {
-                _ = executor.successfullyCopiedIDs.remove(message.id)
+                message.isCopied = false
             }
         }
     }
@@ -855,7 +855,7 @@ struct MessageView: View {
             .keyboardShortcut(.defaultAction)
             Button("Cancel", role: .cancel) { }
         } message: {
-            if let modelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+            if let modelName = selectedModelName {
                 Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             } else {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
@@ -919,7 +919,7 @@ struct MessageView: View {
                                         .onTapGesture {
                                             if let fullImage = PlatformImage(data: imageContainer.data) {
                                                 withAnimation(.easeInOut(duration: 0.2)) {
-                                                    executor.previewImage = fullImage
+                                                    onPreviewImage?(fullImage)
                                                 }
                                             }
                                         }
@@ -1002,7 +1002,7 @@ struct MessageView: View {
                                     .contentShape(Rectangle())
                                     .onTapGesture {
                                         withAnimation(.easeInOut(duration: 0.2)) {
-                                            executor.previewImage = image
+                                            onPreviewImage?(image)
                                         }
                                     }
                             }
@@ -1024,7 +1024,7 @@ struct MessageView: View {
 #endif
                                         .onTapGesture {
                                             withAnimation(.easeInOut(duration: 0.2)) {
-                                                executor.previewImage = image
+                                                onPreviewImage?(image)
                                             }
                                         }
                                 }
@@ -1093,7 +1093,7 @@ struct MessageView: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                executor.previewImage = image
+                                onPreviewImage?(image)
                             }
                         }
                         .contextMenu {
