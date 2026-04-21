@@ -290,7 +290,7 @@ struct ChatView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -343,7 +343,7 @@ struct ChatView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
             
             Menu {
                 Section {
@@ -1033,7 +1033,7 @@ struct ImageGenerationView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -1069,7 +1069,7 @@ struct ImageGenerationView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
             
             Menu {
                 Section {

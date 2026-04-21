@@ -374,6 +374,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "Ollamaサーバーからモデルリストを取得中のメッセージ。API (サーバーURL)...。"), apiBaseURL)
         try? await Task.sleep(nanoseconds: 100_000_000)
+        let targetServerID = serverManager.selectedServerID
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
         
@@ -398,6 +399,12 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 print("API Error: Unknown response type.")
                 self.models = [] // エラー時もモデルリストをクリア
                 self.apiConnectionError = true // API接続エラーを設定
+                return
+            }
+            
+            // 通信中にサーバーが切り替わった場合は、結果を破棄する
+            if serverManager.selectedServerID != targetServerID {
+                print("Server changed during fetch. Aborting model list update.")
                 return
             }
             
