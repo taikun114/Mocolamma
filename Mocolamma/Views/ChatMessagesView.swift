@@ -115,6 +115,8 @@ struct ChatMessagesScrollView: View {
     @State private var isUserInteracting: Bool = false
     @GestureState private var isTouching: Bool = false
     @State private var latestScrollState: ScrollState? = nil
+    @State private var maxMessagesHeight: CGFloat = 0
+    @State private var currentMessagesHeight: CGFloat = 0
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -144,6 +146,14 @@ struct ChatMessagesScrollView: View {
                         .id(message.id)
                     }
                 }
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { newValue in
+                    currentMessagesHeight = newValue
+                    if newValue > maxMessagesHeight {
+                        maxMessagesHeight = newValue
+                    }
+                }
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel("Chat messages")
                 .padding()
@@ -156,6 +166,12 @@ struct ChatMessagesScrollView: View {
                 }
                 
                 Spacer().id("bottom-spacer")
+                
+                // 補完用スペーサー：点滅などで一時的に高さが減少した際、
+                // アンカーが上に跳ねるのを防ぐために不足分を埋める
+                if !isUserInteracting && maxMessagesHeight > currentMessagesHeight {
+                    Spacer(minLength: maxMessagesHeight - currentMessagesHeight)
+                }
             }
 #if os(iOS)
             .scrollDismissesKeyboard(.interactively)
@@ -183,14 +199,14 @@ struct ChatMessagesScrollView: View {
                 let maxOffset = max(0, contentHeight - visibleHeight)
                 let distanceFromBottom = maxOffset - scrollOffset
                 
-                let threshold: CGFloat = 800 // より広めに設定
+                let threshold: CGFloat = 300 // 下端付近とみなすしきい値
                 let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
                 
                 return ScrollState(nearBottom: nearBottom, contentHeight: contentHeight)
             } action: { _, newValue in
                 // 変更があった時のみシグナルを送る
-                // コンテンツの高さの変化が微細な場合は無視して負荷を下げる
-                let heightChanged = abs((latestScrollState?.contentHeight ?? 0) - newValue.contentHeight) > 2.0
+                // より微細な高さ変化（0.5px）も検知して、スクロール追従の精度を上げる
+                let heightChanged = abs((latestScrollState?.contentHeight ?? 0) - newValue.contentHeight) > 0.5
                 let nearBottomChanged = (latestScrollState?.nearBottom ?? false) != newValue.nearBottom
                 
                 if heightChanged || nearBottomChanged {
@@ -199,60 +215,61 @@ struct ChatMessagesScrollView: View {
             }
             .task(id: latestScrollState) {
                 guard let state = latestScrollState else { return }
+                
+                let isUserSent = messages.last?.role == "user"
+                
                 do {
-                    // ループを止める最小限のディレイ
-                    try await Task.sleep(nanoseconds: 25_000_000)
+                    // レイアウトの安定を待つ
+                    try await Task.sleep(nanoseconds: 10_000_000)
                     
                     await MainActor.run {
-                        // 状態の不一致がある場合のみ更新
                         if isNearBottom != state.nearBottom {
                             isNearBottom = state.nearBottom
                         }
                         
                         let now = Date()
-                        // 追従頻度をさらに最適化（0.15秒）
-                        if state.nearBottom && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.15 {
+                        let shouldScroll = isUserSent || state.nearBottom
+                        let interval: TimeInterval = !isOverallStreaming ? 0.05 : 0.1
+                        
+                        if shouldScroll && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= interval {
                             lastScrollTime = now
                             scrollBottom(proxy: proxy)
                         }
                     }
                 } catch {}
             }
-            .task(id: messages.count) {
-                do {
-                    // メッセージの増加を検知した際の防振
-                    try await Task.sleep(nanoseconds: 50_000_000)
-                    
-                    await MainActor.run {
-                        scrollBottom(proxy: proxy)
-                    }
-                } catch {}
-            }
             .task(id: isOverallStreaming) {
-                if !isOverallStreaming {
-                    // ストリーミング完了時は、レイアウト（選択ボタンの出現など）の確定を待つために少し待機
-                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
-                    await MainActor.run {
-                        if isNearBottom {
-                            scrollBottom(proxy: proxy)
-                        }
-                    }
-                } else if isNearBottom {
+                // ストリーミング開始時と終了時の両方で、最新の状態に基づいたスクロール判定をトリガーする
+                if latestScrollState?.nearBottom ?? false || (messages.last?.role == "user") {
                     await MainActor.run {
                         scrollBottom(proxy: proxy)
                     }
                 }
             }
+            .onChange(of: isOverallStreaming) { _, newValue in
+                if newValue {
+                    // ストリーミング開始時（送信・やり直し）は高さの最大値をリセット
+                    maxMessagesHeight = 0
+                } else {
+                    // ストリーミング終了時
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if latestScrollState?.nearBottom ?? false {
+                            scrollBottom(proxy: proxy)
+                        }
+                    }
+                }
+            }
+            .onChange(of: messages.count) { _, _ in
+                // メッセージ数が変わった（送信・削除・リセット）時は高さの最大値をリセットし
+                // 新しいレイアウトを正しく追従できるようにする
+                maxMessagesHeight = 0
+            }
         }
     }
     
     private func scrollBottom(proxy: ScrollViewProxy) {
-        // すでに実行中のスクロールタスクがある場合は無視されるように設計
-        // レイアウト変更（選択ボタン出現など）が完全に完了するまで少し待つ
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(reduceMotionEnabled ? .none : .default) {
-                proxy.scrollTo("bottom-spacer", anchor: .bottom)
-            }
+        withAnimation(reduceMotionEnabled ? .none : .easeInOut(duration: 0.25)) {
+            proxy.scrollTo("bottom-spacer", anchor: .bottom)
         }
     }
 }

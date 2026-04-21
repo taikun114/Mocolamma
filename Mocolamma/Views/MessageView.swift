@@ -31,10 +31,11 @@ struct MessageView: View {
     @State private var isDraggingOver = false
     
     // 保存関連の状態
-    @State private var showingSaveOptions = false
-    @State private var showingFileExporter = false
+    @State private var isSaveOptionsPresented: Bool = false
+    @State private var isFileExporterPresented: Bool = false
     @State private var imageDocument: ImageDocument?
     @State private var isThinkingExpanded: Bool = false
+    @State private var isStreamingSettled: Bool = true
     
     private var isDownloadSuccessful: Bool {
         message.isDownloadSuccessful
@@ -128,10 +129,22 @@ struct MessageView: View {
                     
                     HStack(spacing: 6) {
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.role == "assistant" && isLastAssistantMessage {
+                            retryButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
+                        if (message.role == "assistant" || message.role == "user") {
+                            copyButton
+                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "assistant" {
+                            shareButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
@@ -155,10 +168,22 @@ struct MessageView: View {
                     HStack(spacing: 6) {
                         if message.role == "user" { Spacer() }
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.role == "assistant" && isLastAssistantMessage {
+                            retryButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
+                        if (message.role == "assistant" || message.role == "user") {
+                            copyButton
+                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "assistant" {
+                            shareButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
@@ -223,6 +248,15 @@ struct MessageView: View {
             .opacity(1.0)
 #endif
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
+            .onChange(of: message.isStreaming) { _, newValue in
+                if !newValue {
+                    // ストリーミング終了後、マークダウンの再描画などが安定するまで少し待ってから機能を有効化
+                    isStreamingSettled = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        isStreamingSettled = true
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
@@ -475,7 +509,7 @@ struct MessageView: View {
     @ViewBuilder
     private var downloadButton: some View {
         Button(action: {
-            showingSaveOptions = true
+            isSaveOptionsPresented = true
         }) {
             Image(systemName: isDownloadSuccessful ? "checkmark" : "arrow.down.to.line")
                 .contentShape(Rectangle())
@@ -497,7 +531,7 @@ struct MessageView: View {
         .foregroundColor(.accentColor)
 #endif
         .help("Download Image")
-        .confirmationDialog(Text("Select Destination"), isPresented: $showingSaveOptions, titleVisibility: .visible) {
+        .confirmationDialog(Text("Select Destination"), isPresented: $isSaveOptionsPresented, titleVisibility: .visible) {
             Button(String(localized: "Save to Photo Library")) {
                 saveToPhotoLibrary()
             }
@@ -509,7 +543,7 @@ struct MessageView: View {
             Text("Please select where to save this image.")
         }
         .fileExporter(
-            isPresented: $showingFileExporter,
+            isPresented: $isFileExporterPresented,
             document: imageDocument,
             contentType: .png,
             defaultFilename: "generated_image.png"
@@ -605,7 +639,7 @@ struct MessageView: View {
         }
 #else
         self.imageDocument = ImageDocument(image: data)
-        self.showingFileExporter = true
+        self.isFileExporterPresented = true
 #endif
     }
     
@@ -1132,8 +1166,8 @@ struct MessageView: View {
                     StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textualSelection(enabled: !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
-                        .textual.syntaxHighlightingEnabled(!message.isStreaming && !isStreamingAny)
+                        .textualSelection(enabled: isStreamingSettled && !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
+                        .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming && !isStreamingAny)
                         .textual.overflowMode(.scroll)
                 } else {
                     Text("Failed to generate image.")
@@ -1171,8 +1205,8 @@ struct MessageView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textualSelection(enabled: !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
-                            .textual.syntaxHighlightingEnabled(!(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .textualSelection(enabled: isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .textual.syntaxHighlightingEnabled(isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
                     }
@@ -1206,8 +1240,8 @@ struct MessageView: View {
                 StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
-                    .textualSelection(enabled: !message.isStreaming)
-                    .textual.syntaxHighlightingEnabled(!message.isStreaming)
+                    .textualSelection(enabled: isStreamingSettled && !message.isStreaming)
+                    .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming)
                     .textual.overflowMode(.scroll)
                     .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
             }
