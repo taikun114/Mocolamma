@@ -68,6 +68,8 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Fixed an issue where models could not be downloaded if the model name contained a `/` in the `ollama` command format.
 - **Improve model loading process**
   - Performance has improved by automatically loading models when the app launches and when the server changes, thereby eliminating unnecessary model loading.
+- **Improve the feature to allow copying the model name using a keyboard shortcut**
+  - You can copy the model name by pressing `⌘ (Command)` + `C` while the model is selected. On macOS, you can also copy it by selecting “Copy” from the “Edit” menu.
 
 #### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**

@@ -579,6 +579,31 @@ struct ModelListContentView: View {
         }
 #endif
         }
+#if os(macOS)
+        .onCopyCommand {
+            if let selectedID = selectedModel,
+               let model = sortedModels.first(where: { $0.id == selectedID }) {
+                return [NSItemProvider(object: model.name as NSString)]
+            }
+            return []
+        }
+#endif
+        .focusable()
+        .onKeyPress(KeyEquivalent("c"), phases: .down) { press in
+            if press.modifiers.contains(.command) {
+                if let selectedID = selectedModel,
+                   let model = sortedModels.first(where: { $0.id == selectedID }) {
+                    #if os(macOS)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(model.name, forType: .string)
+                    #else
+                    UIPasteboard.general.string = model.name
+                    #endif
+                    return .handled
+                }
+            }
+            return .ignored
+        }
         .sheet(item: $modelForCustomKeepAlive) { model in
             CustomKeepAliveSheet(modelName: model.name, modelForCustomKeepAlive: $modelForCustomKeepAlive) { keepAlive in
                 Task {
