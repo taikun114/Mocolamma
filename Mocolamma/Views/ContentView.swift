@@ -37,9 +37,15 @@ struct ContentView: View {
     // フィルター状態を保持するState変数
     @State private var selectedFilterTag: String? = nil
     
-    // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
-    var sortedModels: [OllamaModel] {
-        executor.models.sorted(using: sortOrder)
+    // 現在のソート順に基づいてモデルリストを保持するState変数
+    @State private var sortedModels: [OllamaModel] = []
+    
+    // モデルリストを更新するメソッド
+    private func updateSortedModels() {
+        let models = executor.models.sorted(using: sortOrder)
+        if sortedModels != models {
+            sortedModels = models
+        }
     }
     
     // MARK: - Server Inspector related states
@@ -150,13 +156,20 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            updateSortedModels()
             handleOnAppear()
         }
-        .onChange(of: selection) { _, newValue in handleSelectionChange(newValue) }
+        .onChange(of: selection) { _, newValue in
+            Task { @MainActor in
+                handleSelectionChange(newValue)
+            }
+        }
         .onChange(of: selectedModel) { _, newValue in handleModelSelectionChange(newValue) }
         .onChange(of: selectedServerForInspector) { _, newValue in handleServerSelectionChange(newValue) }
         .onChange(of: shouldClearChat) { _, newValue in handleClearChatChange(newValue) }
         .onChange(of: shouldClearGeneration) { _, newValue in handleClearGenerationChange(newValue) }
+        .onChange(of: executor.models) { _, _ in updateSortedModels() }
+        .onChange(of: sortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }

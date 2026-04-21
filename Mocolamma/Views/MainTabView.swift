@@ -84,19 +84,22 @@ struct MainTabView: View {
             .tag("settings")
         }
         .onChange(of: selection) { _, newSelection in
+            // タブが切り替えられたときに、重い状態更新を非同期化してメインスレッドの占有を避け、アニメーションをスムーズにする
+            Task { @MainActor in
 #if os(visionOS)
-            withAnimation(.easeInOut(duration: 0.3)) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    executor.previewImage = nil
+                    if newSelection == "settings" && showingInspector {
+                        showingInspector = false
+                    }
+                }
+#else
                 executor.previewImage = nil
                 if newSelection == "settings" && showingInspector {
                     showingInspector = false
                 }
-            }
-#else
-            executor.previewImage = nil
-            if newSelection == "settings" && showingInspector {
-                showingInspector = false
-            }
 #endif
+            }
         }
         .tabViewStyle(.sidebarAdaptable)
 #if !os(visionOS)
