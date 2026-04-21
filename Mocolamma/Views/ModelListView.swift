@@ -593,6 +593,9 @@ struct ModelListContentView: View {
                     }
                 }
             }
+#if os(iOS)
+            .presentationBackground(Color(uiColor: .systemBackground))
+#endif
         }
     }
     
