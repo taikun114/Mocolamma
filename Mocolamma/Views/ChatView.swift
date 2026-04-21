@@ -52,12 +52,7 @@ struct ChatView: View {
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
             } else {
-                // OSバージョン26以降かどうかの条件分岐
-                if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
-                } else {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
-                }
+                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
             }
         }
         .frame(maxHeight: .infinity) // Make sure it fills the available height
@@ -107,29 +102,13 @@ struct ChatView: View {
                         makeSafeAreaBarContent()
                     }
             } else {
-                ZStack {
-                    chatContent
-                    
-                    VStack {
-                        Spacer()
-                        
-                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                            sendMessage()
-                        } stopMessage: {
-                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                                executor.updateIsChatStreaming()
+                chatContent
+                    .safeAreaInset(edge: .bottom) {
+                        makeSafeAreaBarContent()
+                            .if(horizontalSizeClass != .compact) { view in
+                                view.ignoresSafeArea(.container, edges: [.bottom])
                             }
-                            executor.isChatStreaming = false
-                            executor.cancelChatStreaming()
-                        }
                     }
-                    .padding()
-                    .if(horizontalSizeClass != .compact) { view in
-                        view.ignoresSafeArea(.container, edges: [.bottom])
-                    }
-                }
             }
 #else
             if #available(macOS 26.0, *) {
@@ -138,26 +117,10 @@ struct ChatView: View {
                         makeSafeAreaBarContent()
                     }
             } else {
-                ZStack {
-                    chatContent
-                    
-                    VStack {
-                        Spacer()
-                        
-                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                            sendMessage()
-                        } stopMessage: {
-                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                                executor.updateIsChatStreaming()
-                            }
-                            executor.isChatStreaming = false
-                            executor.cancelChatStreaming()
-                        }
+                chatContent
+                    .safeAreaInset(edge: .bottom) {
+                        makeSafeAreaBarContent()
                     }
-                    .padding()
-                }
             }
 #endif
         }
@@ -892,10 +855,6 @@ struct ImageGenerationView: View {
                     onRetry: retryGeneration,
                     isOverallStreaming: $executor.isImageStreaming,
                     isModelSelected: imageSettings.selectedModelID != nil,
-                    isUsingSafeAreaBar: {
-                        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) { return true }
-                        return false
-                    }(),
                     bottomInset: inputAreaHeight,
                     emptyStateTitle: "Image Generation",
                     emptyStateDescription: "Here you can generate images using models that support image generation.",
@@ -972,14 +931,10 @@ struct ImageGenerationView: View {
                         makeInputArea()
                     }
             } else {
-                ZStack {
-                    content
-                    
-                    VStack {
-                        Spacer()
+                content
+                    .safeAreaInset(edge: .bottom) {
                         makeInputArea()
                     }
-                }
             }
 #endif
         }

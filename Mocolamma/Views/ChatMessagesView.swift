@@ -23,9 +23,7 @@ struct ChatMessagesView: View {
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
-    let isUsingSafeAreaBar: Bool
     var bottomInset: CGFloat = 0
-    
     // 空の状態の表示をカスタマイズするための引数を追加
     let emptyStateTitle: LocalizedStringKey
     let emptyStateDescription: LocalizedStringKey
@@ -58,7 +56,6 @@ struct ChatMessagesView: View {
                     isModelSelected: isModelSelected,
                     supportsEffects: supportsEffects,
                     reduceMotionEnabled: reduceMotionEnabled,
-                    isUsingSafeAreaBar: isUsingSafeAreaBar,
                     bottomInset: bottomInset
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -107,7 +104,6 @@ struct ChatMessagesScrollView: View {
     let isModelSelected: Bool
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
-    let isUsingSafeAreaBar: Bool
     var bottomInset: CGFloat = 0
     
     @State private var isNearBottom: Bool = true
@@ -157,9 +153,6 @@ struct ChatMessagesScrollView: View {
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel("Chat messages")
                 .padding()
-                .if(!isUsingSafeAreaBar) { view in
-                    view.padding(.bottom, 50)
-                }
                 
                 if bottomInset > 0 {
                     Spacer(minLength: bottomInset)
