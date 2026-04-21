@@ -769,9 +769,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     }
     
     /// モデルをメモリにロードします。
+    /// - Parameters:
+    ///   - modelName: ロードするモデル名。
+    ///   - keepAlive: メモリ保持時間（keep_alive）。
+    ///   - ignoreTimeout: trueの場合、タイムアウトを無視してロードを試みます（コンテキストメニューからのロードなどで使用）。
     /// - Returns: 成功した場合はtrue。
     @discardableResult
-    func loadModel(modelName: String, keepAlive: JSONValue? = nil) async -> Bool {
+    func loadModel(modelName: String, keepAlive: JSONValue? = nil, ignoreTimeout: Bool = false) async -> Bool {
         guard let apiBaseURL = self.apiBaseURL else {
             print("Ollama API base URL is not set. Skipping model load.")
             self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "モデルのロードを行おうとした際にサーバーが選択されていなかった場合のエラー。")
@@ -796,7 +800,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             updateModelWeights() // ステータス更新
         }
         
-        print("Attempting to load model \(modelName) to \(apiBaseURL) with keep_alive: \(String(describing: keepAlive))")
+        print("Attempting to load model \(modelName) to \(apiBaseURL) with keep_alive: \(String(describing: keepAlive)), ignoreTimeout: \(ignoreTimeout)")
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
@@ -830,8 +834,17 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return false
         }
         
+        // タイムアウトを無視する場合、特別なセッションを使用する
+        var sessionToUse = urlSession!
+        if ignoreTimeout {
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = TimeInterval(3600) // 1時間のタイムアウト（実質無制限）
+            config.timeoutIntervalForResource = TimeInterval(86400) // 24時間のタイムアウト（実質無制限）
+            sessionToUse = URLSession(configuration: config)
+        }
+        
         do {
-            let (_, response) = try await urlSession.data(for: request)
+            let (_, response) = try await sessionToUse.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 let code = (response as? HTTPURLResponse)?.statusCode ?? -1
@@ -867,6 +880,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return false
         }
     }
+
     
     /// キャッシュされたモデルの詳細情報を取得します（同期的）。
     func getCachedModelInfo(modelName: String) -> OllamaShowResponse? {

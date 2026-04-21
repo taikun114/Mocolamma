@@ -476,7 +476,7 @@ struct ModelListContentView: View {
                     isSelected: selectedModel == model.id,
                     isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil,
                     copyIconName: copyIconName,
-                    loadModel: { await executor.loadModel(modelName: $0, keepAlive: $1) },
+                    loadModel: { await executor.loadModel(modelName: $0, keepAlive: $1, ignoreTimeout: $2) },
                     unloadModel: { await executor.unloadModel(modelName: $0) },
                     onDelete: { modelToDelete = $0; showingDeleteConfirmation = true },
                     onCustomKeepAlive: { modelForCustomKeepAlive = $0 },
@@ -582,7 +582,7 @@ struct ModelListContentView: View {
         .sheet(item: $modelForCustomKeepAlive) { model in
             CustomKeepAliveSheet(modelName: model.name, modelForCustomKeepAlive: $modelForCustomKeepAlive) { keepAlive in
                 Task {
-                    let success = await executor.loadModel(modelName: model.name, keepAlive: keepAlive)
+                    let success = await executor.loadModel(modelName: model.name, keepAlive: keepAlive, ignoreTimeout: true)
                     if !success {
                         await MainActor.run {
                             if let errorText = parseError(from: executor.output) {
@@ -604,7 +604,7 @@ struct ModelListContentView: View {
         Menu {
             Button("Load with Default Time") {
                 Task {
-                    let success = await executor.loadModel(modelName: model.name)
+                    let success = await executor.loadModel(modelName: model.name, ignoreTimeout: true)
                     if !success {
                         await MainActor.run {
                             if let errorText = parseError(from: executor.output) {
@@ -622,7 +622,7 @@ struct ModelListContentView: View {
             Group {
                 Button(LocalizedStringKey(KeepAliveOption.m1.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -635,7 +635,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.m3.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("3m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("3m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -648,7 +648,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.m5.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("5m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("5m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -661,7 +661,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.m10.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("10m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("10m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -674,7 +674,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.m15.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("15m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("15m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -687,7 +687,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.m30.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("30m"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("30m"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -700,7 +700,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1h"))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1h"), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -713,7 +713,7 @@ struct ModelListContentView: View {
                 }
                 Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) {
                     Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1))
+                        let success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1), ignoreTimeout: true)
                         if !success {
                             await MainActor.run {
                                 if let errorText = parseError(from: executor.output) {
@@ -759,7 +759,7 @@ struct ModelListRowView: View, Equatable {
     let isActionsDisabled: Bool
     let copyIconName: String
     
-    var loadModel: (String, JSONValue?) async -> Bool
+    var loadModel: (String, JSONValue?, Bool) async -> Bool
     var unloadModel: (String) async -> Bool
     var onDelete: (OllamaModel) -> Void
     var onCustomKeepAlive: (OllamaModel) -> Void
@@ -817,7 +817,7 @@ struct ModelListRowView: View, Equatable {
         .accessibilityInputLabels([model.name])
         .accessibilityAction(named: String(localized: "Load Model")) {
             Task {
-                await loadModel(model.name, nil)
+                await loadModel(model.name, nil, true)
             }
         }
         .accessibilityAction(named: String(localized: "Copy Model Name")) {
@@ -830,7 +830,7 @@ struct ModelListRowView: View, Equatable {
             Menu {
                 Button("Load with Default Time") {
                     Task {
-                        let success = await loadModel(model.name, nil)
+                        let success = await loadModel(model.name, nil, true)
                         if !success {
                             if let errorText = parseError(getExecutorOutput()) {
                                 await MainActor.run {
@@ -903,9 +903,9 @@ struct ModelListRowView: View, Equatable {
         Task {
             let success: Bool
             if time == "-1" {
-                success = await loadModel(model.name, .int(-1))
+                success = await loadModel(model.name, .int(-1), true)
             } else {
-                success = await loadModel(model.name, .string(time))
+                success = await loadModel(model.name, .string(time), true)
             }
             
             if !success {
