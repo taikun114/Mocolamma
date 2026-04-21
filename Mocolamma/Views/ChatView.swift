@@ -319,7 +319,7 @@ struct ChatView: View {
                 }
             }
             .pickerStyle(.menu)
-            .frame(maxWidth: 150)
+            .frame(width: 150)
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -377,6 +377,9 @@ struct ChatView: View {
             } label: {
                 let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                    .labelStyle(.titleAndIcon)
+#endif
             }
             .help({
                 if let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
@@ -1062,7 +1065,7 @@ struct ImageGenerationView: View {
                 }
             }
             .pickerStyle(.menu)
-            .frame(maxWidth: 150)
+            .frame(width: 150)
         }
 #else
         ToolbarItemGroup(placement: .primaryAction) {
@@ -1103,6 +1106,9 @@ struct ImageGenerationView: View {
             } label: {
                 let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                    .labelStyle(.titleAndIcon)
+#endif
             }
             .help({
                 if let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name {
