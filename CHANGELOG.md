@@ -76,6 +76,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve the model picker display while loading models**
 - **Improve the appearance of the model picker**
   - On macOS, the width now remains fixed, and on visionOS, model names are now displayed just like on macOS.
+- **Improve the appearance of the message input field**
+  - When an input field is disabled, it is now semi-transparent to make its disabled state easier to recognize.
 
 #### Chat
 - **Fix issue where list bullets were not displayed**

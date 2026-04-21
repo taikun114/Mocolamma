@@ -204,18 +204,6 @@ struct MessageInputView: View {
                         .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
-                        .contentShape(.rect(cornerRadius: 24))
-#if os(visionOS)
-                        .hoverEffect()
-                        .background(.regularMaterial)
-#else
-                        .background(Color.clear)
-#endif
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
                         .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
 #if os(macOS)
                             if !isStreaming {
@@ -248,6 +236,21 @@ struct MessageInputView: View {
 #endif
                         }
                 }
+                .contentShape(.rect(cornerRadius: 24))
+                .onTapGesture {
+                    if selectedModel != nil {
+                        isInputFocused = true
+                    }
+                }
+#if os(visionOS)
+                .hoverEffect()
+                .background(.regularMaterial, in: .rect(cornerRadius: 24))
+#endif
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
                 .fixedSize(horizontal: false, vertical: true)
                 
 #if !os(macOS)
@@ -335,6 +338,8 @@ struct MessageInputView: View {
 #endif
             }
         }
+        .opacity(selectedModel == nil ? 0.5 : 1.0)
+        .allowsHitTesting(selectedModel != nil)
         .background(Color.clear)
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $selectedImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: selectedModel?.supportsVision ?? false, onURLsDropped: { urls in
             addImages(from: urls)
