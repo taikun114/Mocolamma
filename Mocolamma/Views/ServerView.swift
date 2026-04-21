@@ -144,9 +144,12 @@ struct ServerView: View {
                 }
             }
             
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            if serverManager.selectedServerID != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: serverManager.servers) { oldServers, newServers in
