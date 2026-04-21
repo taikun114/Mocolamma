@@ -377,6 +377,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         let targetServerID = serverManager.selectedServerID
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
+        self.isPullingErrorHold = false // プルのエラー状態もリセット
         
         defer {
             self.isRunning = false
@@ -550,6 +551,28 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         pullTask?.cancel()
         pullTask = pullSession.dataTask(with: request)
         pullTask?.resume()
+    }
+    
+    /// モデルのプル（ダウンロード）を中断します。
+    func stopPulling() {
+        pullTask?.cancel()
+        pullTask = nil
+        isPulling = false
+        isPullingErrorHold = true
+        pullHasError = true // エラー画面（再試行ボタン）を表示するために必要
+        pullStatus = NSLocalizedString("Cancelled", comment: "モデルのダウンロードを中断したときのメッセージ。")
+        pullProgress = 0.0
+        pullTotal = 0
+        pullCompleted = 0
+        pullSpeedBytesPerSec = 0.0
+        pullETARemaining = 0
+        
+        // タイマーの停止
+        pullStatusUpdateTimer?.invalidate()
+        pullStatusUpdateTimer = nil
+        
+        self.output = "" // 手動キャンセル時はエラーアラートを表示しないように出力をクリア
+        print("Model pull cancelled by user.")
     }
     
     /// デモモード用のダウンロードシミュレーションを実行します

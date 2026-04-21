@@ -1003,7 +1003,16 @@ struct PullProgressView: View {
                     }
                 }
                 
-                if executor.isPullingErrorHold && executor.pullHasError {
+                if executor.isPulling {
+                    Button(action: {
+                        executor.stopPulling()
+                    }) {
+                        Image(systemName: "xmark")
+                    }
+                    .accessibilityLabel("Cancel")
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                } else if executor.isPullingErrorHold && executor.pullHasError {
                     Button(action: {
                         if !executor.lastPulledModelName.isEmpty {
                             executor.pullModel(modelName: executor.lastPulledModelName)
@@ -1026,7 +1035,18 @@ struct PullProgressView: View {
                         Text(executor.pullStatus)
                             .animation(nil, value: executor.pullStatus)
                         Spacer()
-                        if executor.isPullingErrorHold && executor.pullHasError {
+                        if executor.isPulling {
+                            Button(action: {
+                                executor.stopPulling()
+                            }) {
+                                Image(systemName: "xmark")
+                            }
+                            .accessibilityLabel("Cancel")
+                            .buttonStyle(.plain)
+                            .padding(.top, 4)
+                            .padding(.bottom, 2)
+                            .contentShape(Rectangle())
+                        } else if executor.isPullingErrorHold && executor.pullHasError {
                             Button(action: {
                                 if !executor.lastPulledModelName.isEmpty {
                                     executor.pullModel(modelName: executor.lastPulledModelName)

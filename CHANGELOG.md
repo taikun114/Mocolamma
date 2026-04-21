@@ -52,6 +52,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Add a feature that allows scrolling by dragging tags in the model inspector**
 - **Add the ability to load and unload models from the context menu of each model**
   - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
+- **Add a feature to cancel model downloading**
 
 ### Bug Fixes and Improvements
 #### General
