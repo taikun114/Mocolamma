@@ -7,6 +7,7 @@ import Network
 import Observation
 
 struct SettingsView: View {
+    private var modelSettings = ModelSettingsManager.shared
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
     @State private var localNetworkChecker = LocalNetworkPermissionChecker()
@@ -16,6 +17,7 @@ struct SettingsView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     var body: some View {
+        @Bindable var modelSettings = modelSettings
         Form {
             content
         }
@@ -46,6 +48,7 @@ struct SettingsView: View {
     
     @ViewBuilder
     private var content: some View {
+        @Bindable var modelSettings = modelSettings
         Section("General") {
 #if os(macOS)
             Toggle("Launch at Login", isOn: $launchAtLogin)
@@ -114,6 +117,69 @@ struct SettingsView: View {
                 APITimeoutManager.shared.set(option: newValue)
             }
 #endif
+        }
+        
+        Section("Model") {
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle("Use Model List Order", isOn: $modelSettings.useModelListOrder)
+                Text("Use the order specified in the model list for the model pickers in Chat and Image Generation.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack(alignment: .top) {
+                Picker(selection: $modelSettings.chatSortCriterion) {
+                    ForEach(ModelSortCriterion.allCases) { criterion in
+                        if criterion == .number {
+                            Divider()
+                        }
+                        Label(criterion.localizedName, systemImage: criterion.iconName)
+                            .tag(criterion)
+                    }
+                } label: {
+                    Text("Chat Model Order")
+                        .foregroundColor(modelSettings.useModelListOrder ? .secondary : .primary)
+                }
+                .labelStyle(.titleAndIcon)
+                .disabled(modelSettings.useModelListOrder)
+                
+                Button(action: {
+                    modelSettings.chatSortOrder = (modelSettings.chatSortOrder == .ascending) ? .descending : .ascending
+                }) {
+                    Image(systemName: modelSettings.chatSortOrder.iconName)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .buttonStyle(.plain)
+                .disabled(modelSettings.useModelListOrder)
+                .help(modelSettings.chatSortOrder.localizedName)
+            }
+            
+            HStack(alignment: .top) {
+                Picker(selection: $modelSettings.imageSortCriterion) {
+                    ForEach(ModelSortCriterion.allCases) { criterion in
+                        if criterion == .number {
+                            Divider()
+                        }
+                        Label(criterion.localizedName, systemImage: criterion.iconName)
+                            .tag(criterion)
+                    }
+                } label: {
+                    Text("Image Generation Model Order")
+                        .foregroundColor(modelSettings.useModelListOrder ? .secondary : .primary)
+                }
+                .labelStyle(.titleAndIcon)
+                .disabled(modelSettings.useModelListOrder)
+                
+                Button(action: {
+                    modelSettings.imageSortOrder = (modelSettings.imageSortOrder == .ascending) ? .descending : .ascending
+                }) {
+                    Image(systemName: modelSettings.imageSortOrder.iconName)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .buttonStyle(.plain)
+                .disabled(modelSettings.useModelListOrder)
+                .help(modelSettings.imageSortOrder.localizedName)
+            }
         }
         
         Section("Permissions") {

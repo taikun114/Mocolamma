@@ -2,7 +2,7 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 <!--
-The order of listing is as follows (1.2.3 or later):
+The order of listing is as follows (1.3.0 or later):
 - New Features
   - General
   - Server
@@ -45,7 +45,7 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
-## 1.2.3
+## 1.3.0
 ### New Features
 #### Model
 - **Support audio model tag**
@@ -53,6 +53,10 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Add the ability to load and unload models from the context menu of each model**
   - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
 - **Add a feature to cancel model downloading**
+
+#### Chat and Image Generation
+- **Add options to set the order of models**
+  - By default, the order displayed on the model screen is used, but you can change it to your preferred order in the settings.
 
 ### Bug Fixes and Improvements
 #### General

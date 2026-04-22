@@ -15,9 +15,16 @@ struct ChatView: View {
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
+    private var modelSettings = ModelSettingsManager.shared
+
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
+    
+    init(showingInspector: Binding<Bool>, onToggleInspector: @escaping () -> Void) {
+        self._showingInspector = showingInspector
+        self.onToggleInspector = onToggleInspector
+    }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
@@ -260,7 +267,8 @@ struct ChatView: View {
             Picker("Select Model", selection: $chatSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
-                ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
+                ForEach(sortedModels) { model in
                     let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                     HStack {
                         Text(model.name)
@@ -317,7 +325,8 @@ struct ChatView: View {
                 }
                 Section {
                     Picker("Models", selection: $chatSettings.selectedModelID) {
-                        ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                        let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
+                        ForEach(sortedModels) { model in
                             let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                             HStack {
                                 Text(model.name)
@@ -808,6 +817,7 @@ struct ImageGenerationView: View {
     @Environment(ServerManager.self) var serverManager
     @Environment(RefreshTrigger.self) var appRefreshTrigger
     @Environment(ImageGenerationSettings.self) var imageSettings
+    private var modelSettings = ModelSettingsManager.shared
     
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
@@ -816,6 +826,11 @@ struct ImageGenerationView: View {
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
+    
+    init(showingInspector: Binding<Bool>, onToggleInspector: @escaping () -> Void) {
+        self._showingInspector = showingInspector
+        self.onToggleInspector = onToggleInspector
+    }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
@@ -998,7 +1013,8 @@ struct ImageGenerationView: View {
             Picker("Select Model", selection: $imageSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
-                ForEach(executor.models.filter { $0.isImageModel }) { model in
+                let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
+                ForEach(sortedModels) { model in
                     let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                     HStack {
                         Text(model.name)
@@ -1038,7 +1054,8 @@ struct ImageGenerationView: View {
                 }
                 Section {
                     Picker("Models", selection: $imageSettings.selectedModelID) {
-                        ForEach(executor.models.filter { $0.isImageModel }) { model in
+                        let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
+                        ForEach(sortedModels) { model in
                             let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                             HStack {
                                 Text(model.name)

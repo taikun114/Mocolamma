@@ -29,10 +29,7 @@ struct ContentView: View {
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
     
-    // ソート順を保持するState変数 (ModelListViewにバインディングとして渡します)
-    @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
-        .init(\.originalIndex, order: .forward)
-    ]
+    private var modelSettings = ModelSettingsManager.shared
     
     // フィルター状態を保持するState変数
     @State private var selectedFilterTag: String? = nil
@@ -42,7 +39,7 @@ struct ContentView: View {
     
     // モデルリストを更新するメソッド
     private func updateSortedModels() {
-        let models = executor.models.sorted(using: sortOrder)
+        let models = executor.models.sorted(using: modelSettings.modelListSortOrder)
         if sortedModels != models {
             sortedModels = models
         }
@@ -70,6 +67,7 @@ struct ContentView: View {
     @Binding var isPulling: Bool
     
     var body: some View {
+        @Bindable var modelSettings = modelSettings
         Group {
 #if os(macOS)
             MainNavigationView(
@@ -79,7 +77,7 @@ struct ContentView: View {
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
+                sortOrder: $modelSettings.modelListSortOrder,
                 selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
@@ -95,7 +93,7 @@ struct ContentView: View {
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
+                sortOrder: $modelSettings.modelListSortOrder,
                 selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
@@ -169,7 +167,7 @@ struct ContentView: View {
         .onChange(of: shouldClearChat) { _, newValue in handleClearChatChange(newValue) }
         .onChange(of: shouldClearGeneration) { _, newValue in handleClearGenerationChange(newValue) }
         .onChange(of: executor.models) { _, _ in updateSortedModels() }
-        .onChange(of: sortOrder) { _, _ in updateSortedModels() }
+        .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
