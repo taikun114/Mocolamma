@@ -121,6 +121,7 @@ struct InspectorContentView: View {
                                 Text("System Prompt")
                             }
                             TextEditor(text: $chatSettings.systemPrompt)
+                                .accessibilityLabel("System Prompt")
                                 .focused($isSystemPromptFocused) // ここにフォーカス状態をバインド
                                 .frame(height: 100)
                                 .disabled(!chatSettings.isSystemPromptEnabled)
