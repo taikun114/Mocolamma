@@ -62,6 +62,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### General
 - **Fix issue where sheet backgrounds appear slightly green in iPadOS 26 Dark Mode**
 - **Fix issue where performance significantly degrades when voice control is enabled ([#5](https://github.com/taikun114/Mocolamma/issues/5))**
+- **Improve the layout of the settings screen**
 
 #### Server
 - **Improve the display of connection status in server inspector**
