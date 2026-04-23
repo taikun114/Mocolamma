@@ -15,6 +15,8 @@ struct ChatView: View {
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
+    @State private var isNearBottom: Bool = true
+    @State private var scrollToBottomTrigger: Int = 0
     private var modelSettings = ModelSettingsManager.shared
 
     
@@ -59,7 +61,18 @@ struct ChatView: View {
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
             } else {
-                ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
+                ChatMessagesView(
+                    messages: $executor.chatMessages,
+                    onRetry: retryMessage,
+                    isOverallStreaming: $executor.isChatStreaming,
+                    isNearBottom: $isNearBottom,
+                    scrollToBottomTrigger: $scrollToBottomTrigger,
+                    isModelSelected: chatSettings.selectedModelID != nil,
+                    bottomInset: inputAreaHeight,
+                    emptyStateTitle: "Chat",
+                    emptyStateDescription: "Here you can perform a simple chat to check the model.",
+                    emptyStateImage: "message.fill"
+                )
             }
         }
         .frame(maxHeight: .infinity) // Make sure it fills the available height
@@ -68,17 +81,24 @@ struct ChatView: View {
     @ViewBuilder
     private func makeSafeAreaBarContent() -> some View {
         @Bindable var executor = executor
-        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-            sendMessage()
-        } stopMessage: {
-            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                executor.updateIsChatStreaming()
+        VStack(spacing: 0) {
+#if !os(visionOS)
+            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+#endif
+            
+            ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+                sendMessage()
+            } stopMessage: {
+                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                    executor.updateIsChatStreaming()
+                }
+                executor.isChatStreaming = false
+                executor.cancelChatStreaming()
             }
-            executor.isChatStreaming = false
-            executor.cancelChatStreaming()
         }
+        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -95,13 +115,53 @@ struct ChatView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            chatContent
-                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                    makeSafeAreaBarContent()
-                        .frame(width: 600)
-                        .padding(16)
-                        .glassBackgroundEffect()
-                }
+            if #available(visionOS 26.0, *) {
+                chatContent
+                    .safeAreaBar(edge: .bottom) {
+                        VStack(spacing: 0) {
+                            if !isNearBottom && !executor.chatMessages.isEmpty {
+                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                                    .padding()
+                            }
+                            
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                        .animation(.spring(duration: 0.3), value: isNearBottom)
+                        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
+                    }
+                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                        makeSafeAreaBarContent()
+                            .frame(width: 600)
+                            .padding(16)
+                            .glassBackgroundEffect()
+                    }
+            } else {
+                chatContent
+                    .safeAreaInset(edge: .bottom) {
+                        VStack(spacing: 0) {
+                            if !isNearBottom && !executor.chatMessages.isEmpty {
+                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                                    .padding()
+                            }
+                            
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                        .animation(.spring(duration: 0.3), value: isNearBottom)
+                        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
+                    }
+                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                        makeSafeAreaBarContent()
+                            .frame(width: 600)
+                            .padding(16)
+                            .glassBackgroundEffect()
+                    }
+            }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 chatContent
@@ -823,6 +883,8 @@ struct ImageGenerationView: View {
     @State private var generalErrorMessage: String? = nil
     @State private var showingClearConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
+    @State private var isNearBottom: Bool = true
+    @State private var scrollToBottomTrigger: Int = 0
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -869,6 +931,8 @@ struct ImageGenerationView: View {
                     messages: $executor.imageMessages,
                     onRetry: retryGeneration,
                     isOverallStreaming: $executor.isImageStreaming,
+                    isNearBottom: $isNearBottom,
+                    scrollToBottomTrigger: $scrollToBottomTrigger,
                     isModelSelected: imageSettings.selectedModelID != nil,
                     bottomInset: inputAreaHeight,
                     emptyStateTitle: "Image Generation",
@@ -883,23 +947,30 @@ struct ImageGenerationView: View {
     @ViewBuilder
     private func makeInputArea() -> some View {
         @Bindable var executor = executor
-        ChatInputView(
-            inputText: $executor.chatInputText,
-            selectedImages: $executor.imageInputImages,
-            isStreaming: $executor.isImageStreaming,
-            showingInspector: $showingInspector,
-            placeholder: "Enter a prompt...",
-            selectedModel: currentSelectedModel
-        ) {
-            generateImage()
-        } stopMessage: {
-            if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
-                last.isStreaming = false
-                last.isStopped = true
+        VStack(spacing: 0) {
+#if !os(visionOS)
+            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+#endif
+            
+            ChatInputView(
+                inputText: $executor.chatInputText,
+                selectedImages: $executor.imageInputImages,
+                isStreaming: $executor.isImageStreaming,
+                showingInspector: $showingInspector,
+                placeholder: "Enter a prompt...",
+                selectedModel: currentSelectedModel
+            ) {
+                generateImage()
+            } stopMessage: {
+                if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
+                    last.isStreaming = false
+                    last.isStopped = true
+                }
+                executor.isImageStreaming = false
+                executor.cancelImageGeneration()
             }
-            executor.isImageStreaming = false
-            executor.cancelImageGeneration()
         }
+        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -916,13 +987,53 @@ struct ImageGenerationView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            content
-                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                    makeInputArea()
-                        .frame(width: 600)
-                        .padding(16)
-                        .glassBackgroundEffect()
-                }
+            if #available(visionOS 26.0, *) {
+                content
+                    .safeAreaBar(edge: .bottom) {
+                        VStack(spacing: 0) {
+                            if !isNearBottom && !executor.imageMessages.isEmpty {
+                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                                    .padding()
+                            }
+                            
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                        .animation(.spring(duration: 0.3), value: isNearBottom)
+                        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
+                    }
+                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                        makeInputArea()
+                            .frame(width: 600)
+                            .padding(16)
+                            .glassBackgroundEffect()
+                    }
+            } else {
+                content
+                    .safeAreaInset(edge: .bottom) {
+                        VStack(spacing: 0) {
+                            if !isNearBottom && !executor.imageMessages.isEmpty {
+                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                                    .padding()
+                            }
+                            
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                        .animation(.spring(duration: 0.3), value: isNearBottom)
+                        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
+                    }
+                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                        makeInputArea()
+                            .frame(width: 600)
+                            .padding(16)
+                            .glassBackgroundEffect()
+                    }
+            }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 content
@@ -1296,6 +1407,28 @@ struct ImageGenerationView: View {
         await MainActor.run { 
             executor.isImageStreaming = false 
             executor.updateIsImageStreaming()
+        }
+    }
+}
+
+struct ScrollToBottomButton: View {
+    let isNearBottom: Bool
+    let messagesEmpty: Bool
+    @Binding var scrollToBottomTrigger: Int
+
+    var body: some View {
+        if !isNearBottom && !messagesEmpty {
+            Button {
+                scrollToBottomTrigger += 1
+            } label: {
+                Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                    .font(.subheadline.bold())
+                    .padding()
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
+            .frame(maxWidth: .infinity)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
     }
 }

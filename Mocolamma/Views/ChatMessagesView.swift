@@ -22,6 +22,8 @@ struct ChatMessagesView: View {
     @Binding var messages: [ChatMessage]
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
+    @Binding var isNearBottom: Bool
+    @Binding var scrollToBottomTrigger: Int
     let isModelSelected: Bool
     var bottomInset: CGFloat = 0
     // 空の状態の表示をカスタマイズするための引数を追加
@@ -53,6 +55,8 @@ struct ChatMessagesView: View {
                     messages: $messages,
                     onRetry: onRetry,
                     isOverallStreaming: $isOverallStreaming,
+                    isNearBottom: $isNearBottom,
+                    scrollToBottomTrigger: $scrollToBottomTrigger,
                     isModelSelected: isModelSelected,
                     supportsEffects: supportsEffects,
                     reduceMotionEnabled: reduceMotionEnabled,
@@ -101,12 +105,13 @@ struct ChatMessagesScrollView: View {
     @Binding var messages: [ChatMessage]
     let onRetry: ((UUID, ChatMessage) -> Void)?
     @Binding var isOverallStreaming: Bool
+    @Binding var isNearBottom: Bool
+    @Binding var scrollToBottomTrigger: Int
     let isModelSelected: Bool
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
     var bottomInset: CGFloat = 0
     
-    @State private var isNearBottom: Bool = true
     @State private var lastScrollTime: Date = .distantPast
     @State private var isUserInteracting: Bool = false
     @GestureState private var isTouching: Bool = false
@@ -154,9 +159,6 @@ struct ChatMessagesScrollView: View {
                 .accessibilityLabel("Chat messages")
                 .padding()
                 
-                if bottomInset > 0 {
-                    Spacer(minLength: bottomInset)
-                }
                 
                 Spacer().id("bottom-spacer")
                 
@@ -192,7 +194,7 @@ struct ChatMessagesScrollView: View {
                 let maxOffset = max(0, contentHeight - visibleHeight)
                 let distanceFromBottom = maxOffset - scrollOffset
                 
-                let threshold: CGFloat = 300 // 下端付近とみなすしきい値
+                let threshold: CGFloat = 300 + bottomInset // 下端付近とみなすしきい値
                 let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
                 
                 return ScrollState(nearBottom: nearBottom, contentHeight: contentHeight)
@@ -256,6 +258,9 @@ struct ChatMessagesScrollView: View {
                 // メッセージ数が変わった（送信・削除・リセット）時は高さの最大値をリセットし
                 // 新しいレイアウトを正しく追従できるようにする
                 maxMessagesHeight = 0
+            }
+            .onChange(of: scrollToBottomTrigger) { _, _ in
+                scrollBottom(proxy: proxy)
             }
         }
     }

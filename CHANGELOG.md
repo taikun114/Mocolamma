@@ -57,6 +57,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Chat and Image Generation
 - **Add options to set the order of models**
   - By default, the order displayed on the model screen is used, but you can change it to your preferred order in the settings.
+- **Add a button to scroll to the bottom**
+  - A button now appears that allows you to scroll straight to the bottom when you are outside the auto-follow scroll range.
 
 ### Bug Fixes and Improvements
 #### General
@@ -78,6 +80,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 #### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**
+- **Fix issue where auto-follow scrolling would sometimes jumps**
 - **Improve the model picker display while loading models**
 - **Improve the appearance of the model picker**
   - On macOS, the width now remains fixed, and on visionOS, model names are now displayed just like on macOS.
@@ -86,7 +89,6 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 #### Chat
 - **Fix issue where list bullets were not displayed**
-- **Fix issue where auto-follow scrolling would sometimes jumps**
 - **Improve the display of the thinking text to use Markdown**
 - **Improve Markdown styling**
 - **Improve the performance of the thinking process**
