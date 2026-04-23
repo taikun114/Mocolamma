@@ -621,6 +621,10 @@ struct ModelListContentView: View {
 #if os(iOS)
             .presentationBackground(Color(uiColor: .systemBackground))
 #endif
+#if os(visionOS)
+            .frame(width: 550, height: 250)
+            .presentationSizing(.fitted)
+#endif
         }
     }
     
