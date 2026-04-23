@@ -930,14 +930,10 @@ struct ImageGenerationView: View {
                         makeInputArea()
                     }
             } else {
-                ZStack {
-                    content
-                    
-                    VStack {
-                        Spacer()
+                content
+                    .safeAreaInset(edge: .bottom) {
                         makeInputArea()
                     }
-                }
             }
 #else
             if #available(macOS 26.0, *) {
