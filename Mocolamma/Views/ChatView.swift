@@ -6,9 +6,9 @@ import UniformTypeIdentifiers
 
 struct ChatView: View {
     @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var serverManager: ServerManager
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @EnvironmentObject var chatSettings: ChatSettings
+    @Environment(ServerManager.self) var serverManager
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    @Environment(ChatSettings.self) var chatSettings
     @Environment(\.requestReview) var requestReview
     
     @State private var errorMessage: String?
@@ -17,9 +17,20 @@ struct ChatView: View {
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
+    @State private var isNearBottom: Bool = true
+    @State private var scrollToBottomTrigger: Int = 0
+    @State private var scrollToMessageIDTrigger: UUID? = nil
+    private var modelSettings = ModelSettingsManager.shared
+    @State private var selectionCoordinator = TextSelectionCoordinator()
+
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
+    
+    init(showingInspector: Binding<Bool>, onToggleInspector: @escaping () -> Void) {
+        self._showingInspector = showingInspector
+        self.onToggleInspector = onToggleInspector
+    }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
@@ -54,12 +65,19 @@ struct ChatView: View {
                     description: Text(LocalizedStringKey(executor.specificConnectionErrorMessage ?? "Failed to connect to the Ollama API. Please check your network connection or server settings."))
                 )
             } else {
-                // OSバージョン26以降かどうかの条件分岐
-                if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: true, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
-                } else {
-                    ChatMessagesView(messages: $executor.chatMessages, onRetry: retryMessage, isOverallStreaming: $executor.isChatStreaming, isModelSelected: chatSettings.selectedModelID != nil, isUsingSafeAreaBar: false, bottomInset: inputAreaHeight, emptyStateTitle: "Chat", emptyStateDescription: "Here you can perform a simple chat to check the model.", emptyStateImage: "message.fill")
-                }
+                ChatMessagesView(
+                    messages: $executor.chatMessages,
+                    onRetry: retryMessage,
+                    isOverallStreaming: $executor.isChatStreaming,
+                    isNearBottom: $isNearBottom,
+                    scrollToBottomTrigger: $scrollToBottomTrigger,
+                    scrollToMessageIDTrigger: $scrollToMessageIDTrigger,
+                    isModelSelected: chatSettings.selectedModelID != nil,
+                    bottomInset: inputAreaHeight,
+                    emptyStateTitle: "Chat",
+                    emptyStateDescription: "Here you can perform a simple chat to check the model.",
+                    emptyStateImage: "message.fill"
+                )
             }
         }
         .frame(maxHeight: .infinity) // Make sure it fills the available height
@@ -68,17 +86,24 @@ struct ChatView: View {
     @ViewBuilder
     private func makeSafeAreaBarContent() -> some View {
         @Bindable var executor = executor
-        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-            sendMessage()
-        } stopMessage: {
-            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                executor.updateIsChatStreaming()
+        VStack(spacing: 0) {
+#if !os(visionOS)
+            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+#endif
+            
+            ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
+                sendMessage()
+            } stopMessage: {
+                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                    executor.updateIsChatStreaming()
+                }
+                executor.isChatStreaming = false
+                executor.cancelChatStreaming()
             }
-            executor.isChatStreaming = false
-            executor.cancelChatStreaming()
         }
+        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -95,13 +120,38 @@ struct ChatView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            chatContent
-                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                    makeSafeAreaBarContent()
-                        .frame(width: 600)
-                        .padding(16)
-                        .glassBackgroundEffect()
+            ZStack(alignment: .bottom) {
+                if #available(visionOS 26.0, *) {
+                    chatContent
+                        .safeAreaBar(edge: .bottom) {
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                } else {
+                    chatContent
+                        .safeAreaInset(edge: .bottom) {
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
                 }
+
+                ZStack(alignment: .bottom) {
+                    ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                        .padding(.bottom, inputAreaHeight + 8)
+                }
+                .animation(.spring(duration: 0.3), value: isNearBottom)
+                .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
+            }
+            .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                makeSafeAreaBarContent()
+                    .frame(width: 600)
+                    .padding(16)
+                    .glassBackgroundEffect()
+            }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 chatContent
@@ -109,29 +159,13 @@ struct ChatView: View {
                         makeSafeAreaBarContent()
                     }
             } else {
-                ZStack {
-                    chatContent
-                    
-                    VStack {
-                        Spacer()
-                        
-                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                            sendMessage()
-                        } stopMessage: {
-                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                                executor.updateIsChatStreaming()
+                chatContent
+                    .safeAreaInset(edge: .bottom) {
+                        makeSafeAreaBarContent()
+                            .if(horizontalSizeClass != .compact) { view in
+                                view.ignoresSafeArea(.container, edges: [.bottom])
                             }
-                            executor.isChatStreaming = false
-                            executor.cancelChatStreaming()
-                        }
                     }
-                    .padding()
-                    .if(horizontalSizeClass != .compact) { view in
-                        view.ignoresSafeArea(.container, edges: [.bottom])
-                    }
-                }
             }
 #else
             if #available(macOS 26.0, *) {
@@ -140,34 +174,21 @@ struct ChatView: View {
                         makeSafeAreaBarContent()
                     }
             } else {
-                ZStack {
-                    chatContent
-                    
-                    VStack {
-                        Spacer()
-                        
-                        ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                            sendMessage()
-                        } stopMessage: {
-                            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                                executor.updateIsChatStreaming()
-                            }
-                            executor.isChatStreaming = false
-                            executor.cancelChatStreaming()
-                        }
+                chatContent
+                    .safeAreaInset(edge: .bottom) {
+                        makeSafeAreaBarContent()
                     }
-                    .padding()
-                }
             }
 #endif
         }
 #if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            selectionCoordinator.deselectAll()
         }
 #endif
+        .environment(selectionCoordinator)
+        .modifier(TextSelectionCoordination())
         .navigationTitle("Chat")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
@@ -178,9 +199,12 @@ struct ChatView: View {
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
         .task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: executor.models) { _, newModels in
@@ -282,19 +306,22 @@ struct ChatView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        @Bindable var chatSettings = chatSettings
+        @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
         }
         
         ToolbarItem(placement: .primaryAction) {
             Picker("Select Model", selection: $chatSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
-                ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
+                ForEach(sortedModels) { model in
                     let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                     HStack {
                         Text(model.name)
@@ -304,13 +331,19 @@ struct ChatView: View {
                 }
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Divider()
-                    Text(LocalizedStringKey("No models available"))
-                        .tag("no-models-available-tag" as OllamaModel.ID?)
-                        .selectionDisabled(true)
+                    if executor.isRunning {
+                        Text("Loading models...")
+                            .tag("loading-models-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    } else {
+                        Text("No models available")
+                            .tag("no-models-available-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    }
                 }
             }
             .pickerStyle(.menu)
-            .frame(maxWidth: 150)
+            .frame(width: 150)
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -334,7 +367,7 @@ struct ChatView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
             
             Menu {
                 Section {
@@ -345,7 +378,8 @@ struct ChatView: View {
                 }
                 Section {
                     Picker("Models", selection: $chatSettings.selectedModelID) {
-                        ForEach(executor.models.filter { $0.supportsCompletion }) { model in
+                        let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
+                        ForEach(sortedModels) { model in
                             let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                             HStack {
                                 Text(model.name)
@@ -358,12 +392,19 @@ struct ChatView: View {
                 }
                 if executor.models.filter({ $0.supportsCompletion }).isEmpty {
                     Section {
-                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
+                        if executor.isRunning {
+                            Button(action: {}) { Text("Loading models...") }.disabled(true)
+                        } else {
+                            Button(action: {}) { Text("No models available") }.disabled(true)
+                        }
                     }
                 }
             } label: {
                 let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                    .labelStyle(.titleAndIcon)
+#endif
             }
             .help({
                 if let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
@@ -484,6 +525,7 @@ struct ChatView: View {
             // 編集されたユーザーメッセージを履歴の最後に移動
             let userMessage = executor.chatMessages.remove(at: indexToRetry)
             executor.chatMessages.append(userMessage)
+            let scrollId = userMessage.id
             
             // ユーザーメッセージ以降のアシスタントメッセージを削除
             executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in
@@ -512,6 +554,7 @@ struct ChatView: View {
             }
             
             executor.isChatStreaming = true
+            scrollToMessageIDTrigger = scrollId
             Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
             
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
@@ -529,6 +572,7 @@ struct ChatView: View {
                 return
             }
             let userMessageIndex = indexToRetry - 1
+            let scrollId = executor.chatMessages[userMessageIndex].id
             
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content の順
@@ -604,19 +648,110 @@ struct ChatView: View {
             }
             
             executor.isChatStreaming = true
+            scrollToMessageIDTrigger = scrollId
             Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
         }
     }
     
-    /// ストリーミング応答を処理し、UIをバッファリングしながら更新
+    /// ストリーミング応答を処理し、UIの更新負荷に応じて動的に頻度と排出量を調整
+    @MainActor
     private func streamAssistantResponse(for messageId: UUID, with apiMessages: [ChatMessage], model: OllamaModel) async {
-        var lastUIUpdateTime = Date()
-        let throttleInterval = 0.03 // 約30fpsで更新
         var isFirstChunk = true
         var isInsideThinkingBlock = false
         
-        var fullContent = ""
-        var fullThinking = ""
+        // --- 排出システムの管理用状態 ---
+        class StreamBuffer {
+            var rawContent = ""
+            var rawThinking = ""
+            var isThinkingCompleted = false
+            var isStreamingFinished = false
+            var finalChunk: ChatResponseChunk? = nil
+        }
+        
+        let buffer = StreamBuffer()
+        var displayedContentLength = 0
+        var displayedThinkingLength = 0
+        
+        // --- ディスペンサー（排出）ループ ---
+        let dispenserTask = Task {
+#if os(visionOS)
+            var currentInterval: TimeInterval = 0.066 // visionOSは15fpsから開始して負荷を抑制
+#else
+            var currentInterval: TimeInterval = 0.033 // 他は30fps
+#endif
+            var charsPerTick: Int = 30
+            
+            while true {
+                if buffer.isStreamingFinished && 
+                   buffer.rawContent.count <= displayedContentLength && 
+                   buffer.rawThinking.count <= displayedThinkingLength {
+                    break
+                }
+                
+                let tickStart = Date()
+                
+                let lag = (buffer.rawContent.count - displayedContentLength) + (buffer.rawThinking.count - displayedThinkingLength)
+                let adaptiveChars = charsPerTick + (lag > 200 ? (lag / 100) * 10 : 0)
+                
+                let targetC = min(buffer.rawContent.count, displayedContentLength + adaptiveChars)
+                let targetT = min(buffer.rawThinking.count, displayedThinkingLength + adaptiveChars)
+                
+                let nextC = String(buffer.rawContent.prefix(targetC))
+                let nextT = String(buffer.rawThinking.prefix(targetT))
+                
+                if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }) {
+                    // プロパティ更新を一括化してObservationの通知回数を削減
+                    executor.chatMessages[index].updateStreamingContent(
+                        content: nextC,
+                        thinking: nextT.isEmpty ? nil : nextT,
+                        isThinkingCompleted: buffer.isThinkingCompleted
+                    )
+                    
+                    displayedContentLength = targetC
+                    displayedThinkingLength = targetT
+                } else {
+                    break
+                }
+                
+                let tickEnd = Date()
+                let updateDuration = tickEnd.timeIntervalSince(tickStart)
+                
+                // --- メインスレッド負荷に応じた適応的調整 ---
+                if updateDuration > 0.016 {
+                    currentInterval = min(0.25, currentInterval + 0.02)
+                    charsPerTick = max(5, charsPerTick - 1)
+                } else if updateDuration < 0.008 && lag > 0 {
+                    currentInterval = max(0.01, currentInterval - 0.005)
+                    charsPerTick = min(300, charsPerTick + 5)
+                }
+                
+                try? await Task.sleep(nanoseconds: UInt64(currentInterval * 1_000_000_000))
+                if Task.isCancelled { break }
+            }
+            
+            // 最終確定処理
+            if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
+               let chunk = buffer.finalChunk {
+                let isThinkingCompleted = buffer.isThinkingCompleted || !buffer.rawThinking.isEmpty
+                
+                executor.chatMessages[index].finalizeStreaming(
+                    content: buffer.rawContent,
+                    thinking: buffer.rawThinking.isEmpty ? nil : buffer.rawThinking,
+                    totalDuration: chunk.totalDuration,
+                    evalCount: chunk.evalCount,
+                    evalDuration: chunk.evalDuration,
+                    isThinkingCompleted: isThinkingCompleted
+                )
+                
+                executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
+                executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
+                executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
+                executor.chatMessages[index].finalTotalDuration = executor.chatMessages[index].totalDuration
+                executor.chatMessages[index].finalEvalCount = executor.chatMessages[index].evalCount
+                executor.chatMessages[index].finalEvalDuration = executor.chatMessages[index].evalDuration
+                executor.chatMessages[index].finalIsStopped = executor.chatMessages[index].isStopped
+            }
+        }
         
         do {
             // パラメータの計算
@@ -664,36 +799,33 @@ struct ChatView: View {
                 
                 if let messageChunk = chunk.message {
                     if chatSettings.thinkingOption == .on {
-                        if let apiThinking = messageChunk.thinking { fullThinking += apiThinking }
-                        fullContent += messageChunk.content
+                        if let apiThinking = messageChunk.thinking { buffer.rawThinking += apiThinking }
+                        if !messageChunk.content.isEmpty {
+                            buffer.rawContent += messageChunk.content
+                            buffer.isThinkingCompleted = true
+                        }
                     } else {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
                             isInsideThinkingBlock = true
-                            fullContent += String(current[..<start.lowerBound])
+                            buffer.rawContent += String(current[..<start.lowerBound])
                             current = String(current[start.upperBound...])
                         }
                         if let end = current.range(of: "</think>") {
                             isInsideThinkingBlock = false
-                            fullThinking += String(current[..<end.lowerBound])
-                            fullContent += String(current[end.upperBound...])
-                            await MainActor.run {
-                                if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
-                                }
-                            }
+                            buffer.rawThinking += String(current[..<end.lowerBound])
+                            buffer.rawContent += String(current[end.upperBound...])
+                            buffer.isThinkingCompleted = true
                         } else if isInsideThinkingBlock {
-                            fullThinking += current
+                            buffer.rawThinking += current
                         } else {
-                            fullContent += current
+                            buffer.rawContent += current
                         }
                     }
                     
                     if isFirstChunk {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
-                            }
+                        if executor.chatMessages.indices.contains(assistantMessageIndex) {
+                            executor.chatMessages[assistantMessageIndex].createdAt = chunk.createdAt
                         }
                         // 最初のレスポンスが来た = モデルがメモリにロードされたので実行中リストを更新
                         Task {
@@ -701,102 +833,70 @@ struct ChatView: View {
                         }
                         isFirstChunk = false
                     }
-                    
-                    let now = Date()
-                    if now.timeIntervalSince(lastUIUpdateTime) > throttleInterval || chunk.done {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(assistantMessageIndex) {
-                                // プロパティを直接更新して即座にMarkdownに反映
-                                executor.chatMessages[assistantMessageIndex].content = fullContent
-                                executor.chatMessages[assistantMessageIndex].thinking = fullThinking.isEmpty ? nil : fullThinking
-                                
-                                executor.chatMessages[assistantMessageIndex].latestContent = fullContent
-                                
-                                if chatSettings.thinkingOption == .on &&
-                                    !fullThinking.isEmpty &&
-                                    !fullContent.isEmpty &&
-                                    !executor.chatMessages[assistantMessageIndex].isThinkingCompleted {
-                                    executor.chatMessages[assistantMessageIndex].isThinkingCompleted = true
-                                }
-                            }
-                        }
-                        lastUIUpdateTime = now
-                    }
                 }
                 
                 if chunk.done {
-                    if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
-                        await MainActor.run {
-                            if executor.chatMessages.indices.contains(index) {
-                                executor.chatMessages[index].content = fullContent
-                                executor.chatMessages[index].thinking = fullThinking.isEmpty ? nil : fullThinking
-                                executor.chatMessages[index].totalDuration = chunk.totalDuration
-                                executor.chatMessages[index].evalCount = chunk.evalCount
-                                executor.chatMessages[index].evalDuration = chunk.evalDuration
-                                executor.chatMessages[index].isStreaming = false
-                                
-                                if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil && !executor.chatMessages[index].isThinkingCompleted {
-                                    executor.chatMessages[index].isThinkingCompleted = true
-                                }
-                                
-                                executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
-                                executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
-                                executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
-                                executor.chatMessages[index].finalTotalDuration = executor.chatMessages[index].totalDuration
-                                executor.chatMessages[index].finalEvalCount = executor.chatMessages[index].evalCount
-                                executor.chatMessages[index].finalEvalDuration = executor.chatMessages[index].evalDuration
-                                executor.chatMessages[index].finalIsStopped = executor.chatMessages[index].isStopped
-                            }
-                        }
-                    }
+                    buffer.isStreamingFinished = true
+                    buffer.finalChunk = chunk
                 }
             }
         } catch {
             print("Chat streaming error or cancelled: \(error)")
+            dispenserTask.cancel()
             if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), executor.chatMessages.indices.contains(index) {
-                await MainActor.run {
-                    executor.chatMessages[index].isStreaming = false
+                executor.chatMessages[index].isStreaming = false
+                
+                let isCancelled = (error as? URLError)?.code == .cancelled || 
+                                 (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
+                
+                if isCancelled {
+                    executor.chatMessages[index].isStopped = true
+                } else {
+                    executor.chatMessages[index].isStopped = false
                     
-                    let isCancelled = (error as? URLError)?.code == .cancelled || 
-                                     (error as NSError).domain == NSURLErrorDomain && (error as NSError).code == -999
-                    
-                    if isCancelled {
-                        executor.chatMessages[index].isStopped = true
-                    } else {
-                        executor.chatMessages[index].isStopped = false
-                        
-                        var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
-                        if (error as? URLError)?.code == .timedOut {
-                            fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
-                        }
-                        
-                        if executor.chatMessages[index].content.isEmpty {
-                            executor.chatMessages[index].content = fullErrorMessage
-                        }
-                        
-                        generalErrorMessage = fullErrorMessage
+                    var fullErrorMessage = "Chat API Error: \(error.localizedDescription)"
+                    if (error as? URLError)?.code == .timedOut {
+                        fullErrorMessage += "\n\n" + String(localized: "If it takes time to load large models, increasing the API timeout in Mocolamma settings or changing it to unlimited may help.")
                     }
+                    
+                    if executor.chatMessages[index].content.isEmpty {
+                        executor.chatMessages[index].content = fullErrorMessage
+                    }
+                    
+                    generalErrorMessage = fullErrorMessage
                 }
             }
         }
-        await MainActor.run { executor.isChatStreaming = false }
+        await dispenserTask.value
+        executor.isChatStreaming = false
     }
 }
 
+
 struct ImageGenerationView: View {
     @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var serverManager: ServerManager
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @EnvironmentObject var imageSettings: ImageGenerationSettings
+    @Environment(ServerManager.self) var serverManager
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    @Environment(ImageGenerationSettings.self) var imageSettings
     @Environment(\.requestReview) var requestReview
+    private var modelSettings = ModelSettingsManager.shared
+    @State private var selectionCoordinator = TextSelectionCoordinator()
     
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
     @State private var showingClearConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
+    @State private var isNearBottom: Bool = true
+    @State private var scrollToBottomTrigger: Int = 0
+    @State private var scrollToMessageIDTrigger: UUID? = nil
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
+    
+    init(showingInspector: Binding<Bool>, onToggleInspector: @escaping () -> Void) {
+        self._showingInspector = showingInspector
+        self.onToggleInspector = onToggleInspector
+    }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var currentSelectedModel: OllamaModel? {
@@ -835,11 +935,10 @@ struct ImageGenerationView: View {
                     messages: $executor.imageMessages,
                     onRetry: retryGeneration,
                     isOverallStreaming: $executor.isImageStreaming,
+                    isNearBottom: $isNearBottom,
+                    scrollToBottomTrigger: $scrollToBottomTrigger,
+                    scrollToMessageIDTrigger: $scrollToMessageIDTrigger,
                     isModelSelected: imageSettings.selectedModelID != nil,
-                    isUsingSafeAreaBar: {
-                        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) { return true }
-                        return false
-                    }(),
                     bottomInset: inputAreaHeight,
                     emptyStateTitle: "Image Generation",
                     emptyStateDescription: "Here you can generate images using models that support image generation.",
@@ -853,23 +952,30 @@ struct ImageGenerationView: View {
     @ViewBuilder
     private func makeInputArea() -> some View {
         @Bindable var executor = executor
-        ChatInputView(
-            inputText: $executor.chatInputText,
-            selectedImages: $executor.imageInputImages,
-            isStreaming: $executor.isImageStreaming,
-            showingInspector: $showingInspector,
-            placeholder: "Enter a prompt...",
-            selectedModel: currentSelectedModel
-        ) {
-            generateImage()
-        } stopMessage: {
-            if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
-                last.isStreaming = false
-                last.isStopped = true
+        VStack(spacing: 0) {
+#if !os(visionOS)
+            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+#endif
+            
+            ChatInputView(
+                inputText: $executor.chatInputText,
+                selectedImages: $executor.imageInputImages,
+                isStreaming: $executor.isImageStreaming,
+                showingInspector: $showingInspector,
+                placeholder: "Enter a prompt...",
+                selectedModel: currentSelectedModel
+            ) {
+                generateImage()
+            } stopMessage: {
+                if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
+                    last.isStreaming = false
+                    last.isStopped = true
+                }
+                executor.isImageStreaming = false
+                executor.cancelImageGeneration()
             }
-            executor.isImageStreaming = false
-            executor.cancelImageGeneration()
         }
+        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -886,13 +992,38 @@ struct ImageGenerationView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            content
-                .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                    makeInputArea()
-                        .frame(width: 600)
-                        .padding(16)
-                        .glassBackgroundEffect()
+            ZStack(alignment: .bottom) {
+                if #available(visionOS 26.0, *) {
+                    content
+                        .safeAreaBar(edge: .bottom) {
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
+                } else {
+                    content
+                        .safeAreaInset(edge: .bottom) {
+                            if inputAreaHeight > 0 {
+                                Color.clear
+                                    .frame(height: inputAreaHeight)
+                            }
+                        }
                 }
+
+                ZStack(alignment: .bottom) {
+                    ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                        .padding(.bottom, inputAreaHeight + 8)
+                }
+                .animation(.spring(duration: 0.3), value: isNearBottom)
+                .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
+            }
+            .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                makeInputArea()
+                    .frame(width: 600)
+                    .padding(16)
+                    .glassBackgroundEffect()
+            }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 content
@@ -900,14 +1031,10 @@ struct ImageGenerationView: View {
                         makeInputArea()
                     }
             } else {
-                ZStack {
-                    content
-                    
-                    VStack {
-                        Spacer()
+                content
+                    .safeAreaInset(edge: .bottom) {
                         makeInputArea()
                     }
-                }
             }
 #else
             if #available(macOS 26.0, *) {
@@ -916,22 +1043,21 @@ struct ImageGenerationView: View {
                         makeInputArea()
                     }
             } else {
-                ZStack {
-                    content
-                    
-                    VStack {
-                        Spacer()
+                content
+                    .safeAreaInset(edge: .bottom) {
                         makeInputArea()
                     }
-                }
             }
 #endif
         }
 #if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            selectionCoordinator.deselectAll()
         }
 #endif
+        .environment(selectionCoordinator)
+        .modifier(TextSelectionCoordination())
         .navigationTitle("Image Generation")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
@@ -942,9 +1068,13 @@ struct ImageGenerationView: View {
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
         .task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            // これにより、タブ切り替えのたびにリロードが走るのを防ぎ、ハングアップを回避する
+            if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: executor.models) { _, newModels in
@@ -969,19 +1099,22 @@ struct ImageGenerationView: View {
     
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        @Bindable var imageSettings = imageSettings
+        @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
         }
         
         ToolbarItem(placement: .primaryAction) {
             Picker("Select Model", selection: $imageSettings.selectedModelID) {
                 Text("Select Model").tag(nil as OllamaModel.ID?)
                 Divider()
-                ForEach(executor.models.filter { $0.isImageModel }) { model in
+                let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
+                ForEach(sortedModels) { model in
                     let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                     HStack {
                         Text(model.name)
@@ -991,20 +1124,26 @@ struct ImageGenerationView: View {
                 }
                 if executor.models.filter({ $0.isImageModel }).isEmpty {
                     Divider()
-                    Text(LocalizedStringKey("No models available"))
-                        .tag("no-image-models-available-tag" as OllamaModel.ID?)
-                        .selectionDisabled(true)
+                    if executor.isRunning {
+                        Text("Loading models...")
+                            .tag("loading-image-models-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    } else {
+                        Text("No models available")
+                            .tag("no-image-models-available-tag" as OllamaModel.ID?)
+                            .selectionDisabled(true)
+                    }
                 }
             }
             .pickerStyle(.menu)
-            .frame(maxWidth: 150)
+            .frame(width: 150)
         }
 #else
         ToolbarItemGroup(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
-            .disabled(executor.isRunning)
+            .disabled(executor.isRunning || executor.isPulling)
             
             Menu {
                 Section {
@@ -1015,7 +1154,8 @@ struct ImageGenerationView: View {
                 }
                 Section {
                     Picker("Models", selection: $imageSettings.selectedModelID) {
-                        ForEach(executor.models.filter { $0.isImageModel }) { model in
+                        let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
+                        ForEach(sortedModels) { model in
                             let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
                             HStack {
                                 Text(model.name)
@@ -1028,12 +1168,19 @@ struct ImageGenerationView: View {
                 }
                 if executor.models.filter({ $0.isImageModel }).isEmpty {
                     Section {
-                        Button(action: {}) { Text(LocalizedStringKey("No models available")) }.disabled(true)
+                        if executor.isRunning {
+                            Button(action: {}) { Text("Loading models...") }.disabled(true)
+                        } else {
+                            Button(action: {}) { Text("No models available") }.disabled(true)
+                        }
                     }
                 }
             } label: {
                 let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
                 Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                    .labelStyle(.titleAndIcon)
+#endif
             }
             .help({
                 if let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name {
@@ -1118,12 +1265,15 @@ struct ImageGenerationView: View {
         // 画像生成のリトライロジック
         guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { return }
         
+        let promptId: UUID
         let prompt: String
         if executor.imageMessages[index].role == "user" {
+            promptId = executor.imageMessages[index].id
             prompt = executor.imageMessages[index].content
             executor.imageMessages.removeSubrange(index+1..<executor.imageMessages.count)
         } else {
             guard index > 0 else { return }
+            promptId = executor.imageMessages[index-1].id
             prompt = executor.imageMessages[index-1].content
             
             // 重要: 現在表示中のリビジョンではなく、常に「最新の完成版」をアーカイブする
@@ -1174,8 +1324,10 @@ struct ImageGenerationView: View {
                 isImageGeneration: true
             )
             executor.imageMessages.append(assistantMessage)
+            scrollToMessageIDTrigger = promptId
             Task { await runImageGeneration(for: assistantMessage.id, prompt: prompt, model: model) }
         } else {
+            scrollToMessageIDTrigger = promptId
             Task { await runImageGeneration(for: messageId, prompt: prompt, model: model) }
         }
     }
@@ -1256,6 +1408,28 @@ struct ImageGenerationView: View {
         await MainActor.run { 
             executor.isImageStreaming = false 
             executor.updateIsImageStreaming()
+        }
+    }
+}
+
+struct ScrollToBottomButton: View {
+    let isNearBottom: Bool
+    let messagesEmpty: Bool
+    @Binding var scrollToBottomTrigger: Int
+
+    var body: some View {
+        if !isNearBottom && !messagesEmpty {
+            Button {
+                scrollToBottomTrigger += 1
+            } label: {
+                Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                    .font(.subheadline.bold())
+                    .padding()
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
+            .frame(maxWidth: .infinity)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
     }
 }

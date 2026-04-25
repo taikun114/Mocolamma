@@ -9,7 +9,14 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var isRunning: Bool = false
     var pullHttpErrorTriggered: Bool = false
     var pullHttpErrorMessage: String = ""
-    var models: [OllamaModel] = []
+    var models: [OllamaModel] = [] {
+        didSet {
+            // modelsが更新されたら、検索用の辞書も更新
+            modelsByID = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0) })
+        }
+    }
+    var modelsByID: [String: OllamaModel] = [:] // IDからモデルを高速に検索するための辞書
+    var initialFetchCompleted: Bool = false // サーバー選択後に一度でもモデル取得が完了したかどうかのフラグ
     var apiConnectionError: Bool = false
     var specificConnectionErrorMessage: String?
         var chatMessages: [ChatMessage] = []
@@ -21,10 +28,12 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var imageInputImages: [ChatInputImage] = []
         var isImageStreaming: Bool = false
         var previewImage: PlatformImage? = nil
-    var successfullyDownloadedIDs: Set<UUID> = []
-    var successfullyCopiedIDs: Set<UUID> = []
     var runningModels: [OllamaRunningModel] = []
     var isDraggingFile: Bool = false
+    
+    // ロード状態を各モデルごとに追跡するための状態
+    var loadingModelNames: Set<String> = []
+    var recentLoadedModelNames: Set<String> = []
     
     // システム全体のドラッグ監視用 (deinitからアクセスできるようnonisolatedに)
     @ObservationIgnored
@@ -54,6 +63,22 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var lastSpeedSampleTime: Date? // 速度算出用の前回サンプル時刻
     private var lastSpeedSampleCompleted: Int64 = 0 // 速度算出用の前回完了バイト
     private var pullStatusUpdateTimer: Timer? // プルステータスの更新タイマー
+    
+    /// モデルの表示用の重み付け（ステータス）を更新します。
+    private func updateModelWeights() {
+        for i in 0..<models.count {
+            let modelName = models[i].name
+            if recentLoadedModelNames.contains(modelName) {
+                models[i].statusWeight = 0 // 成功フィードバック
+            } else if loadingModelNames.contains(modelName) {
+                models[i].statusWeight = 1 // ロード中
+            } else if runningModels.contains(where: { $0.name == modelName }) {
+                models[i].statusWeight = 2 // ロード済み
+            } else {
+                models[i].statusWeight = 3 // 未ロード
+            }
+        }
+    }
     private var lastPullStatusUpdate: Date = Date(timeIntervalSince1970: 0) // 最後にプルステータスを更新した時間
     private var pendingPullStatus: String? // 更新待機中のプルステータス
     private var pendingPullTotal: Int64 = 0 // 更新待機中の合計バイト数
@@ -63,15 +88,22 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var imageContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ImageGenerationResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
+    
+    // ServerManagerのインスタンスを保持します
+    var serverManager: ServerManager
     private var imageLineBuffers: [URLSessionTask: String] = [:]
     private var currentChatTask: URLSessionDataTask? // 現在のチャットタスクを保持
     private var currentImageTask: URLSessionDataTask? // 現在の画像生成タスクを保持
     private var loggedTasks: Set<URLSessionTask> = [] // アクションを記録済みのタスク
     
     // Ollama APIのベースURL
-    var apiBaseURL: String?
-    
-    private var cancellables = Set<AnyCancellable>()
+    var apiBaseURL: String? {
+        if let selectedID = serverManager.selectedServerID,
+           let selectedServer = serverManager.servers.first(where: { $0.id == selectedID }) {
+            return selectedServer.host
+        }
+        return nil
+    }
     
     // MARK: - デモモード用
     private var hasDownloadedDemoModel: Bool = false
@@ -200,8 +232,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
     init(serverManager: ServerManager) {
-        // 初期化時にServerManagerから現在のホストURLを設定
-        self.apiBaseURL = serverManager.currentServerHost
+        self.serverManager = serverManager
         super.init()
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
         let configuration = URLSessionConfiguration.default
@@ -219,30 +250,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         // ドラッグ監視のセットアップ (ポーリング方式)
         setupDragMonitoring()
         
-        // ServerManagerのcurrentServerHostの変更を監視し、apiBaseURLを更新
-        serverManager.$servers
-            .map { servers in
-                // serversリストが変更された場合、selectedServerIDに基づき新しいcurrentServerHostを計算
-                if let selectedID = serverManager.selectedServerID,
-                   let selectedServer = servers.first(where: { $0.id == selectedID }) {
-                    return selectedServer.host
-                }
-                return nil
-            }
-            .sink { [weak self] host in
-                self?.apiBaseURL = host
-            }
-            .store(in: &cancellables)
-        
-        serverManager.$selectedServerID
-            .compactMap { selectedID in
-                // selectedIDが変更された場合、対応するサーバーのホストを返す
-                serverManager.servers.first(where: { $0.id == selectedID })?.host
-            }
-            .sink { [weak self] host in
-                self?.apiBaseURL = host
-            }
-            .store(in: &cancellables)
+        // apiBaseURLは計算プロパティとしてServerManagerの状態を直接参照するため、監視は不要。
         
         NotificationCenter.default.addObserver(forName: .apiTimeoutChanged, object: nil, queue: .main) { [weak self] note in
             guard let self = self else { return }
@@ -348,9 +356,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 mutableModel.originalIndex = index
                 return mutableModel
             }
+            updateModelWeights() // ステータス更新
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models from demo server. Total: %d", comment: "デモサーバーからモデル情報を取得した場合のメッセージ。"), self.models.count)
             self.output = successMessage
+            self.initialFetchCompleted = true
             self.apiConnectionError = false // 成功時はエラーなし
             return
         }
@@ -362,12 +372,16 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.apiConnectionError = true
             return
         }
+#if DEBUG
         print("Fetching model list from Ollama API at \(apiBaseURL)...")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "Ollamaサーバーからモデルリストを取得中のメッセージ。API (サーバーURL)...。"), apiBaseURL)
         try? await Task.sleep(nanoseconds: 100_000_000)
+        let targetServerID = serverManager.selectedServerID
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
+        self.isPullingErrorHold = false // プルのエラー状態もリセット
         
         defer {
             self.isRunning = false
@@ -390,6 +404,12 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 print("API Error: Unknown response type.")
                 self.models = [] // エラー時もモデルリストをクリア
                 self.apiConnectionError = true // API接続エラーを設定
+                return
+            }
+            
+            // 通信中にサーバーが切り替わった場合は、結果を破棄する
+            if serverManager.selectedServerID != targetServerID {
+                print("Server changed during fetch. Aborting model list update.")
                 return
             }
             
@@ -430,8 +450,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     updatedModels.append(result)
                 }
                 // 元の順序を維持してソート
+                self.initialFetchCompleted = true
                 return updatedModels.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
             }
+            updateModelWeights() // ステータス更新
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "Ollamaサーバー上からモデル情報を取得することができた場合のメッセージ。合計モデル数。"), self.models.count)
             self.output = successMessage
@@ -487,7 +509,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return
         }
         
+#if DEBUG
         print("Attempting to pull model \(modelName) from \(apiBaseURL)")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "Ollamaサーバー上でモデルをダウンロード中に表示されるメッセージ。モデル名 from サーバーURL"), modelName, apiBaseURL)
         self.isPulling = true
@@ -533,6 +557,28 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         pullTask?.cancel()
         pullTask = pullSession.dataTask(with: request)
         pullTask?.resume()
+    }
+    
+    /// モデルのプル（ダウンロード）を中断します。
+    func stopPulling() {
+        pullTask?.cancel()
+        pullTask = nil
+        isPulling = false
+        isPullingErrorHold = true
+        pullHasError = true // エラー画面（再試行ボタン）を表示するために必要
+        pullStatus = NSLocalizedString("Cancelled", comment: "モデルのダウンロードを中断したときのメッセージ。")
+        pullProgress = 0.0
+        pullTotal = 0
+        pullCompleted = 0
+        pullSpeedBytesPerSec = 0.0
+        pullETARemaining = 0
+        
+        // タイマーの停止
+        pullStatusUpdateTimer?.invalidate()
+        pullStatusUpdateTimer = nil
+        
+        self.output = "" // 手動キャンセル時はエラーアラートを表示しないように出力をクリア
+        print("Model pull cancelled by user.")
     }
     
     /// デモモード用のダウンロードシミュレーションを実行します
@@ -613,7 +659,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return
         }
         
+#if DEBUG
         print("Attempting to delete model \(modelName) from \(apiBaseURL)")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "Ollamaサーバーからモデルを削除しているときに表示されるメッセージ。モデル名 from サーバーURL。"), modelName, apiBaseURL)
         self.isRunning = true
@@ -650,17 +698,23 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             
             if httpResponse.statusCode == 200 {
                 self.output = String(format: NSLocalizedString("Successfully deleted model '%@' from %@.", comment: "Ollamaサーファーからモデルを削除することに成功した場合のメッセージ。モデル名 from サーバーURL。"), modelName, apiBaseURL)
+#if DEBUG
                 print("Successfully deleted model '\(modelName)' from \(apiBaseURL).")
+#endif
                 await self.fetchOllamaModelsFromAPI() // メインアクターで実行されるasync関数なので直接呼び出し可能です
                 
             } else if httpResponse.statusCode == 404 {
                 self.output = String(format: NSLocalizedString("Delete Error: Model '%@' not found (404 Not Found) on %@.", comment: "Ollamaサーバーからモデルを削除しようとしたとき、削除しようとしているモデルがサーバー上に見つからない場合のエラーメッセージ。モデル名 not found (404 Not Found) on サーバーURL。"), modelName, apiBaseURL)
+#if DEBUG
                 print("Deletion Error: Model '\(modelName)' not found at \(apiBaseURL) (404).")
+#endif
             } else {
                 let errorString = String(data: data, encoding: .utf8) ?? NSLocalizedString("No data available", comment: "データが得られなかったときのメッセージ。")
                 let errorMessage = String(format: NSLocalizedString("Delete Error: HTTP Status Code %d - %@ on %@", comment: "Ollamaサーバーからモデルを削除しようとしたときのエラーメッセージ。エラーコード - エラーメッセージ on サーバーURL。"), httpResponse.statusCode, errorString, apiBaseURL)
                 self.output = errorMessage
+#if DEBUG
                 print("Deletion Error: HTTP status code \(httpResponse.statusCode) - \(errorString) on \(apiBaseURL)")
+#endif
             }
         } catch {
             self.output = NSLocalizedString("Model deletion failed: ", comment: "Ollamaサーバーからモデルの削除に失敗した場合のプレフィックスメッセージ。") + error.localizedDescription
@@ -683,7 +737,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return true
         }
         
+#if DEBUG
         print("Attempting to unload model \(modelName) from \(apiBaseURL)")
+#endif
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
@@ -718,6 +774,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
             // 実行中のモデルリストを更新
             _ = await self.fetchRunningModels(host: host)
+            updateModelWeights() // ステータス更新
             // 通知を送ってUIをリフレッシュさせる
             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
             return true
@@ -726,6 +783,132 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             print("Model unload request failed: \(error.localizedDescription)")
             return false
         }
+    }
+    
+    /// モデルをメモリにロードします。
+    /// - Parameters:
+    ///   - modelName: ロードするモデル名。
+    ///   - keepAlive: メモリ保持時間（keep_alive）。
+    ///   - ignoreTimeout: trueの場合、タイムアウトを無視してロードを試みます（コンテキストメニューからのロードなどで使用）。
+    /// - Returns: 成功した場合はtrue。
+    @discardableResult
+    func loadModel(modelName: String, keepAlive: JSONValue? = nil, ignoreTimeout: Bool = false) async -> Bool {
+        guard let apiBaseURL = self.apiBaseURL else {
+            print("Ollama API base URL is not set. Skipping model load.")
+            self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "モデルのロードを行おうとした際にサーバーが選択されていなかった場合のエラー。")
+            return false
+        }
+        
+        // デモモードでのロード
+        if isDemoServer() {
+            print("Simulation: Loading model \(modelName) to memory in demo mode.")
+            // シミュレーション: 実行中リストに放り込む
+            self.runningModels = [OllamaRunningModel(name: modelName, expires_at: Date().addingTimeInterval(300), size_vram: 0)]
+            return true
+        }
+        
+        // ロード中状態に追加
+        _ = loadingModelNames.insert(modelName)
+        updateModelWeights() // ステータス更新
+        
+        defer {
+            // 終了時にロード中状態を解除
+            _ = loadingModelNames.remove(modelName)
+            updateModelWeights() // ステータス更新
+        }
+        
+#if DEBUG
+        print("Attempting to load model \(modelName) to \(apiBaseURL) with keep_alive: \(String(describing: keepAlive)), ignoreTimeout: \(ignoreTimeout)")
+#endif
+        
+        let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
+        let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/generate") else {
+            let message = NSLocalizedString("Error: Invalid API URL.", comment: "APIのURLが無効だった場合のエラー。")
+            print("Error: \(message)")
+            self.output = message
+            return false
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        var body: [String: Any] = ["model": modelName]
+        if let keepAlive = keepAlive {
+            switch keepAlive {
+            case .int(let i): body["keep_alive"] = i
+            case .string(let s): body["keep_alive"] = s
+            case .double(let d): body["keep_alive"] = d
+            default: break
+            }
+        }
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            let message = NSLocalizedString("Error: Failed to serialize request body.", comment: "リクエストボディのシリアライズに失敗した場合のエラー。") + ": \(error.localizedDescription)"
+            print(message)
+            self.output = message
+            return false
+        }
+        
+        // タイムアウトを無視する場合、特別なセッションを使用する
+        var sessionToUse = urlSession!
+        if ignoreTimeout {
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = TimeInterval(3600) // 1時間のタイムアウト（実質無制限）
+            config.timeoutIntervalForResource = TimeInterval(86400) // 24時間のタイムアウト（実質無制限）
+            sessionToUse = URLSession(configuration: config)
+        }
+        
+        do {
+            let (_, response) = try await sessionToUse.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+                let message = NSLocalizedString("Load Error: HTTP status code ", comment: "モデルのロード中にHTTPエラーが発生した場合のメッセージ。") + "\(code)"
+                print(message)
+                self.output = message
+                return false
+            }
+            
+            print("Successfully requested to load model '\(modelName)'.")
+            // 完了時の視覚フィードバック用状態を更新
+            _ = recentLoadedModelNames.insert(modelName)
+            updateModelWeights() // ステータス更新
+            
+            // 3秒後に「ロード完了」状態を解除
+            Task {
+                try? await Task.sleep(nanoseconds: 3 * 1_000_000_000)
+                await MainActor.run {
+                    _ = recentLoadedModelNames.remove(modelName)
+                    updateModelWeights() // ステータス更新
+                }
+            }
+            // 実行中のモデルリストを更新
+            _ = await self.fetchRunningModels()
+            // 通知を送ってUIをリフレッシュさせる
+            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+            return true
+            
+        } catch {
+            let message = NSLocalizedString("Model load request failed: ", comment: "モデルのロードリクエストに失敗した場合のメッセージ。") + error.localizedDescription
+            print(message)
+            self.output = message
+            return false
+        }
+    }
+
+    
+    /// キャッシュされたモデルの詳細情報を取得します（同期的）。
+    func getCachedModelInfo(modelName: String) -> OllamaShowResponse? {
+        return modelInfoCache[modelName]
+    }
+    
+    /// 初期フェッチフラグをリセットします
+    func resetInitialFetchFlag() {
+        initialFetchCompleted = false
     }
     
     /// モデルの詳細情報を取得します
@@ -862,7 +1045,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return cachedInfo
         }
         
+#if DEBUG
         print("Fetching model \(modelName) details from \(String(describing: apiBaseURL))...")
+#endif
         
         guard let apiBaseURL = self.apiBaseURL else {
             print("Ollama API base URL is not set. Skipping model details retrieval.")
@@ -1059,6 +1244,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 size_vram: 0 // 0バイト
             )]
             self.runningModels = demoRunningModels
+            updateModelWeights() // ステータス更新
             return demoRunningModels
         }
         
@@ -1071,6 +1257,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
             self.runningModels = ps.models
+            updateModelWeights() // ステータス更新
             return ps.models
         } catch {
             print("Failed to retrieve /api/ps: \(error.localizedDescription)")
@@ -1087,10 +1274,148 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    // チャットストリームを開始
+                    let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
+                    let isMarkdownTest = lastUserMessage == "Test Markdown" || lastUserMessage == "Markdownをテスト" || lastUserMessage == "マークダウンをテスト"
+                    
                     let created_at = Date()
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+                    if isMarkdownTest {
+                    let markdownText = #"""
+# 1. 大見出し（H1）: Markdownレンダリングの整合性と視覚的デザインを検証するための非常に長くて詳細なタイトルのテスト
+このセクションでは、基本的なテキスト装飾のテストを行います。**太字（Bold）**、*斜体（Italic）*、そして~~打ち消し線（Strikethrough）~~が正しく表示されているか確認してください。  
+文末にバックスラッシュを入れることで強制改行を行います。\
+このように次の行へ継続されます。
+
+また、これは段落のテストです。2回の改行（空行）を挟むことで、新しい段落として認識される必要があります。
+
+## 2. 中見出し（H2）: リスト構造とネストされた項目のレンダリングに関する包括的なチェック項目
+リスト表示のスタイル（インデントや記号）を確認するためのテキストです。
+
+* 箇条書きの第1項目：リンゴ
+* 箇条書きの第2項目：バナナ
+    * ネストされた項目：モンキーバナナ
+* 箇条書きの第3項目：チェリー
+* リスト内のインデントされたコードブロックのテスト：
+    ```swift
+    func hello() {
+        print("Hello from indented code block!")
+    }
+    ```
+
+1.  順序付きリストの1番目
+2.  順序付きリストの2番目
+    1.  ネストされた順序付きリスト A
+    2.  ネストされた順序付きリスト B
+3.  順序付きリストの3番目
+
+### 3. 小見出し（H3）: リンクと画像の埋め込みに関するメディア要素の表示テスト
+外部リソースへの参照が正しく機能するかを確認します。
+
+* 外部リンクのテスト: [**Mocolammaのホームページ**](https://mocolamma.taikun.design/)
+*   画像のレンダリングテスト（インデントあり）:
+        ![Mocolamma Introduction Indented](https://github.com/taikun114/Mocolamma/blob/main/docs/images/Introduction-HP.webp?raw=true)
+
+画像のレンダリングテスト（インデントなし）：
+![Mocolamma Introduction](https://github.com/taikun114/Mocolamma/blob/main/docs/images/Introduction-HP.webp?raw=true)
+
+#### 4. 見出し4（H4）: プログラミング言語 Swift を使用したインラインコードとコードブロックの構文強調テスト
+エンジニアリング向けのドキュメントにおいて、コードの読みやすさは非常に重要です。
+
+インラインで表示されるコードの例は `let message = "Hello, World!"` です。
+
+以下は、Swiftのコードブロックのテストです。
+```swift
+import SwiftUI
+
+struct MarkdownTestView: View {
+    @State private var isScrolling: Bool = false
+    
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: true) {
+            HStack(spacing: 20) {
+                ForEach(0..<100) { index in
+                    VStack {
+                        Image(systemName: "swift")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .foregroundStyle(.orange)
+                        
+                        Text("Item \(index)")
+                            .font(.caption)
+                            .bold()
+                    }
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.2), lineWidth: 1))
+                }
+            }
+            .padding()
+        }
+        .frame(height: 150)
+        .background(Material.thin)
+        .navigationTitle("This is an extremely long title designed to test horizontal scrolling in the code block container.")
+    }
+}
+```
+---
+## 5. 特殊なMarkdown要素のテスト
+ここでは、テーブル、引用、水平線などの高度な要素を検証します。
+
+### テーブルのテスト
+| 機能 | 説明 | 状態 |
+| :--- | :--- | :---: |
+| モデル管理 | サーバー上のモデルを表示・削除 | ✅ |
+| チャット | 多彩なモデルと対話 | ✅ |
+| 画像生成 | プロンプトから画像を生成 | 🚧 |
+
+### 引用のテスト
+> これは引用文のテストです。
+> 複数行にわたる引用が正しくインデントされ、左側にアクセントの垂直線が表示されるか確認します。
+> > ネストされた引用も、段階状の構造が維持されている必要があります。
+
+### タスクリストのテスト
+- [x] ダークモード対応の確認
+- [x] マルチサーバー管理の実装
+- [ ] モバイルアプリ版の最適化（未完了タスク）
+
+---
+
+##### 6. 見出し5（H5）：
+階層が深くなった際にも、上位の見出しと区別がつくデザインになっているか、あるいは文字が小さくなりすぎていないかを検証します。
+
+###### 7. 見出し6（H6）: 最小サイズの見出しにおける視認性とアクセシビリティを確保するための最終チェック
+これがMarkdownでサポートされる最小レベルの見出しです。通常、本文に近いサイズになりますが、太字や色などのスタイリングで構造が維持されていることを確認してください。
+"""#
+                        
+                        let thinkingResponse = thinkingOption == .on ? markdownText : nil
+                        
+                        let responseChunk = ChatResponseChunk(
+                            model: model,
+                            createdAt: formatter.string(from: created_at),
+                            message: ChatMessage(
+                                role: "assistant",
+                                content: markdownText,
+                                thinking: thinkingResponse
+                            ),
+                            done: true,
+                            totalDuration: 1000000,
+                            loadDuration: 100000,
+                            promptEvalCount: 10,
+                            promptEvalDuration: 100000,
+                            evalCount: 5,
+                            evalDuration: 200000,
+                            doneReason: "stop"
+                        )
+                        
+                        continuation.yield(responseChunk)
+                        continuation.finish()
+                        return
+                    }
+
+                    // チャットストリームを開始
                     
                     if stream {
                         // ストリーミングモード（stream: true）
@@ -1223,7 +1548,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 do {
+#if DEBUG
                     print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSeedEnabled: \(isSeedEnabled), seed: \(seed), repeatLastN: \(String(describing: repeatLastN)), repeatPenalty: \(String(describing: repeatPenalty)), numPredict: \(String(describing: numPredict)), topK: \(String(describing: topK)), topP: \(String(describing: topP)), minP: \(String(describing: minP)), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt), thinkingOption: \(thinkingOption)")
+#endif
                     var chatOptions: ChatRequestOptions?
                     if useCustomChatSettings {
                         var options = ChatRequestOptions()
@@ -1246,7 +1573,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         options.minP = minP
                         
                         chatOptions = options
+#if DEBUG
                         print("DEBUG: Constructed chatOptions: \(String(describing: chatOptions))")
+#endif
                     }
                     
                     var finalMessages = messages
@@ -1272,7 +1601,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化
                     request.httpBody = try encoder.encode(chatRequest)
+#if DEBUG
                     print("DEBUG: Final Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+#endif
                 } catch {
                     continuation.finish(throwing: error)
                     return
@@ -1451,7 +1782,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .withoutEscapingSlashes
                     request.httpBody = try encoder.encode(generationRequest)
+#if DEBUG
                     print("DEBUG: Image Generation Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+#endif
                 } catch {
                     continuation.finish(throwing: error)
                     return
@@ -1716,7 +2049,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                             
                             continuation.yield(chunk)
                         } catch {
+#if DEBUG
                             print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+#endif
                         }
                     }
                 } else {
@@ -1735,7 +2070,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         continuation.yield(chunk)
                         continuation.finish() // 非ストリーミングなので、一度だけyieldして終了
                     } catch {
+#if DEBUG
                         print("Non-streaming chat response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+#endif
                         continuation.finish(throwing: error)
                     }
                 }
@@ -1788,7 +2125,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                             
                             continuation.yield(chunk)
                         } catch {
+#if DEBUG
                             print("Image generation response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+#endif
                             // デコード失敗時に生のデータを表示（エラーメッセージ確認用）
                             if let errorJson = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
                                let errorMessage = errorJson["error"] as? String {
@@ -1812,7 +2151,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                         continuation.yield(chunk)
                         continuation.finish()
                     } catch {
+#if DEBUG
                         print("Non-streaming image generation response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+#endif
                         // エラーメッセージの抽出
                         if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                            let errorMessage = errorJson["error"] as? String {
@@ -1915,7 +2256,6 @@ struct OllamaAPIModelsResponse: Decodable {
     let models: [OllamaModel]
 }
 
-/// /api/show エンドポイントからのレスポンス
 struct OllamaShowResponse: Decodable {
     let license: String?
     let modelfile: String?
@@ -1924,7 +2264,24 @@ struct OllamaShowResponse: Decodable {
     let details: OllamaModelDetails?
     let model_info: [String: JSONValue]?
     let capabilities: [String]?
+}
+
+extension OllamaShowResponse {
+    var parameterCount: Int? {
+        model_info?["general.parameter_count"]?.intValue
+    }
     
+    var contextLength: Int? {
+        guard let info = model_info,
+              let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) else { return nil }
+        return info[key]?.intValue
+    }
+    
+    var embeddingLength: Int? {
+        guard let info = model_info,
+              let key = info.keys.first(where: { $0.hasSuffix(".embedding_length") }) else { return nil }
+        return info[key]?.intValue
+    }
 }
 
 struct OllamaPullResponse: Decodable {

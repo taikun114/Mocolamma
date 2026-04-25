@@ -62,9 +62,15 @@ struct ServerInspectorView: View {
                         } else {
                             Circle().fill(.red).frame(width: indicatorSize, height: indicatorSize)
                         }
-                        Text("Not Connected (Status Code: \(statusCode))")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        if statusCode == -1004 {
+                            Text("Not Connected (Connection failed)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Not Connected (Status Code: \(statusCode))")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 case .errorWithMessage(let statusCode, let errorMessage):
                     VStack(alignment: .leading, spacing: 2) {
@@ -82,9 +88,15 @@ struct ServerInspectorView: View {
                                     .frame(width: indicatorSize, height: indicatorSize)
                                     .foregroundColor(.orange)
                             }
-                            Text("Error (Status Code: \(statusCode))")
-                                .font(.subheadline)
-                                .foregroundColor(.red)
+                            if statusCode == -1004 {
+                                Text("Error (Connection failed)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.red)
+                            } else {
+                                Text("Error (Status Code: \(statusCode))")
+                                    .font(.subheadline)
+                                    .foregroundColor(.red)
+                            }
                         }
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
@@ -126,25 +138,14 @@ struct ServerInspectorView: View {
                             .foregroundColor(.secondary)
                     }
                 case .checking, .none:
-                    HStack(spacing: 4) {
-                        if differentiateWithoutColor {
-                            Image(systemName: "questionmark.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: indicatorSize, height: indicatorSize)
-                                .foregroundColor(.gray)
-                                .fontWeight(.bold)
-                        } else {
-                            Circle().fill(.gray).frame(width: indicatorSize, height: indicatorSize)
-                        }
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(indicatorSize / 20)
+                            .frame(width: indicatorSize, height: indicatorSize)
+                        
                         Text("Checking...")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        if !differentiateWithoutColor {
-                            ProgressView()
-                                .scaleEffect(0.5)
-                                .frame(width: 10, height: 10)
-                        }
                     }
                 }
                 
@@ -173,6 +174,7 @@ struct ServerInspectorView: View {
                             }
                         }
                 }
+                .accessibilityElement(children: .combine)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Ollamaバージョン情報
@@ -219,6 +221,7 @@ struct ServerInspectorView: View {
                                 .frame(width: 20, height: 20)
 #endif
                         }
+                        .accessibilityLabel("Refresh")
 #if os(visionOS)
                         .buttonStyle(.bordered)
 #else

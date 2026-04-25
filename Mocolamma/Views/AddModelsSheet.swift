@@ -5,7 +5,7 @@ import SwiftUI
 /// 新しいモデルの追加（プル）を行うためのシートビューです。ユーザーがモデル名を入力し、ダウンロードを開始するためのUIを提供します。
 struct AddModelsSheet: View {
     @Binding var showingAddSheet: Bool // シートの表示/非表示を制御するバインディング
-    var executor: CommandExecutor // @ObservedObjectを削除
+    var executor: CommandExecutor
     
     @State private var modelNameInput: String = "" // モデル名入力
     @State private var showHttpErrorAlert: Bool = false

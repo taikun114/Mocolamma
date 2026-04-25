@@ -66,9 +66,11 @@ struct LicenseInfoModalView: View {
     
     var body: some View {
 #if os(macOS)
-        licenseInfoModalViewContent
-            .frame(width: 650, height: 450)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+        ScrollView(scrollAxes) {
+            licenseInfoModalViewContent
+        }
+        .frame(width: 650, height: 450)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
                 ZStack(alignment: .center) {
                     if #available(macOS 26, *) {
                         Color.clear
@@ -145,8 +147,7 @@ struct LicenseInfoModalView: View {
     }
     
     private var licenseInfoModalViewContent: some View {
-        ScrollView(scrollAxes) { // scrollAxes を使用
-            VStack(alignment: .leading) {
+        VStack(alignment: .leading) {
                 VStack(alignment: .leading) {
                     Text("Open Source License")
                         .font(.title)
@@ -501,12 +502,9 @@ struct LicenseInfoModalView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 1)
                     .fixedSize(horizontal: horizontalFixed, vertical: false)
-                
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 20)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }
 

@@ -5,14 +5,14 @@ import Photos
 import PhotosUI
 
 struct MessageView: View {
-    @Environment(CommandExecutor.self) var executor
-    @EnvironmentObject var chatSettings: ChatSettings
-    @ObservedObject var message: ChatMessage
+    @Environment(ChatSettings.self) var chatSettings
+    var message: ChatMessage
     let isLastAssistantMessage: Bool
     let isLastOwnUserMessage: Bool
+    let selectedModelName: String?
     let onRetry: ((UUID, ChatMessage) -> Void)?
+    let onPreviewImage: ((PlatformImage) -> Void)?
     @Binding var isStreamingAny: Bool
-    @Binding var allMessages: [ChatMessage]
     let isModelSelected: Bool
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
@@ -31,16 +31,18 @@ struct MessageView: View {
     @State private var isDraggingOver = false
     
     // 保存関連の状態
-    @State private var showingSaveOptions = false
-    @State private var showingFileExporter = false
+    @State private var isSaveOptionsPresented: Bool = false
+    @State private var isFileExporterPresented: Bool = false
     @State private var imageDocument: ImageDocument?
+    @State private var isThinkingExpanded: Bool = false
+    @State private var isStreamingSettled: Bool = true
     
     private var isDownloadSuccessful: Bool {
-        executor.successfullyDownloadedIDs.contains(message.id)
+        message.isDownloadSuccessful
     }
     
     private var isCopied: Bool {
-        executor.successfullyCopiedIDs.contains(message.id)
+        message.isCopied
     }
 
     private var supportsVision: Bool {
@@ -54,9 +56,12 @@ struct MessageView: View {
     }()
     
     var body: some View {
-        @Bindable var executor = executor
+        @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
             messageContentView
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(message.role == "user" ? "User message" : "Assistant message")
+                .accessibilityValue(message.content)
                 .padding(10)
                 .background(
                     Group {
@@ -64,9 +69,9 @@ struct MessageView: View {
                             Color.accentColor
                         } else {
 #if os(visionOS)
-                            AnyView(Rectangle().fill(.regularMaterial))
+                            Rectangle().fill(.regularMaterial)
 #else
-                            AnyView(Color.gray.opacity(0.1))
+                            Color.gray.opacity(0.1)
 #endif
                         }
                     }
@@ -93,7 +98,7 @@ struct MessageView: View {
                         }
                     }
                 }
-                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, executor: executor, isEnabled: supportsVision, onURLsDropped: { urls in
+                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: supportsVision, onURLsDropped: { urls in
                     if isEditing && supportsVision {
                         addImages(from: urls)
                     }
@@ -105,10 +110,8 @@ struct MessageView: View {
 
                 .lineSpacing(4)
             
-            HStack {
-                EmptyView()
-            }
-            .id(isStreamingAny)
+            Spacer()
+                .frame(height: 0)
             
 #if !os(macOS)
             Spacer().frame(height: 8)
@@ -126,10 +129,22 @@ struct MessageView: View {
                     
                     HStack(spacing: 6) {
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.role == "assistant" && isLastAssistantMessage {
+                            retryButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
+                        if (message.role == "assistant" || message.role == "user") {
+                            copyButton
+                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "assistant" {
+                            shareButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
@@ -153,10 +168,22 @@ struct MessageView: View {
                     HStack(spacing: 6) {
                         if message.role == "user" { Spacer() }
                         if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { retryButton }
-                        if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) { copyButton }
+                        if message.role == "assistant" && isLastAssistantMessage {
+                            retryButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
+                        if (message.role == "assistant" || message.role == "user") {
+                            copyButton
+                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" && ((!message.isStreaming || message.isStopped) && !isStreamingAny) { shareButton }
+                        if message.role == "assistant" {
+                            shareButton
+                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
+                                .disabled(message.isStreaming && !message.isStopped)
+                        }
                         if message.role == "user" && isLastOwnUserMessage {
                             if isEditing {
                                 cancelButton
@@ -221,6 +248,15 @@ struct MessageView: View {
             .opacity(1.0)
 #endif
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
+            .onChange(of: message.isStreaming) { _, newValue in
+                if !newValue {
+                    // ストリーミング終了後、マークダウンの再描画などが安定するまで少し待ってから機能を有効化
+                    isStreamingSettled = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        isStreamingSettled = true
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
@@ -370,6 +406,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Previous Revision")
 #if !os(macOS)
             .font(.body)
 #else
@@ -424,6 +461,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Next Revision")
 #if !os(macOS)
             .font(.body)
 #else
@@ -451,6 +489,7 @@ struct MessageView: View {
                 .contentShape(Rectangle())
                 .padding(5)
         }
+        .accessibilityLabel("Retry")
 #if !os(macOS)
         .font(.body)
 #else
@@ -470,7 +509,7 @@ struct MessageView: View {
     @ViewBuilder
     private var downloadButton: some View {
         Button(action: {
-            showingSaveOptions = true
+            isSaveOptionsPresented = true
         }) {
             Image(systemName: isDownloadSuccessful ? "checkmark" : "arrow.down.to.line")
                 .contentShape(Rectangle())
@@ -478,6 +517,7 @@ struct MessageView: View {
                 .symbolVariant(isDownloadSuccessful ? .none : .none) // 整合性のための指定
                 .contentTransition(.symbolEffect(.replace))
         }
+        .accessibilityLabel("Download Image")
 #if !os(macOS)
         .font(.body)
 #else
@@ -491,7 +531,7 @@ struct MessageView: View {
         .foregroundColor(.accentColor)
 #endif
         .help("Download Image")
-        .confirmationDialog(Text("Select Destination"), isPresented: $showingSaveOptions, titleVisibility: .visible) {
+        .confirmationDialog(Text("Select Destination"), isPresented: $isSaveOptionsPresented, titleVisibility: .visible) {
             Button(String(localized: "Save to Photo Library")) {
                 saveToPhotoLibrary()
             }
@@ -503,7 +543,7 @@ struct MessageView: View {
             Text("Please select where to save this image.")
         }
         .fileExporter(
-            isPresented: $showingFileExporter,
+            isPresented: $isFileExporterPresented,
             document: imageDocument,
             contentType: .png,
             defaultFilename: "generated_image.png"
@@ -521,11 +561,11 @@ struct MessageView: View {
     private func showSuccessFeedback() {
         Task { @MainActor in
             withAnimation(.spring()) {
-                _ = executor.successfullyDownloadedIDs.insert(message.id)
+                message.isDownloadSuccessful = true
             }
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             withAnimation(.spring()) {
-                _ = executor.successfullyDownloadedIDs.remove(message.id)
+                message.isDownloadSuccessful = false
             }
         }
     }
@@ -599,7 +639,7 @@ struct MessageView: View {
         }
 #else
         self.imageDocument = ImageDocument(image: data)
-        self.showingFileExporter = true
+        self.isFileExporterPresented = true
 #endif
     }
     
@@ -636,6 +676,7 @@ struct MessageView: View {
                 .padding(5)
                 .contentTransition(.symbolEffect(.replace))
         }
+        .accessibilityLabel("Copy")
 #if !os(macOS)
         .font(.body)
 #else
@@ -696,11 +737,11 @@ struct MessageView: View {
     private func showCopyFeedback() {
         Task { @MainActor in
             withAnimation(.spring()) {
-                _ = executor.successfullyCopiedIDs.insert(message.id)
+                message.isCopied = true
             }
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             withAnimation(.spring()) {
-                _ = executor.successfullyCopiedIDs.remove(message.id)
+                message.isCopied = false
             }
         }
     }
@@ -755,6 +796,7 @@ struct MessageView: View {
                     .contentShape(Rectangle())
                     .padding(5)
             }
+            .accessibilityLabel("Edit")
 #if !os(macOS)
             .font(.body)
 #else
@@ -770,8 +812,7 @@ struct MessageView: View {
             .help("Edit")
             .disabled(isStreamingAny)
         }
-        .id(isStreamingAny)
-    }
+        }
     
     @ViewBuilder
     private var cancelButton: some View {
@@ -841,7 +882,6 @@ struct MessageView: View {
         .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
-        .id(isStreamingAny ? "on" : "off")
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
             Button("Send") {
                 performDone(skipImages: true)
@@ -849,7 +889,7 @@ struct MessageView: View {
             .keyboardShortcut(.defaultAction)
             Button("Cancel", role: .cancel) { }
         } message: {
-            if let modelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+            if let modelName = selectedModelName {
                 Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             } else {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
@@ -884,6 +924,7 @@ struct MessageView: View {
     
     @ViewBuilder
     private var messageContentView: some View {
+        @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
             if message.isProcessingImages {
                 HStack(spacing: 8) {
@@ -912,7 +953,7 @@ struct MessageView: View {
                                         .onTapGesture {
                                             if let fullImage = PlatformImage(data: imageContainer.data) {
                                                 withAnimation(.easeInOut(duration: 0.2)) {
-                                                    executor.previewImage = fullImage
+                                                    onPreviewImage?(fullImage)
                                                 }
                                             }
                                         }
@@ -995,7 +1036,7 @@ struct MessageView: View {
                                     .contentShape(Rectangle())
                                     .onTapGesture {
                                         withAnimation(.easeInOut(duration: 0.2)) {
-                                            executor.previewImage = image
+                                            onPreviewImage?(image)
                                         }
                                     }
                             }
@@ -1017,7 +1058,7 @@ struct MessageView: View {
 #endif
                                         .onTapGesture {
                                             withAnimation(.easeInOut(duration: 0.2)) {
-                                                executor.previewImage = image
+                                                onPreviewImage?(image)
                                             }
                                         }
                                 }
@@ -1086,7 +1127,7 @@ struct MessageView: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                executor.previewImage = image
+                                onPreviewImage?(image)
                             }
                         }
                         .contextMenu {
@@ -1121,15 +1162,13 @@ struct MessageView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if !message.content.isEmpty {
-                    let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
-                        ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
-                        : message.content
-                    StructuredText(markdown: displayContent)
+                    let displayContent = message.content
+                    StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textual.textSelection(.enabled)
+                        .textualSelection(enabled: isStreamingSettled && !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
+                        .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming && !isStreamingAny)
                         .textual.overflowMode(.scroll)
-                        .compositingGroup() // 描画を最適化
                 } else {
                     Text("Failed to generate image.")
                         .foregroundColor(.red)
@@ -1137,22 +1176,40 @@ struct MessageView: View {
             }
         } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
-                DisclosureGroup {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let thinking = message.thinking, !thinking.isEmpty {
-                            Text(thinking)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .textSelection(.enabled)
-                        }
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isThinkingExpanded.toggle()
                     }
-                } label: {
-                    Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
-                        .foregroundColor(.secondary)
-                        .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
+                }) {
+                    HStack {
+                        Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
+                            .foregroundColor(.secondary)
+                            .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .rotationEffect(.degrees(isThinkingExpanded ? 90 : 0))
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .help(isThinkingExpanded ? "Collapse thinking process" : "Expand thinking process")
                 .padding(.bottom, 4)
+                
+                if isThinkingExpanded {
+                    if let thinking = message.thinking, !thinking.isEmpty {
+                        StructuredText.Streaming(markdown: thinking, isStreaming: message.isStreaming && !message.isThinkingCompleted)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
+                            .textualSelection(enabled: isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .textual.syntaxHighlightingEnabled(isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
                 
                 streamingContentBody
             }
@@ -1178,15 +1235,13 @@ struct MessageView: View {
                 .foregroundColor(.secondary)
         } else if !message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 6) {
-                let displayContent = (message.role == "assistant" && message.isStreaming && !message.isStopped)
-                    ? message.content.replacingOccurrences(of: #"(?m)^```[^\s\n]+\s*\n"#, with: "```\n", options: [.regularExpression])
-                    : message.content
-                StructuredText(markdown: displayContent)
+                let displayContent = message.content
+                StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
-                    .textual.textSelection(.enabled)
+                    .textualSelection(enabled: isStreamingSettled && !message.isStreaming)
+                    .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming)
                     .textual.overflowMode(.scroll)
-                    .compositingGroup() // 描画を最適化
             }
         } else {
             EmptyView()
@@ -1201,6 +1256,13 @@ struct MessageView: View {
     }
 }
 
+// MARK: - View Helper for Textual Selection
+extension View {
+    func textualSelection(enabled: Bool) -> some View {
+        self.textual.textSelection(enabled)
+    }
+}
+
 // MARK: - Textual Custom Style
 
 struct SimpleStyle: StructuredText.Style {
@@ -1208,7 +1270,7 @@ struct SimpleStyle: StructuredText.Style {
 
     var inlineStyle: InlineStyle {
         InlineStyle()
-            .strong(.bold)
+            .strong(.fontWeight(.black))
             .emphasis(.italic)
             .link(
                 .foregroundColor(message.role == "user" ? Color.white : Color.accentColor),
@@ -1247,11 +1309,11 @@ struct SimpleStyle: StructuredText.Style {
     }
 
     var unorderedListMarker: some StructuredText.UnorderedListMarker {
-        StructuredText.SymbolListMarker.disc
+        MocolammaUnorderedListMarker()
     }
 
     var orderedListMarker: some StructuredText.OrderedListMarker {
-        StructuredText.DecimalListMarker.decimal
+        MocolammaOrderedListMarker()
     }
 
     var tableStyle: some StructuredText.TableStyle {
@@ -1265,11 +1327,46 @@ struct SimpleStyle: StructuredText.Style {
     var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
         StructuredText.DividerThematicBreakStyle.divider
     }
+
+    var listSpacing: FontScaled<StructuredText.BlockSpacing> {
+        .fontScaled(top: 0.8, bottom: 0.8)
+    }
 }
 
 struct SimpleListItemStyle: StructuredText.ListItemStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.block
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            ZStack(alignment: .trailing) {
+                Color.clear
+                    .frame(width: 20, height: 1)
+                configuration.marker
+            }
+            configuration.block
+        }
+        .padding(.leading, -4)
+    }
+}
+
+struct MocolammaUnorderedListMarker: StructuredText.UnorderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        StructuredText.SymbolListMarker.disc
+            .makeBody(configuration: configuration)
+            .offset(y: -3.5)
+    }
+}
+
+struct MocolammaThinkingUnorderedListMarker: StructuredText.UnorderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        StructuredText.SymbolListMarker.disc
+            .makeBody(configuration: configuration)
+            .offset(y: -2.0)
+    }
+}
+
+struct MocolammaOrderedListMarker: StructuredText.OrderedListMarker {
+    func makeBody(configuration: Configuration) -> some View {
+        Text(verbatim: "\(configuration.ordinal).")
+            .monospacedDigit()
     }
 }
 
@@ -1280,7 +1377,7 @@ struct SimpleTableStyle: StructuredText.TableStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
-            .textual.blockSpacing(.fontScaled(top: 1.6, bottom: 1.6))
+            .textual.blockSpacing(.fontScaled(top: 0.8, bottom: 0.8))
             .textual.tableOverlay { layout in
                 Canvas { context, _ in
                     for divider in layout.dividers() {
@@ -1300,7 +1397,7 @@ struct SimpleTableStyle: StructuredText.TableStyle {
 }
 
 struct SimpleHeadingStyle: StructuredText.HeadingStyle {
-    private static let fontScales: [CGFloat] = [2.0, 1.75, 1.5, 1.25, 1.0, 0.8]
+    private static let fontScales: [CGFloat] = [2.0, 1.8, 1.6, 1.4, 1.2, 1.0]
 
     func makeBody(configuration: Configuration) -> some View {
         let level = min(configuration.headingLevel, 6)
@@ -1309,8 +1406,8 @@ struct SimpleHeadingStyle: StructuredText.HeadingStyle {
         configuration.label
             .textual.fontScale(fontScale)
             .fontWeight(.bold)
-            .padding(.top, 8)
-            .padding(.bottom, 4)
+            .padding(.top, 16)
+            .padding(.bottom, 16)
     }
 }
 
@@ -1327,7 +1424,8 @@ struct SimpleBlockQuoteStyle: StructuredText.BlockQuoteStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
             .overlay(alignment: .leading) {
                 Rectangle()
                     .fill(message.role == "user" ? Color.white : Color.gray)
@@ -1363,6 +1461,7 @@ struct SimpleCodeBlockStyle: StructuredText.CodeBlockStyle {
             // コード本体
             Overflow(isIntegratedSelection: true) {
                 configuration.label
+                    .textual.fontScale(0.9)
                     .monospaced()
                     .textual.lineSpacing(.fontScaled(0.39))
                     .padding()
@@ -1471,6 +1570,200 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 
 // MARK: - Document Support
 
+// MARK: - Dedicated Style for Thinking Text
+
+struct SimpleThinkingStyle: StructuredText.Style {
+    let message: ChatMessage
+
+    var inlineStyle: InlineStyle {
+        InlineStyle()
+            .strong(.fontWeight(.black))
+            .emphasis(.italic)
+            .link(
+                .foregroundColor(.accentColor.opacity(0.8)),
+                .underlineStyle(.single)
+            )
+            .code(
+                .monospaced,
+                .backgroundColor(Color.secondary.opacity(0.1))
+            )
+    }
+
+    var headingStyle: some StructuredText.HeadingStyle {
+        SimpleThinkingHeadingStyle()
+    }
+
+    var paragraphStyle: some StructuredText.ParagraphStyle {
+        SimpleThinkingParagraphStyle()
+    }
+
+    var blockQuoteStyle: some StructuredText.BlockQuoteStyle {
+        SimpleThinkingBlockQuoteStyle(message: message)
+    }
+
+    var codeBlockStyle: some StructuredText.CodeBlockStyle {
+        SimpleThinkingCodeBlockStyle(message: message)
+    }
+
+    var listItemStyle: some StructuredText.ListItemStyle {
+        SimpleThinkingListItemStyle()
+    }
+
+    var unorderedListMarker: some StructuredText.UnorderedListMarker {
+        MocolammaThinkingUnorderedListMarker()
+    }
+
+    var orderedListMarker: some StructuredText.OrderedListMarker {
+        MocolammaOrderedListMarker()
+    }
+
+    var tableStyle: some StructuredText.TableStyle {
+        SimpleThinkingTableStyle(message: message)
+    }
+
+    var tableCellStyle: some StructuredText.TableCellStyle {
+        SimpleThinkingTableCellStyle()
+    }
+
+    var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
+        StructuredText.DividerThematicBreakStyle.divider
+    }
+
+    var listSpacing: FontScaled<StructuredText.BlockSpacing> {
+        .fontScaled(top: 0.5, bottom: 0.5)
+    }
+}
+
+struct SimpleThinkingHeadingStyle: StructuredText.HeadingStyle {
+    // シンキングテキスト用により小さいスケールを設定
+    private static let fontScales: [CGFloat] = [1.5, 1.4, 1.3, 1.2, 1.1, 1.0]
+
+    func makeBody(configuration: Configuration) -> some View {
+        let level = min(configuration.headingLevel, 6)
+        let fontScale = Self.fontScales[level - 1]
+
+        configuration.label
+            .textual.fontScale(fontScale)
+            .fontWeight(.bold)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+    }
+}
+
+struct SimpleThinkingParagraphStyle: StructuredText.ParagraphStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.lineSpacing(.fontScaled(0.2))
+            .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.4)) // 余白を狭く
+    }
+}
+
+struct SimpleThinkingBlockQuoteStyle: StructuredText.BlockQuoteStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.leading, 8)
+            .padding(.vertical, 2)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.4))
+                    .frame(width: 3)
+            }
+    }
+}
+
+struct SimpleThinkingCodeBlockStyle: StructuredText.CodeBlockStyle {
+    let message: ChatMessage
+
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // シンキングテキスト内のコードブロックはヘッダーをより目立たなくする
+            HStack(alignment: .center) {
+                Text(hintText(configuration.languageHint))
+                    .font(.system(.caption2, design: .monospaced))
+                    .fontWeight(.bold)
+                    .foregroundColor(.secondary)
+                Spacer()
+                CopyCodeButton(configuration: configuration)
+                    .controlSize(.mini)
+            }
+            .padding(.leading, 10)
+            .padding(.trailing, 4)
+            .padding(.vertical, 4)
+            .background(Color.secondary.opacity(0.05))
+
+            Divider().opacity(0.3)
+
+            Overflow(isIntegratedSelection: true) {
+                configuration.label
+                    .textual.fontScale(0.9)
+                    .monospaced()
+                    .textual.lineSpacing(.fontScaled(0.2))
+                    .padding(8)
+            }
+        }
+        .background(Color.secondary.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .padding(.vertical, 4)
+        .textual.blockSpacing(.fontScaled(top: 0, bottom: 0.4))
+    }
+
+    private func hintText(_ hint: String?) -> String {
+        guard let hint = hint?.uppercased() else {
+            return String(localized: "Code")
+        }
+        return hint
+    }
+}
+
+struct SimpleThinkingListItemStyle: StructuredText.ListItemStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            ZStack(alignment: .trailing) {
+                Color.clear
+                    .frame(width: 16, height: 1)
+                configuration.marker
+            }
+            configuration.block
+        }
+    }
+}
+
+struct SimpleThinkingTableStyle: StructuredText.TableStyle {
+    let message: ChatMessage
+    private static let borderWidth: CGFloat = 0.5
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
+            .textual.blockSpacing(.fontScaled(top: 0.8, bottom: 0.8))
+            .textual.tableOverlay { layout in
+                Canvas { context, _ in
+                    for divider in layout.dividers() {
+                        context.fill(
+                            Path(divider),
+                            with: .style(Color.secondary.opacity(0.3))
+                        )
+                    }
+                }
+            }
+            .padding(Self.borderWidth)
+            .overlay {
+                RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.secondary.opacity(0.3), lineWidth: Self.borderWidth)
+            }
+    }
+}
+
+struct SimpleThinkingTableCellStyle: StructuredText.TableCellStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(4)
+            .textual.textSelection(.enabled)
+    }
+}
+
 struct ImageDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.png] }
     var image: Data
@@ -1491,4 +1784,5 @@ struct ImageDocument: FileDocument {
         return FileWrapper(regularFileWithContents: image)
     }
 }
+
 

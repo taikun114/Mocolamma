@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import Observation
 
 // MARK: - サーバー接続ステータス
 enum ServerConnectionStatus {
@@ -26,6 +26,9 @@ enum ServerConnectionStatus {
         case .connected:
             return String(localized: "Connected successfully.")
         case .notConnected(let code):
+            if code == -1004 {
+                return String(localized: "Connection failed. Please check if the Ollama server is running.")
+            }
             return String(localized: "Failed to connect. (HTTP \(code))")
         case .errorWithMessage(_, let message):
             return message ?? String(localized: "An unknown error occurred.")
@@ -43,7 +46,8 @@ enum ServerConnectionStatus {
 
 /// アプリケーション内でOllamaサーバーのリストと現在の選択状態を管理するクラスです。
 /// サーバー情報はUserDefaultsに永続化されます。
-class ServerManager: ObservableObject {
+@Observable
+class ServerManager {
     // サーバー情報のUserDefaultsキー
     private let serversKey = "saved_ollama_servers"
     // 選択されたサーバーIDのUserDefaultsキー
@@ -54,14 +58,14 @@ class ServerManager: ObservableObject {
     private let didUserDeleteDemoServerKey = "did_user_delete_demo_server"
     
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
-    @Published var servers: [ServerInfo] {
+    var servers: [ServerInfo] {
         didSet {
             saveServers()
         }
     }
     
     /// 現在選択されているサーバーのID。
-    @Published var selectedServerID: ServerInfo.ID? {
+    var selectedServerID: ServerInfo.ID? {
         didSet {
             // 選択されたIDが変更されたときにUserDefaultsに保存
             saveSelectedServerID()
@@ -74,19 +78,19 @@ class ServerManager: ObservableObject {
     }
     
     /// 各サーバーの接続状態を詳細に保持する辞書
-    @Published var serverConnectionStatuses: [ServerInfo.ID: ServerConnectionStatus] = [:]
+    var serverConnectionStatuses: [ServerInfo.ID: ServerConnectionStatus] = [:]
     
     /// インスペクターの再描画を誘発するためのトークン
-    @Published var inspectorRefreshToken: UUID = UUID()
+    var inspectorRefreshToken: UUID = UUID()
     
     /// インスペクターに表示する現在のカテゴリ（server, models, chat, image_generationなど）
-    @Published var inspectorSelection: String?
+    var inspectorSelection: String?
     
     /// インスペクターで選択されているモデルのID
-    @Published var inspectorSelectedModelID: OllamaModel.ID?
+    var inspectorSelectedModelID: OllamaModel.ID?
     
     /// インスペクターで選択されているサーバー
-    @Published var inspectorSelectedServer: ServerInfo?
+    var inspectorSelectedServer: ServerInfo?
     
     /// 現在選択されているサーバーのホストURL。
     /// 選択されているサーバーがない場合はnilを返します。
@@ -116,18 +120,18 @@ class ServerManager: ObservableObject {
         let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
         let didUserDeleteLocal = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
         
-#if os(macOS) || DEBUG
+        #if os(macOS) || DEBUG
         let shouldAddLocal = true
-#else
+        #else
         let shouldAddLocal = false
-#endif
+        #endif
         
         if shouldAddLocal && !servers.contains(where: { $0.id == localServer.id }) && !didUserDeleteLocal {
             servers.insert(localServer, at: 0)
         }
         
         // 2. デバッグ時の「Demo Mode」サーバーの追加
-#if DEBUG
+        #if DEBUG
         let demoServer = ServerInfo(id: ServerInfo.demoServerID, name: "Demo Mode", host: "demo-mode", iconName: "testtube.2", isDemo: true)
         let didUserDeleteDemo = UserDefaults.standard.bool(forKey: didUserDeleteDemoServerKey)
         
@@ -136,7 +140,7 @@ class ServerManager: ObservableObject {
             let insertIndex = servers.firstIndex(where: { $0.id == ServerInfo.defaultServerID }).map { $0 + 1 } ?? 0
             servers.insert(demoServer, at: insertIndex)
         }
-#endif
+        #endif
         
         // 以前選択されていたサーバーIDを読み込む
         if let savedSelectedIDString = UserDefaults.standard.string(forKey: selectedServerIDKey),

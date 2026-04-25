@@ -7,8 +7,8 @@ import UniversalSFSymbolsPicker
 /// サーバー名とホストURLの入力欄を提供し、保存時に接続確認を行います。
 struct ServerFormView: View {
     @Environment(\.dismiss) var dismiss // シートを閉じるための環境変数
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
-    @ObservedObject var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
+    var serverManager: ServerManager // ServerManagerのインスタンスを受け取ります
     var executor: CommandExecutor // @ObservedObjectを削除
     
     @State private var serverNameInput: String
@@ -70,6 +70,7 @@ struct ServerFormView: View {
                     }
                     .buttonStyle(.plain)
                     .help(String(localized: "Select Icon"))
+                    .accessibilityLabel("Select Icon")
                     .symbolPicker(isPresented: $isShowingSymbolPicker, selection: $serverIconInput)
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -168,6 +169,7 @@ struct ServerFormView: View {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Close")
             }
             ToolbarItem(placement: .primaryAction) {
                 if #available(iOS 26.0, visionOS 26.0, *) {
@@ -183,6 +185,7 @@ struct ServerFormView: View {
                     }) {
                         Image(systemName: "checkmark")
                     }
+                    .accessibilityLabel("Save")
                     .keyboardShortcut(.defaultAction)
                     .disabled(isSaveButtonDisabled)
                     .applyGlassProminentButtonStyle(isDisabled: isSaveButtonDisabled)

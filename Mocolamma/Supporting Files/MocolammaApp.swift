@@ -26,10 +26,10 @@ struct MocolammaApp: App {
     
     // アプリケーション全体で共有されるServerManagerのインスタンスを作成します。
     // @StateObject を使用することで、アプリのライフサイクル全体でインスタンスが保持されます。
-    @StateObject private var serverManager = ServerManager()
-    @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
-    @StateObject private var imageSettings = ImageGenerationSettings()
-    @StateObject private var chatSettings = ChatSettings() // ContentViewから昇格させて共有
+    @State private var serverManager = ServerManager()
+    @State private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @State private var imageSettings = ImageGenerationSettings()
+    @State private var chatSettings = ChatSettings() // ContentViewから昇格させて共有
     @State private var executor: CommandExecutor
     @State private var selection: String? = "server"
     @State private var showingAboutSheet = false // Aboutシートの表示状態
@@ -38,7 +38,7 @@ struct MocolammaApp: App {
     @State private var showingInspector: Bool = false
     
     // リフレッシュコマンドを発行するためのトリガー
-    @StateObject private var appRefreshTrigger = RefreshTrigger()
+    @State private var appRefreshTrigger = RefreshTrigger()
     
     // チャットクリア要求を伝える状態変数
     @State private var shouldClearChat: Bool = false
@@ -59,7 +59,7 @@ struct MocolammaApp: App {
     
     init() {
         let sm = ServerManager()
-        _serverManager = StateObject(wrappedValue: sm)
+        _serverManager = State(wrappedValue: sm)
         _executor = State(wrappedValue: CommandExecutor(serverManager: sm))
 #if os(macOS)
         NSWindow.allowsAutomaticWindowTabbing = false  // これでタブ機能無効化 & メニュー項目非表示
@@ -85,9 +85,10 @@ struct MocolammaApp: App {
 #elseif os(visionOS)
             .frame(minWidth: 700, maxWidth: 1200, minHeight: 500, maxHeight: 900)
 #endif
-            .environmentObject(appRefreshTrigger)
-            .environmentObject(imageSettings)
-            .environmentObject(chatSettings)
+            .environment(appRefreshTrigger)
+            .environment(imageSettings)
+            .environment(chatSettings)
+            .environment(serverManager)
             .environment(executor)
             .onAppear {
                 localNetworkChecker.refresh()

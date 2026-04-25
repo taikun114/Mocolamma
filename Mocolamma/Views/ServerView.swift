@@ -5,9 +5,9 @@ import SwiftUI
 /// アプリケーションのメインサイドバーからアクセスされるサーバーコンテンツのUIを定義するSwiftUIビューです。
 /// サーバーのリストを表示し、新しいサーバーの追加、既存サーバーの編集を管理します。
 struct ServerView: View {
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     var executor: CommandExecutor
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     
     @State private var showingAddServerSheet = false
     @State private var serverToEdit: ServerInfo?
@@ -35,6 +35,7 @@ struct ServerView: View {
             Button(action: { appRefreshTrigger.send() }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }
+            .accessibilityLabel("Refresh")
         }
 #endif
         
@@ -42,6 +43,7 @@ struct ServerView: View {
             Button(action: { showingAddServerSheet = true }) {
                 Label("Add Server", systemImage: "plus")
             }
+            .accessibilityLabel("Add Server")
         }
 
 #if os(iOS)
@@ -55,6 +57,7 @@ struct ServerView: View {
             Button(action: { onTogglePreview() }) {
                 Label("Inspector", systemImage: (isNativeVisionOS || isiOSAppOnVision) ? "info.circle" : (horizontalSizeClass == .compact ? "info.circle" : "sidebar.trailing"))
             }
+            .accessibilityLabel("Inspector")
         }
 #endif
     }
@@ -86,8 +89,11 @@ struct ServerView: View {
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
+#if os(iOS)
+            .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
@@ -96,8 +102,11 @@ struct ServerView: View {
         .sheet(item: $serverToEdit) { server in
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: server)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
+#if os(iOS)
+            .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
@@ -135,9 +144,12 @@ struct ServerView: View {
                 }
             }
             
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            if !Task.isCancelled {
-                appRefreshTrigger.send()
+            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
+            if serverManager.selectedServerID != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                if !Task.isCancelled {
+                    appRefreshTrigger.send()
+                }
             }
         }
         .onChange(of: serverManager.servers) { oldServers, newServers in
@@ -186,13 +198,13 @@ struct ServerView: View {
 }
 
 private struct ServerListViewContent: View {
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     var executor: CommandExecutor
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
     @Binding var serverToDelete: ServerInfo?
-    @ObservedObject var appRefreshTrigger: RefreshTrigger
+    var appRefreshTrigger: RefreshTrigger
     
     var body: some View {
         List(selection: $listSelection) {
@@ -240,6 +252,9 @@ private struct ServerListViewContent: View {
             }
             .onMove(perform: serverManager.moveServer)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Server List")
+        .accessibilityIdentifier("server_list")
         .contextMenu(forSelectionType: ServerInfo.ID.self, menu: { _ in }) { selectedIDs in
 #if os(macOS)
             if let selectedID = selectedIDs.first {
@@ -257,7 +272,7 @@ private struct ServerListViewContent: View {
 
 private struct ServerRowContent: View {
     let server: ServerInfo
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var listSelection: ServerInfo.ID?
     @Binding var serverToEdit: ServerInfo?
     @Binding var showingDeleteConfirmationServer: Bool
@@ -270,6 +285,18 @@ private struct ServerRowContent: View {
             isSelected: isSelected,
             connectionStatus: serverManager.serverConnectionStatuses[server.id] ?? nil
         )
+        .accessibilityIdentifier("server_row_\(server.id)")
+        .accessibilityInputLabels([server.name, server.host])
+        .accessibilityAction(named: String(localized: "Select Server")) {
+            serverManager.selectedServerID = server.id
+        }
+        .accessibilityAction(named: String(localized: "Edit Server")) {
+            serverToEdit = server
+        }
+        .accessibilityAction(named: String(localized: "Delete Server")) {
+            serverToDelete = server
+            showingDeleteConfirmationServer = true
+        }
 #if !os(macOS)
         .contentShape(Rectangle())
         
@@ -297,21 +324,23 @@ private struct ServerRowContent: View {
 // MARK: - プレビュー
 
 #Preview {
-    let previewServerManager = ServerManager()
+    let previewServerManager: ServerManager = {
+        let sm = ServerManager()
+        sm.servers = [
+            ServerInfo(name: "Local", host: "localhost:11434"),
+            ServerInfo(name: "Remote Server 1", host: "192.168.1.50:11434"),
+            ServerInfo(name: "Remote Server 2", host: "api.example.com:11434")
+        ]
+        sm.selectedServerID = sm.servers.first?.id
+        return sm
+    }()
     let previewCommandExecutor = CommandExecutor(serverManager: previewServerManager)
     
-    previewServerManager.servers = [
-        ServerInfo(name: "Local", host: "localhost:11434"),
-        ServerInfo(name: "Remote Server 1", host: "192.168.1.50:11434"),
-        ServerInfo(name: "Remote Server 2", host: "api.example.com:11434")
-    ]
-    previewServerManager.selectedServerID = previewServerManager.servers.first?.id
-    
-    return ServerView(
+    ServerView(
         serverManager: previewServerManager,
         executor: previewCommandExecutor,
         onTogglePreview: { print("ServerView_Preview: Dummy onTogglePreview called.") },
         selectedServerForInspector: .constant(previewServerManager.servers.first)
     )
-    .environmentObject(RefreshTrigger())
+    .environment(RefreshTrigger())
 }

@@ -5,13 +5,13 @@ import CompactSlider
 // MARK: - インスペクターコンテンツヘルパービュー
 struct InspectorContentView: View {
     @Environment(CommandExecutor.self) var commandExecutor
-    @EnvironmentObject var chatSettings: ChatSettings
-    @EnvironmentObject var imageSettings: ImageGenerationSettings
+    @Environment(ChatSettings.self) var chatSettings
+    @Environment(ImageGenerationSettings.self) var imageSettings
     let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel]
     let selectedServerForInspector: ServerInfo?
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     @Binding var showingInspector: Bool
     @Binding var selectedFilterTag: String?
     
@@ -55,6 +55,9 @@ struct InspectorContentView: View {
     }
     
     var body: some View {
+        @Bindable var chatSettings = chatSettings
+        @Bindable var imageSettings = imageSettings
+        
         Group {
             if selection == "models" {
                 if let selectedModelID = selectedModel,
@@ -118,6 +121,7 @@ struct InspectorContentView: View {
                                 Text("System Prompt")
                             }
                             TextEditor(text: $chatSettings.systemPrompt)
+                                .accessibilityLabel("System Prompt")
                                 .focused($isSystemPromptFocused) // ここにフォーカス状態をバインド
                                 .frame(height: 100)
                                 .disabled(!chatSettings.isSystemPromptEnabled)
@@ -344,17 +348,6 @@ struct InspectorContentView: View {
                 }
                 .formStyle(.grouped)
                 .frame(minWidth: 200)
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                inspectorWidth = geometry.size.width
-                            }
-                            .onChange(of: geometry.size.width) { _, newWidth in
-                                inspectorWidth = newWidth
-                            }
-                    }
-                )
 #if !os(macOS)
                 .onTapGesture {
                     isCustomWidthFocused = false
@@ -371,6 +364,19 @@ struct InspectorContentView: View {
                     .padding()
             }
         }
+        .background(
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        inspectorWidth = geometry.size.width
+                    }
+                    .onChange(of: geometry.size.width) { _, newWidth in
+                        if abs(inspectorWidth - newWidth) > 1.0 {
+                            inspectorWidth = newWidth
+                        }
+                    }
+            }
+        )
 #if os(macOS)
         .toolbar {
             Spacer()
@@ -393,6 +399,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var widthSettingsSection: some View {
+        @Bindable var imageSettings = imageSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Width")
@@ -438,6 +445,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var heightSettingsSection: some View {
+        @Bindable var imageSettings = imageSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Height")
@@ -541,6 +549,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var stepsSettingsSection: some View {
+        @Bindable var imageSettings = imageSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             HStack {
                 Text("Steps")
@@ -566,6 +575,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var chatSeedSettingsSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Toggle(isOn: $chatSettings.isSeedEnabled) {
                 Text("Seed")
@@ -594,6 +604,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var repeatLastNSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Picker("Repeat Last N", selection: $chatSettings.repeatLastNOption) {
                 ForEach(RepeatLastNOption.allCases) { opt in
@@ -631,6 +642,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var repeatPenaltySection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack {
             Toggle(isOn: $chatSettings.isRepeatPenaltyEnabled) {
                 Text("Repeat Penalty")
@@ -661,6 +673,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var numPredictSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Picker("Num Predict", selection: $chatSettings.numPredictOption) {
                 ForEach(NumPredictOption.allCases) { opt in
@@ -693,6 +706,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var topKSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Toggle(isOn: $chatSettings.isTopKEnabled) {
                 Text("Top-k")
@@ -721,6 +735,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var topPSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack {
             Toggle(isOn: $chatSettings.isTopPEnabled) {
                 Text("Top-p")
@@ -751,6 +766,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var minPSection: some View {
+        @Bindable var chatSettings = chatSettings
         VStack {
             Toggle(isOn: $chatSettings.isMinPEnabled) {
                 Text("Min-p")
@@ -781,6 +797,7 @@ struct InspectorContentView: View {
     
     @ViewBuilder
     private var seedSettingsSection: some View {
+        @Bindable var imageSettings = imageSettings
         VStack(alignment: .leading, spacing: vStackSpacing) {
             Toggle(isOn: $imageSettings.isSeedEnabled) {
                 Text("Seed")

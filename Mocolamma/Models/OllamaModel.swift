@@ -23,8 +23,14 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     let digest: String
     var details: OllamaModelDetails? // detailsオブジェクトはOptionalにする
     var capabilities: [String]?
+    var statusWeight: Int = 3 // UIでのソート用：0=成功フィードバック, 1=ロード中, 2=ロード済み, 3=未ロード
     
-    // Codable プロトコルのために必要な CodingKeys (originalIndexとidはデコード対象外)
+    // 事前計算されたプロパティ
+    let comparableModifiedDate: Date
+    let formattedSize: String
+    let formattedModifiedAt: String
+    
+    // Codable プロトコルのために必要な CodingKeys (originalIndex, id, statusWeight, 事前計算済みプロパティはデコード対象外)
     enum CodingKeys: String, CodingKey {
         case name
         case model
@@ -45,6 +51,12 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.details = details
         self.capabilities = capabilities
         self.originalIndex = originalIndex
+        
+        // 初期化時に事前計算
+        let date = Self.iso8601Formatter.date(from: modifiedAt) ?? Date.distantPast
+        self.comparableModifiedDate = date
+        self.formattedSize = Self.byteCountFormatter.string(fromByteCount: size)
+        self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
     }
     
     // Decodable のカスタムイニシャライザ
@@ -58,41 +70,61 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.details = try container.decodeIfPresent(OllamaModelDetails.self, forKey: .details)
         self.capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities)
         
+        // 初期化時に事前計算
+        let date = Self.iso8601Formatter.date(from: self.modified_at) ?? Date.distantPast
+        self.comparableModifiedDate = date
+        self.formattedSize = Self.byteCountFormatter.string(fromByteCount: self.size)
+        self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
+        
         // originalIndex は API レスポンスに含まれないため、ここでは初期化しない
         // CommandExecutor で API 応答後に設定する
         self.originalIndex = 0 // デフォルト値
     }
     
+    // MARK: - Cached Properties
+    
+    // キャッシュされたプロパティを使用して、リストスクロール時の再計算を防止
+    // OllamaModelはHashableプロトコル等でmutating関数と相性が悪い場合があるため、遅延評価は行わずinit/decode時に計算するか、
+    // DateFormatterの生成が重いため静的Formatterを使用するアプローチに変更
+    
+    private static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
+        return formatter
+    }()
+    
+    private static let displayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    
+    private static let byteCountFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter
+    }()
+    
+    private static let decimalFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }()
     
     // MARK: - Sorting Helpers
     
-    /// サイズ (バイト単位の数値) をGB単位のDoubleに変換して比較用に使用
+    /// サイズ (バイト単位の数値) をDoubleに変換して比較用に使用
     var comparableSize: Double {
-        return Double(size) // sizeがInt64なので直接Doubleに変換
+        return Double(size)
     }
     
-    /// modified_at (ISO 8601文字列) をDateオブジェクトに変換して比較用に使用
-    var comparableModifiedDate: Date {
-        let formatter = ISO8601DateFormatter()
-        // オプションを追加して、ミリ秒とタイムゾーンの両方に対応できるようにする
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
-        return formatter.date(from: modified_at) ?? Date.distantPast
-    }
+    // comparableModifiedDate は Stored Property に移行しました
     
-    /// サイズを判読可能な文字列に変換するヘルパー
-    var formattedSize: String {
-        let byteCountFormatter = ByteCountFormatter()
-        byteCountFormatter.countStyle = .file
-        return byteCountFormatter.string(fromByteCount: size)
-    }
+    // formattedSize は Stored Property に移行しました
     
-    /// modified_at を判読可能な日付文字列に変換するヘルパー
-    var formattedModifiedAt: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium // 例: Jul 24, 2025
-        dateFormatter.timeStyle = .short // 例: 9:30 PM
-        return dateFormatter.string(from: comparableModifiedDate)
-    }
+    // formattedModifiedAt は Stored Property に移行しました
     
     /// 画像生成モデルかどうかを判定するヘルパー
     var isImageModel: Bool {
@@ -120,6 +152,19 @@ struct OllamaModel: Identifiable, Hashable, Codable {
             return caps.contains(where: { $0.lowercased() == "vision" })
         }
         return false
+    }
+
+    /// オーディオに対応しているモデルかどうかを判定します。
+    var supportsAudio: Bool {
+        if let caps = capabilities {
+            return caps.contains(where: { $0.lowercased() == "audio" })
+        }
+        return false
+    }
+
+    /// 数値をカンマ区切りの文字列にフォーマットするヘルパー
+    static func formatDecimal(_ value: Int) -> String {
+        return decimalFormatter.string(from: NSNumber(value: value)) ?? String(value)
     }
 }
 

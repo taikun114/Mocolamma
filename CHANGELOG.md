@@ -2,7 +2,37 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 <!--
-The order of listing is as follows.
+The order of listing is as follows (1.3.0 or later):
+- New Features
+  - General
+  - Server
+  - Model
+  - Chat and Image Generation
+  - Chat
+  - Image Generation
+- Bug Fixes and Improvements
+  - General
+  - Server
+  - Model
+  - Chat and Image Generation
+  - Chat
+  - Image Generation
+
+Each section lists items in the following order:
+- Notable Information
+- Support
+- Additions
+- Fixes
+- Improvements
+- Changes
+- Removals
+
+Notes
+- Make the first level of the list bold
+- Make links bold
+- When linking to Issues, Pull Requests, or Discussions, include the full URL
+
+In version 1.2.2 or earlier, it was listed as follows:
 - New Features
   - Notable Information
   - Support
@@ -13,12 +43,58 @@ The order of listing is as follows.
   - Changes
   - Additions
   - Removals
-
-Notes
-- Make the first level of the list bold
-- Make links bold
-- When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
+
+## 1.3.0
+### New Features
+#### Model
+- **Support audio model tag**
+- **Add a feature that allows scrolling by dragging tags in the model inspector**
+- **Add the ability to load and unload models from the context menu of each model**
+  - You can load models by specifying a Keep Alive time, or unload them. You can also check the loading status in the model list.
+- **Add a feature to cancel model downloading**
+
+#### Chat and Image Generation
+- **Add options to set the order of models**
+  - By default, the order displayed on the model screen is used, but you can change it to your preferred order in the settings.
+- **Add a button to scroll to the bottom**
+  - A button now appears that allows you to scroll straight to the bottom when you are outside the auto-follow scroll range.
+
+### Bug Fixes and Improvements
+#### General
+- **Fix issue where sheet backgrounds appear slightly green in iPadOS 26 Dark Mode**
+- **Fix issue where performance significantly degrades when voice control is enabled ([#5](https://github.com/taikun114/Mocolamma/issues/5))**
+- **Improve the layout of the settings screen**
+
+#### Server
+- **Improve the display of connection status in server inspector**
+
+#### Model
+- **Fix issue where the model filter icon was not displayed in macOS Sequoia**
+- **Fix issue where models could not be added in a specific format**
+  - Fixed an issue where models could not be downloaded if the model name contained a `/` in the `ollama` command format.
+- **Improve model loading process**
+  - Performance has improved by automatically loading models when the app launches and when the server changes, thereby eliminating unnecessary model loading.
+- **Improve the feature to allow copying the model name using a keyboard shortcut**
+  - You can copy the model name by pressing `⌘ (Command)` + `C` while the model is selected. On macOS, you can also copy it by selecting “Copy” from the “Edit” menu.
+
+#### Chat and Image Generation
+- **Fix issue where the corner radius of the message input field was shifted**
+- **Fix issue where auto-follow scrolling would sometimes jumps**
+- **Fix issue where the keyboard sometimes did not close when the background was tapped**
+- **Improve the model picker display while loading models**
+- **Improve the appearance of the model picker**
+  - On macOS, the width now remains fixed, and on visionOS, model names are now displayed just like on macOS.
+- **Improve the appearance of the message input field**
+  - When an input field is disabled, it is now semi-transparent to make its disabled state easier to recognize.
+- **Improve to scroll when editing or retrying a message**
+
+#### Chat
+- **Fix issue where list bullets were not displayed**
+- **Fix issue where text selection did not work properly in visionOS**
+- **Improve the display of the thinking text to use Markdown**
+- **Improve Markdown styling**
+- **Improve the performance of the thinking process**
 
 ## 1.2.2
 ### New Features

@@ -8,14 +8,17 @@ import AppKit
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
 struct ModelInspectorView: View {
     let model: OllamaModel
-    let modelInfo: [String: JSONValue]?
+    let response: OllamaShowResponse?
     let isLoading: Bool
-    let fetchedCapabilities: [String]?
-    let licenseBody: String?
-    let licenseLink: String?
     @Binding var selectedFilterTag: String?
     
     @State private var showingLicenseSheet = false
+    
+    // タグエリアのドラッグスクロール用状態変数
+    @State private var tagsScrollPos: ScrollPosition = .init(point: .zero)
+    @State private var currentTagsOffset: CGPoint = .zero
+    @State private var dragStartOffset: CGPoint = .zero
+    @State private var isDraggingTags = false
     
     // サイズのフルバイト表記を取得するヘルパー
     private var fullSizeText: String {
@@ -29,48 +32,38 @@ struct ModelInspectorView: View {
     
     // modelInfoからパラメーターカウントを取得するヘルパー
     private var parameterCount: (formatted: String, raw: Int)? {
-        guard let count = modelInfo?["general.parameter_count"]?.intValue else { return nil }
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-        let formattedCount = numberFormatter.string(from: NSNumber(value: count)) ?? String(count)
-        return (formattedCount, count)
+        guard let count = response?.parameterCount else { return nil }
+        return (OllamaModel.formatDecimal(count), count)
     }
     
     // modelInfoからコンテキスト長を取得するヘルパー
     private var contextLength: (formatted: String, raw: Int)? {
-        guard let info = modelInfo else { return nil }
-        // ".context_length"で終わるキーを探す
-        if let key = info.keys.first(where: { $0.hasSuffix(".context_length") }) {
-            guard let length = info[key]?.intValue else { return nil }
-            let numberFormatter = NumberFormatter()
-            numberFormatter.numberStyle = .decimal
-            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
-            return (formattedLength, length)
-        }
-        return nil
+        guard let length = response?.contextLength else { return nil }
+        return (OllamaModel.formatDecimal(length), length)
     }
     
     // modelInfoからエンベディング長を取得するヘルパー
     private var embeddingLength: (formatted: String, raw: Int)? {
-        guard let info = modelInfo else { return nil }
-        // ".embedding_length"で終わるキーを探す
-        if let key = info.keys.first(where: { $0.hasSuffix(".embedding_length") }) {
-            guard let length = info[key]?.intValue else { return nil }
-            let numberFormatter = NumberFormatter()
-            numberFormatter.numberStyle = .decimal
-            numberFormatter.maximumFractionDigits = 0 // 小数点以下を表示しない
-            let formattedLength = numberFormatter.string(from: NSNumber(value: length)) ?? String(length)
-            return (formattedLength, length)
-        }
-        return nil
+        guard let length = response?.embeddingLength else { return nil }
+        return (OllamaModel.formatDecimal(length), length)
     }
     
     
+    private var licenseBody: String? {
+        response?.license
+    }
+    
+    private var licenseLink: String? {
+        // デモモデルの場合はテスト用ライセンスURLを設定
+        if model.name == "demo:0b" || model.name == "demo2:0b" {
+            return "https://example.com/"
+        }
+        return response?.model_info?["general.license.link"]?.stringValue
+    }
+    
     private var licenseName: String {
-        // 1. modelInfoに明示的なライセンス名がある場合
-        if let rawLicense = modelInfo?["general.license"]?.stringValue {
+        // 1. model_infoに明示的なライセンス名がある場合
+        if let rawLicense = response?.model_info?["general.license"]?.stringValue {
             switch rawLicense.lowercased() {
             case "mit":
                 return "MIT License"
@@ -108,6 +101,9 @@ struct ModelInspectorView: View {
         case "vision":
             displayText = String(localized: "Vision")
             iconName = "eye"
+        case "audio":
+            displayText = String(localized: "Audio")
+            iconName = "music.note"
         case "tools":
             displayText = String(localized: "Tools")
             iconName = "wrench.and.screwdriver"
@@ -138,6 +134,7 @@ struct ModelInspectorView: View {
             }
             .font(.caption)
             .bold()
+            .contentShape(Capsule()) // 点击判定范围
 #if !os(macOS)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -164,9 +161,10 @@ struct ModelInspectorView: View {
         .buttonStyle(.plain)
         .onHover { inside in
 #if os(macOS)
-            if inside {
+            if inside && !isDraggingTags {
                 NSCursor.pointingHand.push()
-            } else {
+            } else if !inside && !isDraggingTags {
+                // ドラッグ中ではない場合のみ抜けた時にpop
                 NSCursor.pop()
             }
 #endif
@@ -186,13 +184,48 @@ struct ModelInspectorView: View {
                     .help(model.name) // モデル名のフルテキストをツールチップに表示
                 
                 // 機能セクション
-                if let capabilities = fetchedCapabilities, !capabilities.isEmpty {
-                    ScrollView(.horizontal) {
+                if let capabilities = response?.capabilities, !capabilities.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
                                 tagView(for: capability)
                             }
                         }
+                        .scrollTargetLayout()
+                    }
+                    .scrollPosition($tagsScrollPos)
+#if os(macOS)
+                    .onScrollGeometryChange(for: CGPoint.self) { geo in
+                        geo.contentOffset
+                    } action: { _, newValue in
+                        currentTagsOffset = newValue
+                    }
+                    .highPriorityGesture(
+                        DragGesture(minimumDistance: 5)
+                            .onChanged { value in
+                                if !isDraggingTags {
+                                    isDraggingTags = true
+                                    NSCursor.closedHand.push()
+                                    dragStartOffset = currentTagsOffset
+                                }
+                                let deltaX = value.translation.width
+                                // スクロール位置を更新
+                                tagsScrollPos = ScrollPosition(point: CGPoint(x: dragStartOffset.x - deltaX, y: 0))
+                            }
+                            .onEnded { _ in
+                                isDraggingTags = false
+                                NSCursor.pop()
+                            }
+                    )
+#endif
+                    .onHover { inside in
+                        #if os(macOS)
+                        if inside {
+                            NSCursor.openHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                        #endif
                     }
                     .scrollClipDisabled() // クリッピングを無効化
                 }
@@ -219,6 +252,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Size:") // サイズ。
                         Text(model.formattedSize)
@@ -238,6 +272,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Modified At:") // 変更日
                         Text(model.formattedModifiedAt)
@@ -257,6 +292,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Digest:") // ダイジェスト。
                         Text(model.digest)
@@ -276,6 +312,7 @@ struct ModelInspectorView: View {
                                 }
                             }
                     }
+                    .accessibilityElement(children: .combine)
                 }
                 .font(.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -438,12 +475,12 @@ struct ModelInspectorView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
-                } else if modelInfo != nil {
+                } else if response != nil {
                     VStack(alignment: .leading, spacing: 10) {
                         
                         // ライセンス情報がある場合のみ表示
-                        // modelInfoにlicenseキーがあるか、licenseBodyがある場合
-                        if modelInfo?["general.license"] != nil || licenseBody != nil {
+                        // model_infoにlicenseキーがあるか、licenseBodyがある場合
+                        if response?.model_info?["general.license"] != nil || licenseBody != nil {
                             VStack(alignment: .leading) {
                                 Text("License:") // ライセンス
                                 if licenseBody != nil {
@@ -529,7 +566,7 @@ struct ModelInspectorView: View {
                         }
                         
                         // 全ての詳細項目が空の場合のみ「モデル情報がありません」を表示
-                        let hasLicense = modelInfo?["general.license"] != nil || licenseBody != nil
+                        let hasLicense = response?.model_info?["general.license"] != nil || licenseBody != nil
                         let hasAnyInfo = parameterCount != nil || contextLength != nil || embeddingLength != nil || hasLicense
                         
                         if !hasAnyInfo {

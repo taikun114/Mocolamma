@@ -2,16 +2,16 @@ import SwiftUI
 import StoreKit
 #if os(macOS)
 import ServiceManagement
-#endif
-#if os(macOS)
 import AppKit
 #endif
 import Network
+import Observation
 
 struct SettingsView: View {
+    private var modelSettings = ModelSettingsManager.shared
     @State private var launchAtLogin: Bool = false
     @State private var apiTimeoutSelection: APITimeoutOption = APITimeoutManager.shared.currentOption
-    @StateObject private var localNetworkChecker = LocalNetworkPermissionChecker()
+    @State private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var showingInstructions: Bool = false
     @State private var showingAbout: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
@@ -20,6 +20,7 @@ struct SettingsView: View {
     @State private var isReviewRequestDisabled: Bool = ReviewManager.shared.isReviewRequestDisabled
     
     var body: some View {
+        @Bindable var modelSettings = modelSettings
         Form {
             content
         }
@@ -50,6 +51,7 @@ struct SettingsView: View {
     
     @ViewBuilder
     private var content: some View {
+        @Bindable var modelSettings = modelSettings
         Section("General") {
 #if os(macOS)
             Toggle("Launch at Login", isOn: $launchAtLogin)
@@ -58,11 +60,11 @@ struct SettingsView: View {
                 }
 #endif
 #if os(iOS)
-            HStack(alignment: .top) {
+            HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("API Timeout")
                     Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
@@ -83,7 +85,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("API Timeout")
                     Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
@@ -106,18 +108,119 @@ struct SettingsView: View {
                 Text("5 min").tag(APITimeoutOption.minutes5)
                 Text("Unlimited").tag(APITimeoutOption.unlimited)
             } label: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("API Timeout")
-                    Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text("API Timeout")
+                Text("If responses take longer, such as when loading large models, increasing the timeout may help.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
             .pickerStyle(.menu)
             .onChange(of: apiTimeoutSelection) { _, newValue in
                 APITimeoutManager.shared.set(option: newValue)
             }
 #endif
+        }
+        
+        Section("Model") {
+            Toggle(isOn: $modelSettings.useModelListOrder) {
+                Text("Use Model List Order")
+                Text("Use the order specified in the model list for the model pickers in Chat and Image Generation.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack(alignment: {
+                #if os(macOS)
+                return .top
+                #else
+                return .center
+                #endif
+            }(), spacing: {
+                #if os(macOS)
+                return nil
+                #else
+                return nil
+                #endif
+            }()) {
+                Picker(selection: $modelSettings.chatSortCriterion) {
+                    ForEach(ModelSortCriterion.allCases) { criterion in
+                        if criterion == .number {
+                            Divider()
+                        }
+                        Label(criterion.localizedName, systemImage: criterion.iconName)
+                            .tag(criterion)
+                    }
+                } label: {
+                    Text("Chat Model Order")
+                        .foregroundColor(modelSettings.useModelListOrder ? .secondary : .primary)
+                }
+                .labelStyle(.titleAndIcon)
+                .disabled(modelSettings.useModelListOrder)
+                
+                #if !os(macOS)
+                Spacer()
+                #endif
+                
+                Button(action: {
+                    modelSettings.chatSortOrder = (modelSettings.chatSortOrder == .ascending) ? .descending : .ascending
+                }) {
+                    Image(systemName: modelSettings.chatSortOrder.iconName)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                #if os(macOS)
+                .buttonStyle(.plain)
+                #else
+                .buttonStyle(.bordered)
+                #endif
+                .disabled(modelSettings.useModelListOrder)
+                .help(modelSettings.chatSortOrder.localizedName)
+            }
+            
+            HStack(alignment: {
+                #if os(macOS)
+                return .top
+                #else
+                return .center
+                #endif
+            }(), spacing: {
+                #if os(macOS)
+                return nil
+                #else
+                return nil
+                #endif
+            }()) {
+                Picker(selection: $modelSettings.imageSortCriterion) {
+                    ForEach(ModelSortCriterion.allCases) { criterion in
+                        if criterion == .number {
+                            Divider()
+                        }
+                        Label(criterion.localizedName, systemImage: criterion.iconName)
+                            .tag(criterion)
+                    }
+                } label: {
+                    Text("Image Generation Model Order")
+                        .foregroundColor(modelSettings.useModelListOrder ? .secondary : .primary)
+                }
+                .labelStyle(.titleAndIcon)
+                .disabled(modelSettings.useModelListOrder)
+                
+                #if !os(macOS)
+                Spacer()
+                #endif
+                
+                Button(action: {
+                    modelSettings.imageSortOrder = (modelSettings.imageSortOrder == .ascending) ? .descending : .ascending
+                }) {
+                    Image(systemName: modelSettings.imageSortOrder.iconName)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                #if os(macOS)
+                .buttonStyle(.plain)
+                #else
+                .buttonStyle(.bordered)
+                #endif
+                .disabled(modelSettings.useModelListOrder)
+                .help(modelSettings.imageSortOrder.localizedName)
+            }
         }
         
         Section("Permissions") {
@@ -141,7 +244,7 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Local Network Access")
                                 Text("Permission is required to connect to Ollama servers on the same network.")
-                                    .font(.caption)
+                                    .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
                             Spacer()
@@ -190,7 +293,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading) {
                             Text("Local Network Access")
                             Text("Permission is required to connect to Ollama servers on the same network.")
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
@@ -230,7 +333,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading) {
                             Text("Local Network Access")
                             Text("Permission is required to connect to Ollama servers on the same network.")
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
@@ -272,7 +375,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading) {
                     Text("Local Network Access")
                     Text("Permission is required to connect to Ollama servers on the same network.")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
@@ -539,8 +642,9 @@ final class LoginItemManager {
 }
 #endif
 
-final class LocalNetworkPermissionChecker: ObservableObject {
-    @Published var isAllowed: Bool = false
+@Observable
+final class LocalNetworkPermissionChecker {
+    var isAllowed: Bool = false
     
     private let authorizer = LocalNetworkAuthorization()
     

@@ -9,7 +9,7 @@ import Combine
 /// プラットフォームに応じて、NavigationSplitViewまたはTabViewを使用してUIを構築します。
 struct ContentView: View {
     // ServerManagerのインスタンスをAppStateに保持し、ライフサイクル全体で利用可能にする
-    @ObservedObject var serverManager: ServerManager
+    var serverManager: ServerManager
     // CommandExecutorはServerManagerに依存するため、後から初期化
     @State var executor: CommandExecutor
     
@@ -21,7 +21,7 @@ struct ContentView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all // デフォルトで全パネル表示
     
     @Binding var showingInspector: Bool
-    @EnvironmentObject var chatSettings: ChatSettings
+    @Environment(ChatSettings.self) var chatSettings
     
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -29,22 +29,25 @@ struct ContentView: View {
     @State private var showingDeleteConfirmation = false // 削除確認アラートの表示/非表示を制御します
     @State private var modelToDelete: OllamaModel? // 削除対象のモデルを保持します
     
-    // ソート順を保持するState変数 (ModelListViewにバインディングとして渡します)
-    @State private var sortOrder: [KeyPathComparator<OllamaModel>] = [
-        .init(\.originalIndex, order: .forward)
-    ]
+    private var modelSettings = ModelSettingsManager.shared
     
     // フィルター状態を保持するState変数
     @State private var selectedFilterTag: String? = nil
     
-    // 現在のソート順に基づいてモデルリストを返すComputed Property (ModelListViewに渡します)
-    var sortedModels: [OllamaModel] {
-        executor.models.sorted(using: sortOrder)
+    // 現在のソート順に基づいてモデルリストを保持するState変数
+    @State private var sortedModels: [OllamaModel] = []
+    
+    // モデルリストを更新するメソッド
+    private func updateSortedModels() {
+        let models = executor.models.sorted(using: modelSettings.modelListSortOrder)
+        if sortedModels != models {
+            sortedModels = models
+        }
     }
     
     // MARK: - Server Inspector related states
     @State private var selectedServerForInspector: ServerInfo? // Inspectorに表示するサーバー情報
-    @EnvironmentObject var appRefreshTrigger: RefreshTrigger
+    @Environment(RefreshTrigger.self) var appRefreshTrigger
     
     // ContentViewの初期化子を更新
     init(serverManager: ServerManager, executor: CommandExecutor, selection: Binding<String?>, showingInspector: Binding<Bool>, showingAddModelsSheet: Binding<Bool>, showingAddServerSheet: Binding<Bool>, shouldClearChat: Binding<Bool>, shouldClearGeneration: Binding<Bool>, isPulling: Binding<Bool>) {
@@ -64,6 +67,7 @@ struct ContentView: View {
     @Binding var isPulling: Bool
     
     var body: some View {
+        @Bindable var modelSettings = modelSettings
         Group {
 #if os(macOS)
             MainNavigationView(
@@ -73,7 +77,7 @@ struct ContentView: View {
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
+                sortOrder: $modelSettings.modelListSortOrder,
                 selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
@@ -89,7 +93,7 @@ struct ContentView: View {
                 serverManager: serverManager,
                 selectedServerForInspector: $selectedServerForInspector,
                 showingInspector: $showingInspector,
-                sortOrder: $sortOrder,
+                sortOrder: $modelSettings.modelListSortOrder,
                 selectedFilterTag: $selectedFilterTag,
                 showingAddModelsSheet: $showingAddModelsSheet,
                 showingDeleteConfirmation: $showingDeleteConfirmation,
@@ -99,12 +103,15 @@ struct ContentView: View {
 #endif
         }
         .environment(executor)
-        .environmentObject(chatSettings)
+        .environment(chatSettings)
         .sheet(isPresented: $showingAddModelsSheet) {
             NavigationStack {
                 AddModelsSheet(showingAddSheet: $showingAddModelsSheet, executor: executor)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
+#if os(iOS)
+            .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 350)
             .presentationSizing(.fitted)
@@ -113,8 +120,11 @@ struct ContentView: View {
         .sheet(isPresented: $showingAddServerSheet) {
             NavigationStack {
                 ServerFormView(serverManager: serverManager, executor: executor, editingServer: nil)
-                    .environmentObject(appRefreshTrigger)
+                    .environment(appRefreshTrigger)
             }
+#if os(iOS)
+            .presentationBackground(Color(uiColor: .systemBackground))
+#endif
 #if os(visionOS)
             .frame(width: 500, height: 300)
             .presentationSizing(.fitted)
@@ -144,66 +154,108 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            selection = "server"
-            // 初期値を同期
-            updateSelectedServerForInspector()
-            serverManager.inspectorSelection = selection
-            serverManager.inspectorSelectedModelID = selectedModel
-            serverManager.inspectorSelectedServer = selectedServerForInspector
+            updateSortedModels()
+            handleOnAppear()
         }
-        .onChange(of: selection) { oldSelection, newSelection in
-            serverManager.inspectorSelection = newSelection
-            if newSelection == "server" {
-                updateSelectedServerForInspector()
-            }
-            if newSelection == "settings" && showingInspector {
-#if os(visionOS)
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    showingInspector = false
-                }
-#else
-                showingInspector = false
-#endif
+        .onChange(of: selection) { _, newValue in
+            Task { @MainActor in
+                handleSelectionChange(newValue)
             }
         }
-        .onChange(of: selectedModel) { _, newValue in
-#if os(visionOS)
-            withAnimation(.easeInOut(duration: 0.3)) {
-                serverManager.inspectorSelectedModelID = newValue
-            }
-#else
-            serverManager.inspectorSelectedModelID = newValue
-#endif
-        }
-        .onChange(of: selectedServerForInspector) { oldServer, newServer in
-            serverManager.inspectorSelectedServer = newServer
-            if newServer != nil {
-                if selection == "server" {
-                    appRefreshTrigger.send()
-                }
-            }
-        }
-        .onChange(of: shouldClearChat) { oldValue, newValue in
-            if newValue {
-                // チャットクリアを実行
-                executor.clearChat()
-                // 状態をリセット
-                shouldClearChat = false
-            }
-        }
-        .onChange(of: shouldClearGeneration) { oldValue, newValue in
-            if newValue {
-                // 画像生成クリアを実行
-                executor.clearImageGeneration()
-                // 状態をリセット
-                shouldClearGeneration = false
-            }
-        }
-        .onChange(of: executor.isPulling) { oldValue, newValue in
-            isPulling = newValue
-        }
+        .onChange(of: selectedModel) { _, newValue in handleModelSelectionChange(newValue) }
+        .onChange(of: selectedServerForInspector) { _, newValue in handleServerSelectionChange(newValue) }
+        .onChange(of: shouldClearChat) { _, newValue in handleClearChatChange(newValue) }
+        .onChange(of: shouldClearGeneration) { _, newValue in handleClearGenerationChange(newValue) }
+        .onChange(of: executor.models) { _, _ in updateSortedModels() }
+        .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
+        .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
+        .onChange(of: serverManager.selectedServerID) { _, _ in handleActiveServerChange() }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
+        }
+    }
+    
+    // MARK: - Event Handlers
+    
+    private func handleActiveServerChange() {
+        executor.resetInitialFetchFlag()
+        executor.models = [] // モデルリストを一旦クリアして「読み込み中」を表示させる
+        Task {
+            await executor.fetchOllamaModelsFromAPI()
+        }
+    }
+    
+    private func handleServerSelectionChange(_ newServer: ServerInfo?) {
+        serverManager.inspectorSelectedServer = newServer
+    }
+    
+    private func handleOnAppear() {
+        selection = "server"
+        updateSelectedServerForInspector()
+        serverManager.inspectorSelection = selection
+        serverManager.inspectorSelectedModelID = selectedModel
+        serverManager.inspectorSelectedServer = selectedServerForInspector
+        
+        // アプリ起動時にサーバーが選択されていれば、モデルリストの初期取得を行う
+        // これにより、どのタブから開始してもモデル情報が利用可能になります
+        if serverManager.selectedServer != nil {
+            Task {
+                if !executor.initialFetchCompleted {
+                    await executor.fetchOllamaModelsFromAPI()
+                } else {
+                    // すでに取得済みの場合は実行中モデル（/api/ps）のみ更新
+                    _ = await executor.fetchRunningModels()
+                }
+            }
+        }
+    }
+    
+    private func handleSelectionChange(_ newSelection: String?) {
+        serverManager.inspectorSelection = newSelection
+        
+        // 実行中モデルの更新（サーバー、モデル、チャット、画像生成タブ切り替え時に最新状態を確認）
+        if let sel = newSelection, ["server", "models", "chat", "image_generation"].contains(sel) && serverManager.selectedServer != nil {
+            Task {
+                _ = await executor.fetchRunningModels()
+            }
+        }
+        
+        if newSelection == "server" {
+            updateSelectedServerForInspector()
+        }
+        if newSelection == "settings" && showingInspector {
+#if os(visionOS)
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showingInspector = false
+            }
+#else
+            showingInspector = false
+#endif
+        }
+    }
+    
+    private func handleModelSelectionChange(_ newValue: OllamaModel.ID?) {
+#if os(visionOS)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            serverManager.inspectorSelectedModelID = newValue
+        }
+#else
+        serverManager.inspectorSelectedModelID = newValue
+#endif
+    }
+    
+    
+    private func handleClearChatChange(_ newValue: Bool) {
+        if newValue {
+            executor.clearChat()
+            shouldClearChat = false
+        }
+    }
+    
+    private func handleClearGenerationChange(_ newValue: Bool) {
+        if newValue {
+            executor.clearImageGeneration()
+            shouldClearGeneration = false
         }
     }
     
@@ -274,6 +326,7 @@ struct ContentView: View {
                     }
                 }
                 
+                // 明示的なリフレッシュ（ボタン押しなど）の場合はフラグを無視して取得
                 await executor.fetchOllamaModelsFromAPI()
                 
                 if let sid = selectedServerID, let host = serverManager.servers.first(where: { $0.id == sid })?.host {
@@ -293,14 +346,14 @@ struct ContentView: View {
             }
             
         case "chat":
-            // チャットではモデルリストを再取得
+            // チャット画面でのリフレッシュ要請
             Task {
                 executor.clearModelInfoCache()
                 await executor.fetchOllamaModelsFromAPI()
             }
             
         case "image_generation":
-            // 画像生成でもモデルリストを再取得
+            // 画像生成画面でのリフレッシュ要請
             Task {
                 executor.clearModelInfoCache()
                 await executor.fetchOllamaModelsFromAPI()
@@ -317,5 +370,5 @@ struct ContentView: View {
     let previewServerManager = ServerManager()
     let previewExecutor = CommandExecutor(serverManager: previewServerManager)
     ContentView(serverManager: previewServerManager, executor: previewExecutor, selection: .constant("server"), showingInspector: .constant(false), showingAddModelsSheet: .constant(false), showingAddServerSheet: .constant(false), shouldClearChat: .constant(false), shouldClearGeneration: .constant(false), isPulling: .constant(false))
-        .environmentObject(RefreshTrigger())
+        .environment(RefreshTrigger())
 }
