@@ -195,10 +195,25 @@ struct ContentView: View {
         serverManager.inspectorSelection = selection
         serverManager.inspectorSelectedModelID = selectedModel
         serverManager.inspectorSelectedServer = selectedServerForInspector
+        
+        // 初期表示時も実行中モデルを更新
+        if serverManager.selectedServer != nil {
+            Task {
+                _ = await executor.fetchRunningModels()
+            }
+        }
     }
     
     private func handleSelectionChange(_ newSelection: String?) {
         serverManager.inspectorSelection = newSelection
+        
+        // 実行中モデルの更新（サーバー、モデル、チャット、画像生成タブ切り替え時に最新状態を確認）
+        if let sel = newSelection, ["server", "models", "chat", "image_generation"].contains(sel) && serverManager.selectedServer != nil {
+            Task {
+                _ = await executor.fetchRunningModels()
+            }
+        }
+        
         if newSelection == "server" {
             updateSelectedServerForInspector()
         }
