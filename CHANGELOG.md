@@ -81,6 +81,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Chat and Image Generation
 - **Fix issue where the corner radius of the message input field was shifted**
 - **Fix issue where auto-follow scrolling would sometimes jumps**
+- **Fix issue where the keyboard sometimes did not close when the background was tapped**
 - **Improve the model picker display while loading models**
 - **Improve the appearance of the model picker**
   - On macOS, the width now remains fixed, and on visionOS, model names are now displayed just like on macOS.

@@ -115,6 +115,8 @@ struct ChatMessagesScrollView: View {
     let reduceMotionEnabled: Bool
     var bottomInset: CGFloat = 0
     
+    @Environment(\.containerHeight) var containerHeight
+    
     @State private var lastScrollTime: Date = .distantPast
     @State private var lastStateUpdateTime: Date = .distantPast
     @State private var isUserInteracting: Bool = false
@@ -124,17 +126,27 @@ struct ChatMessagesScrollView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                // メッセージリストとその高さ監視ロジックをSubviewに切り出し、
-                // 頻繁な高さ変更（1トークンごと）がScrollView全体や親ビューの再描画を
-                // 引き起こさないように局所化（Fundamental Fix）
-                MessagesList(
-                    messages: $messages,
-                    isOverallStreaming: $isOverallStreaming,
-                    isModelSelected: isModelSelected,
-                    onRetry: onRetry
-                )
-                
-                Spacer().frame(height: 1).id("bottom-spacer")
+                VStack(spacing: 0) {
+                    // メッセージリストとその高さ監視ロジックをSubviewに切り出し、
+                    // 頻繁な高さ変更（1トークンごと）がScrollView全体や親ビューの再描画を
+                    // 引き起こさないように局所化（Fundamental Fix）
+                    MessagesList(
+                        messages: $messages,
+                        isOverallStreaming: $isOverallStreaming,
+                        isModelSelected: isModelSelected,
+                        onRetry: onRetry
+                    )
+                    
+                    Spacer().frame(height: 1).id("bottom-spacer")
+                }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .frame(minHeight: containerHeight, alignment: .top)
+                .contentShape(Rectangle())
+#if !os(macOS)
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+#endif
             }
 #if os(iOS)
             .scrollDismissesKeyboard(.interactively)
