@@ -196,10 +196,16 @@ struct ContentView: View {
         serverManager.inspectorSelectedModelID = selectedModel
         serverManager.inspectorSelectedServer = selectedServerForInspector
         
-        // 初期表示時も実行中モデルを更新
+        // アプリ起動時にサーバーが選択されていれば、モデルリストの初期取得を行う
+        // これにより、どのタブから開始してもモデル情報が利用可能になります
         if serverManager.selectedServer != nil {
             Task {
-                _ = await executor.fetchRunningModels()
+                if !executor.initialFetchCompleted {
+                    await executor.fetchOllamaModelsFromAPI()
+                } else {
+                    // すでに取得済みの場合は実行中モデル（/api/ps）のみ更新
+                    _ = await executor.fetchRunningModels()
+                }
             }
         }
     }
