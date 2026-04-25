@@ -115,52 +115,37 @@ struct ChatView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            if #available(visionOS 26.0, *) {
-                chatContent
-                    .safeAreaBar(edge: .bottom) {
-                        VStack(spacing: 0) {
-                            if !isNearBottom && !executor.chatMessages.isEmpty {
-                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-                                    .padding()
-                            }
-                            
+            ZStack(alignment: .bottom) {
+                if #available(visionOS 26.0, *) {
+                    chatContent
+                        .safeAreaBar(edge: .bottom) {
                             if inputAreaHeight > 0 {
                                 Color.clear
                                     .frame(height: inputAreaHeight)
                             }
                         }
-                        .animation(.spring(duration: 0.3), value: isNearBottom)
-                        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
-                    }
-                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                        makeSafeAreaBarContent()
-                            .frame(width: 600)
-                            .padding(16)
-                            .glassBackgroundEffect()
-                    }
-            } else {
-                chatContent
-                    .safeAreaInset(edge: .bottom) {
-                        VStack(spacing: 0) {
-                            if !isNearBottom && !executor.chatMessages.isEmpty {
-                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-                                    .padding()
-                            }
-                            
+                } else {
+                    chatContent
+                        .safeAreaInset(edge: .bottom) {
                             if inputAreaHeight > 0 {
                                 Color.clear
                                     .frame(height: inputAreaHeight)
                             }
                         }
-                        .animation(.spring(duration: 0.3), value: isNearBottom)
-                        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
-                    }
-                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                        makeSafeAreaBarContent()
-                            .frame(width: 600)
-                            .padding(16)
-                            .glassBackgroundEffect()
-                    }
+                }
+
+                ZStack(alignment: .bottom) {
+                    ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                        .padding(.bottom, inputAreaHeight + 8)
+                }
+                .animation(.spring(duration: 0.3), value: isNearBottom)
+                .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
+            }
+            .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                makeSafeAreaBarContent()
+                    .frame(width: 600)
+                    .padding(16)
+                    .glassBackgroundEffect()
             }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
@@ -989,52 +974,37 @@ struct ImageGenerationView: View {
         @Bindable var executor = executor
         Group {
 #if os(visionOS)
-            if #available(visionOS 26.0, *) {
-                content
-                    .safeAreaBar(edge: .bottom) {
-                        VStack(spacing: 0) {
-                            if !isNearBottom && !executor.imageMessages.isEmpty {
-                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-                                    .padding()
-                            }
-                            
+            ZStack(alignment: .bottom) {
+                if #available(visionOS 26.0, *) {
+                    content
+                        .safeAreaBar(edge: .bottom) {
                             if inputAreaHeight > 0 {
                                 Color.clear
                                     .frame(height: inputAreaHeight)
                             }
                         }
-                        .animation(.spring(duration: 0.3), value: isNearBottom)
-                        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
-                    }
-                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                        makeInputArea()
-                            .frame(width: 600)
-                            .padding(16)
-                            .glassBackgroundEffect()
-                    }
-            } else {
-                content
-                    .safeAreaInset(edge: .bottom) {
-                        VStack(spacing: 0) {
-                            if !isNearBottom && !executor.imageMessages.isEmpty {
-                                ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-                                    .padding()
-                            }
-                            
+                } else {
+                    content
+                        .safeAreaInset(edge: .bottom) {
                             if inputAreaHeight > 0 {
                                 Color.clear
                                     .frame(height: inputAreaHeight)
                             }
                         }
-                        .animation(.spring(duration: 0.3), value: isNearBottom)
-                        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
-                    }
-                    .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                        makeInputArea()
-                            .frame(width: 600)
-                            .padding(16)
-                            .glassBackgroundEffect()
-                    }
+                }
+
+                ZStack(alignment: .bottom) {
+                    ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
+                        .padding(.bottom, inputAreaHeight + 8)
+                }
+                .animation(.spring(duration: 0.3), value: isNearBottom)
+                .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
+            }
+            .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
+                makeInputArea()
+                    .frame(width: 600)
+                    .padding(16)
+                    .glassBackgroundEffect()
             }
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
