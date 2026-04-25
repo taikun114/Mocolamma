@@ -169,12 +169,25 @@ struct ContentView: View {
         .onChange(of: executor.models) { _, _ in updateSortedModels() }
         .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
+        .onChange(of: serverManager.selectedServerID) { _, _ in handleActiveServerChange() }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
         }
     }
     
     // MARK: - Event Handlers
+    
+    private func handleActiveServerChange() {
+        executor.resetInitialFetchFlag()
+        executor.models = [] // モデルリストを一旦クリアして「読み込み中」を表示させる
+        Task {
+            await executor.fetchOllamaModelsFromAPI()
+        }
+    }
+    
+    private func handleServerSelectionChange(_ newServer: ServerInfo?) {
+        serverManager.inspectorSelectedServer = newServer
+    }
     
     private func handleOnAppear() {
         selection = "server"
@@ -210,15 +223,6 @@ struct ContentView: View {
 #endif
     }
     
-    private func handleServerSelectionChange(_ newServer: ServerInfo?) {
-        serverManager.inspectorSelectedServer = newServer
-        if newServer != nil {
-            executor.resetInitialFetchFlag()
-            Task {
-                await executor.fetchOllamaModelsFromAPI()
-            }
-        }
-    }
     
     private func handleClearChatChange(_ newValue: Bool) {
         if newValue {

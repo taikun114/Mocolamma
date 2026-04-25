@@ -359,6 +359,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models from demo server. Total: %d", comment: "デモサーバーからモデル情報を取得した場合のメッセージ。"), self.models.count)
             self.output = successMessage
+            self.initialFetchCompleted = true
             self.apiConnectionError = false // 成功時はエラーなし
             return
         }
