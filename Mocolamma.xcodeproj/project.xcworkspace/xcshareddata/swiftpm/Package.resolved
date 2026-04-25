@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/taikun114/textual",
       "state" : {
-        "revision" : "1a5ad6598ccb909f9309c5aaa2c4d029c62d93cc",
-        "version" : "1.0.0"
+        "revision" : "a17dafc8be3cce87d06f63fcffbc78631c387dda",
+        "version" : "1.1.0"
       }
     },
     {
