@@ -86,9 +86,11 @@ In version 1.2.2 or earlier, it was listed as follows:
   - On macOS, the width now remains fixed, and on visionOS, model names are now displayed just like on macOS.
 - **Improve the appearance of the message input field**
   - When an input field is disabled, it is now semi-transparent to make its disabled state easier to recognize.
+- **Improve to scroll when editing or retrying a message**
 
 #### Chat
 - **Fix issue where list bullets were not displayed**
+- **Fix issue where text selection did not work properly in visionOS**
 - **Improve the display of the thinking text to use Markdown**
 - **Improve Markdown styling**
 - **Improve the performance of the thinking process**

@@ -17,6 +17,7 @@ struct ChatView: View {
     @State private var inputAreaHeight: CGFloat = 0
     @State private var isNearBottom: Bool = true
     @State private var scrollToBottomTrigger: Int = 0
+    @State private var scrollToMessageIDTrigger: UUID? = nil
     private var modelSettings = ModelSettingsManager.shared
 
     
@@ -67,6 +68,7 @@ struct ChatView: View {
                     isOverallStreaming: $executor.isChatStreaming,
                     isNearBottom: $isNearBottom,
                     scrollToBottomTrigger: $scrollToBottomTrigger,
+                    scrollToMessageIDTrigger: $scrollToMessageIDTrigger,
                     isModelSelected: chatSettings.selectedModelID != nil,
                     bottomInset: inputAreaHeight,
                     emptyStateTitle: "Chat",
@@ -515,6 +517,7 @@ struct ChatView: View {
             // 編集されたユーザーメッセージを履歴の最後に移動
             let userMessage = executor.chatMessages.remove(at: indexToRetry)
             executor.chatMessages.append(userMessage)
+            let scrollId = userMessage.id
             
             // ユーザーメッセージ以降のアシスタントメッセージを削除
             executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in
@@ -543,6 +546,7 @@ struct ChatView: View {
             }
             
             executor.isChatStreaming = true
+            scrollToMessageIDTrigger = scrollId
             Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
             
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
@@ -560,6 +564,7 @@ struct ChatView: View {
                 return
             }
             let userMessageIndex = indexToRetry - 1
+            let scrollId = executor.chatMessages[userMessageIndex].id
             
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content の順
@@ -635,6 +640,7 @@ struct ChatView: View {
             }
             
             executor.isChatStreaming = true
+            scrollToMessageIDTrigger = scrollId
             Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
         }
     }
@@ -872,6 +878,7 @@ struct ImageGenerationView: View {
     @State private var inputAreaHeight: CGFloat = 0
     @State private var isNearBottom: Bool = true
     @State private var scrollToBottomTrigger: Int = 0
+    @State private var scrollToMessageIDTrigger: UUID? = nil
     
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -920,6 +927,7 @@ struct ImageGenerationView: View {
                     isOverallStreaming: $executor.isImageStreaming,
                     isNearBottom: $isNearBottom,
                     scrollToBottomTrigger: $scrollToBottomTrigger,
+                    scrollToMessageIDTrigger: $scrollToMessageIDTrigger,
                     isModelSelected: imageSettings.selectedModelID != nil,
                     bottomInset: inputAreaHeight,
                     emptyStateTitle: "Image Generation",
@@ -1241,12 +1249,15 @@ struct ImageGenerationView: View {
         // 画像生成のリトライロジック
         guard let index = executor.imageMessages.firstIndex(where: { $0.id == messageId }) else { return }
         
+        let promptId: UUID
         let prompt: String
         if executor.imageMessages[index].role == "user" {
+            promptId = executor.imageMessages[index].id
             prompt = executor.imageMessages[index].content
             executor.imageMessages.removeSubrange(index+1..<executor.imageMessages.count)
         } else {
             guard index > 0 else { return }
+            promptId = executor.imageMessages[index-1].id
             prompt = executor.imageMessages[index-1].content
             
             // 重要: 現在表示中のリビジョンではなく、常に「最新の完成版」をアーカイブする
@@ -1297,8 +1308,10 @@ struct ImageGenerationView: View {
                 isImageGeneration: true
             )
             executor.imageMessages.append(assistantMessage)
+            scrollToMessageIDTrigger = promptId
             Task { await runImageGeneration(for: assistantMessage.id, prompt: prompt, model: model) }
         } else {
+            scrollToMessageIDTrigger = promptId
             Task { await runImageGeneration(for: messageId, prompt: prompt, model: model) }
         }
     }

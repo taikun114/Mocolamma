@@ -24,6 +24,7 @@ struct ChatMessagesView: View {
     @Binding var isOverallStreaming: Bool
     @Binding var isNearBottom: Bool
     @Binding var scrollToBottomTrigger: Int
+    @Binding var scrollToMessageIDTrigger: UUID?
     let isModelSelected: Bool
     var bottomInset: CGFloat = 0
     let emptyStateTitle: LocalizedStringKey
@@ -56,6 +57,7 @@ struct ChatMessagesView: View {
                     isOverallStreaming: $isOverallStreaming,
                     isNearBottom: $isNearBottom,
                     scrollToBottomTrigger: $scrollToBottomTrigger,
+                    scrollToMessageIDTrigger: $scrollToMessageIDTrigger,
                     isModelSelected: isModelSelected,
                     supportsEffects: supportsEffects,
                     reduceMotionEnabled: reduceMotionEnabled,
@@ -107,6 +109,7 @@ struct ChatMessagesScrollView: View {
     @Binding var isOverallStreaming: Bool
     @Binding var isNearBottom: Bool
     @Binding var scrollToBottomTrigger: Int
+    @Binding var scrollToMessageIDTrigger: UUID?
     let isModelSelected: Bool
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
@@ -217,6 +220,14 @@ struct ChatMessagesScrollView: View {
             }
             .onChange(of: scrollToBottomTrigger) { _, _ in
                 scrollBottom(proxy: proxy, force: true, animated: true)
+            }
+            .onChange(of: scrollToMessageIDTrigger) { _, newValue in
+                if let id = newValue {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        proxy.scrollTo(id, anchor: .bottom)
+                    }
+                    scrollToMessageIDTrigger = nil
+                }
             }
         }
     }
