@@ -19,6 +19,7 @@ struct ChatView: View {
     @State private var scrollToBottomTrigger: Int = 0
     @State private var scrollToMessageIDTrigger: UUID? = nil
     private var modelSettings = ModelSettingsManager.shared
+    @State private var selectionCoordinator = TextSelectionCoordinator()
 
     
     @Binding var showingInspector: Bool
@@ -181,8 +182,11 @@ struct ChatView: View {
 #if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            selectionCoordinator.deselectAll()
         }
 #endif
+        .environment(selectionCoordinator)
+        .modifier(TextSelectionCoordination())
         .navigationTitle("Chat")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
@@ -871,6 +875,7 @@ struct ImageGenerationView: View {
     @Environment(RefreshTrigger.self) var appRefreshTrigger
     @Environment(ImageGenerationSettings.self) var imageSettings
     private var modelSettings = ModelSettingsManager.shared
+    @State private var selectionCoordinator = TextSelectionCoordinator()
     
     @State private var errorMessage: String?
     @State private var generalErrorMessage: String? = nil
@@ -1043,8 +1048,11 @@ struct ImageGenerationView: View {
 #if !os(macOS)
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            selectionCoordinator.deselectAll()
         }
 #endif
+        .environment(selectionCoordinator)
+        .modifier(TextSelectionCoordination())
         .navigationTitle("Image Generation")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }

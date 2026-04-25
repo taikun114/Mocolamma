@@ -4,6 +4,7 @@ import AppKit
 #elseif os(iOS)
 import UIKit
 #endif
+import Textual
 
 struct ContainerHeightKey: EnvironmentKey {
     static let defaultValue: CGFloat = 600
@@ -30,6 +31,8 @@ struct ChatMessagesView: View {
     let emptyStateTitle: LocalizedStringKey
     let emptyStateDescription: LocalizedStringKey
     let emptyStateImage: String
+    
+    @State private var selectionCoordinator = TextSelectionCoordinator()
     
     private var reduceMotionEnabled: Bool {
 #if !os(macOS)
@@ -86,9 +89,12 @@ struct ChatMessagesView: View {
 #if !os(macOS)
             .onTapGesture {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                selectionCoordinator.deselectAll()
             }
 #endif
             .environment(\.containerHeight, geometry.size.height)
+            .environment(selectionCoordinator)
+            .modifier(TextSelectionCoordination())
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
@@ -116,6 +122,7 @@ struct ChatMessagesScrollView: View {
     var bottomInset: CGFloat = 0
     
     @Environment(\.containerHeight) var containerHeight
+    @Environment(TextSelectionCoordinator.self) var selectionCoordinator
     
     @State private var lastScrollTime: Date = .distantPast
     @State private var lastStateUpdateTime: Date = .distantPast
@@ -145,6 +152,7 @@ struct ChatMessagesScrollView: View {
 #if !os(macOS)
                 .onTapGesture {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    selectionCoordinator.deselectAll()
                 }
 #endif
             }
