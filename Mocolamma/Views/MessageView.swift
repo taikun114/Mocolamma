@@ -1327,6 +1327,10 @@ struct SimpleStyle: StructuredText.Style {
     var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
         StructuredText.DividerThematicBreakStyle.divider
     }
+
+    var listSpacing: FontScaled<StructuredText.BlockSpacing> {
+        .fontScaled(top: 0.8, bottom: 0.8)
+    }
 }
 
 struct SimpleListItemStyle: StructuredText.ListItemStyle {
@@ -1373,7 +1377,7 @@ struct SimpleTableStyle: StructuredText.TableStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
-            .textual.blockSpacing(.fontScaled(top: 1.6, bottom: 1.6))
+            .textual.blockSpacing(.fontScaled(top: 0.8, bottom: 0.8))
             .textual.tableOverlay { layout in
                 Canvas { context, _ in
                     for divider in layout.dividers() {
@@ -1624,6 +1628,10 @@ struct SimpleThinkingStyle: StructuredText.Style {
     var thematicBreakStyle: some StructuredText.ThematicBreakStyle {
         StructuredText.DividerThematicBreakStyle.divider
     }
+
+    var listSpacing: FontScaled<StructuredText.BlockSpacing> {
+        .fontScaled(top: 0.5, bottom: 0.5)
+    }
 }
 
 struct SimpleThinkingHeadingStyle: StructuredText.HeadingStyle {
@@ -1729,7 +1737,7 @@ struct SimpleThinkingTableStyle: StructuredText.TableStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textual.tableCellSpacing(horizontal: Self.borderWidth, vertical: Self.borderWidth)
-            .textual.blockSpacing(.fontScaled(top: 1, bottom: 1))
+            .textual.blockSpacing(.fontScaled(top: 0.8, bottom: 0.8))
             .textual.tableOverlay { layout in
                 Canvas { context, _ in
                     for divider in layout.dividers() {
