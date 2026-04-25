@@ -733,7 +733,7 @@ struct ChatView: View {
             // 最終確定処理
             if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
                let chunk = buffer.finalChunk {
-                let isThinkingCompleted = chatSettings.thinkingOption == .on && buffer.rawThinking.count > 0
+                let isThinkingCompleted = buffer.isThinkingCompleted || !buffer.rawThinking.isEmpty
                 
                 executor.chatMessages[index].finalizeStreaming(
                     content: buffer.rawContent,
@@ -801,7 +801,10 @@ struct ChatView: View {
                 if let messageChunk = chunk.message {
                     if chatSettings.thinkingOption == .on {
                         if let apiThinking = messageChunk.thinking { buffer.rawThinking += apiThinking }
-                        buffer.rawContent += messageChunk.content
+                        if !messageChunk.content.isEmpty {
+                            buffer.rawContent += messageChunk.content
+                            buffer.isThinkingCompleted = true
+                        }
                     } else {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
