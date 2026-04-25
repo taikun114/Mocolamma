@@ -371,7 +371,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             self.apiConnectionError = true
             return
         }
+#if DEBUG
         print("Fetching model list from Ollama API at \(apiBaseURL)...")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "Ollamaサーバーからモデルリストを取得中のメッセージ。API (サーバーURL)...。"), apiBaseURL)
         try? await Task.sleep(nanoseconds: 100_000_000)
@@ -506,7 +508,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return
         }
         
+#if DEBUG
         print("Attempting to pull model \(modelName) from \(apiBaseURL)")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Downloading model '%@' from %@...", comment: "Ollamaサーバー上でモデルをダウンロード中に表示されるメッセージ。モデル名 from サーバーURL"), modelName, apiBaseURL)
         self.isPulling = true
@@ -653,7 +657,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return
         }
         
+#if DEBUG
         print("Attempting to delete model \(modelName) from \(apiBaseURL)")
+#endif
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Deleting model '%@' from %@...", comment: "Ollamaサーバーからモデルを削除しているときに表示されるメッセージ。モデル名 from サーバーURL。"), modelName, apiBaseURL)
         self.isRunning = true
@@ -690,17 +696,23 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             
             if httpResponse.statusCode == 200 {
                 self.output = String(format: NSLocalizedString("Successfully deleted model '%@' from %@.", comment: "Ollamaサーファーからモデルを削除することに成功した場合のメッセージ。モデル名 from サーバーURL。"), modelName, apiBaseURL)
+#if DEBUG
                 print("Successfully deleted model '\(modelName)' from \(apiBaseURL).")
+#endif
                 await self.fetchOllamaModelsFromAPI() // メインアクターで実行されるasync関数なので直接呼び出し可能です
                 
             } else if httpResponse.statusCode == 404 {
                 self.output = String(format: NSLocalizedString("Delete Error: Model '%@' not found (404 Not Found) on %@.", comment: "Ollamaサーバーからモデルを削除しようとしたとき、削除しようとしているモデルがサーバー上に見つからない場合のエラーメッセージ。モデル名 not found (404 Not Found) on サーバーURL。"), modelName, apiBaseURL)
+#if DEBUG
                 print("Deletion Error: Model '\(modelName)' not found at \(apiBaseURL) (404).")
+#endif
             } else {
                 let errorString = String(data: data, encoding: .utf8) ?? NSLocalizedString("No data available", comment: "データが得られなかったときのメッセージ。")
                 let errorMessage = String(format: NSLocalizedString("Delete Error: HTTP Status Code %d - %@ on %@", comment: "Ollamaサーバーからモデルを削除しようとしたときのエラーメッセージ。エラーコード - エラーメッセージ on サーバーURL。"), httpResponse.statusCode, errorString, apiBaseURL)
                 self.output = errorMessage
+#if DEBUG
                 print("Deletion Error: HTTP status code \(httpResponse.statusCode) - \(errorString) on \(apiBaseURL)")
+#endif
             }
         } catch {
             self.output = NSLocalizedString("Model deletion failed: ", comment: "Ollamaサーバーからモデルの削除に失敗した場合のプレフィックスメッセージ。") + error.localizedDescription
@@ -723,7 +735,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return true
         }
         
+#if DEBUG
         print("Attempting to unload model \(modelName) from \(apiBaseURL)")
+#endif
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
@@ -801,7 +815,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             updateModelWeights() // ステータス更新
         }
         
+#if DEBUG
         print("Attempting to load model \(modelName) to \(apiBaseURL) with keep_alive: \(String(describing: keepAlive)), ignoreTimeout: \(ignoreTimeout)")
+#endif
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = apiBaseURL.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
@@ -1027,7 +1043,9 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return cachedInfo
         }
         
+#if DEBUG
         print("Fetching model \(modelName) details from \(String(describing: apiBaseURL))...")
+#endif
         
         guard let apiBaseURL = self.apiBaseURL else {
             print("Ollama API base URL is not set. Skipping model details retrieval.")
@@ -1527,7 +1545,9 @@ struct MarkdownTestView: View {
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 do {
+#if DEBUG
                     print("DEBUG: useCustomChatSettings: \(useCustomChatSettings), isTemperatureEnabled: \(isTemperatureEnabled), chatTemperature: \(chatTemperature), isContextWindowEnabled: \(isContextWindowEnabled), contextWindowValue: \(contextWindowValue), isSeedEnabled: \(isSeedEnabled), seed: \(seed), repeatLastN: \(String(describing: repeatLastN)), repeatPenalty: \(String(describing: repeatPenalty)), numPredict: \(String(describing: numPredict)), topK: \(String(describing: topK)), topP: \(String(describing: topP)), minP: \(String(describing: minP)), isSystemPromptEnabled: \(isSystemPromptEnabled), systemPrompt: \(systemPrompt), thinkingOption: \(thinkingOption)")
+#endif
                     var chatOptions: ChatRequestOptions?
                     if useCustomChatSettings {
                         var options = ChatRequestOptions()
@@ -1550,7 +1570,9 @@ struct MarkdownTestView: View {
                         options.minP = minP
                         
                         chatOptions = options
+#if DEBUG
                         print("DEBUG: Constructed chatOptions: \(String(describing: chatOptions))")
+#endif
                     }
                     
                     var finalMessages = messages
@@ -1576,7 +1598,9 @@ struct MarkdownTestView: View {
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化
                     request.httpBody = try encoder.encode(chatRequest)
+#if DEBUG
                     print("DEBUG: Final Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+#endif
                 } catch {
                     continuation.finish(throwing: error)
                     return
@@ -1754,7 +1778,9 @@ struct MarkdownTestView: View {
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = .withoutEscapingSlashes
                     request.httpBody = try encoder.encode(generationRequest)
+#if DEBUG
                     print("DEBUG: Image Generation Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")
+#endif
                 } catch {
                     continuation.finish(throwing: error)
                     return
@@ -2004,7 +2030,9 @@ struct MarkdownTestView: View {
                             let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
                             continuation.yield(chunk)
                         } catch {
+#if DEBUG
                             print("Chat response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+#endif
                         }
                     }
                 } else {
@@ -2014,7 +2042,9 @@ struct MarkdownTestView: View {
                         continuation.yield(chunk)
                         continuation.finish() // 非ストリーミングなので、一度だけyieldして終了
                     } catch {
+#if DEBUG
                         print("Non-streaming chat response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+#endif
                         continuation.finish(throwing: error)
                     }
                 }
@@ -2060,7 +2090,9 @@ struct MarkdownTestView: View {
                             let chunk = try JSONDecoder().decode(ImageGenerationResponseChunk.self, from: jsonData)
                             continuation.yield(chunk)
                         } catch {
+#if DEBUG
                             print("Image generation response JSON decode error: \(error.localizedDescription) - Line: \(line)")
+#endif
                             // デコード失敗時に生のデータを表示（エラーメッセージ確認用）
                             if let errorJson = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
                                let errorMessage = errorJson["error"] as? String {
@@ -2075,7 +2107,9 @@ struct MarkdownTestView: View {
                         continuation.yield(chunk)
                         continuation.finish()
                     } catch {
+#if DEBUG
                         print("Non-streaming image generation response JSON decode error: \(error.localizedDescription) - Data: \(String(data: data, encoding: .utf8) ?? "Unreadable Data")")
+#endif
                         // エラーメッセージの抽出
                         if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                            let errorMessage = errorJson["error"] as? String {
