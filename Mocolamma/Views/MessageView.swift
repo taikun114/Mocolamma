@@ -1208,7 +1208,6 @@ struct MessageView: View {
                             .textualSelection(enabled: isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
                             .textual.syntaxHighlightingEnabled(isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
                     }
                 }
                 
@@ -1243,7 +1242,6 @@ struct MessageView: View {
                     .textualSelection(enabled: isStreamingSettled && !message.isStreaming)
                     .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming)
                     .textual.overflowMode(.scroll)
-                    .compositingGroup() // 描画を最適化（.drawingGroupはメッセージがレンダリングできなくなるため使用しない）
             }
         } else {
             EmptyView()

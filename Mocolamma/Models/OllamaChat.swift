@@ -146,6 +146,27 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalEvalDuration: Int? // 最終的な評価時間
     var finalIsStopped: Bool = false // 最終的な停止状態
     
+    /// ストリーミング中のコンテンツを一括更新します（Observationの通知を最小限に抑えるため）
+    @MainActor
+    func updateStreamingContent(content: String, thinking: String?, isThinkingCompleted: Bool) {
+        self.content = content
+        self.latestContent = content
+        self.thinking = thinking
+        self.isThinkingCompleted = isThinkingCompleted
+    }
+    
+    /// ストリーミング終了時の処理を一括で行います
+    @MainActor
+    func finalizeStreaming(content: String, thinking: String?, totalDuration: Int?, evalCount: Int?, evalDuration: Int?, isThinkingCompleted: Bool) {
+        self.content = content
+        self.thinking = thinking
+        self.totalDuration = totalDuration
+        self.evalCount = evalCount
+        self.evalDuration = evalDuration
+        self.isStreaming = false
+        self.isThinkingCompleted = isThinkingCompleted
+    }
+    
     // 表示状態管理用（Observationの局所化のため）
     var isCopied: Bool = false
     var isDownloadSuccessful: Bool = false

@@ -26,7 +26,6 @@ struct ChatMessagesView: View {
     @Binding var scrollToBottomTrigger: Int
     let isModelSelected: Bool
     var bottomInset: CGFloat = 0
-    // 空の状態の表示をカスタマイズするための引数を追加
     let emptyStateTitle: LocalizedStringKey
     let emptyStateDescription: LocalizedStringKey
     let emptyStateImage: String
@@ -72,7 +71,6 @@ struct ChatMessagesView: View {
                     }
                 }
                 
-                // 拡大表示オーバーレイ
                 if let image = executor.previewImage {
                     ImagePreviewOverlay(image: image, onClose: {
                         withAnimation(.easeInOut(duration: 0.2)) {
@@ -115,59 +113,24 @@ struct ChatMessagesScrollView: View {
     var bottomInset: CGFloat = 0
     
     @State private var lastScrollTime: Date = .distantPast
+    @State private var lastStateUpdateTime: Date = .distantPast
     @State private var isUserInteracting: Bool = false
     @GestureState private var isTouching: Bool = false
     @State private var latestScrollState: ScrollState? = nil
-    @State private var maxMessagesHeight: CGFloat = 0
-    @State private var currentMessagesHeight: CGFloat = 0
     
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                // LazyVStackからVStackに変更してレイアウトの安定性を確保
-                // LazyVStackでは急激なスクロールや表示エリア変更時にCPU使用率が100%に張り付いて無限にフリーズしてしまう問題が発生するため
-                VStack(alignment: .leading, spacing: 10) {
-                    let lastAssistantId = messages.last(where: { $0.role == "assistant" })?.id
-                    let lastUserId = messages.last(where: { $0.role == "user" })?.id
-                    
-                    ForEach(messages) { message in
-                        let modelName = chatSettings.selectedModelID.flatMap { executor.modelsByID[$0]?.name }
-                        MessageViewWrapper(
-                            message: message,
-                            isLastAssistantMessage: message.id == lastAssistantId,
-                            isLastOwnUserMessage: message.id == lastUserId,
-                            selectedModelName: modelName,
-                            onRetry: onRetry,
-                            onPreviewImage: { image in
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    executor.previewImage = image
-                                }
-                            },
-                            isOverallStreaming: $isOverallStreaming,
-                            isModelSelected: isModelSelected
-                        )
-                        .id(message.id)
-                    }
-                }
-                .onGeometryChange(for: CGFloat.self) { proxy in
-                    proxy.size.height
-                } action: { newValue in
-                    currentMessagesHeight = newValue
-                    if newValue > maxMessagesHeight {
-                        maxMessagesHeight = newValue
-                    }
-                }
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel("Chat messages")
-                .padding()
+                // メッセージリストとその高さ監視ロジックをSubviewに切り出し、
+                // 頻繁な高さ変更（1トークンごと）がScrollView全体や親ビューの再描画を
+                // 引き起こさないように局所化（Fundamental Fix）
+                MessagesList(
+                    messages: $messages,
+                    isOverallStreaming: $isOverallStreaming,
+                    isModelSelected: isModelSelected,
+                    onRetry: onRetry
+                )
                 
-                
-                // 補完用スペーサー：点滅などで一時的に高さが減少した際、
-                // アンカーが上に跳ねるのを防ぐために不足分を埋める
-                if maxMessagesHeight > currentMessagesHeight {
-                    Spacer(minLength: maxMessagesHeight - currentMessagesHeight)
-                }
-
                 Spacer().frame(height: 1).id("bottom-spacer")
             }
 #if os(iOS)
@@ -196,7 +159,7 @@ struct ChatMessagesScrollView: View {
                 let maxOffset = max(0, contentHeight - visibleHeight)
                 let distanceFromBottom = maxOffset - scrollOffset
                 
-                let threshold: CGFloat = 300 + bottomInset // 下端付近とみなすしきい値
+                let threshold: CGFloat = 300 + bottomInset
                 let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
                 
                 return ScrollState(
@@ -206,85 +169,151 @@ struct ChatMessagesScrollView: View {
                     contentOffset: geometry.contentOffset
                 )
             } action: { _, newValue in
-                // 変更があった時のみシグナルを送る
-                // より微細な高さ変化（0.5px）も検知して、スクロール追従の精度を上げる
-                let heightChanged = abs((latestScrollState?.contentHeight ?? 0) - newValue.contentHeight) > 0.5
-                let nearBottomChanged = (latestScrollState?.nearBottom ?? false) != newValue.nearBottom
-                
-                if heightChanged || nearBottomChanged {
+                // ストリーミング中は最新のスクロール状態の更新をスロットリング（10Hz）し、
+                // RTIInputSystemClient（テキスト入力管理）への負荷を軽減する
+                let now = Date()
+                if !isOverallStreaming || now.timeIntervalSince(lastStateUpdateTime) >= 0.1 {
                     latestScrollState = newValue
+                    lastStateUpdateTime = now
+                    isNearBottom = newValue.nearBottom
                 }
             }
-            .task(id: latestScrollState) {
-                guard let state = latestScrollState else { return }
-                
-                let isUserSent = messages.last?.role == "user"
-                
-                do {
-                    // レイアウトの安定を待つ
-                    try await Task.sleep(nanoseconds: 10_000_000)
-                    
-                    await MainActor.run {
-                        if isNearBottom != state.nearBottom {
-                            isNearBottom = state.nearBottom
-                        }
-                        
-                        let now = Date()
-                        let shouldScroll = isUserSent || (isOverallStreaming && state.nearBottom)
-                        let interval: TimeInterval = isOverallStreaming ? 0.05 : 0.1
-                        
-                        if shouldScroll && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= interval {
-                            lastScrollTime = now
-                            scrollBottom(proxy: proxy, force: isUserSent)
+            .task(id: isOverallStreaming) {
+                if isOverallStreaming {
+                    while !Task.isCancelled {
+                        do {
+                            // 15fps程度（約0.06s間隔）でチェックを行い、必要ならスクロール
+                            // 高頻度なスクロール命令によるオーバーヘッドを抑制
+                            try await Task.sleep(nanoseconds: 66_666_666)
+                            
+                            if let state = latestScrollState {
+                                let isUserSent = messages.last?.role == "user"
+                                let now = Date()
+                                let shouldScroll = isUserSent || state.nearBottom
+                                
+                                if shouldScroll && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.05 {
+                                    lastScrollTime = now
+                                    // [CRITICAL] ストリーミング中はアニメーションなしでスクロール
+                                    // 30Hz近くでアニメーションを開始し続けると、visionOSのレイアウトエンジンが飽和し、
+                                    // 1メッセージだけでも100%負荷になります。
+                                    scrollBottom(proxy: proxy, force: isUserSent, animated: false)
+                                }
+                            }
+                        } catch {
+                            break
                         }
                     }
-                } catch {}
-            }
-            .task(id: isOverallStreaming) {
-                // ストリーミング開始時と終了時の両方で、最新の状態に基づいたスクロール判定をトリガーする
-                let isUserSent = messages.last?.role == "user"
-                if latestScrollState?.nearBottom ?? false || isUserSent {
-                    await MainActor.run {
-                        scrollBottom(proxy: proxy, force: isUserSent)
+                } else {
+                    let isUserSent = messages.last?.role == "user"
+                    if latestScrollState?.nearBottom ?? false || isUserSent {
+                        scrollBottom(proxy: proxy, force: isUserSent, animated: true)
                     }
                 }
             }
             .onChange(of: isOverallStreaming) { _, newValue in
-                let isUserSent = messages.last?.role == "user"
                 if newValue {
-                    // ストリーミング開始時（送信・やり直し）は高さの最大値をリセット
-                    maxMessagesHeight = 0
-                } else {
-                    // ストリーミング終了時
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if latestScrollState?.nearBottom ?? false {
-                            scrollBottom(proxy: proxy, force: isUserSent)
-                        }
-                    }
+                    scrollBottom(proxy: proxy, force: true, animated: true)
                 }
             }
-            .onChange(of: messages.count) { _, _ in
-                // メッセージ数が変わった（送信・削除・リセット）時は高さの最大値をリセットし
-                // 新しいレイアウトを正しく追従できるようにする
-                maxMessagesHeight = 0
-            }
             .onChange(of: scrollToBottomTrigger) { _, _ in
-                scrollBottom(proxy: proxy, force: true)
+                scrollBottom(proxy: proxy, force: true, animated: true)
             }
         }
     }
     
-    private func scrollBottom(proxy: ScrollViewProxy, force: Bool = false) {
-        if !force, let state = latestScrollState {
-            let targetOffset = state.contentHeight - state.containerHeight
-            // 目標値が現在の位置より上にある（巻き戻りが発生する）場合は、自動スクロールを実行しない
-            if targetOffset < state.contentOffset.y - 1 {
-                return
+    private func scrollBottom(proxy: ScrollViewProxy, force: Bool = false, animated: Bool = true) {
+        if force || (latestScrollState?.nearBottom ?? false) {
+            if animated && !reduceMotionEnabled {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    proxy.scrollTo("bottom-spacer", anchor: .bottom)
+                }
+            } else {
+                proxy.scrollTo("bottom-spacer", anchor: .bottom)
             }
         }
-        withAnimation(reduceMotionEnabled ? .none : .easeInOut(duration: 0.25)) {
-            proxy.scrollTo("bottom-spacer", anchor: .bottom)
+    }
+}
+
+// MARK: - Subviews
+
+/// メッセージのリスト表示と高さ監視をカプセル化するビュー
+/// このビュー内での高さ変更による再描画を親（ScrollView）に波及させない
+struct MessagesList: View {
+    @Environment(CommandExecutor.self) var executor
+    @Environment(ChatSettings.self) var chatSettings
+    @Binding var messages: [ChatMessage]
+    @Binding var isOverallStreaming: Bool
+    let isModelSelected: Bool
+    let onRetry: ((UUID, ChatMessage) -> Void)?
+    
+    @State private var maxMessagesHeight: CGFloat = 0
+    @State private var currentMessagesHeight: CGFloat = 0
+    @State private var lastGeometryUpdateTime: Date = .distantPast
+    
+    // パフォーマンス最適化のためのメモ化された状態
+    @State private var lastAssistantId: UUID? = nil
+    @State private var lastUserId: UUID? = nil
+    @State private var memoizedModelName: String? = nil
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(messages) { message in
+                MessageViewWrapper(
+                    message: message,
+                    isLastAssistantMessage: message.id == lastAssistantId,
+                    isLastOwnUserMessage: message.id == lastUserId,
+                    selectedModelName: memoizedModelName,
+                    onRetry: onRetry,
+                    onPreviewImage: { image in
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            executor.previewImage = image
+                        }
+                    },
+                    isOverallStreaming: $isOverallStreaming,
+                    isModelSelected: isModelSelected
+                )
+                .id(message.id)
+            }
         }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+        } action: { newValue in
+            // ストリーミング中はレイアウト計算の連鎖を防ぐため、高階層のState更新をスロットリング（5Hz）
+            let now = Date()
+            if !isOverallStreaming || now.timeIntervalSince(lastGeometryUpdateTime) >= 0.2 {
+                currentMessagesHeight = newValue
+                if newValue > maxMessagesHeight {
+                    maxMessagesHeight = newValue
+                }
+                lastGeometryUpdateTime = now
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Chat messages")
+        .padding()
+        .onChange(of: isOverallStreaming, initial: true) { _, newValue in
+            if newValue {
+                maxMessagesHeight = 0
+            }
+            updateMemoizedState()
+        }
+        .onChange(of: messages.count, initial: true) { _, _ in
+            maxMessagesHeight = 0
+            updateMemoizedState()
+        }
+        .onChange(of: chatSettings.selectedModelID) { _, _ in
+            updateMemoizedState()
+        }
+        
+        if maxMessagesHeight > currentMessagesHeight {
+            Spacer(minLength: maxMessagesHeight - currentMessagesHeight)
+        }
+    }
+    
+    private func updateMemoizedState() {
+        lastAssistantId = messages.last(where: { $0.role == "assistant" })?.id
+        lastUserId = messages.last(where: { $0.role == "user" })?.id
+        memoizedModelName = chatSettings.selectedModelID.flatMap { executor.modelsByID[$0]?.name }
     }
 }
 
@@ -298,27 +327,33 @@ struct MessageViewWrapper: View, Equatable {
     @Binding var isOverallStreaming: Bool
     let isModelSelected: Bool
     
-    // Equatableの実装
     static func == (lhs: MessageViewWrapper, rhs: MessageViewWrapper) -> Bool {
-        // メッセージオブジェクト自体が異なる場合は再描画
+        // オブジェクトの同一性をチェック（基本同じインスタンスであることを前提）
         guard lhs.message === rhs.message else { return false }
         
-        // メッセージの内容や状態が変更されている場合は再描画が必要。
-        // ※ Observableクラスのプロパティ変更はSwiftUIが個別に検知しますが、
-        //   View全体の再評価を抑えるためにEquatableで明示的にチェックします。
-        return lhs.message.content == rhs.message.content &&
-               lhs.message.thinking == rhs.message.thinking &&
-               lhs.message.isStreaming == rhs.message.isStreaming &&
-               lhs.message.isStopped == rhs.message.isStopped &&
+        // 基本属性の変更をチェック
+        if lhs.isLastAssistantMessage != rhs.isLastAssistantMessage ||
+           lhs.isLastOwnUserMessage != rhs.isLastOwnUserMessage ||
+           lhs.isModelSelected != rhs.isModelSelected ||
+           lhs.selectedModelName != rhs.selectedModelName ||
+           lhs.isOverallStreaming != rhs.isOverallStreaming {
+            return false
+        }
+        
+        // [CRITICAL] ストリーミング中または画像処理中の場合のみ、重い文字列比較を行う。
+        // これにより、膨大な過去メッセージ（数千〜数万文字）に対する毎フレームの文字列比較を回避し、CPU負荷を劇的に低減する。
+        if lhs.message.isStreaming || lhs.message.isProcessingImages || rhs.message.isStreaming {
+            return lhs.message.content == rhs.message.content &&
+                   lhs.message.thinking == rhs.message.thinking &&
+                   lhs.message.isThinkingCompleted == rhs.message.isThinkingCompleted
+        }
+        
+        // 完了済みメッセージについては、メタデータのみ比較
+        return lhs.message.isStopped == rhs.message.isStopped &&
                lhs.message.isCopied == rhs.message.isCopied &&
-               lhs.message.isDownloadSuccessful == rhs.message.isDownloadSuccessful &&
                lhs.message.currentRevisionIndex == rhs.message.currentRevisionIndex &&
                lhs.message.revisions.count == rhs.message.revisions.count &&
-               lhs.isLastAssistantMessage == rhs.isLastAssistantMessage &&
-               lhs.isLastOwnUserMessage == rhs.isLastOwnUserMessage &&
-               lhs.isModelSelected == rhs.isModelSelected &&
-               lhs.selectedModelName == rhs.selectedModelName &&
-               lhs.isOverallStreaming == rhs.isOverallStreaming
+               lhs.message.isDownloadSuccessful == rhs.message.isDownloadSuccessful
     }
     
     var body: some View {

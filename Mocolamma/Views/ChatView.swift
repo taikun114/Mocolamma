@@ -674,13 +674,15 @@ struct ChatView: View {
         var displayedThinkingLength = 0
         
         // --- ディスペンサー（排出）ループ ---
-        // メインスレッドの負荷を計測しながら、バッファからUIへ少しずつ流し込む
         let dispenserTask = Task {
-            var currentInterval: TimeInterval = 0.033 // 目標 30fps
-            var charsPerTick: Int = 30 // 1回あたりに追加する文字数（ベース）
+#if os(visionOS)
+            var currentInterval: TimeInterval = 0.066 // visionOSは15fpsから開始して負荷を抑制
+#else
+            var currentInterval: TimeInterval = 0.033 // 他は30fps
+#endif
+            var charsPerTick: Int = 30
             
             while true {
-                // ストリーミング終了＆バッファ排出済みならループを抜ける
                 if buffer.isStreamingFinished && 
                    buffer.rawContent.count <= displayedContentLength && 
                    buffer.rawThinking.count <= displayedThinkingLength {
@@ -689,28 +691,27 @@ struct ChatView: View {
                 
                 let tickStart = Date()
                 
-                // バッファが大量に溜まっている（渋滞）場合は、排出量を増やして追いつく
                 let lag = (buffer.rawContent.count - displayedContentLength) + (buffer.rawThinking.count - displayedThinkingLength)
-                let adaptiveChars = charsPerTick + (lag > 200 ? (lag / 100) * 10 : 0) // 200文字以上のラグでさらに加速
+                let adaptiveChars = charsPerTick + (lag > 200 ? (lag / 100) * 10 : 0)
                 
-                // 次の排出目標
                 let targetC = min(buffer.rawContent.count, displayedContentLength + adaptiveChars)
                 let targetT = min(buffer.rawThinking.count, displayedThinkingLength + adaptiveChars)
                 
                 let nextC = String(buffer.rawContent.prefix(targetC))
                 let nextT = String(buffer.rawThinking.prefix(targetT))
                 
-                // UI更新
                 if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }) {
-                    executor.chatMessages[index].content = nextC
-                    executor.chatMessages[index].latestContent = nextC
-                    executor.chatMessages[index].thinking = nextT.isEmpty ? nil : nextT
-                    executor.chatMessages[index].isThinkingCompleted = buffer.isThinkingCompleted
+                    // プロパティ更新を一括化してObservationの通知回数を削減
+                    executor.chatMessages[index].updateStreamingContent(
+                        content: nextC,
+                        thinking: nextT.isEmpty ? nil : nextT,
+                        isThinkingCompleted: buffer.isThinkingCompleted
+                    )
                     
                     displayedContentLength = targetC
                     displayedThinkingLength = targetT
                 } else {
-                    break // メッセージが削除された場合など
+                    break
                 }
                 
                 let tickEnd = Date()
@@ -718,11 +719,9 @@ struct ChatView: View {
                 
                 // --- メインスレッド負荷に応じた適応的調整 ---
                 if updateDuration > 0.016 {
-                    // 重い場合：更新頻度を下げ、1回あたりの排出量を減らして描画負荷を抑える
                     currentInterval = min(0.25, currentInterval + 0.02)
                     charsPerTick = max(5, charsPerTick - 1)
                 } else if updateDuration < 0.008 && lag > 0 {
-                    // 余裕がある：更新頻度を上げ、排出量を増やしてスムーズに見せる
                     currentInterval = max(0.01, currentInterval - 0.005)
                     charsPerTick = min(300, charsPerTick + 5)
                 }
@@ -734,16 +733,16 @@ struct ChatView: View {
             // 最終確定処理
             if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
                let chunk = buffer.finalChunk {
-                executor.chatMessages[index].content = buffer.rawContent
-                executor.chatMessages[index].thinking = buffer.rawThinking.isEmpty ? nil : buffer.rawThinking
-                executor.chatMessages[index].totalDuration = chunk.totalDuration
-                executor.chatMessages[index].evalCount = chunk.evalCount
-                executor.chatMessages[index].evalDuration = chunk.evalDuration
-                executor.chatMessages[index].isStreaming = false
+                let isThinkingCompleted = chatSettings.thinkingOption == .on && buffer.rawThinking.count > 0
                 
-                if chatSettings.thinkingOption == .on && executor.chatMessages[index].thinking != nil {
-                    executor.chatMessages[index].isThinkingCompleted = true
-                }
+                executor.chatMessages[index].finalizeStreaming(
+                    content: buffer.rawContent,
+                    thinking: buffer.rawThinking.isEmpty ? nil : buffer.rawThinking,
+                    totalDuration: chunk.totalDuration,
+                    evalCount: chunk.evalCount,
+                    evalDuration: chunk.evalDuration,
+                    isThinkingCompleted: isThinkingCompleted
+                )
                 
                 executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
                 executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
