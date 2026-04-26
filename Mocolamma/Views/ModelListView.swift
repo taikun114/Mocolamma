@@ -418,8 +418,10 @@ struct ModelListView: View {
         .onChange(of: selectedFilterTag) { _, _ in updateSortedAndFilteredModels() }
         .onChange(of: sortOrder) { _, _ in updateSortedAndFilteredModels() }
         .onChange(of: executor.isPulling) { oldValue, newValue in
-            if oldValue == true && newValue == false && executor.pullProgress >= 1.0 {
-                ReviewManager.shared.requestReviewIfAppropriate(requestReviewAction: requestReview)
+            if oldValue, !newValue {
+                if executor.pullProgress >= 1.0 {
+                    ReviewManager.shared.requestReviewIfAppropriate(requestReviewAction: requestReview)
+                }
             }
         }
         .onChange(of: executor.isPullingErrorHold) { _, newValue in
