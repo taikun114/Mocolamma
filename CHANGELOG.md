@@ -46,6 +46,11 @@ In version 1.2.2 or earlier, it was listed as follows:
 -->
 
 ## 1.3.1
+### New Features
+#### Chat
+- **Support selecting thinking levels**
+  - You can now select thinking levels from "Off", "Low", "Medium", "High", and "Max" for thinking-capable models. In addition, "None" has been renamed to "Default".
+
 ### Bug Fixes and Improvements
 #### Chat
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**

@@ -1387,7 +1387,7 @@ struct MarkdownTestView: View {
 これがMarkdownでサポートされる最小レベルの見出しです。通常、本文に近いサイズになりますが、太字や色などのスタイリングで構造が維持されていることを確認してください。
 """#
                         
-                        let thinkingResponse = thinkingOption == .on ? markdownText : nil
+                        let thinkingResponse = thinkingOption.isThinkingRequested ? markdownText : nil
                         
                         let responseChunk = ChatResponseChunk(
                             model: model,
@@ -1417,8 +1417,8 @@ struct MarkdownTestView: View {
                     if stream {
                         // ストリーミングモード（stream: true）
                         
-                        // チンキングオプションがONの場合、Thinkingメッセージを送信
-                        if thinkingOption == .on {
+                        // 思考オプションが有効な場合、Thinkingメッセージを送信
+                        if thinkingOption.isThinkingRequested {
                             let thinkingMessages = ["Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".!"]
                             
                             for thinkingMessage in thinkingMessages {
@@ -1500,7 +1500,7 @@ struct MarkdownTestView: View {
                         
                         // 思考モードが有効な場合、thinkingプロパティを持つメッセージを含める
                         let fullResponse = "This is a test!"
-                        let thinkingResponse = thinkingOption == .on ? "Testing... Testing... Testing...!" : nil
+                        let thinkingResponse = thinkingOption.isThinkingRequested ? "Testing... Testing... Testing...!" : nil
                         
                         let responseChunk = ChatResponseChunk(
                             model: model,
@@ -1585,15 +1585,15 @@ struct MarkdownTestView: View {
                         }
                     }
                     
-                    let chatRequest: ChatRequest
-                    switch thinkingOption {
-                    case .none:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: nil, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    case .on:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: true, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    case .off:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: false, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    }
+                    let chatRequest = ChatRequest(
+                        model: model,
+                        messages: finalMessages,
+                        stream: stream,
+                        think: thinkingOption.apiValue,
+                        keepAlive: keepAlive,
+                        options: chatOptions,
+                        tools: tools
+                    )
                     
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化

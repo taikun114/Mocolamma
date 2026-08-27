@@ -255,7 +255,7 @@ struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
     let stream: Bool
-    let think: Bool?
+    let think: JSONValue?
     let keepAlive: JSONValue?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
@@ -284,14 +284,44 @@ struct ChatRequest: Codable {
 
 /// チャットリクエストの思考オプションを表します。
 enum ThinkingOption: String, CaseIterable, Identifiable {
-    case none = "ThinkingOption_None"
-    case on = "ThinkingOption_On"
+    case defaultOption = "ThinkingOption_Default"
     case off = "ThinkingOption_Off"
+    case low = "ThinkingOption_Low"
+    case medium = "ThinkingOption_Medium"
+    case high = "ThinkingOption_High"
+    case max = "ThinkingOption_Max"
     
     var id: String { self.rawValue }
     
     var localizedName: LocalizedStringKey {
         LocalizedStringKey(rawValue)
+    }
+    
+    var apiValue: JSONValue? {
+        switch self {
+        case .defaultOption:
+            return nil
+        case .off:
+            return .bool(false)
+        case .low:
+            return .string("low")
+        case .medium:
+            return .string("medium")
+        case .high:
+            return .string("high")
+        case .max:
+            return .string("max")
+        }
+    }
+    
+    /// デモ環境などで思考出力を行うべきかどうかを判定します。
+    var isThinkingRequested: Bool {
+        switch self {
+        case .defaultOption, .off:
+            return false
+        case .low, .medium, .high, .max:
+            return true
+        }
     }
 }
 
@@ -673,7 +703,7 @@ class ChatSettings {
     var contextWindowValue: Double = 2048.0
     var isSystemPromptEnabled: Bool = false
     var systemPrompt: String = ""
-    var thinkingOption: ThinkingOption = .none
+    var thinkingOption: ThinkingOption = .defaultOption
     
     // 追加のカスタム設定
     var repeatLastNOption: RepeatLastNOption = .none
