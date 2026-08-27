@@ -45,6 +45,11 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
+## 1.3.1
+### Bug Fixes and Improvements
+#### Chat
+- **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
+
 ## 1.3.0
 ### New Features
 #### Model

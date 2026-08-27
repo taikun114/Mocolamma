@@ -794,13 +794,13 @@ struct ChatView: View {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
                 
                 if let messageChunk = chunk.message {
-                    if chatSettings.thinkingOption == .on {
-                        if let apiThinking = messageChunk.thinking { buffer.rawThinking += apiThinking }
-                        if !messageChunk.content.isEmpty {
-                            buffer.rawContent += messageChunk.content
-                            buffer.isThinkingCompleted = true
-                        }
-                    } else {
+                    // APIから返されたネイティブな思考テキストの処理
+                    if let apiThinking = messageChunk.thinking, !apiThinking.isEmpty {
+                        buffer.rawThinking += apiThinking
+                    }
+                    
+                    // 本文コンテンツおよびインライン<think>タグの処理
+                    if !messageChunk.content.isEmpty {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
                             isInsideThinkingBlock = true
@@ -816,6 +816,10 @@ struct ChatView: View {
                             buffer.rawThinking += current
                         } else {
                             buffer.rawContent += current
+                            // 本文が届き始めた時点で、思考テキストが存在していれば思考完了とみなす
+                            if !buffer.rawThinking.isEmpty {
+                                buffer.isThinkingCompleted = true
+                            }
                         }
                     }
                     
