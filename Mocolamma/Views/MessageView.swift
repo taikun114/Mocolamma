@@ -35,7 +35,6 @@ struct MessageView: View {
     @State private var isFileExporterPresented: Bool = false
     @State private var imageDocument: ImageDocument?
     @State private var isThinkingExpanded: Bool = false
-    @State private var isStreamingSettled: Bool = true
     
     private var isDownloadSuccessful: Bool {
         message.isDownloadSuccessful
@@ -248,15 +247,6 @@ struct MessageView: View {
             .opacity(1.0)
 #endif
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
-            .onChange(of: message.isStreaming) { _, newValue in
-                if !newValue {
-                    // ストリーミング終了後、マークダウンの再描画などが安定するまで少し待ってから機能を有効化
-                    isStreamingSettled = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        isStreamingSettled = true
-                    }
-                }
-            }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
         .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
@@ -1166,8 +1156,8 @@ struct MessageView: View {
                     StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textualSelection(enabled: isStreamingSettled && !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
-                        .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming && !isStreamingAny)
+                        .textualSelection(enabled: true)
+                        .textual.syntaxHighlightingEnabled(true)
                         .textual.overflowMode(.scroll)
                 } else {
                     Text("Failed to generate image.")
@@ -1205,8 +1195,8 @@ struct MessageView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textualSelection(enabled: isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
-                            .textual.syntaxHighlightingEnabled(isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
+                            .textualSelection(enabled: true)
+                            .textual.syntaxHighlightingEnabled(true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
@@ -1239,8 +1229,8 @@ struct MessageView: View {
                 StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
-                    .textualSelection(enabled: isStreamingSettled && !message.isStreaming)
-                    .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming)
+                    .textualSelection(enabled: true)
+                    .textual.syntaxHighlightingEnabled(true)
                     .textual.overflowMode(.scroll)
             }
         } else {

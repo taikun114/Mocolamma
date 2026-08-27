@@ -49,6 +49,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 ### Bug Fixes and Improvements
 #### Chat
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
+- **Fix issue where scrolling would sometimes jump when streaming completed**
 
 ## 1.3.0
 ### New Features

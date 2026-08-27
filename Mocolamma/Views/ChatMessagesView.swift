@@ -226,11 +226,6 @@ struct ChatMessagesScrollView: View {
                             break
                         }
                     }
-                } else {
-                    let isUserSent = messages.last?.role == "user"
-                    if latestScrollState?.nearBottom ?? false || isUserSent {
-                        scrollBottom(proxy: proxy, force: isUserSent, animated: true)
-                    }
                 }
             }
             .onChange(of: isOverallStreaming) { _, newValue in
@@ -277,10 +272,6 @@ struct MessagesList: View {
     let isModelSelected: Bool
     let onRetry: ((UUID, ChatMessage) -> Void)?
     
-    @State private var maxMessagesHeight: CGFloat = 0
-    @State private var currentMessagesHeight: CGFloat = 0
-    @State private var lastGeometryUpdateTime: Date = .distantPast
-    
     // パフォーマンス最適化のためのメモ化された状態
     @State private var lastAssistantId: UUID? = nil
     @State private var lastUserId: UUID? = nil
@@ -306,38 +297,17 @@ struct MessagesList: View {
                 .id(message.id)
             }
         }
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.height
-        } action: { newValue in
-            // ストリーミング中はレイアウト計算の連鎖を防ぐため、高階層のState更新をスロットリング（5Hz）
-            let now = Date()
-            if !isOverallStreaming || now.timeIntervalSince(lastGeometryUpdateTime) >= 0.2 {
-                currentMessagesHeight = newValue
-                if newValue > maxMessagesHeight {
-                    maxMessagesHeight = newValue
-                }
-                lastGeometryUpdateTime = now
-            }
-        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Chat messages")
         .padding()
-        .onChange(of: isOverallStreaming, initial: true) { _, newValue in
-            if newValue {
-                maxMessagesHeight = 0
-            }
+        .onChange(of: isOverallStreaming, initial: true) { _, _ in
             updateMemoizedState()
         }
         .onChange(of: messages.count, initial: true) { _, _ in
-            maxMessagesHeight = 0
             updateMemoizedState()
         }
         .onChange(of: chatSettings.selectedModelID) { _, _ in
             updateMemoizedState()
-        }
-        
-        if maxMessagesHeight > currentMessagesHeight {
-            Spacer(minLength: maxMessagesHeight - currentMessagesHeight)
         }
     }
     
