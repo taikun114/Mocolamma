@@ -1271,7 +1271,8 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
+                    do {
+                        let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
                     let isMarkdownTest = lastUserMessage == "Test Markdown" || lastUserMessage == "Markdownをテスト" || lastUserMessage == "マークダウンをテスト"
                     
                     let created_at = Date()
@@ -1523,11 +1524,14 @@ struct MarkdownTestView: View {
                         continuation.yield(responseChunk)
                         continuation.finish()
                     }
+                } catch {
+                    continuation.finish(throwing: error)
                 }
             }
         }
+    }
         
-        return AsyncThrowingStream { continuation in
+    return AsyncThrowingStream { continuation in
             Task { @MainActor in // UIプロパティを安全に更新するためにMainActorで実行することを保証
                 guard let apiBaseURL = self.apiBaseURL else {
                     continuation.finish(throwing: URLError(.badURL))
@@ -1654,7 +1658,8 @@ struct MarkdownTestView: View {
             // ... (demo logic)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    let created_at = Date()
+                    do {
+                        let created_at = Date()
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
                     let createdAtString = formatter.string(from: created_at)
@@ -1736,11 +1741,14 @@ struct MarkdownTestView: View {
                         continuation.yield(finalChunk)
                         continuation.finish()
                     }
+                } catch {
+                    continuation.finish(throwing: error)
                 }
             }
         }
-        
-        return AsyncThrowingStream { continuation in
+    }
+    
+    return AsyncThrowingStream { continuation in
             Task { @MainActor in
                 guard let apiBaseURL = self.apiBaseURL else {
                     continuation.finish(throwing: URLError(.badURL))
