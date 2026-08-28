@@ -56,6 +56,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve the appearance of the license screens**
 
 #### Chat and Image Generation
+- **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
 - **Improve the appearance of the message input area and scroll to bottom button on macOS Golden Gate**
 
 #### Chat
