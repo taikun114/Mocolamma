@@ -82,26 +82,26 @@ struct ChatView: View {
     }
     
     @ViewBuilder
-    private func makeSafeAreaBarContent() -> some View {
+    private var chatInputArea: some View {
         @Bindable var executor = executor
-        VStack(spacing: 0) {
-#if !os(visionOS)
-            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-#endif
-            
-            ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                sendMessage()
-            } stopMessage: {
-                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                    executor.updateIsChatStreaming()
-                }
-                executor.isChatStreaming = false
-                executor.cancelChatStreaming()
+        ChatInputView(
+            inputText: $executor.chatInputText,
+            selectedImages: $executor.chatInputImages,
+            isStreaming: $executor.isChatStreaming,
+            showingInspector: $showingInspector,
+            placeholder: "Type your message...",
+            selectedModel: currentSelectedModel
+        ) {
+            sendMessage()
+        } stopMessage: {
+            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+                executor.updateIsChatStreaming()
             }
+            executor.isChatStreaming = false
+            executor.cancelChatStreaming()
         }
-        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -112,6 +112,16 @@ struct ChatView: View {
             inputAreaHeight = newValue
         }
 #endif
+    }
+    
+    @ViewBuilder
+    private var scrollToBottomArea: some View {
+        @Bindable var executor = executor
+        ScrollToBottomButton(
+            isNearBottom: isNearBottom,
+            messagesEmpty: executor.chatMessages.isEmpty,
+            scrollToBottomTrigger: $scrollToBottomTrigger
+        )
     }
     
     var body: some View {
@@ -145,7 +155,7 @@ struct ChatView: View {
                 .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
             }
             .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                makeSafeAreaBarContent()
+                chatInputArea
                     .frame(width: 600)
                     .padding(16)
                     .glassBackgroundEffect()
@@ -153,28 +163,48 @@ struct ChatView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 chatContent
-                    .safeAreaBar(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        chatInputArea
                             .if(horizontalSizeClass != .compact) { view in
                                 view.ignoresSafeArea(.container, edges: [.bottom])
                             }
                     }
             }
 #else
-            if #available(macOS 26.0, *) {
+            if #available(macOS 27.0, *) {
                 chatContent
-                    .safeAreaBar(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        chatInputArea
+                    }
+            } else if #available(macOS 26.0, *) {
+                chatContent
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             }
 #endif
@@ -949,32 +979,25 @@ struct ImageGenerationView: View {
     }
     
     @ViewBuilder
-    private func makeInputArea() -> some View {
+    private var imageInputArea: some View {
         @Bindable var executor = executor
-        VStack(spacing: 0) {
-#if !os(visionOS)
-            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-#endif
-            
-            ChatInputView(
-                inputText: $executor.chatInputText,
-                selectedImages: $executor.imageInputImages,
-                isStreaming: $executor.isImageStreaming,
-                showingInspector: $showingInspector,
-                placeholder: "Enter a prompt...",
-                selectedModel: currentSelectedModel
-            ) {
-                generateImage()
-            } stopMessage: {
-                if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
-                    last.isStreaming = false
-                    last.isStopped = true
-                }
-                executor.isImageStreaming = false
-                executor.cancelImageGeneration()
+        ChatInputView(
+            inputText: $executor.chatInputText,
+            selectedImages: $executor.imageInputImages,
+            isStreaming: $executor.isImageStreaming,
+            showingInspector: $showingInspector,
+            placeholder: "Enter a prompt...",
+            selectedModel: currentSelectedModel
+        ) {
+            generateImage()
+        } stopMessage: {
+            if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
+                last.isStreaming = false
+                last.isStopped = true
             }
+            executor.isImageStreaming = false
+            executor.cancelImageGeneration()
         }
-        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -985,6 +1008,16 @@ struct ImageGenerationView: View {
             inputAreaHeight = newValue
         }
 #endif
+    }
+    
+    @ViewBuilder
+    private var scrollToBottomArea: some View {
+        @Bindable var executor = executor
+        ScrollToBottomButton(
+            isNearBottom: isNearBottom,
+            messagesEmpty: executor.imageMessages.isEmpty,
+            scrollToBottomTrigger: $scrollToBottomTrigger
+        )
     }
     
     var body: some View {
@@ -1018,7 +1051,7 @@ struct ImageGenerationView: View {
                 .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
             }
             .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                makeInputArea()
+                imageInputArea
                     .frame(width: 600)
                     .padding(16)
                     .glassBackgroundEffect()
@@ -1026,25 +1059,48 @@ struct ImageGenerationView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 content
-                    .safeAreaBar(edge: .bottom) {
-                        makeInputArea()
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom) {
-                        makeInputArea()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        imageInputArea
+                            .if(horizontalSizeClass != .compact) { view in
+                                view.ignoresSafeArea(.container, edges: [.bottom])
+                            }
                     }
             }
 #else
-            if #available(macOS 26.0, *) {
+            if #available(macOS 27.0, *) {
                 content
-                    .safeAreaBar(edge: .bottom) {
-                        makeInputArea()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        imageInputArea
+                    }
+            } else if #available(macOS 26.0, *) {
+                content
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom) {
-                        makeInputArea()
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             }
 #endif

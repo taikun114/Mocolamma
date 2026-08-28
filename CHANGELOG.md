@@ -55,6 +55,9 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### General
 - **Improve the appearance of the license screens**
 
+#### Chat and Image Generation
+- **Improve the appearance of the message input area and scroll to bottom button on macOS Golden Gate**
+
 #### Chat
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
 - **Fix issue where scrolling would sometimes jump when streaming completed**
