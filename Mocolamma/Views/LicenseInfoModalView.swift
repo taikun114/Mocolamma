@@ -38,12 +38,12 @@ struct LicenseInfoModalView: View {
         Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"
     }
     
-    private let compactSliderVersionString: String = "2.0.9"
-    private let textualVersionString: String = "1.0.0"
-    private let universalSFSymbolsPickerVersionString: String = "0.2.0"
+    private let compactSliderVersionString: String = "2.1.0"
+    private let textualVersionString: String = "1.1.1"
+    private let universalSFSymbolsPickerVersionString: String = "1.1.0"
     private let geminiCLIVersionString: String = "0.35.3"
     private let qwenCodeVersionString: String = "0.12.3"
-    private let createDmgVersionString: String = "1.2.2"
+    private let createDmgVersionString: String = "1.3.0"
     private let openCodeVersionString: String = "0.4.2"
     
     // スクロール軸の決定

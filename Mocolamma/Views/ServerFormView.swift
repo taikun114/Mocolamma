@@ -309,8 +309,9 @@ struct SymbolPickerWrapper: View {
             ),
             showAs: showAs,
             showSearchBar: showAs == .popover, // ポップオーバー時はカスタム検索バーを表示、シート時は非表示
+            searchText: $searchText,
             showIconName: true,
-            searchText: $searchText
+            showRecents: true
         )
         .conditionalSearchable(show: showAs == .sheet, text: $searchText)
     }
@@ -341,13 +342,13 @@ extension View {
             }
         }
 #else
-        self.popover(isPresented: isPresented, arrowEdge: .top) {
+        self.popover(isPresented: isPresented, arrowEdge: .leading) {
             SymbolPickerWrapper(
                 isPresented: isPresented,
                 selection: selection,
                 showAs: .popover
             )
-            .frame(width: 500, height: 400)
+            .frame(width: 400, height: 500)
         }
 #endif
     }
