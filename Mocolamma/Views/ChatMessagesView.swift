@@ -159,7 +159,7 @@ struct ChatMessagesScrollView: View {
 #if os(iOS)
             .scrollDismissesKeyboard(.interactively)
 #endif
-            .modifier(SoftEdgeIfAvailable(enabled: supportsEffects))
+            .adaptiveScrollEdgeEffect(enabled: supportsEffects)
             .onScrollPhaseChange { oldPhase, newPhase in
                 if newPhase == .interacting || newPhase == .decelerating {
                     isUserInteracting = true

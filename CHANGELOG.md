@@ -52,6 +52,9 @@ In version 1.2.2 or earlier, it was listed as follows:
   - You can now select thinking levels from "Off", "Low", "Medium", "High", and "Max" for thinking-capable models. In addition, "None" has been renamed to "Default".
 
 ### Bug Fixes and Improvements
+#### General
+- **Improve the appearance of the license screens**
+
 #### Chat
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
 - **Fix issue where scrolling would sometimes jump when streaming completed**
