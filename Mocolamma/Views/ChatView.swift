@@ -87,6 +87,7 @@ struct ChatView: View {
         ChatInputView(
             inputText: $executor.chatInputText,
             selectedImages: $executor.chatInputImages,
+            selectedAttachments: $executor.chatInputAttachments,
             isStreaming: $executor.isChatStreaming,
             showingInspector: $showingInspector,
             placeholder: "Type your message...",
@@ -225,7 +226,7 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
-        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
+        .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true))
         .task {
             // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
             if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
@@ -487,7 +488,7 @@ struct ChatView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty || !executor.chatInputAttachments.isEmpty else { return }
         
         // ビジョン非対応モデルで画像がある場合の警告チェック
         if !executor.chatInputImages.isEmpty && !model.supportsVision {
@@ -501,14 +502,14 @@ struct ChatView: View {
     private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
         let text = executor.chatInputText
         let imagesData = skipImages ? [] : executor.chatInputImages.map { $0.data }
+        let attachments = executor.chatInputAttachments
         
         executor.chatInputText = ""
-        if !skipImages {
-            executor.chatInputImages = []
-        }
+        executor.chatInputImages = []
+        executor.chatInputAttachments = []
         executor.isChatStreaming = true
         
-        let userMessage = ChatMessage(role: "user", content: text, images: nil, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: attachments.isEmpty ? nil : attachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         userMessage.isProcessingImages = !imagesData.isEmpty
         executor.chatMessages.append(userMessage)
         
@@ -626,6 +627,7 @@ struct ChatView: View {
                 content: archiveContent,
                 thinking: archiveThinking,
                 images: executor.chatMessages[indexToRetry].images,
+                attachments: executor.chatMessages[indexToRetry].attachments,
                 toolCalls: executor.chatMessages[indexToRetry].toolCalls,
                 toolName: executor.chatMessages[indexToRetry].toolName,
                 createdAt: executor.chatMessages[indexToRetry].createdAt,

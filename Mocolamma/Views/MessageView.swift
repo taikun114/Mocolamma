@@ -22,13 +22,17 @@ struct MessageView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.containerHeight) private var containerHeight
     
-    // 編集用画像の状態
+    // 編集用画像および添付ファイルの状態
     @State private var editingImages: [ChatInputImage] = []
+    @State private var editingAttachments: [ChatInputAttachment] = []
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
     @State private var draggingItem: ChatInputImage?
+    @State private var draggingAttachment: ChatInputAttachment?
     @State private var isDraggingOver = false
+    @State private var showingUnsupportedFileAlert = false
+    @State private var unsupportedFileAlertTitle = "This file cannot be attached"
     
     // 保存関連の状態
     @State private var isSaveOptionsPresented: Bool = false
@@ -46,6 +50,27 @@ struct MessageView: View {
 
     private var supportsVision: Bool {
         chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "vision" }) ?? false
+    }
+    
+    private var supportsCompletion: Bool {
+        chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "completion" }) ?? false
+    }
+    
+    private var canAttach: Bool {
+        isModelSelected && (supportsCompletion || supportsVision)
+    }
+    
+    private var isDoneDisabled: Bool {
+        guard isModelSelected && !isStreamingAny else { return true }
+        let hasText = !message.content.isEmpty
+        let hasAttachments = !editingAttachments.isEmpty
+        let hasImages = !editingImages.isEmpty
+        
+        if supportsVision {
+            return !hasText && !hasAttachments && !hasImages
+        } else {
+            return !hasText && !hasAttachments
+        }
     }
     
     static let iso8601Formatter: ISO8601DateFormatter = {
@@ -77,7 +102,7 @@ struct MessageView: View {
                 )
                 .cornerRadius(16)
                 .overlay {
-                    if isEditing && isDraggingOver && supportsVision {
+                    if isEditing && isDraggingOver {
                         ZStack {
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(Color.white.opacity(0.2))
@@ -89,7 +114,7 @@ struct MessageView: View {
                             HStack {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title3)
-                                Text("Drop here to add images")
+                                Text("Drop here to add files")
                                     .font(.system(.body, design: .rounded))
                                     .fontWeight(.bold)
                             }
@@ -97,12 +122,12 @@ struct MessageView: View {
                         }
                     }
                 }
-                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: supportsVision, onURLsDropped: { urls in
-                    if isEditing && supportsVision {
-                        addImages(from: urls)
+                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                    if isEditing {
+                        handleDroppedURLs(urls)
                     }
                 }, onDataDropped: { data in
-                    if isEditing && supportsVision {
+                    if isEditing {
                         addImages(from: data)
                     }
                 }))
@@ -260,12 +285,12 @@ struct MessageView: View {
         }
         .fileImporter(
             isPresented: $showingFilePicker,
-            allowedContentTypes: [.image],
+            allowedContentTypes: ChatInputAttachment.allowedContentTypes,
             allowsMultipleSelection: true
         ) { result in
             switch result {
             case .success(let urls):
-                addImages(from: urls)
+                addFiles(from: urls)
             case .failure(let error):
                 print("Error picking files: \(error.localizedDescription)")
             }
@@ -287,6 +312,85 @@ struct MessageView: View {
             }
             return Date()
         }())
+    }
+    
+    private func addFiles(from urls: [URL]) {
+        Task {
+            for url in urls {
+                let accessing = url.startAccessingSecurityScopedResource()
+                let data = try? Data(contentsOf: url)
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+                
+                guard let data = data else { continue }
+                
+                if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                    let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                }
+            }
+        }
+    }
+    
+    private func handleDroppedURLs(_ urls: [URL]) {
+        Task {
+            var successCount = 0
+            var failureCount = 0
+            
+            for url in urls {
+                let accessing = url.startAccessingSecurityScopedResource()
+                let data = try? Data(contentsOf: url)
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+                
+                guard let data = data else {
+                    failureCount += 1
+                    continue
+                }
+                
+                if PlatformImage(data: data) != nil {
+                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
+                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                        }
+                    }
+                    successCount += 1
+                } else if supportsCompletion, let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                    let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
+                        }
+                    }
+                    successCount += 1
+                } else {
+                    failureCount += 1
+                }
+                try? await Task.sleep(nanoseconds: 20_000_000)
+            }
+            
+            if failureCount > 0 {
+                await MainActor.run {
+                    if successCount > 0 {
+                        unsupportedFileAlertTitle = "Some files could not be attached"
+                    } else if failureCount > 1 {
+                        unsupportedFileAlertTitle = "These files cannot be attached"
+                    } else {
+                        unsupportedFileAlertTitle = "This file cannot be attached"
+                    }
+                    showingUnsupportedFileAlert = true
+                }
+            }
+        }
     }
     
     private func addImages(from urls: [URL]) {
@@ -754,6 +858,7 @@ struct MessageView: View {
                 isEditing = true
                 isEditingFocused = true
                 message.content = message.content
+                editingAttachments = message.attachments ?? []
                 
                 // 画像を編集用にコピー
                 Task {
@@ -869,7 +974,7 @@ struct MessageView: View {
         .buttonStyle(.plain)
 #endif
         .help(String(localized: "Complete editing and retry."))
-        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
+        .disabled(isDoneDisabled)
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
@@ -885,6 +990,14 @@ struct MessageView: View {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             }
         }
+        .alert(
+            Text(LocalizedStringKey(unsupportedFileAlertTitle)),
+            isPresented: $showingUnsupportedFileAlert
+        ) {
+            Button("OK") { }
+        } message: {
+            Text("Only text or image files (vision-capable models only) can be attached.")
+        }
     }
     
     private func performDone(skipImages: Bool = false) {
@@ -892,6 +1005,9 @@ struct MessageView: View {
         
         // 編集内容を反映させるためのTaskを開始
         Task {
+            // 添付ファイルの変更を反映
+            message.attachments = editingAttachments.isEmpty ? nil : editingAttachments
+            
             // 画像の変更を反映
             if editingImages.isEmpty || skipImages {
                 message.images = nil
@@ -925,7 +1041,7 @@ struct MessageView: View {
                         .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
                 }
                 .padding(.vertical, 4)
-            } else if isEditing && message.role == "user" && (supportsVision || !editingImages.isEmpty) {
+            } else if isEditing && message.role == "user" {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(editingImages) { imageContainer in
@@ -959,12 +1075,11 @@ struct MessageView: View {
                                         .font(.system(size: 20))
                                 }
                                 .buttonStyle(.plain)
-                                                                .offset(x: -8, y: -8)
-                                                                }
-                                                                .padding(.top, 0)
-                                                                .padding(.leading, 0)
-                                                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                                
+                                .offset(x: -8, y: -8)
+                            }
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
                             .onDrag {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
@@ -972,8 +1087,34 @@ struct MessageView: View {
                             .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
                         }
                         
-                        // 画像追加タイル (ビジョン対応モデルが選択されている場合のみ表示)
-                        if supportsVision {
+                        ForEach(editingAttachments) { attachment in
+                            ZStack(alignment: .topLeading) {
+                                FileAttachmentTileView(fileName: attachment.name, size: 80, isUserBubble: true)
+                                
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        editingAttachments.removeAll(where: { $0.id == attachment.id })
+                                    }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.white, .black.opacity(0.6))
+                                        .font(.system(size: 20))
+                                }
+                                .buttonStyle(.plain)
+                                .offset(x: -8, y: -8)
+                            }
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+                            .onDrag {
+                                self.draggingAttachment = attachment
+                                return NSItemProvider(object: attachment.id.uuidString as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: AttachmentDropDelegate(item: attachment, items: $editingAttachments, draggingItem: $draggingAttachment, isDraggingOver: .constant(false)))
+                        }
+                        
+                        // ファイルおよび画像追加タイル
+                        if canAttach {
                             Button(action: {
                                 showingAttachSheet = true
                             }) {
@@ -990,29 +1131,24 @@ struct MessageView: View {
                             .buttonStyle(.plain)
                             .padding(.top, 0)
                             .padding(.leading, 0)
-                            .confirmationDialog(
-                                Text("Attach Images"),
+                            .attachFileConfirmationDialog(
                                 isPresented: $showingAttachSheet,
-                                titleVisibility: .visible
-                            ) {
-                                Button(String(localized: "Photo Library...")) {
-                                    showingPhotoPicker = true
-                                }
-                                Button(String(localized: "Choose Files...")) {
-                                    showingFilePicker = true
-                                }
-                                Button(String(localized: "Cancel"), role: .cancel) { }
-                            } message: {
-                                Text("Please select the location of the images you want to attach.")
-                            }
+                                showingFilePicker: $showingFilePicker,
+                                showingPhotoPicker: $showingPhotoPicker,
+                                supportsCompletion: supportsCompletion,
+                                supportsVision: supportsVision
+                            )
                         }
                     }
                     .padding(.horizontal, 4)
                 }
                 .frame(height: 90)
                 .scrollClipDisabled()
-            } else if let images = message.images, !images.isEmpty {
-                // 画像が少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
+            } else if (message.images != nil && !message.images!.isEmpty) || (message.attachments != nil && !message.attachments!.isEmpty) {
+                // 画像・ファイルが少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
+                let images = message.images ?? []
+                let attachments = message.attachments ?? []
+                
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
                         ForEach(images, id: \.self) { base64 in
@@ -1030,6 +1166,9 @@ struct MessageView: View {
                                         }
                                     }
                             }
+                        }
+                        ForEach(attachments) { attachment in
+                            FileAttachmentTileView(fileName: attachment.name, size: 100, isUserBubble: message.role == "user")
                         }
                     }
                     ScrollView(.horizontal) {
@@ -1052,6 +1191,9 @@ struct MessageView: View {
                                             }
                                         }
                                 }
+                            }
+                            ForEach(attachments) { attachment in
+                                FileAttachmentTileView(fileName: attachment.name, size: 100, isUserBubble: message.role == "user")
                             }
                         }
                     }

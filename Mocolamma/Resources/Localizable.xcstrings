@@ -6210,79 +6210,78 @@
         }
       }
     },
-    "Attach Images" : {
-      "comment" : "チャット入力欄の+ボタンをタップしたときに表示される、画像添付アクションシートのタイトル。",
+    "Attach File" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إرفاق صور"
+            "value" : "إرفاق ملف"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilder anhängen"
+            "value" : "Datei anhängen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attach Images"
+            "value" : "Attach File"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adjuntar imágenes"
+            "value" : "Adjuntar archivo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Joindre des images"
+            "value" : "Joindre un fichier"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像を添付"
+            "value" : "ファイルを添付"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이미지 첨부"
+            "value" : "파일 첨부"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прикрепить изображения"
+            "value" : "Прикрепить файл"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прикріпити зображення"
+            "value" : "Прикріпити файл"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加图像"
+            "value" : "附加文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加圖像"
+            "value" : "附加檔案"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加圖像"
+            "value" : "附加檔案"
           }
         }
       }
@@ -7205,83 +7204,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "檢查中…"
-          }
-        }
-      }
-    },
-    "Choose Files..." : {
-      "comment" : "画像添付アクションシート内に表示される、ファイル管理アプリから画像ファイルを選択するためのボタン。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اختر ملفات..."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dateien auswählen..."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Files..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir archivos..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir des fichiers..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルを選択..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "파일 선택..."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать файлы..."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вибрати файли..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择文件..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇檔案..."
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇檔案..."
           }
         }
       }
@@ -11307,79 +11229,78 @@
         }
       }
     },
-    "Drop here to add images" : {
-      "comment" : "ドラッグ&ドロップエリアに表示される、画像をドロップして追加するように促すテキスト。",
+    "Drop here to add files" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "قم بالسحب والإفلات هنا لإضافة الصور"
+            "value" : "أفلت هنا لإضافة ملفات"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hier ablegen, um Bilder hinzuzufügen"
+            "value" : "Hier ablegen, um Dateien hinzuzufügen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drop here to add images"
+            "value" : "Drop here to add files"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suelta aquí para añadir imágenes"
+            "value" : "Suelta aquí para añadir archivos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Déposez ici pour ajouter des images"
+            "value" : "Déposer ici pour ajouter des fichiers"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ここにドロップして画像を追加"
+            "value" : "ファイルを追加するにはここにドロップ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "여기에 드롭하여 이미지 추가"
+            "value" : "파일을 추가하려면 여기에 드롭하세요"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетащите сюда, чтобы добавить изображения"
+            "value" : "Перетащите сюда, чтобы добавить файлы"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетягніть сюди, щоб додати зображення"
+            "value" : "Перетягніть сюди, щоб додати файли"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此处以添加图像"
+            "value" : "拖放到此处以添加文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此處以添加圖像"
+            "value" : "拖放至此以新增檔案"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此處以添加圖像"
+            "value" : "拖放至此以新增檔案"
           }
         }
       }
@@ -22958,6 +22879,83 @@
         }
       }
     },
+    "Only text or image files (vision-capable models only) can be attached." : {
+      "comment" : "ユーザーが非対応のファイルをドロップしたときに表示されるエラーアラートのメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكن فقط إرفاق ملفات النصوص أو الصور (النماذج الداعمة للرؤية فقط)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es können nur Text- oder Bilddateien (nur Modelle mit Vision-Unterstützung) angehängt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only text or image files (vision-capable models only) can be attached."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se pueden adjuntar archivos de texto o imagen (solo modelos con visión)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seuls les fichiers texte ou image (modèles avec vision uniquement) peuvent être joints."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストか画像ファイル（ビジョン対応モデルのみ）の添付にのみ対応しています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "텍스트 또는 이미지 파일(비전 지원 모델 전용)만 첨부할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно прикреплять только текстовые файлы или изображения (только для моделей с поддержкой Vision)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можна прикріплювати лише текстові файли або зображення (лише для моделей із підтримкою Vision)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅支持附加文本或图像文件（仅限支持视觉的模型）。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅支援附加文字或影像檔案（僅限支援視覺的模型）。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只支援附加文字或圖像檔案（只限支援視覺的模型）。"
+          }
+        }
+      }
+    },
     "Open" : {
       "comment" : "開くボタン。",
       "localizations" : {
@@ -25511,83 +25509,6 @@
         }
       }
     },
-    "Please select the location of the images you want to attach." : {
-      "comment" : "チャット入力欄の+ボタンをタップしたときに表示される、画像添付アクションシートのメッセージ。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يرجى تحديد موقع الصور التي تريد إرفاقها."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte wählen Sie den Speicherort der Bilder aus, die Sie anhängen möchten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please select the location of the images you want to attach."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleccione la ubicación de las imágenes que desea adjuntar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez sélectionner l'emplacement des images que vous souhaitez joindre."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "添付したい画像の場所を選択してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "첨부할 이미지의 위치를 선택하십시오."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выберите местоположение изображений, которые вы хотите прикрепить."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Будь ласка, виберіть розташування зображень, які ви хочете прикріпити."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请选择要附加的图像的位置。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請選擇要附加的圖像的位置。"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請選擇要附加的圖像的位置。"
-          }
-        }
-      }
-    },
     "Please select where to save this image." : {
       "comment" : "A message displayed when the user taps the \"Save as File...\" button in the message view. It instructs the user to select a destination for saving the downloaded image.",
       "isCommentAutoGenerated" : true,
@@ -27990,6 +27911,82 @@
         }
       }
     },
+    "Select File..." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد ملف..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei auswählen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select File..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar archivo..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner un fichier..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルを選択..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 선택..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать файл..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрати файл..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择文件..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取檔案..."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取檔案..."
+          }
+        }
+      }
+    },
     "Select Icon" : {
       "comment" : "サーバーアイコンを選択するボタンのツールチップ。",
       "localizations" : {
@@ -28293,6 +28290,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選擇伺服器"
+          }
+        }
+      }
+    },
+    "Select the location of the file you want to attach." : {
+      "comment" : "添付するファイルの場所（ファイルまたは写真ライブラリ）を選択するためのアクションシートのメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدد موقع الملف الذي تريد إرفاقه."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie den Ort der Datei aus, die Sie anhängen möchten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the location of the file you want to attach."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione la ubicación del archivo que desea adjuntar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez l'emplacement du fichier que vous souhaitez joindre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付したいファイルの場所を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부할 파일의 위치를 선택하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите расположение файла, который хотите прикрепить."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть розташування файлу, який потрібно прикріпити."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择您要附加的文件所在的位置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取您要附加的檔案所在的位置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取您想附加的檔案所在位置。"
           }
         }
       }
@@ -29598,6 +29672,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大小："
+          }
+        }
+      }
+    },
+    "Some files could not be attached" : {
+      "comment" : "ユーザーがドロップしたファイル群の中に非対応のファイルが一部含まれていたときに表示されるエラーアラートのタイトル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر إرفاق بعض الملفات"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Dateien konnten nicht angehängt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some files could not be attached"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron adjuntar algunos archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains fichiers n'ont pas pu être joints"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部のファイルは添付できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일부 파일을 첨부할 수 없었습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось прикрепить некоторые файлы"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося прикріпити деякі файли"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分文件无法附加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分檔案無法附加"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分檔案無法附加"
           }
         }
       }
@@ -31526,6 +31677,83 @@
         }
       }
     },
+    "These files cannot be attached" : {
+      "comment" : "ユーザーが複数の非対応ファイルのみをドロップしたときに表示されるエラーアラートのタイトル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرفاق هذه الملفات"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Dateien können nicht angehängt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These files cannot be attached"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pueden adjuntar estos archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre ces fichiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これらのファイルは添付できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 파일들은 첨부할 수 없습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эти файлы невозможно прикрепить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ці файли неможливо прикріпити"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这些文件无法附加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這些檔案無法附加"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這些檔案無法附加"
+          }
+        }
+      }
+    },
     "Thinking" : {
       "comment" : "モデルの思考を有効化するかどうかを切り替えるとグルスイッチ。",
       "localizations" : {
@@ -32221,6 +32449,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "關閉"
+          }
+        }
+      }
+    },
+    "This file cannot be attached" : {
+      "comment" : "ユーザーが非対応のファイル1件のみをドロップしたときに表示されるエラーアラートのタイトル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرفاق هذا الملف"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei kann nicht angehängt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file cannot be attached"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede adjuntar este archivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre ce fichier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは添付できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 파일은 첨부할 수 없습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот файл невозможно прикрепить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей файл неможливо прикріпити"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法附加此文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法附加此檔案"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法附加此檔案"
           }
         }
       }

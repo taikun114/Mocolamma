@@ -2,16 +2,17 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-// MARK: - ImageDropDelegate
+// MARK: - 並び替え用DropDelegate
 
-struct ImageDropDelegate: DropDelegate {
-    let item: ChatInputImage
-    @Binding var items: [ChatInputImage]
-    @Binding var draggingItem: ChatInputImage?
+/// アイテムの並び替えを行う汎用DropDelegate
+struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
+    let item: T
+    @Binding var items: [T]
+    @Binding var draggingItem: T?
     @Binding var isDraggingOver: Bool
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
-        return DropProposal(operation: .move)
+        DropProposal(operation: .move)
     }
 
     func performDrop(info: DropInfo) -> Bool {
@@ -38,6 +39,9 @@ struct ImageDropDelegate: DropDelegate {
         self.isDraggingOver = false
     }
 }
+
+typealias ImageDropDelegate = ItemReorderDropDelegate<ChatInputImage>
+typealias AttachmentDropDelegate = ItemReorderDropDelegate<ChatInputAttachment>
 struct AreaImageDropDelegate: DropDelegate {
     @Binding var items: [ChatInputImage]
     @Binding var isDraggingOver: Bool
@@ -49,14 +53,15 @@ struct AreaImageDropDelegate: DropDelegate {
     func dropUpdated(info: DropInfo) -> DropProposal? {
         guard isEnabled else { return nil }
         
-        // ドラッグされているアイテムに画像が含まれているか確認
-        let providers = info.itemProviders(for: [.image, .fileURL])
-        let hasImage = providers.contains { provider in
-            // 直接の画像データ、または画像として認識可能なファイルURLを確認
-            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier)
+        // ドラッグされているアイテムに画像、ファイルURL、テキストが含まれているか確認
+        let providers = info.itemProviders(for: [.image, .fileURL, .text])
+        let hasValidItem = providers.contains { provider in
+            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
+            provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+            provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
         }
         
-        guard hasImage else { return nil }
+        guard hasValidItem else { return nil }
         
         executor?.notifyDragActivity()
         return DropProposal(operation: .copy)
@@ -70,27 +75,22 @@ struct AreaImageDropDelegate: DropDelegate {
         // ファイルURLの処理 (macOSのファイル、iOSのファイルアプリ) - こちらを優先
         let urlProviders = info.itemProviders(for: [.fileURL])
         if !urlProviders.isEmpty {
-            var imageURLs: [URL] = []
+            var droppedURLs: [URL] = []
             let group = DispatchGroup()
             
             for provider in urlProviders {
                 group.enter()
                 _ = provider.loadObject(ofClass: URL.self) { url, _ in
                     if let url = url {
-                        // 拡張子またはUTTypeで画像か判定
-                        let ext = url.pathExtension.lowercased()
-                        let isImage = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "tiff", "bmp", "avif"].contains(ext)
-                        if isImage {
-                            imageURLs.append(url)
-                        }
+                        droppedURLs.append(url)
                     }
                     group.leave()
                 }
             }
             
             group.notify(queue: .main) {
-                if !imageURLs.isEmpty {
-                    onURLsDropped?(imageURLs)
+                if !droppedURLs.isEmpty {
+                    onURLsDropped?(droppedURLs)
                 }
             }
             return true // URLとして処理（または試行）した場合は終了
@@ -117,13 +117,15 @@ struct AreaImageDropDelegate: DropDelegate {
     func dropEntered(info: DropInfo) {
         guard isEnabled else { return }
         
-        // ドラッグされているアイテムに画像が含まれているか確認
-        let providers = info.itemProviders(for: [.image, .fileURL])
-        let hasImage = providers.contains { provider in
-            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier)
+        // ドラッグされているアイテムに画像、ファイルURL、テキストが含まれているか確認
+        let providers = info.itemProviders(for: [.image, .fileURL, .text])
+        let hasValidItem = providers.contains { provider in
+            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
+            provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+            provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
         }
         
-        guard hasImage else { return }
+        guard hasValidItem else { return }
         
         withAnimation(.easeInOut(duration: 0.2)) {
             isDraggingOver = true

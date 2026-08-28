@@ -22,6 +22,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var chatMessages: [ChatMessage] = []
         var chatInputText: String = ""
         var chatInputImages: [ChatInputImage] = []
+        var chatInputAttachments: [ChatInputAttachment] = []
         var isChatStreaming: Bool = false
         
         var imageMessages: [ChatMessage] = []
@@ -135,13 +136,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 if currentChangeCount != self.lastDragPasteboardChangeCount {
                     self.lastDragPasteboardChangeCount = currentChangeCount
                     
-                    // ファイルが含まれており、かつそれが画像として読み込み可能か確認
+                    // ファイルまたは画像が含まれているか確認
                     let hasFiles = pb.types?.contains(.fileURL) == true || 
                                  pb.types?.contains(NSPasteboard.PasteboardType("NSFilenamesPboardType")) == true
                     
                     let hasImages = pb.canReadObject(forClasses: [PlatformImage.self], options: nil)
                     
-                    if hasFiles && hasImages {
+                    if hasFiles || hasImages {
                         self.startDragging()
                     }
                 }
@@ -1639,6 +1640,7 @@ struct MarkdownTestView: View {
         chatMessages.removeAll()
         chatInputText = ""
         chatInputImages = []
+        chatInputAttachments = []
         updateIsChatStreaming()
         cancelChatStreaming()
     }

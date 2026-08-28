@@ -105,6 +105,39 @@ extension ChatInputImage {
     }
 }
 
+// MARK: - チャット入力用添付ファイルモデル
+
+/// テキストやMarkdownなどの添付ファイルを管理するモデル
+struct ChatInputAttachment: Identifiable, Equatable, Codable {
+    let id: UUID
+    let name: String
+    let content: String
+    
+    init(id: UUID = UUID(), name: String, content: String) {
+        self.id = id
+        self.name = name
+        self.content = content
+    }
+    
+    /// 添付可能なテキスト系ファイルのUTType一覧
+    static let allowedContentTypes: [UTType] = [
+        .plainText,
+        .utf8PlainText,
+        .sourceCode,
+        .json,
+        .commaSeparatedText,
+        .tabSeparatedText,
+        .yaml,
+        .html,
+        .xml,
+        .text
+    ]
+    
+    static func == (lhs: ChatInputAttachment, rhs: ChatInputAttachment) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 // MARK: - チャットAPI リクエスト/レスポンス モデル
 
 /// チャット会話における単一のメッセージを表します。
@@ -115,6 +148,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var content: String
     var thinking: String?
     var images: [String]? // Base64でエンコードされた画像
+    var attachments: [ChatInputAttachment]? // 添付されたテキスト/Markdownファイル
     var toolCalls: [ToolCall]?
     var toolName: String?
     var createdAt: String? // メッセージが作成された日時
@@ -146,6 +180,34 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalEvalDuration: Int? // 最終的な評価時間
     var finalIsStopped: Bool = false // 最終的な停止状態
     
+    /// 添付ファイルの内容をフォーマットしてプロンプトテキストを構築します
+    static func buildFullPrompt(userText: String, attachments: [ChatInputAttachment]?) -> String {
+        guard let attachments = attachments, !attachments.isEmpty else {
+            return userText
+        }
+        var fullText = userText
+        for attachment in attachments {
+            if !fullText.isEmpty {
+                fullText += "\n\n"
+            }
+            fullText += """
+            ===
+            
+            Attached File: \(attachment.name)
+            
+            ``````````
+            \(attachment.content)
+            ``````````
+            """
+        }
+        return fullText
+    }
+    
+    /// このメッセージのAPI送信用コンテンツ（添付ファイル展開済み）を取得します
+    var promptForAPI: String {
+        ChatMessage.buildFullPrompt(userText: content, attachments: attachments)
+    }
+    
     /// ストリーミング中のコンテンツを一括更新します（Observationの通知を最小限に抑えるため）
     @MainActor
     func updateStreamingContent(content: String, thinking: String?, isThinkingCompleted: Bool) {
@@ -176,6 +238,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
         case content
         case thinking
         case images
+        case attachments
         case toolCalls = "tool_calls"
         case toolName = "tool_name"
         case createdAt = "created_at"
@@ -191,6 +254,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
         self.content = try container.decode(String.self, forKey: .content)
         self.thinking = try container.decodeIfPresent(String.self, forKey: .thinking)
         self.images = try container.decodeIfPresent([String].self, forKey: .images)
+        self.attachments = try container.decodeIfPresent([ChatInputAttachment].self, forKey: .attachments)
         self.toolCalls = try container.decodeIfPresent([ToolCall].self, forKey: .toolCalls)
         self.toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
         self.createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
@@ -203,7 +267,8 @@ class ChatMessage: Identifiable, Codable, Equatable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(role, forKey: .role)
-        try container.encode(content, forKey: .content)
+        let encodedContent = (role == "user" && attachments?.isEmpty == false) ? promptForAPI : content
+        try container.encode(encodedContent, forKey: .content)
         try container.encodeIfPresent(thinking, forKey: .thinking)
         try container.encodeIfPresent(images, forKey: .images)
         try container.encodeIfPresent(toolCalls, forKey: .toolCalls)
@@ -216,11 +281,12 @@ class ChatMessage: Identifiable, Codable, Equatable {
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
-    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, attachments: [ChatInputAttachment]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
         self.role = role
         self.content = content
         self.thinking = thinking
         self.images = images
+        self.attachments = attachments
         self.toolCalls = toolCalls
         self.toolName = toolName
         self.createdAt = createdAt

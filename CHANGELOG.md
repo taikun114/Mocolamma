@@ -45,9 +45,11 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
-## 1.3.1
+## 1.4.0
 ### New Features
 #### Chat
+- **Support attaching text files**
+  - You can now attach various text files, including `.txt` and `.md`, to all models that support chat.
 - **Support selecting thinking levels**
   - You can now select thinking levels from "Off", "Low", "Medium", "High", and "Max" for thinking-capable models. In addition, "None" has been renamed to "Default".
 
