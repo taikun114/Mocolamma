@@ -57,6 +57,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 #### Chat and Image Generation
 - **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
+- **Fix issue where picker contents could shrink on macOS Tahoe or later**
 - **Improve the appearance of the message input area and scroll to bottom button on macOS Golden Gate**
 
 #### Chat

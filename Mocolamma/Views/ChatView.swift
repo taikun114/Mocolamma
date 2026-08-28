@@ -372,6 +372,7 @@ struct ChatView: View {
             }
             .pickerStyle(.menu)
             .labelStyle(.titleAndIcon)
+            .buttonSizingFlexibleIfAvailable()
             .frame(width: 150)
         }
         
@@ -1193,6 +1194,7 @@ struct ImageGenerationView: View {
             }
             .pickerStyle(.menu)
             .labelStyle(.titleAndIcon)
+            .buttonSizingFlexibleIfAvailable()
             .frame(width: 150)
         }
 #else
