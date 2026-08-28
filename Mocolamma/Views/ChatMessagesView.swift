@@ -33,6 +33,7 @@ struct ChatMessagesView: View {
     let emptyStateImage: String
     
     @State private var selectionCoordinator = TextSelectionCoordinator()
+    @State private var stableContainerHeight: CGFloat = 0
     
     private var reduceMotionEnabled: Bool {
 #if !os(macOS)
@@ -53,6 +54,15 @@ struct ChatMessagesView: View {
     
     var body: some View {
         GeometryReader { geometry in
+            let currentHeight = geometry.size.height
+            let isButtonShowing = !isNearBottom && !messages.isEmpty
+            let effectiveHeight: CGFloat = {
+                if isButtonShowing && stableContainerHeight > 0 {
+                    return max(stableContainerHeight, currentHeight)
+                }
+                return currentHeight
+            }()
+            
             ZStack {
                 ChatMessagesScrollView(
                     messages: $messages,
@@ -92,9 +102,19 @@ struct ChatMessagesView: View {
                 selectionCoordinator.deselectAll()
             }
 #endif
-            .environment(\.containerHeight, geometry.size.height)
+            .environment(\.containerHeight, effectiveHeight)
             .environment(selectionCoordinator)
             .modifier(TextSelectionCoordination())
+            .onChange(of: currentHeight) { _, newValue in
+                if !isButtonShowing && newValue > 0 {
+                    stableContainerHeight = newValue
+                }
+            }
+            .onAppear {
+                if !isButtonShowing && currentHeight > 0 {
+                    stableContainerHeight = currentHeight
+                }
+            }
         }
         .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
