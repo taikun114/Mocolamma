@@ -7,10 +7,18 @@ struct FileAttachmentTileView: View {
     var isUserBubble: Bool = false
     
     private var fileIconName: String {
-        if #available(iOS 18.0, macOS 15.0, visionOS 2.0, *) {
-            return "text.document"
+        if fileName.lowercased().hasSuffix(".pdf") {
+            if #available(iOS 18.0, macOS 15.0, visionOS 2.0, *) {
+                return "richtext.page"
+            } else {
+                return "doc.richtext"
+            }
         } else {
-            return "doc.text"
+            if #available(iOS 18.0, macOS 15.0, visionOS 2.0, *) {
+                return "text.document"
+            } else {
+                return "doc.text"
+            }
         }
     }
     

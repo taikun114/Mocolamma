@@ -107,7 +107,7 @@ extension ChatInputImage {
 
 // MARK: - チャット入力用添付ファイルモデル
 
-/// テキストやMarkdownなどの添付ファイルを管理するモデル
+/// テキストやMarkdown、PDFなどの添付ファイルを管理するモデル
 struct ChatInputAttachment: Identifiable, Equatable, Codable {
     let id: UUID
     let name: String
@@ -119,7 +119,12 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable {
         self.content = content
     }
     
-    /// 添付可能なテキスト系ファイルのUTType一覧
+    /// この添付ファイルがPDFかどうかを判定します
+    var isPDF: Bool {
+        name.lowercased().hasSuffix(".pdf")
+    }
+    
+    /// 添付可能なファイル（テキスト系およびPDF）のUTType一覧
     static let allowedContentTypes: [UTType] = [
         .plainText,
         .utf8PlainText,
@@ -130,7 +135,8 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable {
         .yaml,
         .html,
         .xml,
-        .text
+        .text,
+        .pdf
     ]
     
     static func == (lhs: ChatInputAttachment, rhs: ChatInputAttachment) -> Bool {
@@ -147,8 +153,9 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var role: String
     var content: String
     var thinking: String?
-    var images: [String]? // Base64でエンコードされた画像
-    var attachments: [ChatInputAttachment]? // 添付されたテキスト/Markdownファイル
+    var images: [String]? // Base64でエンコードされた画像（ユーザが直接添付した画像）
+    var pdfImages: [String]? // PDFファイルから生成されたページ画像（API送信用）
+    var attachments: [ChatInputAttachment]? // 添付されたテキスト/Markdown/PDFファイル
     var toolCalls: [ToolCall]?
     var toolName: String?
     var createdAt: String? // メッセージが作成された日時
@@ -159,6 +166,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
     var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
+    var isProcessingPDF: Bool = false // PDFの抽出・変換処理中かどうかを示すフラグ
     
     // 画像生成関連のプロパティ
     var generatedImage: String? // 生成された画像 (Base64)
@@ -190,15 +198,21 @@ class ChatMessage: Identifiable, Codable, Equatable {
             if !fullText.isEmpty {
                 fullText += "\n\n"
             }
-            fullText += """
-            ===
-            
-            Attached File: \(attachment.name)
-            
-            ``````````
-            \(attachment.content)
-            ``````````
-            """
+            if attachment.isPDF && attachment.content.hasPrefix("===") {
+                // すでにPDF用フォーマットで整形されている場合
+                fullText += attachment.content
+            } else {
+                // 通常のテキスト添付ファイル
+                fullText += """
+                ===
+                
+                Attached File: \(attachment.name)
+                
+                ``````````
+                \(attachment.content)
+                ``````````
+                """
+            }
         }
         return fullText
     }
@@ -238,6 +252,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
         case content
         case thinking
         case images
+        case pdfImages = "pdf_images"
         case attachments
         case toolCalls = "tool_calls"
         case toolName = "tool_name"
@@ -254,6 +269,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
         self.content = try container.decode(String.self, forKey: .content)
         self.thinking = try container.decodeIfPresent(String.self, forKey: .thinking)
         self.images = try container.decodeIfPresent([String].self, forKey: .images)
+        self.pdfImages = try container.decodeIfPresent([String].self, forKey: .pdfImages)
         self.attachments = try container.decodeIfPresent([ChatInputAttachment].self, forKey: .attachments)
         self.toolCalls = try container.decodeIfPresent([ToolCall].self, forKey: .toolCalls)
         self.toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
@@ -270,7 +286,15 @@ class ChatMessage: Identifiable, Codable, Equatable {
         let encodedContent = (role == "user" && attachments?.isEmpty == false) ? promptForAPI : content
         try container.encode(encodedContent, forKey: .content)
         try container.encodeIfPresent(thinking, forKey: .thinking)
-        try container.encodeIfPresent(images, forKey: .images)
+        
+        // API送信時にはユーザ直接添付画像とPDFページ画像を結合して送信
+        let combinedImages: [String]? = {
+            let direct = images ?? []
+            let pdf = pdfImages ?? []
+            let combined = direct + pdf
+            return combined.isEmpty ? nil : combined
+        }()
+        try container.encodeIfPresent(combinedImages, forKey: .images)
         try container.encodeIfPresent(toolCalls, forKey: .toolCalls)
         try container.encodeIfPresent(toolName, forKey: .toolName)
         try container.encodeIfPresent(createdAt, forKey: .createdAt)
@@ -281,11 +305,12 @@ class ChatMessage: Identifiable, Codable, Equatable {
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
-    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, attachments: [ChatInputAttachment]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, pdfImages: [String]? = nil, attachments: [ChatInputAttachment]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
         self.role = role
         self.content = content
         self.thinking = thinking
         self.images = images
+        self.pdfImages = pdfImages
         self.attachments = attachments
         self.toolCalls = toolCalls
         self.toolName = toolName

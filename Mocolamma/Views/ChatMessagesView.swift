@@ -363,7 +363,7 @@ struct MessageViewWrapper: View, Equatable {
         
         // [CRITICAL] ストリーミング中または画像処理中の場合のみ、重い文字列比較を行う。
         // これにより、膨大な過去メッセージ（数千〜数万文字）に対する毎フレームの文字列比較を回避し、CPU負荷を劇的に低減する。
-        if lhs.message.isStreaming || lhs.message.isProcessingImages || rhs.message.isStreaming {
+        if lhs.message.isStreaming || lhs.message.isProcessingImages || lhs.message.isProcessingPDF || rhs.message.isStreaming {
             return lhs.message.content == rhs.message.content &&
                    lhs.message.thinking == rhs.message.thinking &&
                    lhs.message.isThinkingCompleted == rhs.message.isThinkingCompleted

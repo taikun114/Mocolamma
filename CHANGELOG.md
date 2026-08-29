@@ -50,6 +50,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Chat
 - **Support attaching text files**
   - You can now attach various text files, including `.txt` and `.md`, to all models that support chat.
+- **Support attaching PDF files**
+  - You can now attach PDF files to all models that support chat. In addition, for models that support vision, each page is also sent as an image, allowing them to recognize images, diagrams, and layouts in addition to text.
 - **Support selecting thinking levels**
   - You can now select thinking levels from "Off", "Low", "Medium", "High", and "Max" for thinking-capable models. In addition, "None" has been renamed to "Default".
 

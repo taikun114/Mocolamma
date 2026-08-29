@@ -18,6 +18,7 @@ struct MessageView: View {
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
     @State private var showingVisionWarningAlert = false
+    @State private var showingVisionPDFWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.containerHeight) private var containerHeight
@@ -325,7 +326,16 @@ struct MessageView: View {
                 
                 guard let data = data else { continue }
                 
-                if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                if url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
                     let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -355,12 +365,21 @@ struct MessageView: View {
                     continue
                 }
                 
-                if PlatformImage(data: data) != nil {
-                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
+                if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
+                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加（PDF以外）
                     let thumbnail = await ChatInputImage.createThumbnail(from: data)
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             editingImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                        }
+                    }
+                    successCount += 1
+                } else if supportsCompletion, (url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46)) {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
                         }
                     }
                     successCount += 1
@@ -943,9 +962,17 @@ struct MessageView: View {
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
-            if !editingImages.isEmpty && !supportsVision {
-                showingVisionWarningAlert = true
-                return
+            let hasPDFs = editingAttachments.contains { $0.isPDF }
+            let hasImages = !editingImages.isEmpty
+            
+            if !supportsVision {
+                if hasPDFs {
+                    showingVisionPDFWarningAlert = true
+                    return
+                } else if hasImages {
+                    showingVisionWarningAlert = true
+                    return
+                }
             }
             performDone()
         }) {
@@ -990,6 +1017,19 @@ struct MessageView: View {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             }
         }
+        .alert("This model does not support images", isPresented: $showingVisionPDFWarningAlert) {
+            Button("Send") {
+                performDone(skipImages: true)
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = selectedModelName {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            } else {
+                Text("The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            }
+        }
         .alert(
             Text(LocalizedStringKey(unsupportedFileAlertTitle)),
             isPresented: $showingUnsupportedFileAlert
@@ -1003,25 +1043,47 @@ struct MessageView: View {
     private func performDone(skipImages: Bool = false) {
         isEditing = false
         
+        let rawAttachments = editingAttachments
+        let imagesData = (editingImages.isEmpty || skipImages) ? [] : editingImages.map { $0.data }
+        let hasPDFs = rawAttachments.contains { $0.isPDF }
+        
+        message.isProcessingPDF = hasPDFs
+        message.isProcessingImages = !hasPDFs && !imagesData.isEmpty
+        
         // 編集内容を反映させるためのTaskを開始
         Task {
-            // 添付ファイルの変更を反映
-            message.attachments = editingAttachments.isEmpty ? nil : editingAttachments
+            // PDFファイルのテキスト抽出および画像化（非同期）
+            var processedAttachments: [ChatInputAttachment] = []
+            var pdfPageImages: [String] = []
             
-            // 画像の変更を反映
-            if editingImages.isEmpty || skipImages {
-                message.images = nil
-            } else {
-                // 画像の処理が必要な場合はフラグを立てる
-                message.isProcessingImages = true
-                
-                let imagesData = editingImages.map { $0.data }
-                let base64Images = await ChatInputImage.processImages(imagesData)
-                
-                await MainActor.run {
-                    message.images = base64Images
-                    message.isProcessingImages = false
+            for attachment in rawAttachments {
+                if attachment.isPDF, let pdfData = Data(base64Encoded: attachment.content) {
+                    let result = await PDFAttachmentProcessor.shared.processPDF(
+                        pdfData: pdfData,
+                        fileName: attachment.name,
+                        renderImages: supportsVision && !skipImages
+                    )
+                    processedAttachments.append(ChatInputAttachment(id: attachment.id, name: attachment.name, content: result.formattedPromptText))
+                    for pngData in result.pageImagesPNGData {
+                        pdfPageImages.append(pngData.base64EncodedString())
+                    }
+                } else {
+                    processedAttachments.append(attachment)
                 }
+            }
+            
+            // 直接添付された画像の処理
+            var directImages: [String] = []
+            if !imagesData.isEmpty && !skipImages {
+                directImages = await ChatInputImage.processImages(imagesData)
+            }
+            
+            await MainActor.run {
+                message.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                message.images = directImages.isEmpty ? nil : directImages
+                message.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                message.isProcessingPDF = false
+                message.isProcessingImages = false
             }
             
             onRetry?(message.id, message)
@@ -1032,7 +1094,16 @@ struct MessageView: View {
     private var messageContentView: some View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
-            if message.isProcessingImages {
+            if message.isProcessingPDF {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Processing PDF...")
+                        .font(.caption)
+                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
+                }
+                .padding(.vertical, 4)
+            } else if message.isProcessingImages {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)

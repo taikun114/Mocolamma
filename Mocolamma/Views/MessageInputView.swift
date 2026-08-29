@@ -463,7 +463,16 @@ struct MessageInputView: View {
                 
                 guard let data = data else { continue }
                 
-                if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                if url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedAttachments.append(attachment)
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
                     let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -493,12 +502,21 @@ struct MessageInputView: View {
                     continue
                 }
                 
-                if PlatformImage(data: data) != nil {
-                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
+                if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
+                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加（PDF以外）
                     let thumbnail = await ChatInputImage.createThumbnail(from: data)
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                        }
+                    }
+                    successCount += 1
+                } else if (selectedModel?.supportsCompletion ?? false), (url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46)) {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedAttachments.append(attachment)
                         }
                     }
                     successCount += 1

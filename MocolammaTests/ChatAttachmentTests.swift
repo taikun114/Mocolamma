@@ -100,11 +100,98 @@ struct ChatAttachmentTests {
         )
         
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(message)
         let json = String(decoding: data, as: UTF8.self)
         
         #expect(json.contains("\"content\":\"こんにちは\""))
         #expect(!json.contains("Attached File:"))
+    }
+    
+    @Test func testPDFAttachmentDetection() {
+        let textAttachment = ChatInputAttachment(name: "test.txt", content: "hello")
+        let pdfAttachment = ChatInputAttachment(name: "document.pdf", content: "base64data")
+        let upperPDFAttachment = ChatInputAttachment(name: "DOCUMENT.PDF", content: "base64data")
+        
+        #expect(!textAttachment.isPDF)
+        #expect(pdfAttachment.isPDF)
+        #expect(upperPDFAttachment.isPDF)
+    }
+    
+    @Test func testBuildFullPromptWithPDFAttachment() {
+        let userText = "PDFを要約して"
+        let pdfContent = """
+        ===
+        
+        Attached File: sample.pdf
+        
+        Page: 1 / 2
+        
+        ``````````
+        Page 1 Content
+        ``````````
+        
+        ---
+        
+        Page: 2 / 2 (Extracted by OCR)
+        
+        ``````````
+        Page 2 OCR Content
+        ``````````
+        """
+        let pdfAttachment = ChatInputAttachment(name: "sample.pdf", content: pdfContent)
+        let fullPrompt = ChatMessage.buildFullPrompt(userText: userText, attachments: [pdfAttachment])
+        
+        let expected = """
+        PDFを要約して
+        
+        ===
+        
+        Attached File: sample.pdf
+        
+        Page: 1 / 2
+        
+        ``````````
+        Page 1 Content
+        ``````````
+        
+        ---
+        
+        Page: 2 / 2 (Extracted by OCR)
+        
+        ``````````
+        Page 2 OCR Content
+        ``````````
+        """
+        #expect(fullPrompt == expected)
+    }
+    
+    @Test func testChatMessageEncodingWithDirectAndPDFImages() throws {
+        let directImage = "direct_image_base64"
+        let pdfImage1 = "pdf_page_1_base64"
+        let pdfImage2 = "pdf_page_2_base64"
+        
+        let message = ChatMessage(
+            role: "user",
+            content: "画像とPDFを分析して",
+            images: [directImage],
+            pdfImages: [pdfImage1, pdfImage2]
+        )
+        
+        // メッセージオブジェクトのimagesプロパティにはユーザ添付画像のみ保持される（UI表示用）
+        #expect(message.images == [directImage])
+        #expect(message.pdfImages == [pdfImage1, pdfImage2])
+        
+        // API送信用にエンコードすると、imagesに直接画像とPDF画像が結合されて出力される
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(message)
+        
+        struct DecodedPayload: Decodable {
+            let role: String
+            let content: String
+            let images: [String]?
+        }
+        
+        let payload = try JSONDecoder().decode(DecodedPayload.self, from: data)
+        #expect(payload.images == [directImage, pdfImage1, pdfImage2])
     }
 }

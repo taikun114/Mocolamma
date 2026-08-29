@@ -12,6 +12,7 @@ struct ChatView: View {
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
     @State private var showingVisionWarningAlert: Bool = false
+    @State private var showingVisionPDFWarningAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
@@ -266,6 +267,21 @@ struct ChatView: View {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             }
         }
+        .alert("This model does not support images", isPresented: $showingVisionPDFWarningAlert) {
+            Button("Send") {
+                if let model = currentSelectedModel {
+                    performSendMessage(model: model, skipImages: true)
+                }
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = currentSelectedModel?.name {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            } else {
+                Text("The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            }
+        }
         .alert(Text("Error Occurred"), isPresented: Binding<Bool>(
             get: { generalErrorMessage != nil },
             set: { if !$0 { generalErrorMessage = nil } }
@@ -490,10 +506,18 @@ struct ChatView: View {
         }
         guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty || !executor.chatInputAttachments.isEmpty else { return }
         
-        // ビジョン非対応モデルで画像がある場合の警告チェック
-        if !executor.chatInputImages.isEmpty && !model.supportsVision {
-            showingVisionWarningAlert = true
-            return
+        let hasPDFs = executor.chatInputAttachments.contains { $0.isPDF }
+        let hasImages = !executor.chatInputImages.isEmpty
+        
+        // ビジョン非対応モデルの場合の警告チェック
+        if !model.supportsVision {
+            if hasPDFs {
+                showingVisionPDFWarningAlert = true
+                return
+            } else if hasImages {
+                showingVisionWarningAlert = true
+                return
+            }
         }
         
         performSendMessage(model: model)
@@ -502,15 +526,17 @@ struct ChatView: View {
     private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
         let text = executor.chatInputText
         let imagesData = skipImages ? [] : executor.chatInputImages.map { $0.data }
-        let attachments = executor.chatInputAttachments
+        let rawAttachments = executor.chatInputAttachments
         
         executor.chatInputText = ""
         executor.chatInputImages = []
         executor.chatInputAttachments = []
         executor.isChatStreaming = true
         
-        let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: attachments.isEmpty ? nil : attachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
-        userMessage.isProcessingImages = !imagesData.isEmpty
+        let hasPDFs = rawAttachments.contains { $0.isPDF }
+        let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: rawAttachments.isEmpty ? nil : rawAttachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        userMessage.isProcessingPDF = hasPDFs
+        userMessage.isProcessingImages = !hasPDFs && !imagesData.isEmpty
         executor.chatMessages.append(userMessage)
         
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -522,13 +548,38 @@ struct ChatView: View {
         let assistantMessageId = placeholderMessage.id
         
         Task {
-            // 画像がある場合はバックグラウンドでPNG変換処理を行う
-            if !imagesData.isEmpty {
-                let base64Images = await ChatInputImage.processImages(imagesData)
-                await MainActor.run {
-                    userMessage.images = base64Images
-                    userMessage.isProcessingImages = false
+            // PDFファイルのテキスト抽出および画像化（非同期）
+            var processedAttachments: [ChatInputAttachment] = []
+            var pdfPageImages: [String] = []
+            
+            for attachment in rawAttachments {
+                if attachment.isPDF, let pdfData = Data(base64Encoded: attachment.content) {
+                    let result = await PDFAttachmentProcessor.shared.processPDF(
+                        pdfData: pdfData,
+                        fileName: attachment.name,
+                        renderImages: model.supportsVision && !skipImages
+                    )
+                    processedAttachments.append(ChatInputAttachment(id: attachment.id, name: attachment.name, content: result.formattedPromptText))
+                    for pngData in result.pageImagesPNGData {
+                        pdfPageImages.append(pngData.base64EncodedString())
+                    }
+                } else {
+                    processedAttachments.append(attachment)
                 }
+            }
+            
+            // 直接添付された画像の処理
+            var directImages: [String] = []
+            if !imagesData.isEmpty && !skipImages {
+                directImages = await ChatInputImage.processImages(imagesData)
+            }
+            
+            await MainActor.run {
+                userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                userMessage.images = directImages.isEmpty ? nil : directImages
+                userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                userMessage.isProcessingPDF = false
+                userMessage.isProcessingImages = false
             }
             
             var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }

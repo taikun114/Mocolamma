@@ -25818,6 +25818,83 @@
         }
       }
     },
+    "Processing PDF..." : {
+      "comment" : "PDFのテキスト抽出や画像化を行っているときに表示される処理中メッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ معالجة ملف PDF..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF wird verarbeitet..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing PDF..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Procesando PDF..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traitement du PDF..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFを処理中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF 처리 중..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обработка PDF..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обробка PDF..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在处理PDF..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在處理PDF..."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在處理PDF..."
+          }
+        }
+      }
+    },
     "Quantization Level:" : {
       "comment" : "モデルの量子化レベルを表示するタイトルテキスト。",
       "localizations" : {
@@ -31525,6 +31602,83 @@
     "Textual by Guillermo Gonzalez and Taiga Imaura" : {
       "shouldTranslate" : false
     },
+    "The selected model \"%@\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text." : {
+      "comment" : "ビジョン非対応モデルでPDFが添付されている場合の警告アラートメッセージ（モデル名あり）。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار \"%@\" لا يدعم التعرف على الصور، لذا سيتم إرسال ملفات PDF المرفقة كنصوص مستخرجة فقط. هل أنت متأكد من أنك تريد الإرسال كما هو؟\n\nتلميح: يتيح لك التبديل إلى نموذج يدعم الرؤية إمكانية التعرف على الصور والتنسيقات بالإضافة إلى النصوص."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell „%@“ unterstützt keine Bilderkennung, daher werden angehängte PDF-Dateien nur als extrahierter Text gesendet. Sind Sie sicher, dass Sie den Text so senden möchten?\n\nTipp: Wenn Sie zu einem bildfähigen Modell wechseln, können neben Text auch Bilder und Layouts erkannt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model \"%@\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado \"%@\" no admite el reconocimiento de imágenes, por lo que los archivos PDF adjuntos solo se enviarán como texto extraído. ¿Está seguro de que desea enviarlo tal cual?\n\nSugerencia: Si cambia a un modelo compatible con visión, podrá reconocer imágenes y diseños además del texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné « %@ » ne prend pas en charge la reconnaissance d'images, les fichiers PDF joints ne seront donc envoyés que sous forme de texte extrait. Êtes-vous sûr de vouloir l'envoyer tel quel ?\n\nAstuce : Passer à un modèle prenant en charge la vision permettra de reconnaître les images et les mises en page en plus du texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル「%@」は画像認識に対応していないため、添付されたPDFファイルは抽出されたテキストのみが送信されます。このまま送信してもよろしいですか？\n\nヒント: 画像認識対応モデルに切り替えると、テキストに加えて画像やレイアウトなども確認できるようになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델 \"%@\"은(는) 이미지 인식을 지원하지 않으므로 첨부된 PDF 파일은 추출된 텍스트만 전송됩니다. 이대로 전송하시겠습니까?\n\n힌트: 비전 지원 모델로 전환하면 텍스트 외에 이미지와 레이아웃 등도 확인할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель «%@» не поддерживает распознавание изображений, поэтому прикрепленные PDF-файлы будут отправлены только в виде извлеченного текста. Вы уверены, что хотите отправить как есть?\n\nСовет: переключение на модель с поддержкой зрения позволит распознавать изображения и разметку в дополнение к тексту."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель «%@» не підтримує розпізнавання зображень, тому прикріплені PDF-файли буде надіслано лише у вигляді вилученого тексту. Ви впевнені, що хочете надіслати як є?\n\nПорада: перехід на модель із підтримкою зору дозволить розпізнавати зображення та макети на додаток до тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型“%@”不支持图像识别，因此附加的PDF文件将仅发送提取的文本。您确定要按原样发送吗？\n\n提示：切换到支持视觉的模型后，除了文本之外，还可以识别图像和布局。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        }
+      }
+    },
     "The selected model \"%@\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
       "localizations" : {
         "ar" : {
@@ -31597,6 +31751,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "所選模型「%@」不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        }
+      }
+    },
+    "The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text." : {
+      "comment" : "ビジョン非対応モデルでPDFが添付されている場合の警告アラートメッセージ（モデル名なし）。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار لا يدعم التعرف على الصور، لذا سيتم إرسال ملفات PDF المرفقة كنصوص مستخرجة فقط. هل أنت متأكد من أنك تريد الإرسال كما هو؟\n\nتلميح: يتيح لك التبديل إلى نموذج يدعم الرؤية إمكانية التعرف على الصور والتنسيقات بالإضافة إلى النصوص."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell unterstützt keine Bilderkennung, daher werden angehängte PDF-Dateien nur als extrahierter Text gesendet. Sind Sie sicher, dass Sie den Text so senden möchten?\n\nTipp: Wenn Sie zu einem bildfähigen Modell wechseln, können neben Text auch Bilder und Layouts erkannt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado no admite el reconocimiento de imágenes, por lo que los archivos PDF adjuntos solo se enviarán como texto extraído. ¿Está seguro de que desea enviarlo tal cual?\n\nSugerencia: Si cambia a un modelo compatible con visión, podrá reconocer imágenes y diseños además del texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné ne prend pas en charge la reconnaissance d'images, les fichiers PDF joints ne seront donc envoyés que sous forme de texte extrait. Êtes-vous sûr de vouloir l'envoyer tel quel ?\n\nAstuce : Passer à un modèle prenant en charge la vision permettra de reconnaître les images et les mises en page en plus du texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルは画像認識に対応していないため、添付されたPDFファイルは抽出されたテキストのみが送信されます。このまま送信してもよろしいですか？\n\nヒント: 画像認識対応モデルに切り替えると、テキストに加えて画像やレイアウトなども確認できるようになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델은 이미지 인식을 지원하지 않으므로 첨부된 PDF 파일은 추출된 텍스트만 전송됩니다. 이대로 전송하시겠습니까?\n\n힌트: 비전 지원 모델로 전환하면 텍스트 외에 이미지와 레이아웃 등도 확인할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель не поддерживает распознавание изображений, поэтому прикрепленные PDF-файлы будут отправлены только в виде извлеченного текста. Вы уверены, что хотите отправить как есть?\n\nСовет: переключение на модель с поддержкой зрения позволит распознавать изображения и разметку в дополнение к тексту."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель не підтримує розпізнавання зображень, тому прикріплені PDF-файли буде надіслано лише у вигляді вилученого тексту. Ви впевнені, що хочете надіслати як є?\n\nПорада: перехід на модель із підтримкою зору дозволить розпізнавати зображення та макети на додаток до тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型不支持图像识别，因此附加的PDF文件将仅发送提取的文本。您确定要按原样发送吗？\n\n提示：切换到支持视觉的模型后，除了文本之外，还可以识别图像和布局。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
           }
         }
       }
