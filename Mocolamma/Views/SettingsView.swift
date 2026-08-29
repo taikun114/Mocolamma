@@ -476,7 +476,9 @@ private class LocalNetworkAuthorization: NSObject, NetServiceDelegate {
             case .failed:
                 break
             case .ready:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Task { @MainActor [weak self] in
+                    try? await Task.sleep(for: .milliseconds(100))
+                    guard let self else { return }
                     if let completion = self.completion {
                         self.reset()
                         completion(true)

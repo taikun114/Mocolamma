@@ -42,40 +42,24 @@ struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
         self.isDraggingOver = false
         executor?.stopDragging(immediate: true)
         
-        // 外部ファイル（URL）の処理
         let urlProviders = info.itemProviders(for: [.fileURL])
+        let imageProviders = info.itemProviders(for: [.image])
+        
         if !urlProviders.isEmpty {
-            var droppedURLs: [URL] = []
-            let group = DispatchGroup()
-            
-            for provider in urlProviders {
-                group.enter()
-                _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                    if let url = url {
-                        droppedURLs.append(url)
-                    }
-                    group.leave()
-                }
-            }
-            
-            group.notify(queue: .main) {
-                if !droppedURLs.isEmpty {
-                    onURLsDropped?(droppedURLs)
+            Task { @MainActor in
+                let urls = await DropItemLoader.loadURLs(from: urlProviders)
+                if !urls.isEmpty {
+                    onURLsDropped?(urls)
                 }
             }
             return true
         }
-
-        // 画像データの処理
-        let imageProviders = info.itemProviders(for: [.image])
+        
         if !imageProviders.isEmpty {
-            for provider in imageProviders {
-                provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
-                    if let data = data {
-                        DispatchQueue.main.async {
-                            onDataDropped?([data])
-                        }
-                    }
+            Task { @MainActor in
+                let dataList = await DropItemLoader.loadImageData(from: imageProviders)
+                if !dataList.isEmpty {
+                    onDataDropped?(dataList)
                 }
             }
             return true
@@ -154,40 +138,24 @@ struct AreaImageDropDelegate: DropDelegate {
         isDraggingOver = false
         executor?.stopDragging(immediate: true)
 
-        // ファイルURLの処理 (macOSのファイル、iOSのファイルアプリ) - こちらを優先
         let urlProviders = info.itemProviders(for: [.fileURL])
+        let imageProviders = info.itemProviders(for: [.image])
+
         if !urlProviders.isEmpty {
-            var droppedURLs: [URL] = []
-            let group = DispatchGroup()
-            
-            for provider in urlProviders {
-                group.enter()
-                _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                    if let url = url {
-                        droppedURLs.append(url)
-                    }
-                    group.leave()
+            Task { @MainActor in
+                let urls = await DropItemLoader.loadURLs(from: urlProviders)
+                if !urls.isEmpty {
+                    onURLsDropped?(urls)
                 }
             }
-            
-            group.notify(queue: .main) {
-                if !droppedURLs.isEmpty {
-                    onURLsDropped?(droppedURLs)
-                }
-            }
-            return true // URLとして処理（または試行）した場合は終了
+            return true
         }
 
-        // 画像データの処理 (iOSのPhotosアプリ、ブラウザなど、URLが取得できない場合)
-        let imageProviders = info.itemProviders(for: [.image])
         if !imageProviders.isEmpty {
-            for provider in imageProviders {
-                provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
-                    if let data = data {
-                        DispatchQueue.main.async {
-                            onDataDropped?([data])
-                        }
-                    }
+            Task { @MainActor in
+                let dataList = await DropItemLoader.loadImageData(from: imageProviders)
+                if !dataList.isEmpty {
+                    onDataDropped?(dataList)
                 }
             }
             return true
@@ -220,6 +188,55 @@ struct AreaImageDropDelegate: DropDelegate {
             isDraggingOver = false
         }
         executor?.notifyDragActivity()
+    }
+}
+
+// MARK: - ドロップアイテム非同期ローダー
+
+/// ドラッグ＆ドロップされたアイテム（URLや画像データ）を非同期並列でロードするヘルパー
+enum DropItemLoader {
+    /// NSItemProvider配列からファイルURLを並列ロードします
+    static func loadURLs(from providers: [NSItemProvider]) async -> [URL] {
+        await withTaskGroup(of: URL?.self) { group in
+            for provider in providers {
+                group.addTask {
+                    await withCheckedContinuation { continuation in
+                        _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                            continuation.resume(returning: url)
+                        }
+                    }
+                }
+            }
+            var urls: [URL] = []
+            for await url in group {
+                if let url = url {
+                    urls.append(url)
+                }
+            }
+            return urls
+        }
+    }
+
+    /// NSItemProvider配列から画像データを並列ロードします
+    static func loadImageData(from providers: [NSItemProvider]) async -> [Data] {
+        await withTaskGroup(of: Data?.self) { group in
+            for provider in providers {
+                group.addTask {
+                    await withCheckedContinuation { continuation in
+                        provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
+                            continuation.resume(returning: data)
+                        }
+                    }
+                }
+            }
+            var dataList: [Data] = []
+            for await data in group {
+                if let data = data {
+                    dataList.append(data)
+                }
+            }
+            return dataList
+        }
     }
 }
 

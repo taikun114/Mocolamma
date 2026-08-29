@@ -731,7 +731,8 @@ struct MessageView: View {
         
 #if os(macOS)
         // アクションシートが閉じるのを待つための遅延
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(200))
             let savePanel = NSSavePanel()
             savePanel.allowedContentTypes = [.png]
             savePanel.nameFieldStringValue = "generated_image.png"
@@ -1767,7 +1768,8 @@ struct CopyCodeButton: View {
             withAnimation {
                 isCopied = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
                 withAnimation {
                     isCopied = false
                 }

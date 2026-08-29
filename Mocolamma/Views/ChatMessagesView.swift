@@ -184,7 +184,8 @@ struct ChatMessagesScrollView: View {
                 if newPhase == .interacting || newPhase == .decelerating {
                     isUserInteracting = true
                 } else if newPhase == .idle {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(300))
                         isUserInteracting = false
                     }
                 }
