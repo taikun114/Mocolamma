@@ -463,7 +463,16 @@ struct MessageInputView: View {
                 
                 guard let data = data else { continue }
                 
-                if url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
+                if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
+                    // 画像ファイルの場合
+                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
                     let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
                     let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
                     await MainActor.run {

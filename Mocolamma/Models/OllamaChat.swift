@@ -124,7 +124,7 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable {
         name.lowercased().hasSuffix(".pdf")
     }
     
-    /// 添付可能なファイル（テキスト系およびPDF）のUTType一覧
+    /// 添付可能なファイル（テキスト系、PDF、画像）のUTType一覧
     static let allowedContentTypes: [UTType] = [
         .plainText,
         .utf8PlainText,
@@ -136,7 +136,8 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable {
         .html,
         .xml,
         .text,
-        .pdf
+        .pdf,
+        .image
     ]
     
     static func == (lhs: ChatInputAttachment, rhs: ChatInputAttachment) -> Bool {
