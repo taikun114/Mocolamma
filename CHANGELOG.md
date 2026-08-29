@@ -59,6 +59,9 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### General
 - **Improve the appearance of the license screens**
 
+#### Model
+- **Fix issue where the modified date of models was not displayed correctly depending on the environment**
+
 #### Chat and Image Generation
 - **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
 - **Fix issue where picker contents could shrink on macOS Tahoe or later**

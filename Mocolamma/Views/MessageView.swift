@@ -80,6 +80,16 @@ struct MessageView: View {
         return formatter
     }()
     
+    static let iso8601StandardFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withTimeZone]
+        return formatter
+    }()
+    
+    static func parseDate(from string: String) -> Date? {
+        iso8601Formatter.date(from: string) ?? iso8601StandardFormatter.date(from: string)
+    }
+    
     var body: some View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading) {
@@ -305,7 +315,7 @@ struct MessageView: View {
     private var dateString: String {
         dateFormatter.string(from: {
             if let createdAtString = message.createdAt,
-               let createdAtDate = MessageView.iso8601Formatter.date(from: createdAtString) {
+               let createdAtDate = MessageView.parseDate(from: createdAtString) {
                 if message.role == "assistant", !message.isStopped, let evalDuration = message.evalDuration {
                     return createdAtDate.addingTimeInterval(Double(evalDuration) / 1_000_000_000.0)
                 } else {

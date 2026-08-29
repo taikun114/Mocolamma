@@ -53,7 +53,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.originalIndex = originalIndex
         
         // 初期化時に事前計算
-        let date = Self.iso8601Formatter.date(from: modifiedAt) ?? Date.distantPast
+        let date = Self.parseDate(from: modifiedAt) ?? Date.distantPast
         self.comparableModifiedDate = date
         self.formattedSize = Self.byteCountFormatter.string(fromByteCount: size)
         self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
@@ -71,7 +71,7 @@ struct OllamaModel: Identifiable, Hashable, Codable {
         self.capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities)
         
         // 初期化時に事前計算
-        let date = Self.iso8601Formatter.date(from: self.modified_at) ?? Date.distantPast
+        let date = Self.parseDate(from: self.modified_at) ?? Date.distantPast
         self.comparableModifiedDate = date
         self.formattedSize = Self.byteCountFormatter.string(fromByteCount: self.size)
         self.formattedModifiedAt = Self.displayDateFormatter.string(from: date)
@@ -87,11 +87,21 @@ struct OllamaModel: Identifiable, Hashable, Codable {
     // OllamaModelはHashableプロトコル等でmutating関数と相性が悪い場合があるため、遅延評価は行わずinit/decode時に計算するか、
     // DateFormatterの生成が重いため静的Formatterを使用するアプローチに変更
     
-    private static let iso8601Formatter: ISO8601DateFormatter = {
+    private static let iso8601FractionalFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withDashSeparatorInDate, .withColonSeparatorInTime]
         return formatter
     }()
+    
+    private static let iso8601StandardFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
+        return formatter
+    }()
+    
+    static func parseDate(from string: String) -> Date? {
+        iso8601FractionalFormatter.date(from: string) ?? iso8601StandardFormatter.date(from: string)
+    }
     
     private static let displayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
