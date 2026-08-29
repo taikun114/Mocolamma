@@ -327,7 +327,38 @@ struct MessageView: View {
                 
                 guard let data = data else { continue }
                 
-                if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
+                if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: data, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if PlatformImage(data: data) != nil {
                     // 画像ファイルの場合: 即座にスピナー付きプレースホルダーを追加
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
@@ -355,15 +386,6 @@ struct MessageView: View {
                                     editingImages.removeAll(where: { $0.id == placeholderId })
                                 }
                             }
-                        }
-                    }
-                    try? await Task.sleep(nanoseconds: 20_000_000)
-                } else if url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
-                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
-                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
-                    await MainActor.run {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            editingAttachments.append(attachment)
                         }
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000)
@@ -397,8 +419,39 @@ struct MessageView: View {
                     continue
                 }
                 
-                if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
-                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加（PDF以外）
+                if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: data, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    successCount += 1
+                } else if PlatformImage(data: data) != nil {
+                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
                         await ChatInputImage.create(from: data, id: placeholderId)
@@ -425,15 +478,6 @@ struct MessageView: View {
                                     editingImages.removeAll(where: { $0.id == placeholderId })
                                 }
                             }
-                        }
-                    }
-                    successCount += 1
-                } else if supportsCompletion, (url.pathExtension.lowercased() == "pdf" || (data.count >= 4 && data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46)) {
-                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
-                    let attachment = ChatInputAttachment(name: pdfFileName, content: data.base64EncodedString())
-                    await MainActor.run {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            editingAttachments.append(attachment)
                         }
                     }
                     successCount += 1
@@ -467,55 +511,44 @@ struct MessageView: View {
     }
     
     private func addImages(from urls: [URL]) {
-        Task {
-            for url in urls {
-                let data: Data? = if url.startAccessingSecurityScopedResource() {
-                    try? Data(contentsOf: url)
-                } else {
-                    try? Data(contentsOf: url)
-                }
-                
-                if let urlData = data, PlatformImage(data: urlData) != nil {
-                    let placeholderId = UUID()
-                    let task = Task<ChatInputImage?, Never> {
-                        await ChatInputImage.create(from: urlData, id: placeholderId)
-                    }
-                    
-                    await MainActor.run {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
-                        }
-                    }
-                    
-                    Task {
-                        if let chatInputImage = await task.value {
-                            await MainActor.run {
-                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        editingImages[index] = chatInputImage
-                                    }
-                                }
-                            }
-                        } else {
-                            await MainActor.run {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    editingImages.removeAll(where: { $0.id == placeholderId })
-                                }
-                            }
-                        }
-                    }
-                    url.stopAccessingSecurityScopedResource()
-                    // 少しだけ待機して、左から順に現れるようにする
-                    try? await Task.sleep(nanoseconds: 20_000_000)
-                }
-            }
-        }
+        addFiles(from: urls)
     }
 
     private func addImages(from data: [Data]) {
         Task {
             for urlData in data {
-                if PlatformImage(data: urlData) != nil {
+                if urlData.isPDFData {
+                    let placeholderId = UUID()
+                    let pdfFileName = "Document.pdf"
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: urlData, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if PlatformImage(data: urlData) != nil {
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
                         await ChatInputImage.create(from: urlData, id: placeholderId)
@@ -544,7 +577,6 @@ struct MessageView: View {
                             }
                         }
                     }
-                    // 少しだけ待機して、左から順に現れるようにする
                     try? await Task.sleep(nanoseconds: 20_000_000)
                 }
             }
@@ -1152,25 +1184,8 @@ struct MessageView: View {
         
         // 編集内容を反映させるためのTaskを開始
         Task {
-            // PDFファイルのテキスト抽出および画像化（非同期）
-            var processedAttachments: [ChatInputAttachment] = []
-            var pdfPageImages: [String] = []
-            
-            for attachment in rawAttachments {
-                if attachment.isPDF, let pdfData = Data(base64Encoded: attachment.content) {
-                    let result = await PDFAttachmentProcessor.shared.processPDF(
-                        pdfData: pdfData,
-                        fileName: attachment.name,
-                        renderImages: supportsVision && !skipImages
-                    )
-                    processedAttachments.append(ChatInputAttachment(id: attachment.id, name: attachment.name, content: result.formattedPromptText))
-                    for pngData in result.pageImagesPNGData {
-                        pdfPageImages.append(pngData.base64EncodedString())
-                    }
-                } else {
-                    processedAttachments.append(attachment)
-                }
-            }
+            // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
+            let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: supportsVision && !skipImages)
             
             // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
             var directImages: [String] = []
@@ -1276,9 +1291,10 @@ struct MessageView: View {
                         
                         ForEach(editingAttachments) { attachment in
                             ZStack(alignment: .topLeading) {
-                                FileAttachmentTileView(fileName: attachment.name, size: 80, isUserBubble: true)
+                                FileAttachmentTileView(attachment: attachment, size: 80, isUserBubble: true)
                                 
                                 Button(action: {
+                                    attachment.loadTask?.cancel()
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         editingAttachments.removeAll(where: { $0.id == attachment.id })
                                     }
@@ -1368,7 +1384,7 @@ struct MessageView: View {
 #endif
                         }
                         ForEach(attachments) { attachment in
-                            FileAttachmentTileView(fileName: attachment.name, size: 100, isUserBubble: message.role == "user")
+                            FileAttachmentTileView(attachment: attachment, size: 100, isUserBubble: message.role == "user")
                         }
                     }
                 }

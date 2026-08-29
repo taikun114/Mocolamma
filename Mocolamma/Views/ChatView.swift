@@ -549,25 +549,8 @@ struct ChatView: View {
         let assistantMessageId = placeholderMessage.id
         
         Task {
-            // PDFファイルのテキスト抽出および画像化（非同期）
-            var processedAttachments: [ChatInputAttachment] = []
-            var pdfPageImages: [String] = []
-            
-            for attachment in rawAttachments {
-                if attachment.isPDF, let pdfData = Data(base64Encoded: attachment.content) {
-                    let result = await PDFAttachmentProcessor.shared.processPDF(
-                        pdfData: pdfData,
-                        fileName: attachment.name,
-                        renderImages: model.supportsVision && !skipImages
-                    )
-                    processedAttachments.append(ChatInputAttachment(id: attachment.id, name: attachment.name, content: result.formattedPromptText))
-                    for pngData in result.pageImagesPNGData {
-                        pdfPageImages.append(pngData.base64EncodedString())
-                    }
-                } else {
-                    processedAttachments.append(attachment)
-                }
-            }
+            // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
+            let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision && !skipImages)
             
             // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
             var directImages: [String] = []

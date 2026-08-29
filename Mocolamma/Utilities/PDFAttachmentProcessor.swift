@@ -26,6 +26,8 @@ struct PDFAttachmentProcessor: Sendable {
         let pageImagesPNGData: [Data]
         /// 総ページ数
         let totalPages: Int
+        /// 1ページ目のサムネイル用PNG画像データ（UIタイル表示用）
+        let thumbnailPNGData: Data?
     }
     
     /// PDFデータからテキストとページ画像を抽出・処理します
@@ -52,7 +54,8 @@ struct PDFAttachmentProcessor: Sendable {
                 formattedPromptText: fallbackText,
                 rawExtractedText: "[No Text Detected by OCR]",
                 pageImagesPNGData: [],
-                totalPages: 0
+                totalPages: 0,
+                thumbnailPNGData: nil
             )
         }
         
@@ -73,13 +76,15 @@ struct PDFAttachmentProcessor: Sendable {
                 formattedPromptText: emptyText,
                 rawExtractedText: "[No Text Detected by OCR]",
                 pageImagesPNGData: [],
-                totalPages: 0
+                totalPages: 0,
+                thumbnailPNGData: nil
             )
         }
         
         var pageBlocks: [String] = []
         var rawTexts: [String] = []
         var pageImages: [Data] = []
+        var thumbnailPNGData: Data? = nil
         
         for pageIndex in 0..<totalPages {
             let pageNumber = pageIndex + 1
@@ -128,6 +133,15 @@ struct PDFAttachmentProcessor: Sendable {
                 if let cgImage = renderPageToCGImage(page: page, targetMaxDimension: 2048),
                    let pngData = convertCGImageToPNGData(cgImage) {
                     pageImages.append(pngData)
+                    if pageIndex == 0 {
+                        thumbnailPNGData = pngData
+                    }
+                }
+            } else if pageIndex == 0 {
+                // ビジョン非対応モデルでも1ページ目だけタイル表示用に軽量サムネイル生成
+                if let cgImage = renderPageToCGImage(page: page, targetMaxDimension: 240),
+                   let pngData = convertCGImageToPNGData(cgImage) {
+                    thumbnailPNGData = pngData
                 }
             }
         }
@@ -144,7 +158,8 @@ struct PDFAttachmentProcessor: Sendable {
             formattedPromptText: formattedPromptText,
             rawExtractedText: rawTexts.joined(separator: "\n\n"),
             pageImagesPNGData: pageImages,
-            totalPages: totalPages
+            totalPages: totalPages,
+            thumbnailPNGData: thumbnailPNGData
         )
     }
     
@@ -181,7 +196,7 @@ struct PDFAttachmentProcessor: Sendable {
     }
     
     /// PDFPageをCGImageとしてレンダリングします
-    private func renderPageToCGImage(page: PDFPage, targetMaxDimension: CGFloat) -> CGImage? {
+    func renderPageToCGImage(page: PDFPage, targetMaxDimension: CGFloat) -> CGImage? {
         let mediaBox = page.bounds(for: .mediaBox)
         guard mediaBox.width > 0, mediaBox.height > 0 else { return nil }
         

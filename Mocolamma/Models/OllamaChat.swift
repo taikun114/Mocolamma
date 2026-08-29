@@ -3,6 +3,7 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 import Observation
+import PDFKit
 
 #if os(macOS)
 typealias PlatformImage = NSImage
@@ -199,15 +200,51 @@ extension ChatInputImage {
 // MARK: - チャット入力用添付ファイルモデル
 
 /// テキストやMarkdown、PDFなどの添付ファイルを管理するモデル
-struct ChatInputAttachment: Identifiable, Equatable, Codable {
+struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendable {
     let id: UUID
     let name: String
-    let content: String
+    var content: String
+    var thumbnailBase64: String?
+    var thumbnail: PlatformImage?
+    var pageImagesPNGData: [Data]
+    var isLoading: Bool
     
-    init(id: UUID = UUID(), name: String, content: String) {
+    var loadTask: Task<ChatInputAttachment?, Never>? = nil
+    
+    init(
+        id: UUID = UUID(),
+        name: String,
+        content: String,
+        thumbnailBase64: String? = nil,
+        thumbnail: PlatformImage? = nil,
+        pageImagesPNGData: [Data] = [],
+        isLoading: Bool = false,
+        loadTask: Task<ChatInputAttachment?, Never>? = nil
+    ) {
         self.id = id
         self.name = name
         self.content = content
+        self.thumbnailBase64 = thumbnailBase64
+        self.thumbnail = thumbnail
+        self.pageImagesPNGData = pageImagesPNGData
+        self.isLoading = isLoading
+        self.loadTask = loadTask
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, content, thumbnailBase64
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.content = try container.decode(String.self, forKey: .content)
+        self.thumbnailBase64 = try container.decodeIfPresent(String.self, forKey: .thumbnailBase64)
+        self.thumbnail = nil
+        self.pageImagesPNGData = []
+        self.isLoading = false
+        self.loadTask = nil
     }
     
     /// この添付ファイルがPDFかどうかを判定します
@@ -232,7 +269,87 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable {
     ]
     
     static func == (lhs: ChatInputAttachment, rhs: ChatInputAttachment) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.isLoading == rhs.isLoading && lhs.thumbnailBase64 == rhs.thumbnailBase64
+    }
+}
+
+extension Data {
+    /// このデータがPDF（%PDFマジックナンバー）かどうかを判定します
+    var isPDFData: Bool {
+        count >= 4 && self[0] == 0x25 && self[1] == 0x50 && self[2] == 0x44 && self[3] == 0x46
+    }
+}
+
+extension ChatInputAttachment {
+    /// PDFデータから非同期にテキスト抽出・OCR・ページ画像化およびサムネイル生成を行います（添付時先行処理）
+    static func createPDF(from pdfData: Data, fileName: String, id: UUID = UUID()) async -> ChatInputAttachment? {
+        let result = await PDFAttachmentProcessor.shared.processPDF(
+            pdfData: pdfData,
+            fileName: fileName,
+            renderImages: true
+        )
+        let thumbBase64 = result.thumbnailPNGData?.base64EncodedString()
+        var platformThumb: PlatformImage? = nil
+        
+        if let thumbData = result.thumbnailPNGData {
+            #if os(macOS)
+            platformThumb = NSImage(data: thumbData)
+            #else
+            platformThumb = UIImage(data: thumbData)
+            #endif
+        }
+        
+        // 万一thumbnailPNGDataから生成できなかった場合の直接レンダリング
+        if platformThumb == nil, let doc = PDFDocument(data: pdfData), doc.pageCount > 0, let page = doc.page(at: 0) {
+            if let cgImage = PDFAttachmentProcessor.shared.renderPageToCGImage(page: page, targetMaxDimension: 240) {
+                #if os(macOS)
+                platformThumb = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width / 2, height: cgImage.height / 2))
+                #else
+                platformThumb = UIImage(cgImage: cgImage)
+                #endif
+            }
+        }
+        
+        if let platformThumb = platformThumb, let thumbBase64 = thumbBase64 {
+            PDFThumbnailLoader.setThumbnail(platformThumb, for: thumbBase64)
+        }
+        
+        return ChatInputAttachment(
+            id: id,
+            name: fileName,
+            content: result.formattedPromptText,
+            thumbnailBase64: thumbBase64,
+            thumbnail: platformThumb,
+            pageImagesPNGData: result.pageImagesPNGData,
+            isLoading: false
+        )
+    }
+}
+
+extension [ChatInputAttachment] {
+    /// 読み込み中の添付ファイル（PDF等）の処理完了を待機し、整形済み添付ファイル配列とPDF画像配列を返します
+    func resolveProcessedAttachments(renderImages: Bool) async -> (attachments: [ChatInputAttachment], pdfPageImages: [String]) {
+        var processedAttachments: [ChatInputAttachment] = []
+        var pdfPageImages: [String] = []
+        
+        for item in self {
+            var readyItem = item
+            if item.isLoading, let task = item.loadTask {
+                if let resolved = await task.value {
+                    readyItem = resolved
+                }
+            }
+            
+            processedAttachments.append(readyItem)
+            
+            if readyItem.isPDF && renderImages {
+                for pngData in readyItem.pageImagesPNGData {
+                    pdfPageImages.append(pngData.base64EncodedString())
+                }
+            }
+        }
+        
+        return (processedAttachments, pdfPageImages)
     }
 }
 
