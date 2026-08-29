@@ -22879,79 +22879,79 @@
         }
       }
     },
-    "Only text or image files (vision-capable models only) can be attached." : {
+    "Only text, PDF, or image files (vision-capable models only) can be attached." : {
       "comment" : "ユーザーが非対応のファイルをドロップしたときに表示されるエラーアラートのメッセージ。",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يمكن فقط إرفاق ملفات النصوص أو الصور (النماذج الداعمة للرؤية فقط)."
+            "value" : "يمكن فقط إرفاق ملفات النصوص أو PDF أو الصور (النماذج الداعمة للرؤية فقط)."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es können nur Text- oder Bilddateien (nur Modelle mit Vision-Unterstützung) angehängt werden."
+            "value" : "Es können nur Text-, PDF- oder Bilddateien (nur Modelle mit Vision-Unterstützung) angehängt werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only text or image files (vision-capable models only) can be attached."
+            "value" : "Only text, PDF, or image files (vision-capable models only) can be attached."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solo se pueden adjuntar archivos de texto o imagen (solo modelos con visión)."
+            "value" : "Solo se pueden adjuntar archivos de texto, PDF o imagen (solo modelos con visión)."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seuls les fichiers texte ou image (modèles avec vision uniquement) peuvent être joints."
+            "value" : "Seuls les fichiers texte, PDF ou image (modèles avec vision uniquement) peuvent être joints."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "テキストか画像ファイル（ビジョン対応モデルのみ）の添付にのみ対応しています。"
+            "value" : "テキスト、PDF、または画像ファイル（ビジョン対応モデルのみ）の添付にのみ対応しています。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "텍스트 또는 이미지 파일(비전 지원 모델 전용)만 첨부할 수 있습니다."
+            "value" : "텍스트, PDF 또는 이미지 파일(비전 지원 모델 전용)만 첨부할 수 있습니다."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Можно прикреплять только текстовые файлы или изображения (только для моделей с поддержкой Vision)."
+            "value" : "Можно прикреплять только текстовые файлы, PDF или изображения (только для моделей с поддержкой Vision)."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Можна прикріплювати лише текстові файли або зображення (лише для моделей із підтримкою Vision)."
+            "value" : "Можна прикріплювати лише текстові файли, PDF або зображення (лише для моделей із підтримкою Vision)."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "仅支持附加文本或图像文件（仅限支持视觉的模型）。"
+            "value" : "仅支持附加文本、PDF 或图像文件（仅限支持视觉的模型）。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "僅支援附加文字或影像檔案（僅限支援視覺的模型）。"
+            "value" : "僅支援附加文字、PDF 或影像檔案（僅限支援視覺的模型）。"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "只支援附加文字或圖像檔案（只限支援視覺的模型）。"
+            "value" : "只支援附加文字、PDF 或圖像檔案（只限支援視覺的模型）。"
           }
         }
       }

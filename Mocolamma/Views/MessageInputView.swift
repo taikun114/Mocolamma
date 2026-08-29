@@ -483,7 +483,7 @@ struct MessageInputView: View {
         ) {
             Button("OK") { }
         } message: {
-            Text("Only text or image files (vision-capable models only) can be attached.")
+            Text("Only text, PDF, or image files (vision-capable models only) can be attached.")
         }
     }
     
