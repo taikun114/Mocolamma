@@ -606,17 +606,15 @@ struct ChatView: View {
         
         // ユーザーメッセージのリトライの場合
         if executor.chatMessages[indexToRetry].role == "user" {
-            // 編集されたユーザーメッセージを履歴の最後に移動
-            let userMessage = executor.chatMessages.remove(at: indexToRetry)
-            executor.chatMessages.append(userMessage)
-            let scrollId = userMessage.id
+            // 編集されたユーザーメッセージ以降の後続メッセージ（直後の返答など）をすべて削除
+            if indexToRetry + 1 < executor.chatMessages.count {
+                executor.chatMessages.removeSubrange((indexToRetry + 1)...)
+            }
             
-            // ユーザーメッセージ以降のアシスタントメッセージを削除
-            executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in
-                guard let messageCreatedAt = message.createdAt,
-                      let userMessageCreatedAt = userMessage.createdAt else { return false }
-                return messageCreatedAt > userMessageCreatedAt && message.role == "assistant"
-            })
+            // 編集されたユーザーメッセージで置き換え
+            executor.chatMessages[indexToRetry] = messageToRetry
+            let userMessage = executor.chatMessages[indexToRetry]
+            let scrollId = userMessage.id
             
             var apiMessages = executor.chatMessages
             if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {

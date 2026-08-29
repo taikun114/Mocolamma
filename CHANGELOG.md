@@ -69,6 +69,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Fix issue where scrolling would sometimes jump when streaming completed**
 - **Fix issue where files could not be dropped onto attached file icons**
 - **Fix issue where attaching images could cause performance to degrade**
+- **Fix issue where empty message bubbles could remain after stopping a chat, then editing and resending a message**
 
 #### Image Generation
 - **Fix issue where images would shrink when the scroll to bottom button appeared**
