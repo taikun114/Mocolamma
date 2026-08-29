@@ -328,11 +328,33 @@ struct MessageView: View {
                 guard let data = data else { continue }
                 
                 if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
-                    // 画像ファイルの場合
-                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    // 画像ファイルの場合: 即座にスピナー付きプレースホルダーを追加
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000)
@@ -377,10 +399,32 @@ struct MessageView: View {
                 
                 if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
                     // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加（PDF以外）
-                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     successCount += 1
@@ -432,10 +476,32 @@ struct MessageView: View {
                 }
                 
                 if let urlData = data, PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: urlData, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     url.stopAccessingSecurityScopedResource()
@@ -450,10 +516,32 @@ struct MessageView: View {
         Task {
             for urlData in data {
                 if PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: urlData, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     // 少しだけ待機して、左から順に現れるようにする
@@ -1055,11 +1143,12 @@ struct MessageView: View {
         isEditing = false
         
         let rawAttachments = editingAttachments
-        let imagesData = (editingImages.isEmpty || skipImages) ? [] : editingImages.map { $0.data }
+        let rawEditingImages = editingImages
         let hasPDFs = rawAttachments.contains { $0.isPDF }
+        let hasImages = !skipImages && !rawEditingImages.isEmpty
         
         message.isProcessingPDF = hasPDFs
-        message.isProcessingImages = !hasPDFs && !imagesData.isEmpty
+        message.isProcessingImages = !hasPDFs && hasImages
         
         // 編集内容を反映させるためのTaskを開始
         Task {
@@ -1083,10 +1172,10 @@ struct MessageView: View {
                 }
             }
             
-            // 直接添付された画像の処理
+            // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
             var directImages: [String] = []
-            if !imagesData.isEmpty && !skipImages {
-                directImages = await ChatInputImage.processImages(imagesData)
+            if hasImages {
+                directImages = await rawEditingImages.resolveBase64Images()
             }
             
             await MainActor.run {
@@ -1128,7 +1217,15 @@ struct MessageView: View {
                     HStack(spacing: 8) {
                         ForEach(editingImages) { imageContainer in
                             ZStack(alignment: .topLeading) {
-                                if let image = imageContainer.thumbnail {
+                                if imageContainer.isLoading {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.gray.opacity(0.15))
+                                        .frame(width: 80, height: 80)
+                                        .overlay {
+                                            ProgressView()
+                                                .controlSize(.small)
+                                        }
+                                } else if let image = imageContainer.thumbnail {
                                     Image(platformImage: image)
                                         .resizable()
                                         .scaledToFill()
@@ -1148,6 +1245,7 @@ struct MessageView: View {
                                 }
                                 
                                 Button(action: {
+                                    imageContainer.loadTask?.cancel()
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         editingImages.removeAll(where: { $0.id == imageContainer.id })
                                     }
@@ -1257,59 +1355,24 @@ struct MessageView: View {
                     }
                 }))
             } else if (message.images != nil && !message.images!.isEmpty) || (message.attachments != nil && !message.attachments!.isEmpty) {
-                // 画像・ファイルが少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
+                // 画像・添付ファイルの表示
                 let images = message.images ?? []
                 let attachments = message.attachments ?? []
                 
-                ViewThatFits(in: .horizontal) {
+                ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        ForEach(images, id: \.self) { base64 in
-                            if let data = Data(base64Encoded: base64),
-                               let image = PlatformImage(data: data) {
-                                Image(platformImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            onPreviewImage?(image)
-                                        }
-                                    }
-                            }
+                        ForEach(Array(images.enumerated()), id: \.offset) { index, base64 in
+                            MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
+#if os(visionOS)
+                                .hoverEffect()
+#endif
                         }
                         ForEach(attachments) { attachment in
                             FileAttachmentTileView(fileName: attachment.name, size: 100, isUserBubble: message.role == "user")
                         }
                     }
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8) {
-                            ForEach(images, id: \.self) { base64 in
-                                if let data = Data(base64Encoded: base64),
-                                   let image = PlatformImage(data: data) {
-                                    Image(platformImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 100, height: 100)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .contentShape(Rectangle())
-#if os(visionOS)
-                                        .hoverEffect()
-#endif
-                                        .onTapGesture {
-                                            withAnimation(.easeInOut(duration: 0.2)) {
-                                                onPreviewImage?(image)
-                                            }
-                                        }
-                                }
-                            }
-                            ForEach(attachments) { attachment in
-                                FileAttachmentTileView(fileName: attachment.name, size: 100, isUserBubble: message.role == "user")
-                            }
-                        }
-                    }
                 }
+                .scrollClipDisabled()
                 .frame(height: 100)
             }
             

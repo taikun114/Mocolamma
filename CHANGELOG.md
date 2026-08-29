@@ -68,6 +68,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
 - **Fix issue where scrolling would sometimes jump when streaming completed**
 - **Fix issue where files could not be dropped onto attached file icons**
+- **Fix issue where attaching images could cause performance to degrade**
 
 #### Image Generation
 - **Fix issue where images would shrink when the scroll to bottom button appeared**

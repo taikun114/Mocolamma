@@ -23,19 +23,137 @@ extension Image {
 // MARK: - チャット入力用画像モデル
 
 /// ドラッグ&ドロップやリスト表示を効率化するために、画像データをIDでラップします。
-struct ChatInputImage: Identifiable, Equatable {
-    let id = UUID()
-    let data: Data
-    let thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+struct ChatInputImage: Identifiable, Equatable, @unchecked Sendable {
+    let id: UUID
+    var data: Data
+    var thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+    var isLoading: Bool = false // 読み込み・リサイズ中フラグ
+    var loadTask: Task<ChatInputImage?, Never>? = nil // 非同期リサイズ処理タスク
+    
+    init(id: UUID = UUID(), data: Data = Data(), thumbnail: PlatformImage? = nil, isLoading: Bool = false, loadTask: Task<ChatInputImage?, Never>? = nil) {
+        self.id = id
+        self.data = data
+        self.thumbnail = thumbnail
+        self.isLoading = isLoading
+        self.loadTask = loadTask
+    }
     
     static func == (lhs: ChatInputImage, rhs: ChatInputImage) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.isLoading == rhs.isLoading
+    }
+}
+
+extension [ChatInputImage] {
+    /// 読み込み中の画像も含め、すべての画像リサイズ処理が完了するのを待機して画像データを取得します
+    func resolveImagesData() async -> [Data] {
+        var results: [Data] = []
+        for item in self {
+            if item.isLoading, let task = item.loadTask {
+                if let readyImage = await task.value, !readyImage.data.isEmpty {
+                    results.append(readyImage.data)
+                }
+            } else if !item.data.isEmpty {
+                results.append(item.data)
+            }
+        }
+        return results
+    }
+
+    /// 読み込み中の画像も含め、すべての画像リサイズ処理が完了するのを待機してBase64文字列配列を取得します。
+    /// （同時に生成済みのサムネイルを ImageThumbnailLoader のキャッシュに事前登録してチャット描画を高速化します）
+    func resolveBase64Images() async -> [String] {
+        var base64List: [String] = []
+        for item in self {
+            var finalData: Data? = nil
+            var thumbnail: PlatformImage? = item.thumbnail
+            
+            if item.isLoading, let task = item.loadTask {
+                if let readyImage = await task.value, !readyImage.data.isEmpty {
+                    finalData = readyImage.data
+                    thumbnail = readyImage.thumbnail ?? thumbnail
+                }
+            } else if !item.data.isEmpty {
+                finalData = item.data
+            }
+            
+            if let data = finalData {
+                let base64 = data.base64EncodedString()
+                base64List.append(base64)
+                if let thumbnail = thumbnail {
+                    ImageThumbnailLoader.setThumbnail(thumbnail, for: base64)
+                }
+            }
+        }
+        return base64List
     }
 }
 
 // MARK: - 画像処理ユーティリティ
 
 extension ChatInputImage {
+    /// 添付元の画像データを最大2048pxのPNGにリサイズし、プレビュー用サムネイルを生成します（非同期）
+    static func create(from rawData: Data, id: UUID = UUID()) async -> ChatInputImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false
+            ]
+            guard let source = CGImageSourceCreateWithData(rawData as CFData, options as CFDictionary) else {
+                return nil
+            }
+            
+            // 1. 最大2048pxにリサイズしたPNGデータを生成
+            let resizeOptions: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 2048
+            ]
+            guard let resizedCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, resizeOptions as CFDictionary) else {
+                return nil
+            }
+            
+            let outputData = NSMutableData()
+            guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                return nil
+            }
+            CGImageDestinationAddImage(destination, resizedCGImage, nil)
+            guard CGImageDestinationFinalize(destination) else {
+                return nil
+            }
+            let processedData = outputData as Data
+            
+            // 2. 正方形サムネイル（最大240px）を生成
+            let thumbOptions: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            guard let thumbSource = CGImageSourceCreateWithData(processedData as CFData, nil),
+                  let thumbCGImage = CGImageSourceCreateThumbnailAtIndex(thumbSource, 0, thumbOptions as CFDictionary) else {
+                return ChatInputImage(id: id, data: processedData, thumbnail: nil, isLoading: false)
+            }
+            
+            let width = CGFloat(thumbCGImage.width)
+            let height = CGFloat(thumbCGImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            let finalThumbnail: PlatformImage?
+            if let croppedCGImage = thumbCGImage.cropping(to: cropRect) {
+                #if os(macOS)
+                finalThumbnail = NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+                #else
+                finalThumbnail = UIImage(cgImage: croppedCGImage)
+                #endif
+            } else {
+                finalThumbnail = nil
+            }
+            
+            return ChatInputImage(id: id, data: processedData, thumbnail: finalThumbnail, isLoading: false)
+        }.value
+    }
+
     /// データからサムネイルを作成します（非同期）
     static func createThumbnail(from data: Data) async -> PlatformImage? {
         return await Task.detached(priority: .medium) {
@@ -70,37 +188,10 @@ extension ChatInputImage {
         }.value
     }
     
-    /// 複数の画像をバックグラウンドでPNGに変換し、リサイズします
+    /// 添付された画像データをBase64文字列に変換します
     static func processImages(_ imagesData: [Data]) async -> [String] {
         return await Task.detached(priority: .medium) {
-            var results: [String] = []
-            for data in imagesData {
-                let options: [CFString: Any] = [
-                    kCGImageSourceShouldCache: false
-                ]
-                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
-                
-                let thumbnailOptions: [CFString: Any] = [
-                    kCGImageSourceCreateThumbnailFromImageAlways: true,
-                    kCGImageSourceCreateThumbnailWithTransform: true,
-                    kCGImageSourceThumbnailMaxPixelSize: 2048
-                ]
-                
-                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
-                    continue
-                }
-                
-                let outputData = NSMutableData()
-                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
-                    continue
-                }
-                
-                CGImageDestinationAddImage(destination, cgImage, nil)
-                if CGImageDestinationFinalize(destination) {
-                    results.append((outputData as Data).base64EncodedString())
-                }
-            }
-            return results
+            imagesData.map { $0.base64EncodedString() }
         }.value
     }
 }

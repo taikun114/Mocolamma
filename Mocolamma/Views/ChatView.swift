@@ -525,7 +525,7 @@ struct ChatView: View {
     
     private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
         let text = executor.chatInputText
-        let imagesData = skipImages ? [] : executor.chatInputImages.map { $0.data }
+        let rawInputImages = executor.chatInputImages
         let rawAttachments = executor.chatInputAttachments
         
         executor.chatInputText = ""
@@ -534,9 +534,10 @@ struct ChatView: View {
         executor.isChatStreaming = true
         
         let hasPDFs = rawAttachments.contains { $0.isPDF }
+        let hasImages = !skipImages && !rawInputImages.isEmpty
         let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: rawAttachments.isEmpty ? nil : rawAttachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         userMessage.isProcessingPDF = hasPDFs
-        userMessage.isProcessingImages = !hasPDFs && !imagesData.isEmpty
+        userMessage.isProcessingImages = !hasPDFs && hasImages
         executor.chatMessages.append(userMessage)
         
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -568,10 +569,10 @@ struct ChatView: View {
                 }
             }
             
-            // 直接添付された画像の処理
+            // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
             var directImages: [String] = []
-            if !imagesData.isEmpty && !skipImages {
-                directImages = await ChatInputImage.processImages(imagesData)
+            if hasImages {
+                directImages = await rawInputImages.resolveBase64Images()
             }
             
             await MainActor.run {
@@ -581,6 +582,9 @@ struct ChatView: View {
                 userMessage.isProcessingPDF = false
                 userMessage.isProcessingImages = false
             }
+            
+            // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+            guard executor.isChatStreaming else { return }
             
             var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
             if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {

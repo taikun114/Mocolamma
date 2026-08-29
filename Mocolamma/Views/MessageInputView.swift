@@ -81,7 +81,15 @@ struct MessageInputView: View {
                         HStack(spacing: 8) {
                             ForEach(selectedImages) { imageContainer in
                                 ZStack(alignment: .topLeading) {
-                                    if let image = imageContainer.thumbnail {
+                                    if imageContainer.isLoading {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Color.gray.opacity(0.15))
+                                            .frame(width: 60, height: 60)
+                                            .overlay {
+                                                ProgressView()
+                                                    .controlSize(.small)
+                                            }
+                                    } else if let image = imageContainer.thumbnail {
                                         Image(platformImage: image)
                                             .resizable()
                                             .scaledToFill()
@@ -101,6 +109,7 @@ struct MessageInputView: View {
                                     }
                                     
                                     Button(action: {
+                                        imageContainer.loadTask?.cancel()
                                         withAnimation(.easeInOut(duration: 0.3)) {
                                             selectedImages.removeAll(where: { $0.id == imageContainer.id })
                                         }
@@ -489,11 +498,33 @@ struct MessageInputView: View {
                 guard let data = data else { continue }
                 
                 if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
-                    // 画像ファイルの場合
-                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    // 画像ファイルの場合: 即座にスピナー付きプレースホルダーを追加
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                            selectedImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = selectedImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000)
@@ -538,10 +569,32 @@ struct MessageInputView: View {
                 
                 if PlatformImage(data: data) != nil && url.pathExtension.lowercased() != "pdf" {
                     // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加（PDF以外）
-                    let thumbnail = await ChatInputImage.createThumbnail(from: data)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedImages.append(ChatInputImage(data: data, thumbnail: thumbnail))
+                            selectedImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = selectedImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     successCount += 1
@@ -593,10 +646,32 @@ struct MessageInputView: View {
                 }
                 
                 if let urlData = data, PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: urlData, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            selectedImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = selectedImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     // 少しだけ待機して、左から順に現れるようにする
@@ -610,10 +685,32 @@ struct MessageInputView: View {
         Task {
             for urlData in data {
                 if PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: urlData, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            selectedImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            selectedImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = selectedImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
                         }
                     }
                     // 少しだけ待機して、左から順に現れるようにする
