@@ -1371,11 +1371,11 @@ struct MessageView: View {
                     }
                 }))
             } else if (message.images != nil && !message.images!.isEmpty) || (message.attachments != nil && !message.attachments!.isEmpty) {
-                // 画像・添付ファイルの表示
+                // 画像・添付ファイルの表示（収まる時はバブルを画像幅に合わせ、多い時はスクロール）
                 let images = message.images ?? []
                 let attachments = message.attachments ?? []
                 
-                ScrollView(.horizontal) {
+                ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
                         ForEach(Array(images.enumerated()), id: \.offset) { index, base64 in
                             MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
@@ -1387,8 +1387,22 @@ struct MessageView: View {
                             FileAttachmentTileView(attachment: attachment, size: 100, isUserBubble: message.role == "user")
                         }
                     }
+                    
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(Array(images.enumerated()), id: \.offset) { index, base64 in
+                                MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
+#if os(visionOS)
+                                    .hoverEffect()
+#endif
+                            }
+                            ForEach(attachments) { attachment in
+                                FileAttachmentTileView(attachment: attachment, size: 100, isUserBubble: message.role == "user")
+                            }
+                        }
+                    }
+                    .scrollClipDisabled()
                 }
-                .scrollClipDisabled()
                 .frame(height: 100)
             }
             
