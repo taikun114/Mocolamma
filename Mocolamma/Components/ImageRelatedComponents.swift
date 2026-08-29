@@ -10,33 +10,115 @@ struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
     @Binding var items: [T]
     @Binding var draggingItem: T?
     @Binding var isDraggingOver: Bool
+    var executor: CommandExecutor? = nil
+    var onURLsDropped: (([URL]) -> Void)? = nil
+    var onDataDropped: (([Data]) -> Void)? = nil
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
-        DropProposal(operation: .move)
+        if draggingItem != nil {
+            // アプリ内アイテムの並び替え時
+            return DropProposal(operation: .move)
+        } else {
+            // 外部からのファイル/画像ドラッグ時
+            let providers = info.itemProviders(for: [.image, .fileURL, .text])
+            let hasValidItem = providers.contains { provider in
+                provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
+                provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+                provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
+            }
+            guard hasValidItem else { return nil }
+            executor?.notifyDragActivity()
+            return DropProposal(operation: .copy)
+        }
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        self.draggingItem = nil
+        if draggingItem != nil {
+            self.draggingItem = nil
+            self.isDraggingOver = false
+            return true
+        }
+        
         self.isDraggingOver = false
-        return true
+        executor?.stopDragging(immediate: true)
+        
+        // 外部ファイル（URL）の処理
+        let urlProviders = info.itemProviders(for: [.fileURL])
+        if !urlProviders.isEmpty {
+            var droppedURLs: [URL] = []
+            let group = DispatchGroup()
+            
+            for provider in urlProviders {
+                group.enter()
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                    if let url = url {
+                        droppedURLs.append(url)
+                    }
+                    group.leave()
+                }
+            }
+            
+            group.notify(queue: .main) {
+                if !droppedURLs.isEmpty {
+                    onURLsDropped?(droppedURLs)
+                }
+            }
+            return true
+        }
+
+        // 画像データの処理
+        let imageProviders = info.itemProviders(for: [.image])
+        if !imageProviders.isEmpty {
+            for provider in imageProviders {
+                provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
+                    if let data = data {
+                        DispatchQueue.main.async {
+                            onDataDropped?([data])
+                        }
+                    }
+                }
+            }
+            return true
+        }
+
+        return false
     }
 
     func dropEntered(info: DropInfo) {
-        self.isDraggingOver = true
-        guard let draggingItem = draggingItem,
-              draggingItem != item,
-              let from = items.firstIndex(where: { $0.id == draggingItem.id }),
-              let to = items.firstIndex(where: { $0.id == item.id }) else { return }
+        if let draggingItem = draggingItem {
+            // 並び替え時
+            guard draggingItem != item,
+                  let from = items.firstIndex(where: { $0.id == draggingItem.id }),
+                  let to = items.firstIndex(where: { $0.id == item.id }) else { return }
 
-        if items[to].id != draggingItem.id {
-            withAnimation {
-                items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+            if items[to].id != draggingItem.id {
+                withAnimation {
+                    items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+                }
             }
+        } else {
+            // 外部ファイルドラッグ時
+            let providers = info.itemProviders(for: [.image, .fileURL, .text])
+            let hasValidItem = providers.contains { provider in
+                provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
+                provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
+                provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
+            }
+            guard hasValidItem else { return }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.isDraggingOver = true
+                executor?.startDragging()
+            }
+            executor?.notifyDragActivity()
         }
     }
     
     func dropExited(info: DropInfo) {
-        self.isDraggingOver = false
+        if draggingItem != nil {
+            self.isDraggingOver = false
+        } else {
+            executor?.notifyDragActivity()
+        }
     }
 }
 

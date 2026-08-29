@@ -121,6 +121,7 @@ struct MessageView: View {
                             }
                             .foregroundColor(.white)
                         }
+                        .allowsHitTesting(false)
                     }
                 }
                 .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
@@ -1164,7 +1165,14 @@ struct MessageView: View {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
+                            .onDrop(of: [.fileURL, .image, .text], delegate: ImageDropDelegate(
+                                item: imageContainer,
+                                items: $editingImages,
+                                draggingItem: $draggingItem,
+                                isDraggingOver: $isDraggingOver,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
                         }
                         
                         ForEach(editingAttachments) { attachment in
@@ -1190,7 +1198,14 @@ struct MessageView: View {
                                 self.draggingAttachment = attachment
                                 return NSItemProvider(object: attachment.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: AttachmentDropDelegate(item: attachment, items: $editingAttachments, draggingItem: $draggingAttachment, isDraggingOver: .constant(false)))
+                            .onDrop(of: [.fileURL, .image, .text], delegate: AttachmentDropDelegate(
+                                item: attachment,
+                                items: $editingAttachments,
+                                draggingItem: $draggingAttachment,
+                                isDraggingOver: $isDraggingOver,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
                         }
                         
                         // ファイルおよび画像追加タイル
@@ -1211,6 +1226,13 @@ struct MessageView: View {
                             .buttonStyle(.plain)
                             .padding(.top, 0)
                             .padding(.leading, 0)
+                            .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+                                items: $editingImages,
+                                isDraggingOver: $isDraggingOver,
+                                isEnabled: isEditing && canAttach,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
                             .attachFileConfirmationDialog(
                                 isPresented: $showingAttachSheet,
                                 showingFilePicker: $showingFilePicker,
@@ -1224,6 +1246,15 @@ struct MessageView: View {
                 }
                 .frame(height: 90)
                 .scrollClipDisabled()
+                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                    if isEditing {
+                        handleDroppedURLs(urls)
+                    }
+                }, onDataDropped: { data in
+                    if isEditing {
+                        addImages(from: data)
+                    }
+                }))
             } else if (message.images != nil && !message.images!.isEmpty) || (message.attachments != nil && !message.attachments!.isEmpty) {
                 // 画像・ファイルが少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
                 let images = message.images ?? []

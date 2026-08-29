@@ -13,11 +13,11 @@ import UIKit
 #endif
 
 /// PDFファイルからのテキスト抽出、OCR文字起こし、およびページ画像化を行うプロセッサ
-actor PDFAttachmentProcessor {
+struct PDFAttachmentProcessor: Sendable {
     static let shared = PDFAttachmentProcessor()
     
     /// PDF処理結果
-    struct ProcessResult {
+    struct ProcessResult: Sendable {
         /// プロンプトに埋め込む整形済みテキスト
         let formattedPromptText: String
         /// 抽出されたテキスト（純粋なテキスト結合）
@@ -98,7 +98,7 @@ actor PDFAttachmentProcessor {
                 // 2. テキストが抽出できない場合はVisionでOCR
                 isOCR = true
                 if let cgImage = renderPageToCGImage(page: page, targetMaxDimension: 2048) {
-                    let ocrText = await performOCR(on: cgImage)
+                    let ocrText = performOCR(on: cgImage)
                     if !ocrText.isEmpty {
                         finalText = ocrText
                     } else {
@@ -151,38 +151,32 @@ actor PDFAttachmentProcessor {
     // MARK: - 内部ヘルパー
     
     /// Visionフレームワークを用いてオンデバイスOCRを実行します
-    private func performOCR(on cgImage: CGImage) async -> String {
-        await withCheckedContinuation { continuation in
-            let request = VNRecognizeTextRequest { request, error in
-                guard error == nil, let observations = request.results as? [VNRecognizedTextObservation] else {
-                    continuation.resume(returning: "")
-                    return
-                }
-                
-                var extractedLines: [String] = []
-                for observation in observations {
-                    if let topCandidate = observation.topCandidates(1).first {
-                        let text = topCandidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !text.isEmpty {
-                            extractedLines.append(text)
-                        }
+    private func performOCR(on cgImage: CGImage) -> String {
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = true
+        request.automaticallyDetectsLanguage = true
+        
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        do {
+            try handler.perform([request])
+            guard let observations = request.results else {
+                return ""
+            }
+            
+            var extractedLines: [String] = []
+            for observation in observations {
+                if let topCandidate = observation.topCandidates(1).first {
+                    let text = topCandidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !text.isEmpty {
+                        extractedLines.append(text)
                     }
                 }
-                
-                let result = extractedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-                continuation.resume(returning: result)
             }
             
-            request.recognitionLevel = .accurate
-            request.usesLanguageCorrection = true
-            request.automaticallyDetectsLanguage = true
-            
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            do {
-                try handler.perform([request])
-            } catch {
-                continuation.resume(returning: "")
-            }
+            return extractedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            return ""
         }
     }
     
@@ -229,6 +223,13 @@ actor PDFAttachmentProcessor {
     
     /// CGImageをPNGデータに変換します
     private func convertCGImageToPNGData(_ cgImage: CGImage) -> Data? {
+        #if os(macOS)
+        let rep = NSBitmapImageRep(cgImage: cgImage)
+        return rep.representation(using: .png, properties: [:])
+        #elseif canImport(UIKit)
+        let image = UIImage(cgImage: cgImage)
+        return image.pngData()
+        #else
         let outputData = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
             return nil
@@ -240,5 +241,6 @@ actor PDFAttachmentProcessor {
         }
         
         return outputData as Data
+        #endif
     }
 }

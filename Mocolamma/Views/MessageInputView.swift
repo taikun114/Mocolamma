@@ -119,7 +119,15 @@ struct MessageInputView: View {
                                     self.draggingItem = imageContainer
                                     return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                                 }
-                                .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $selectedImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
+                                .onDrop(of: [.fileURL, .image, .text], delegate: ImageDropDelegate(
+                                    item: imageContainer,
+                                    items: $selectedImages,
+                                    draggingItem: $draggingItem,
+                                    isDraggingOver: $isDraggingOver,
+                                    executor: executor,
+                                    onURLsDropped: { handleDroppedURLs($0) },
+                                    onDataDropped: { addImages(from: $0) }
+                                ))
                             }
                             
                             ForEach(selectedAttachments) { attachment in
@@ -145,13 +153,29 @@ struct MessageInputView: View {
                                     self.draggingAttachment = attachment
                                     return NSItemProvider(object: attachment.id.uuidString as NSString)
                                 }
-                                .onDrop(of: [.text], delegate: AttachmentDropDelegate(item: attachment, items: $selectedAttachments, draggingItem: $draggingAttachment, isDraggingOver: .constant(false)))
+                                .onDrop(of: [.fileURL, .image, .text], delegate: AttachmentDropDelegate(
+                                    item: attachment,
+                                    items: $selectedAttachments,
+                                    draggingItem: $draggingAttachment,
+                                    isDraggingOver: $isDraggingOver,
+                                    executor: executor,
+                                    onURLsDropped: { handleDroppedURLs($0) },
+                                    onDataDropped: { addImages(from: $0) }
+                                ))
                             }
                         }
                         .padding(.horizontal, 4)
                     }
                     .frame(height: 76)
                     .scrollClipDisabled()
+                    .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+                        items: $selectedImages,
+                        isDraggingOver: $isDraggingOver,
+                        executor: executor,
+                        isEnabled: canAttach,
+                        onURLsDropped: { handleDroppedURLs($0) },
+                        onDataDropped: { addImages(from: $0) }
+                    ))
                     .overlay {
                         if executor.isDraggingFile {
                             ZStack {
@@ -174,6 +198,7 @@ struct MessageInputView: View {
                             }
                             .padding(.top, 8)
                             .padding(.horizontal, 4)
+                            .allowsHitTesting(false)
                         }
                     }
                 }
