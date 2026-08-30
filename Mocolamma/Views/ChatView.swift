@@ -19,6 +19,7 @@ struct ChatView: View {
     @State private var isNearBottom: Bool = true
     @State private var scrollToBottomTrigger: Int = 0
     @State private var scrollToMessageIDTrigger: UUID? = nil
+    @State private var currentAssistantStreamTask: Task<Void, Never>? = nil
     private var modelSettings = ModelSettingsManager.shared
     @State private var selectionCoordinator = TextSelectionCoordinator()
 
@@ -31,6 +32,18 @@ struct ChatView: View {
         self.onToggleInspector = onToggleInspector
     }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private func stopChatStreaming() {
+        currentAssistantStreamTask?.cancel()
+        currentAssistantStreamTask = nil
+        if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+            executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+            executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+            executor.updateIsChatStreaming()
+        }
+        executor.isChatStreaming = false
+        executor.cancelChatStreaming()
+    }
     
     private var currentSelectedModel: OllamaModel? {
         if let id = chatSettings.selectedModelID {
@@ -96,13 +109,7 @@ struct ChatView: View {
         ) {
             sendMessage()
         } stopMessage: {
-            if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                executor.updateIsChatStreaming()
-            }
-            executor.isChatStreaming = false
-            executor.cancelChatStreaming()
+            stopChatStreaming()
         }
 #if !os(visionOS)
         .padding()
@@ -538,6 +545,8 @@ struct ChatView: View {
         let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: rawAttachments.isEmpty ? nil : rawAttachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
         userMessage.isProcessingPDF = hasPDFs
         userMessage.isProcessingImages = !hasPDFs && hasImages
+        userMessage.rawInputAttachments = rawAttachments
+        userMessage.rawInputImages = rawInputImages
         executor.chatMessages.append(userMessage)
         
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -548,7 +557,8 @@ struct ChatView: View {
         executor.chatMessages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
         
-        Task {
+        currentAssistantStreamTask?.cancel()
+        currentAssistantStreamTask = Task {
             // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
             let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision && !skipImages)
             
@@ -567,7 +577,7 @@ struct ChatView: View {
             }
             
             // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
-            guard executor.isChatStreaming else { return }
+            guard executor.isChatStreaming, !Task.isCancelled else { return }
             
             var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
             if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
@@ -599,12 +609,6 @@ struct ChatView: View {
             let userMessage = executor.chatMessages[indexToRetry]
             let scrollId = userMessage.id
             
-            var apiMessages = executor.chatMessages
-            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
-                apiMessages.insert(systemMessage, at: 0)
-            }
-            
             let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
             placeholderMessage.revisions = []
             placeholderMessage.currentRevisionIndex = 0
@@ -620,7 +624,43 @@ struct ChatView: View {
             
             executor.isChatStreaming = true
             scrollToMessageIDTrigger = scrollId
-            Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
+            
+            let rawAttachments = userMessage.rawInputAttachments ?? (userMessage.attachments ?? [])
+            let rawEditingImages = userMessage.rawInputImages ?? []
+            let hasImages = userMessage.isProcessingImages && !rawEditingImages.isEmpty
+            
+            currentAssistantStreamTask?.cancel()
+            currentAssistantStreamTask = Task {
+                // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
+                let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision)
+                
+                // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
+                var directImages: [String] = []
+                if hasImages {
+                    directImages = await rawEditingImages.resolveBase64Images()
+                }
+                
+                await MainActor.run {
+                    userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                    if !directImages.isEmpty {
+                        userMessage.images = directImages
+                    }
+                    userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                    userMessage.isProcessingPDF = false
+                    userMessage.isProcessingImages = false
+                }
+                
+                // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+                guard executor.isChatStreaming, !Task.isCancelled else { return }
+                
+                var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
+                if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                    let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
+                    apiMessages.insert(systemMessage, at: 0)
+                }
+                
+                await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
+            }
             
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
             guard indexToRetry == executor.chatMessages.count - 1 else {
@@ -637,7 +677,8 @@ struct ChatView: View {
                 return
             }
             let userMessageIndex = indexToRetry - 1
-            let scrollId = executor.chatMessages[userMessageIndex].id
+            let userMessage = executor.chatMessages[userMessageIndex]
+            let scrollId = userMessage.id
             
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content の順
@@ -701,13 +742,6 @@ struct ChatView: View {
             executor.chatMessages[indexToRetry].evalCount = nil
             executor.chatMessages[indexToRetry].evalDuration = nil
             
-            // 4) APIに出すメッセージ（ユーザー発話まで）
-            var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
-            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
-                apiMessages.insert(systemMessage, at: 0)
-            }
-            
             guard let model = currentSelectedModel else {
                 generalErrorMessage = "Please select a model first."
                 return
@@ -715,7 +749,54 @@ struct ChatView: View {
             
             executor.isChatStreaming = true
             scrollToMessageIDTrigger = scrollId
-            Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
+            
+            // 4) 直前のユーザーメッセージの添付・画像処理が未完了または未解決の場合は完了を待機
+            let rawAttachments = userMessage.rawInputAttachments ?? (userMessage.attachments ?? [])
+            let rawEditingImages = userMessage.rawInputImages ?? []
+            let hasPDFs = rawAttachments.contains { $0.isPDF }
+            let hasImages = !rawEditingImages.isEmpty
+            
+            // まだPDF抽出や画像Base64変換が終わっていない場合（抽出テキストがない、画像がない、または処理中フラグが残っている場合）
+            let isPDFUnresolved = hasPDFs && (userMessage.attachments?.allSatisfy { $0.content.isEmpty || !$0.content.hasPrefix("===") } ?? true)
+            let isImageUnresolved = hasImages && (userMessage.images == nil || userMessage.images?.isEmpty == true)
+            let needsProcessing = isPDFUnresolved || isImageUnresolved || userMessage.isProcessingPDF || userMessage.isProcessingImages
+            
+            currentAssistantStreamTask?.cancel()
+            currentAssistantStreamTask = Task {
+                if needsProcessing {
+                    await MainActor.run {
+                        userMessage.isProcessingPDF = hasPDFs
+                        userMessage.isProcessingImages = !hasPDFs && hasImages
+                    }
+                    
+                    let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision)
+                    var directImages: [String] = []
+                    if hasImages {
+                        directImages = await rawEditingImages.resolveBase64Images()
+                    }
+                    
+                    await MainActor.run {
+                        userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                        if !directImages.isEmpty {
+                            userMessage.images = directImages
+                        }
+                        userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                        userMessage.isProcessingPDF = false
+                        userMessage.isProcessingImages = false
+                    }
+                }
+                
+                // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+                guard executor.isChatStreaming, !Task.isCancelled else { return }
+                
+                var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
+                if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                    let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
+                    apiMessages.insert(systemMessage, at: 0)
+                }
+                
+                await streamAssistantResponse(for: messageId, with: apiMessages, model: model)
+            }
         }
     }
     
@@ -748,6 +829,10 @@ struct ChatView: View {
             var charsPerTick: Int = 30
             
             while true {
+                if Task.isCancelled || !executor.isChatStreaming {
+                    break
+                }
+                
                 if buffer.isStreamingFinished && 
                    buffer.rawContent.count <= displayedContentLength && 
                    buffer.rawThinking.count <= displayedThinkingLength {
@@ -766,15 +851,17 @@ struct ChatView: View {
                 let nextT = String(buffer.rawThinking.prefix(targetT))
                 
                 if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }) {
-                    // プロパティ更新を一括化してObservationの通知回数を削減
-                    executor.chatMessages[index].updateStreamingContent(
-                        content: nextC,
-                        thinking: nextT.isEmpty ? nil : nextT,
-                        isThinkingCompleted: buffer.isThinkingCompleted
-                    )
-                    
-                    displayedContentLength = targetC
-                    displayedThinkingLength = targetT
+                    if !Task.isCancelled && executor.isChatStreaming {
+                        // プロパティ更新を一括化してObservationの通知回数を削減
+                        executor.chatMessages[index].updateStreamingContent(
+                            content: nextC,
+                            thinking: nextT.isEmpty ? nil : nextT,
+                            isThinkingCompleted: buffer.isThinkingCompleted
+                        )
+                        
+                        displayedContentLength = targetC
+                        displayedThinkingLength = targetT
+                    }
                 } else {
                     break
                 }
@@ -792,11 +879,12 @@ struct ChatView: View {
                 }
                 
                 try? await Task.sleep(nanoseconds: UInt64(currentInterval * 1_000_000_000))
-                if Task.isCancelled { break }
+                if Task.isCancelled || !executor.isChatStreaming { break }
             }
             
             // 最終確定処理
-            if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
+            if !Task.isCancelled && executor.isChatStreaming,
+               let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
                let chunk = buffer.finalChunk {
                 let isThinkingCompleted = buffer.isThinkingCompleted || !buffer.rawThinking.isEmpty
                 

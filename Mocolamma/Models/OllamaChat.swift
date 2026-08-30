@@ -376,6 +376,8 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
     var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
     var isProcessingPDF: Bool = false // PDFの抽出・変換処理中かどうかを示すフラグ
+    var rawInputImages: [ChatInputImage]? = nil // 処理前の生入力画像（リトライ・送信時の一時受け渡し用）
+    var rawInputAttachments: [ChatInputAttachment]? = nil // 処理前の生入力添付ファイル（リトライ・送信時の一時受け渡し用）
     
     // 画像生成関連のプロパティ
     var generatedImage: String? // 生成された画像 (Base64)

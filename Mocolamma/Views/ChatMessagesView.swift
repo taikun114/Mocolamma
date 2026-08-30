@@ -358,21 +358,24 @@ struct MessageViewWrapper: View, Equatable {
            lhs.isLastOwnUserMessage != rhs.isLastOwnUserMessage ||
            lhs.isModelSelected != rhs.isModelSelected ||
            lhs.selectedModelName != rhs.selectedModelName ||
-           lhs.isOverallStreaming != rhs.isOverallStreaming {
+           lhs.isOverallStreaming != rhs.isOverallStreaming ||
+           lhs.message.isStreaming != rhs.message.isStreaming ||
+           lhs.message.isStopped != rhs.message.isStopped ||
+           lhs.message.isProcessingPDF != rhs.message.isProcessingPDF ||
+           lhs.message.isProcessingImages != rhs.message.isProcessingImages {
             return false
         }
         
         // [CRITICAL] ストリーミング中または画像処理中の場合のみ、重い文字列比較を行う。
         // これにより、膨大な過去メッセージ（数千〜数万文字）に対する毎フレームの文字列比較を回避し、CPU負荷を劇的に低減する。
-        if lhs.message.isStreaming || lhs.message.isProcessingImages || lhs.message.isProcessingPDF || rhs.message.isStreaming {
+        if lhs.message.isStreaming || lhs.message.isProcessingImages || lhs.message.isProcessingPDF {
             return lhs.message.content == rhs.message.content &&
                    lhs.message.thinking == rhs.message.thinking &&
                    lhs.message.isThinkingCompleted == rhs.message.isThinkingCompleted
         }
         
         // 完了済みメッセージについては、メタデータのみ比較
-        return lhs.message.isStopped == rhs.message.isStopped &&
-               lhs.message.isCopied == rhs.message.isCopied &&
+        return lhs.message.isCopied == rhs.message.isCopied &&
                lhs.message.currentRevisionIndex == rhs.message.currentRevisionIndex &&
                lhs.message.revisions.count == rhs.message.revisions.count &&
                lhs.message.isDownloadSuccessful == rhs.message.isDownloadSuccessful

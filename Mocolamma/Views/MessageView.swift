@@ -1018,11 +1018,15 @@ struct MessageView: View {
                 isEditing = true
                 isEditingFocused = true
                 message.content = message.content
-                editingAttachments = message.attachments ?? []
                 
-                // 画像を編集用にコピー
-                Task {
-                    if let images = message.images {
+                // 添付ファイルの初期化（rawInputAttachments または attachments を復元）
+                editingAttachments = message.rawInputAttachments ?? message.attachments ?? []
+                
+                // 画像の初期化（rawInputImages があれば即座に全件復元、なければ images の Base64 から非同期生成）
+                if let rawImages = message.rawInputImages, !rawImages.isEmpty {
+                    editingImages = rawImages
+                } else if let images = message.images, !images.isEmpty {
+                    Task {
                         editingImages = await withTaskGroup(of: (Int, ChatInputImage?).self) { group in
                             for (index, base64) in images.enumerated() {
                                 group.addTask {
@@ -1042,9 +1046,9 @@ struct MessageView: View {
                             }
                             return results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
                         }
-                    } else {
-                        editingImages = []
                     }
+                } else {
+                    editingImages = []
                 }
             }) {
                 Image(systemName: "pencil")
@@ -1191,53 +1195,20 @@ struct MessageView: View {
         
         message.isProcessingPDF = hasPDFs
         message.isProcessingImages = !hasPDFs && hasImages
+        message.rawInputAttachments = rawAttachments
+        message.rawInputImages = rawEditingImages
+        message.attachments = rawAttachments.isEmpty ? nil : rawAttachments
+        message.images = nil
+        message.pdfImages = nil
         
-        // 編集内容を反映させるためのTaskを開始
-        Task {
-            // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
-            let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: supportsVision && !skipImages)
-            
-            // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
-            var directImages: [String] = []
-            if hasImages {
-                directImages = await rawEditingImages.resolveBase64Images()
-            }
-            
-            await MainActor.run {
-                message.attachments = processedAttachments.isEmpty ? nil : processedAttachments
-                message.images = directImages.isEmpty ? nil : directImages
-                message.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
-                message.isProcessingPDF = false
-                message.isProcessingImages = false
-            }
-            
-            onRetry?(message.id, message)
-        }
+        onRetry?(message.id, message)
     }
     
     @ViewBuilder
     private var messageContentView: some View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
-            if message.isProcessingPDF {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text("Processing PDF...")
-                        .font(.caption)
-                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
-                }
-                .padding(.vertical, 4)
-            } else if message.isProcessingImages {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text("Processing images...")
-                        .font(.caption)
-                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
-                }
-                .padding(.vertical, 4)
-            } else if isEditing && message.role == "user" {
+            if isEditing && message.role == "user" {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(editingImages) { imageContainer in
@@ -1380,40 +1351,8 @@ struct MessageView: View {
                         addImages(from: data)
                     }
                 }))
-            } else if (message.images != nil && !message.images!.isEmpty) || (message.attachments != nil && !message.attachments!.isEmpty) {
-                // 画像・添付ファイルの表示（収まる時はバブルを画像幅に合わせ、多い時はスクロール）
-                let images = message.images ?? []
-                let attachments = message.attachments ?? []
-                
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(Array(images.enumerated()), id: \.offset) { index, base64 in
-                            MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
-#if os(visionOS)
-                                .hoverEffect()
-#endif
-                        }
-                        ForEach(attachments) { attachment in
-                            FileAttachmentTileView(attachment: attachment, size: 100, isUserBubble: message.role == "user")
-                        }
-                    }
-                    
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8) {
-                            ForEach(Array(images.enumerated()), id: \.offset) { index, base64 in
-                                MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
-#if os(visionOS)
-                                    .hoverEffect()
-#endif
-                            }
-                            ForEach(attachments) { attachment in
-                                FileAttachmentTileView(attachment: attachment, size: 100, isUserBubble: message.role == "user")
-                            }
-                        }
-                    }
-                    .scrollClipDisabled()
-                }
-                .frame(height: 100)
+            } else if hasMessageMedia {
+                messageMediaView
             }
             
             if isEditing && message.role == "user" {
@@ -1457,8 +1396,8 @@ struct MessageView: View {
                         // 変換確定後にEnterが押されたら改行を挿入
                         message.content += "\n"
                     }
-            }
-        } else if message.isImageGeneration && message.role == "assistant" {
+                }
+            } else if message.isImageGeneration && message.role == "assistant" {
             VStack(alignment: .leading, spacing: 10) {
                 if let base64String = message.generatedImage,
                    let data = Data(base64Encoded: base64String),
@@ -1563,8 +1502,97 @@ struct MessageView: View {
         } else {
             streamingContentBody
         }
+        }
     }
-}
+    
+    private var hasMessageMedia: Bool {
+        let hasImages = (message.images != nil && !message.images!.isEmpty) || (message.rawInputImages != nil && !message.rawInputImages!.isEmpty)
+        let hasAttachments = (message.attachments != nil && !message.attachments!.isEmpty) || (message.rawInputAttachments != nil && !message.rawInputAttachments!.isEmpty)
+        return hasImages || hasAttachments
+    }
+    
+    @ViewBuilder
+    private var messageMediaView: some View {
+        let directImages = message.images ?? []
+        let rawImages = message.rawInputImages ?? []
+        let attachments = message.attachments ?? message.rawInputAttachments ?? []
+        let isUser = message.role == "user"
+        
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
+            }
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
+                }
+            }
+            .scrollClipDisabled()
+        }
+        .frame(height: 100)
+    }
+    
+    @ViewBuilder
+    private func mediaTiles(directImages: [String], rawImages: [ChatInputImage], attachments: [ChatInputAttachment], isUser: Bool) -> some View {
+        if !directImages.isEmpty {
+            ForEach(Array(directImages.enumerated()), id: \.offset) { index, base64 in
+                MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
+#if os(visionOS)
+                    .hoverEffect()
+#endif
+            }
+        } else if !rawImages.isEmpty {
+            ForEach(rawImages) { rawImage in
+                ZStack {
+                    if let thumb = rawImage.thumbnail {
+                        Image(platformImage: thumb)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if let fullImage = PlatformImage(data: rawImage.data) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        onPreviewImage?(fullImage)
+                                    }
+                                }
+                            }
+                        
+                        if rawImage.isLoading || message.isProcessingImages {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.black.opacity(0.35))
+                                .overlay {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                        }
+                    } else {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(isUser ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
+                            .frame(width: 100, height: 100)
+                            .overlay {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                    }
+                }
+#if os(visionOS)
+                .hoverEffect()
+#endif
+            }
+        }
+        
+        ForEach(attachments) { attachment in
+            FileAttachmentTileView(
+                attachment: attachment,
+                size: 100,
+                isUserBubble: isUser,
+                isProcessing: message.isProcessingPDF && attachment.isPDF
+            )
+        }
+    }
     
     @ViewBuilder
     private var streamingContentBody: some View {

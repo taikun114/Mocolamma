@@ -167,7 +167,7 @@ struct FileAttachmentTileView: View {
         }
     }
     
-    init(attachment: ChatInputAttachment, size: CGFloat = 60, isUserBubble: Bool = false) {
+    init(attachment: ChatInputAttachment, size: CGFloat = 60, isUserBubble: Bool = false, isProcessing: Bool = false) {
         let key = attachment.thumbnailBase64 ?? (attachment.content.isEmpty ? nil : attachment.content)
         self.init(
             fileName: attachment.name,
@@ -175,21 +175,41 @@ struct FileAttachmentTileView: View {
             thumbnail: attachment.thumbnail,
             size: size,
             isUserBubble: isUserBubble,
-            isLoading: attachment.isLoading
+            isLoading: attachment.isLoading || isProcessing
         )
     }
     
     var body: some View {
         ZStack(alignment: .topLeading) {
             if isLoading {
-                // 処理中のスピナー表示（画像添付と同様のデザイン）
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isUserBubble ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
-                    .frame(width: size, height: size)
-                    .overlay {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
+                // 処理中のスピナー表示（サムネイルがあればサムネイル背景、なければ半透明図形）
+                if let thumb = effectiveThumbnail {
+                    #if os(macOS)
+                    Image(nsImage: thumb)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipped()
+                        .overlay(Color.black.opacity(0.45))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    #else
+                    Image(uiImage: thumb)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipped()
+                        .overlay(Color.black.opacity(0.45))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    #endif
+                } else {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isUserBubble ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
+                        .frame(width: size, height: size)
+                }
+                
+                ProgressView()
+                    .controlSize(.small)
+                    .frame(width: size, height: size, alignment: .center)
             } else {
                 // 背景レイヤー
                 if let thumb = effectiveThumbnail {
