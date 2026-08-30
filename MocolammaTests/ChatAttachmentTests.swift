@@ -38,6 +38,10 @@ struct ChatAttachmentTests {
         # My Notes
         Content here
         ``````````
+        
+        ===
+        
+        このマークダウンを要約して
         """
         #expect(fullPrompt == expected)
     }
@@ -65,6 +69,27 @@ struct ChatAttachmentTests {
         
         ``````````
         BBB
+        ``````````
+        
+        ===
+        
+        2つのファイルを比較して
+        """
+        #expect(fullPrompt == expected)
+    }
+    
+    @Test func testBuildFullPromptWithEmptyUserText() {
+        let userText = ""
+        let attachment = ChatInputAttachment(name: "notes.md", content: "# Content")
+        let fullPrompt = ChatMessage.buildFullPrompt(userText: userText, attachments: [attachment])
+        
+        let expected = """
+        ===
+        
+        Attached File: notes.md
+        
+        ``````````
+        # Content
         ``````````
         """
         #expect(fullPrompt == expected)
@@ -161,6 +186,10 @@ struct ChatAttachmentTests {
         ``````````
         Page 2 OCR Content
         ``````````
+        
+        ===
+        
+        PDFを要約して
         """
         #expect(fullPrompt == expected)
     }

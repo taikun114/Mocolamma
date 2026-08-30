@@ -399,11 +399,12 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalEvalDuration: Int? // 最終的な評価時間
     var finalIsStopped: Bool = false // 最終的な停止状態
     
-    /// 添付ファイルの内容をフォーマットしてプロンプトテキストを構築します
+    /// 添付ファイルの内容をフォーマットしてプロンプトテキストを構築します（添付ファイルがある場合はサンドイッチ構成）
     static func buildFullPrompt(userText: String, attachments: [ChatInputAttachment]?) -> String {
         guard let attachments = attachments, !attachments.isEmpty else {
             return userText
         }
+        let trimmedUserText = userText.trimmingCharacters(in: .whitespacesAndNewlines)
         var fullText = userText
         for attachment in attachments {
             if !fullText.isEmpty {
@@ -424,6 +425,10 @@ class ChatMessage: Identifiable, Codable, Equatable {
                 ``````````
                 """
             }
+        }
+        // 添付ファイルがあり、ユーザープロンプトが存在する場合は末尾にも配置してサンドイッチ構成にする
+        if !trimmedUserText.isEmpty {
+            fullText += "\n\n===\n\n" + userText
         }
         return fullText
     }
