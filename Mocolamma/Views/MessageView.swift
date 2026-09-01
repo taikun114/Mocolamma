@@ -1462,40 +1462,13 @@ struct MessageView: View {
             }
         } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isThinkingExpanded.toggle()
-                    }
-                }) {
-                    HStack {
-                        Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
-                            .foregroundColor(.secondary)
-                            .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .rotationEffect(.degrees(isThinkingExpanded ? 90 : 0))
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help(isThinkingExpanded ? "Collapse thinking process" : "Expand thinking process")
-                .padding(.bottom, 4)
-                
-                if isThinkingExpanded {
-                    if let thinking = message.thinking, !thinking.isEmpty {
-                        StructuredText.Streaming(markdown: thinking, isStreaming: message.isStreaming && !message.isThinkingCompleted)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textualSelection(enabled: true)
-                            .textual.syntaxHighlightingEnabled(true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
+                MessageThinkingSectionView(
+                    thinking: message.thinking ?? "",
+                    isStreaming: message.isStreaming,
+                    isThinkingCompleted: message.isThinkingCompleted,
+                    message: message,
+                    isExpanded: $isThinkingExpanded
+                )
                 
                 streamingContentBody
             }
@@ -1947,6 +1920,61 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 // MARK: - Document Support
 
 // MARK: - Dedicated Style for Thinking Text
+
+struct MessageThinkingSectionView: View, Equatable {
+    let thinking: String
+    let isStreaming: Bool
+    let isThinkingCompleted: Bool
+    let message: ChatMessage
+    @Binding var isExpanded: Bool
+
+    static func == (lhs: MessageThinkingSectionView, rhs: MessageThinkingSectionView) -> Bool {
+        lhs.thinking == rhs.thinking &&
+        lhs.isStreaming == rhs.isStreaming &&
+        lhs.isThinkingCompleted == rhs.isThinkingCompleted &&
+        lhs.isExpanded == rhs.isExpanded
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    Label(isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
+                        .foregroundColor(.secondary)
+                        .symbolEffect(.pulse, isActive: isStreaming && !isThinkingCompleted)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(isExpanded ? "Collapse thinking process" : "Expand thinking process")
+            
+            if isExpanded && !thinking.isEmpty {
+                StructuredText.Streaming(
+                    markdown: thinking,
+                    isStreaming: isStreaming && !isThinkingCompleted
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
+                .textualSelection(enabled: true)
+                .textual.syntaxHighlightingEnabled(true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .transition(.opacity)
+            }
+        }
+    }
+}
 
 struct SimpleThinkingStyle: StructuredText.Style {
     let message: ChatMessage
