@@ -58,6 +58,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 ### Bug Fixes and Improvements
 #### General
 - **Improve the appearance of the license screens**
+- **Change default API timeout to 5 minutes**
+  - Reduced the likelihood of timeout errors when loading large models or when prompt processing takes longer.
 
 #### Model
 - **Fix issue where the modified date of models was not displayed correctly depending on the environment**
