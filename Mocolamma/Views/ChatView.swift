@@ -1392,7 +1392,6 @@ struct ImageGenerationView: View {
             .confirmationDialog(String(localized: "Are you sure you want to clear the generation history?"), isPresented: $showingClearConfirm, titleVisibility: .visible) {
                 Button(String(localized: "Clear History"), role: .destructive) {
                     executor.clearImageGeneration()
-                    executor.chatInputText = ""
                 }
                 Button(String(localized: "Cancel"), role: .cancel) { }
             }

@@ -68,6 +68,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
 - **Fix issue where picker contents could shrink on macOS Tahoe or later**
 - **Improve the appearance of the message input area and scroll to bottom button on macOS Golden Gate**
+- **Improve handling so that entered text and attached files are not reset when clearing chat or image generation history**
 
 #### Chat
 - **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**

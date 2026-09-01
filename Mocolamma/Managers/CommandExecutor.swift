@@ -1635,12 +1635,9 @@ struct MarkdownTestView: View {
         print("Image generation cancelled.")
     }
     
-    /// チャット履歴と入力テキストをクリアします。
+    /// チャット履歴をクリアします。
     func clearChat() {
         chatMessages.removeAll()
-        chatInputText = ""
-        chatInputImages = []
-        chatInputAttachments = []
         updateIsChatStreaming()
         cancelChatStreaming()
     }
@@ -1648,8 +1645,6 @@ struct MarkdownTestView: View {
     /// 画像生成履歴をクリアします。
     func clearImageGeneration() {
         imageMessages.removeAll()
-        chatInputText = ""
-        imageInputImages = []
         updateIsImageStreaming()
         cancelImageGeneration()
     }
@@ -1657,7 +1652,6 @@ struct MarkdownTestView: View {
     /// Ollamaの /api/generate エンドポイントにリクエストを送信し、画像生成処理を行います。
     func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
-            // ... (demo logic)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
                     do {
