@@ -57,6 +57,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 ### Bug Fixes and Improvements
 #### General
+- **Refresh the app icon**
+  - Redesigned the app icon and the design displayed on the iOS launch screen.
 - **Improve the appearance of the license screens**
 - **Change default API timeout to 5 minutes**
   - Reduced the likelihood of timeout errors when loading large models or when prompt processing takes longer.

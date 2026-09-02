@@ -17,6 +17,14 @@ struct AboutView: View {
         }
     }
     
+    private var isOS27OrLater: Bool {
+        if #available(iOS 27.0, macOS 27.0, visionOS 27.0, *) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     @State private var showingFeedbackMailAlert = false
     @State private var showingContributorsAlert = false
     @State private var showingBugReportAlert = false
@@ -49,7 +57,7 @@ struct AboutView: View {
     private var aboutViewContent: some View {
         Form {
             Section(header: Text("About Mocolamma").font(.headline)) {
-                HStack(alignment: .center, spacing: 20) {
+                HStack(alignment: .center, spacing: 16) {
 #if os(visionOS)
                     // visionOS用レイヤー構造アイコン
                     ZStack {
@@ -63,42 +71,34 @@ struct AboutView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 96, height: 96)
                     .clipShape(Circle())
-                    .padding(8)
-                    .padding(.trailing, -8)
+#elseif os(macOS)
+                    let appIcon = NSWorkspace.shared.icon(forFile: Bundle.main.bundlePath)
+                    Image(nsImage: appIcon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 128, height: 128)
+                        .padding(.trailing, -8)
+                        .id(colorScheme)
 #else
-                    if isOS26OrLater {
-#if os(macOS)
-                        Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
+                    if isOS27OrLater {
+                        Image("AppIconLiquidGlass27")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
-                            .padding(8)
-                            .padding(.trailing, -10)
                             .id(colorScheme)
-#else
-                        Image("AppIconLiquidGlass")
+                    } else if isOS26OrLater {
+                        Image("AppIconLiquidGlass26")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
-                            .padding(8)
-                            .padding(.trailing, -8)
                             .id(colorScheme)
-#endif
                     } else {
-#if os(macOS)
-                        Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 128, height: 128)
-                            .padding(.trailing, -10)
-#else
-                        Image("AppIconLiquidGlass")
+                        Image("AppIconLiquidGlass26")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
-                            .padding(.trailing, -4)
+                            .padding(.vertical, 8)
                             .id(colorScheme)
-#endif
                     }
 #endif
                     
@@ -128,6 +128,9 @@ struct AboutView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+#if !os(macOS)
+                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+#endif
                 
 #if !os(macOS)
                 VStack(alignment: .leading, spacing: 8) {

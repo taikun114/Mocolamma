@@ -1,95 +1,42 @@
 {
+  "features" : [
+    "refractivity"
+  ],
   "fill" : {
-    "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
+    "automatic-gradient" : "display-p3:0.66971,0.76091,0.87485,1.00000"
   },
   "groups" : [
     {
-      "blur-material" : null,
-      "layers" : [
-        {
-          "image-name" : "Eyes@2x.png",
-          "name" : "Eyes@2x"
-        }
-      ],
-      "opacity-specializations" : [
-        {
-          "appearance" : "dark",
-          "value" : 0.9
-        },
-        {
-          "appearance" : "tinted",
-          "value" : 1
-        }
-      ],
-      "position" : {
-        "scale" : 1.25,
-        "translation-in-points" : [
-          0,
-          0
-        ]
-      },
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 1
-      },
-      "translucency-specializations" : [
-        {
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.6
-          }
-        }
-      ]
-    },
-    {
       "blur-material" : 1,
+      "hidden" : false,
       "layers" : [
         {
-          "image-name" : "Face@2x.png",
-          "name" : "Face@2x"
+          "image-name" : "v2_face.png",
+          "name" : "v2_face"
         }
       ],
-      "lighting" : "individual",
       "opacity-specializations" : [
         {
+          "value" : 1
+        },
+        {
           "appearance" : "dark",
-          "value" : 0.9
+          "value" : 1
         },
         {
           "appearance" : "tinted",
           "value" : 1
         }
       ],
-      "position" : {
-        "scale" : 1.25,
-        "translation-in-points" : [
-          0,
-          0
-        ]
-      },
       "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 1
+        "kind" : "none",
+        "opacity" : 0.5
       },
       "translucency-specializations" : [
         {
           "value" : {
             "enabled" : true,
-            "value" : 0.5
+            "value" : 1
           }
         },
         {
@@ -103,104 +50,85 @@
           "appearance" : "tinted",
           "value" : {
             "enabled" : true,
-            "value" : 0.6
+            "value" : 0.5
           }
         }
       ]
     },
     {
-      "blur-material" : 0.5,
+      "blur-material" : 0.1,
       "layers" : [
         {
-          "image-name" : "Ears@2x.png",
-          "name" : "Ears@2x"
+          "image-name" : "v2_ears.png",
+          "name" : "v2_ears"
+        }
+      ],
+      "opacity" : 0.75,
+      "refractivity" : {
+        "depth" : 0.05,
+        "enabled" : true,
+        "strength" : 0.5
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode" : "plus-lighter",
+      "layers" : [
+        {
+          "image-name" : "v2_glow.png",
+          "name" : "v2_glow"
         }
       ],
       "opacity-specializations" : [
         {
-          "appearance" : "dark",
-          "value" : 0.9
+          "value" : 1
         },
         {
-          "appearance" : "tinted",
+          "appearance" : "dark",
           "value" : 1
         }
       ],
-      "position" : {
-        "scale" : 1.25,
-        "translation-in-points" : [
-          0,
-          0
-        ]
-      },
       "shadow" : {
         "kind" : "neutral",
-        "opacity" : 1
+        "opacity" : 0.5
       },
-      "translucency-specializations" : [
-        {
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.75
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.75
-          }
-        }
-      ]
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
     },
     {
-      "blur-material" : null,
       "layers" : [
         {
-          "image-name" : "Tool@2x.png",
-          "name" : "Tool@2x"
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.66971,0.76091,0.87485,1.00000"
+              }
+            }
+          ],
+          "image-name" : "v2_wrench.png",
+          "name" : "v2_wrench"
         }
       ],
-      "position" : {
-        "scale" : 1.25,
-        "translation-in-points" : [
-          0,
-          0
-        ]
-      },
+      "opacity" : 1,
       "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 1
+        "kind" : "layer-color",
+        "opacity" : 0.5
       },
-      "translucency-specializations" : [
-        {
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        },
-        {
-          "appearance" : "tinted",
-          "value" : {
-            "enabled" : true,
-            "value" : 0.5
-          }
-        }
-      ]
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
     }
   ],
   "supported-platforms" : {
