@@ -47,9 +47,16 @@ struct ModelListView: View {
     @State private var showingPullErrorAlert: Bool = false
     @State private var loadErrorMessage: String? = nil
     @State private var showingLoadErrorAlert: Bool = false
+    @State private var modelForCustomKeepAlive: OllamaModel? = nil
     let isSelected: Bool // 現在のタブが選択されているか
     
     let onTogglePreview: () -> Void // プレビューパネルをトグルするためのクロージャ
+    
+    // 現在選択されているモデルのインスタンスを取得するプロパティ
+    private var currentlySelectedModel: OllamaModel? {
+        guard let selectedModelID = selectedModel else { return nil }
+        return executor.models.first(where: { $0.id == selectedModelID })
+    }
     
     // MARK: - Sorting State
     @State private var sortCriterion: SortCriterion = .number
@@ -106,6 +113,15 @@ struct ModelListView: View {
             return tagIconName(tag)
         }
         return "line.3.horizontal.decrease"
+    }
+    
+    // モデルアクションのアイコン名を返す（macOS 26以降は枠なしのellipsis、それ未満はellipsis.circle）
+    private var modelActionIconName: String {
+        if #available(macOS 26.0, iOS 26.0, visionOS 26.0, *) {
+            return "ellipsis"
+        } else {
+            return "ellipsis.circle"
+        }
     }
     
     // ソート項目のアイコン名を返す
@@ -188,15 +204,6 @@ struct ModelListView: View {
     
     @ToolbarContentBuilder
     private var modelToolbarContent: some ToolbarContent {
-#if os(macOS) || os(visionOS)
-        ToolbarItem(placement: .primaryAction) {
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
-        }
-#endif
-
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
             Menu {
@@ -250,9 +257,47 @@ struct ModelListView: View {
         }
 #endif
 
-#if os(iOS)
-        if #available(iOS 26.0, *) {
+#if !os(visionOS)
+        if #available(macOS 26.0, iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .primaryAction)
+        }
+#endif
+
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                if let selectedModelObject = currentlySelectedModel {
+                    ModelActionMenuContent(
+                        model: selectedModelObject,
+                        executor: executor,
+                        isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError,
+                        onCustomKeepAlive: { model in
+                            modelForCustomKeepAlive = model
+                        },
+                        onDelete: { model in
+                            modelToDelete = model
+                            showingDeleteConfirmation = true
+                        },
+                        onError: { errorText in
+                            loadErrorMessage = errorText
+                            showingLoadErrorAlert = true
+                        }
+                    )
+                }
+            } label: {
+                Label("Model Actions", systemImage: modelActionIconName)
+            }
+            .menuIndicator(.hidden)
+            .accessibilityLabel("Model Actions")
+            .help(String(localized: "Model Actions"))
+            .disabled(currentlySelectedModel == nil || executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+        }
+
+#if os(macOS) || os(visionOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { appRefreshTrigger.send() }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil)
         }
 #endif
         
@@ -281,7 +326,8 @@ struct ModelListView: View {
 #endif
     }
     
-    var body: some View {
+    @ViewBuilder
+    private var contentLayout: some View {
         let copyIconName = SFSymbol.copy
 
         Group {
@@ -294,6 +340,7 @@ struct ModelListView: View {
                 showingDeleteConfirmation: $showingDeleteConfirmation,
                 loadErrorMessage: $loadErrorMessage,
                 showingLoadErrorAlert: $showingLoadErrorAlert,
+                modelForCustomKeepAlive: $modelForCustomKeepAlive,
                 copyIconName: copyIconName,
                 bottomInset: inputAreaHeight
             )
@@ -308,6 +355,7 @@ struct ModelListView: View {
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     loadErrorMessage: $loadErrorMessage,
                     showingLoadErrorAlert: $showingLoadErrorAlert,
+                    modelForCustomKeepAlive: $modelForCustomKeepAlive,
                     copyIconName: copyIconName,
                     bottomInset: 0
                 )
@@ -325,6 +373,7 @@ struct ModelListView: View {
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         loadErrorMessage: $loadErrorMessage,
                         showingLoadErrorAlert: $showingLoadErrorAlert,
+                        modelForCustomKeepAlive: $modelForCustomKeepAlive,
                         copyIconName: copyIconName,
                         bottomInset: 0
                     )
@@ -343,6 +392,7 @@ struct ModelListView: View {
                     showingDeleteConfirmation: $showingDeleteConfirmation,
                     loadErrorMessage: $loadErrorMessage,
                     showingLoadErrorAlert: $showingLoadErrorAlert,
+                    modelForCustomKeepAlive: $modelForCustomKeepAlive,
                     copyIconName: copyIconName,
                     bottomInset: 0
                 )
@@ -351,6 +401,37 @@ struct ModelListView: View {
             }
 #endif
         }
+    }
+    
+    @ViewBuilder
+    private var contentOverlay: some View {
+        if serverManager.selectedServer == nil {
+            ContentUnavailableView(
+                "No Server Selected",
+                systemImage: "server.rack",
+                description: Text("Please select a server in the Server tab.")
+            )
+        } else if executor.apiConnectionError {
+            ContentUnavailableView(
+                "Connection Failed",
+                systemImage: "network.slash",
+                description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
+            )
+        } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
+            ContentUnavailableView(
+                "No Models Available",
+                systemImage: "tray.full",
+                description: Text("No models are currently installed. Click or tap '+' to add a new model.")
+            )
+        } else if executor.isRunning {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .scaleEffect(2)
+        }
+    }
+
+    var body: some View {
+        contentLayout
 #if os(visionOS)
         .ornament(
             visibility: (executor.isPulling || executor.isPullingErrorHold) && isSelected ? .visible : .hidden,
@@ -370,29 +451,7 @@ struct ModelListView: View {
         }
 #endif
         .overlay(alignment: .center) {
-            if serverManager.selectedServer == nil {
-                ContentUnavailableView(
-                    "No Server Selected",
-                    systemImage: "server.rack",
-                    description: Text("Please select a server in the Server tab.")
-                )
-            } else if executor.apiConnectionError {
-                ContentUnavailableView(
-                    "Connection Failed",
-                    systemImage: "network.slash",
-                    description: Text("Failed to connect to the Ollama API. Please check your network connection or server settings.")
-                )
-            } else if executor.models.isEmpty && !executor.isRunning && !executor.isPulling {
-                ContentUnavailableView(
-                    "No Models Available",
-                    systemImage: "tray.full",
-                    description: Text("No models are currently installed. Click or tap '+' to add a new model.")
-                )
-            } else if executor.isRunning {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .scaleEffect(2)
-            }
+            contentOverlay
         }
         
         .navigationTitle("Models")
@@ -460,9 +519,9 @@ struct ModelListContentView: View {
     @Binding var showingDeleteConfirmation: Bool
     @Binding var loadErrorMessage: String?
     @Binding var showingLoadErrorAlert: Bool
+    @Binding var modelForCustomKeepAlive: OllamaModel?
     let copyIconName: String
     var bottomInset: CGFloat = 0
-    @State private var modelForCustomKeepAlive: OllamaModel?
     
     @Environment(RefreshTrigger.self) var appRefreshTrigger
     
@@ -476,8 +535,6 @@ struct ModelListContentView: View {
                     isSelected: selectedModel == model.id,
                     isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil,
                     copyIconName: copyIconName,
-                    loadModel: { await executor.loadModel(modelName: $0, keepAlive: $1, ignoreTimeout: $2) },
-                    unloadModel: { await executor.unloadModel(modelName: $0) },
                     onDelete: { modelToDelete = $0; showingDeleteConfirmation = true },
                     onCustomKeepAlive: { modelForCustomKeepAlive = $0 },
                     onCopy: { text in
@@ -488,9 +545,7 @@ struct ModelListContentView: View {
                         UIPasteboard.general.string = text
 #endif
                     },
-                    onError: { error in loadErrorMessage = error; showingLoadErrorAlert = true },
-                    parseError: { parseError(from: $0) },
-                    getExecutorOutput: { executor.output }
+                    onError: { error in loadErrorMessage = error; showingLoadErrorAlert = true }
                 )
                 .equatable()
                 .tag(model.id)
@@ -555,26 +610,22 @@ struct ModelListContentView: View {
         .contextMenu(forSelectionType: OllamaModel.ID.self) { selectedIDs in
             if let selectedID = selectedIDs.first,
                let model = sortedModels.first(where: { $0.id == selectedID }) {
-                loadModelMenu(for: model)
-                
-                Button("Unload Model", systemImage: "tray.and.arrow.up") {
-                    Task {
-                        await executor.unloadModel(modelName: model.name)
+                ModelActionMenuContent(
+                    model: model,
+                    executor: executor,
+                    isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil,
+                    onCustomKeepAlive: { model in
+                        modelForCustomKeepAlive = model
+                    },
+                    onDelete: { model in
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    },
+                    onError: { errorText in
+                        loadErrorMessage = errorText
+                        showingLoadErrorAlert = true
                     }
-                }
-                .disabled(!executor.runningModels.contains(where: { $0.name == model.name || $0.name == "\(model.name):latest" }))
-                
-                Divider()
-                
-                Button("Copy Model Name", systemImage: copyIconName) {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(model.name, forType: .string)
-                }
-                
-                Button("Delete...", systemImage: "trash", role: .destructive) {
-                    modelToDelete = model
-                    showingDeleteConfirmation = true
-                }
+                )
             }
         }
 #endif
@@ -628,144 +679,6 @@ struct ModelListContentView: View {
         }
     }
     
-    @ViewBuilder
-    private func loadModelMenu(for model: OllamaModel) -> some View {
-        Menu {
-            Button("Load with Default Time") {
-                Task {
-                    let success = await executor.loadModel(modelName: model.name, ignoreTimeout: true)
-                    if !success {
-                        await MainActor.run {
-                            if let errorText = parseError(from: executor.output) {
-                                loadErrorMessage = errorText
-                                showingLoadErrorAlert = true
-                            }
-                        }
-                    }
-                }
-            }
-            
-            Divider()
-            
-            // プリセット (1m, 3m, 5m, 10m, 15m, 30m, 1h, Indefinite)
-            Group {
-                Button(LocalizedStringKey(KeepAliveOption.m1.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.m3.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("3m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.m5.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("5m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.m10.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("10m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.m15.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("15m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.m30.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("30m"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .string("1h"), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-                Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) {
-                    Task {
-                        let success = await executor.loadModel(modelName: model.name, keepAlive: .int(-1), ignoreTimeout: true)
-                        if !success {
-                            await MainActor.run {
-                                if let errorText = parseError(from: executor.output) {
-                                    loadErrorMessage = errorText
-                                    showingLoadErrorAlert = true
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            Divider()
-            
-            Button("Custom...") {
-                modelForCustomKeepAlive = model
-            }
-            
-        } label: {
-            Label("Load Model", systemImage: "tray.and.arrow.down")
-        }
-    }
-    
     private func parseError(from output: String, replaceNewline: Bool = true) -> String? {
         if let data = output.data(using: .utf8),
            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -783,19 +696,16 @@ struct ModelListContentView: View {
 
 /// 各モデル行を表示するビュー。行ごとの不必要な再描画を防ぐために独立させています。
 struct ModelListRowView: View, Equatable {
+    @Environment(CommandExecutor.self) var executor
     let model: OllamaModel
     let isSelected: Bool
     let isActionsDisabled: Bool
     let copyIconName: String
     
-    var loadModel: (String, JSONValue?, Bool) async -> Bool
-    var unloadModel: (String) async -> Bool
     var onDelete: (OllamaModel) -> Void
     var onCustomKeepAlive: (OllamaModel) -> Void
     var onCopy: (String) -> Void
     var onError: (String) -> Void
-    var parseError: (String) -> String?
-    var getExecutorOutput: () -> String
     
     // ModelListRowViewはmodelの内容が変わらない限り再描画されません
     // 依存関係が明確なプロパティのみを比較対象にします
@@ -846,7 +756,7 @@ struct ModelListRowView: View, Equatable {
         .accessibilityInputLabels([model.name])
         .accessibilityAction(named: String(localized: "Load Model")) {
             Task {
-                await loadModel(model.name, nil, true)
+                _ = await executor.loadModel(modelName: model.name, ignoreTimeout: true)
             }
         }
         .accessibilityAction(named: String(localized: "Copy Model Name")) {
@@ -856,66 +766,15 @@ struct ModelListRowView: View, Equatable {
             onDelete(model)
         }
         .contextMenu {
-            Menu {
-                Button("Load with Default Time") {
-                    Task {
-                        let success = await loadModel(model.name, nil, true)
-                        if !success {
-                            if let errorText = parseError(getExecutorOutput()) {
-                                await MainActor.run {
-                                    onError(errorText)
-                                }
-                            }
-                        }
-                    }
-                }
-                .disabled(isActionsDisabled)
-                
-                Divider()
-                
-                Group {
-                    Button(LocalizedStringKey(KeepAliveOption.m1.rawValue)) { loadWithTime("1m") }
-                    Button(LocalizedStringKey(KeepAliveOption.m3.rawValue)) { loadWithTime("3m") }
-                    Button(LocalizedStringKey(KeepAliveOption.m5.rawValue)) { loadWithTime("5m") }
-                    Button(LocalizedStringKey(KeepAliveOption.m10.rawValue)) { loadWithTime("10m") }
-                    Button(LocalizedStringKey(KeepAliveOption.m15.rawValue)) { loadWithTime("15m") }
-                    Button(LocalizedStringKey(KeepAliveOption.m30.rawValue)) { loadWithTime("30m") }
-                    Button(LocalizedStringKey(KeepAliveOption.h1.rawValue)) { loadWithTime("1h") }
-                    Button(LocalizedStringKey(KeepAliveOption.indefinite.rawValue)) { loadWithTime("-1") }
-                }
-                .disabled(isActionsDisabled)
-                
-                Divider()
-                
-                Button("Custom...") {
-                    onCustomKeepAlive(model)
-                }
-                .disabled(isActionsDisabled)
-            } label: {
-                Label("Load Model", systemImage: "tray.and.arrow.down")
-            }
-            
-            Button("Unload Model", systemImage: "tray.and.arrow.up") {
-                Task {
-                    await unloadModel(model.name)
-                }
-            }
-            .disabled(isActionsDisabled || model.statusWeight == 3) // ロード中でない場合は無効化
-            
-            Divider()
-            
-            Button {
-                onCopy(model.name)
-            } label: {
-                Label("Copy Model Name", systemImage: copyIconName)
-            }
-            
-            Button(role: .destructive) {
-                onDelete(model)
-            } label: {
-                Label("Delete...", systemImage: "trash")
-            }
-            .disabled(isActionsDisabled)
+            ModelActionMenuContent(
+                model: model,
+                executor: executor,
+                isActionsDisabled: isActionsDisabled,
+                onCustomKeepAlive: onCustomKeepAlive,
+                onDelete: onDelete,
+                onCopy: onCopy,
+                onError: onError
+            )
         }
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
@@ -925,25 +784,6 @@ struct ModelListRowView: View, Equatable {
             }
             .labelStyle(.iconOnly)
             .disabled(isActionsDisabled)
-        }
-    }
-    
-    private func loadWithTime(_ time: String) {
-        Task {
-            let success: Bool
-            if time == "-1" {
-                success = await loadModel(model.name, .int(-1), true)
-            } else {
-                success = await loadModel(model.name, .string(time), true)
-            }
-            
-            if !success {
-                if let errorText = parseError(getExecutorOutput()) {
-                    await MainActor.run {
-                        onError(errorText)
-                    }
-                }
-            }
         }
     }
     

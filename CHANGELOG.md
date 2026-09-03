@@ -47,6 +47,10 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 ## 1.4.0
 ### New Features
+#### General
+- **Add action buttons to the toolbar on the Server and Model screens**
+  - You can now access context menus without having to right-click or long-press list items.
+
 #### Chat
 - **Support attaching text files**
   - You can now attach various text files, including `.txt` and `.md`, to all models that support chat.
