@@ -149,6 +149,8 @@ struct ChatMessagesScrollView: View {
     @State private var isUserInteracting: Bool = false
     @GestureState private var isTouching: Bool = false
     @State private var latestScrollState: ScrollState? = nil
+    @State private var autoScrollEnabled: Bool = true
+    @State private var previousScrollOffset: CGFloat = 0
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -203,7 +205,7 @@ struct ChatMessagesScrollView: View {
                 let maxOffset = max(0, contentHeight - visibleHeight)
                 let distanceFromBottom = maxOffset - scrollOffset
                 
-                let threshold: CGFloat = 300 + bottomInset
+                let threshold: CGFloat = 100 + bottomInset
                 let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
                 
                 return ScrollState(
@@ -213,13 +215,38 @@ struct ChatMessagesScrollView: View {
                     contentOffset: geometry.contentOffset
                 )
             } action: { _, newValue in
+                let currentOffset = newValue.contentOffset.y
+                let isInteracting = isUserInteracting || isTouching
+                
+                if newValue.nearBottom {
+                    // 最下部（100pt以内）に到達している場合は追従モードを維持・復帰
+                    autoScrollEnabled = true
+                    isNearBottom = true
+                } else {
+                    // 最下部から100pt以上離れている場合：
+                    // ユーザーが手動で操作中、または自発的に上方向へスクロール（オフセット減少）した場合は追従を解除
+                    let scrolledUp = currentOffset < previousScrollOffset - 2
+                    if isInteracting || scrolledUp {
+                        autoScrollEnabled = false
+                        isNearBottom = false
+                    } else if !autoScrollEnabled {
+                        // ユーザーが意図して離脱している状態を維持
+                        isNearBottom = false
+                    } else {
+                        // ユーザーは触っておらず自動追従中だった場合（コードブロック出現等で高さが急増しただけ）：
+                        // 追従を維持する
+                        isNearBottom = true
+                    }
+                }
+                
+                previousScrollOffset = currentOffset
+                
                 // ストリーミング中は最新のスクロール状態の更新をスロットリング（10Hz）し、
                 // RTIInputSystemClient（テキスト入力管理）への負荷を軽減する
                 let now = Date()
                 if !isOverallStreaming || now.timeIntervalSince(lastStateUpdateTime) >= 0.1 {
                     latestScrollState = newValue
                     lastStateUpdateTime = now
-                    isNearBottom = newValue.nearBottom
                 }
             }
             .task(id: isOverallStreaming) {
@@ -233,14 +260,14 @@ struct ChatMessagesScrollView: View {
                             if let state = latestScrollState {
                                 let isUserSent = messages.last?.role == "user"
                                 let now = Date()
-                                let shouldScroll = isUserSent || state.nearBottom
+                                let shouldScroll = isUserSent || autoScrollEnabled || state.nearBottom
                                 
                                 if shouldScroll && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.05 {
                                     lastScrollTime = now
                                     // [CRITICAL] ストリーミング中はアニメーションなしでスクロール
                                     // 30Hz近くでアニメーションを開始し続けると、visionOSのレイアウトエンジンが飽和し、
                                     // 1メッセージだけでも100%負荷になります。
-                                    scrollBottom(proxy: proxy, force: isUserSent, animated: false)
+                                    scrollBottom(proxy: proxy, force: isUserSent || autoScrollEnabled, animated: false)
                                 }
                             }
                         } catch {
@@ -251,10 +278,14 @@ struct ChatMessagesScrollView: View {
             }
             .onChange(of: isOverallStreaming) { _, newValue in
                 if newValue {
+                    autoScrollEnabled = true
+                    isNearBottom = true
                     scrollBottom(proxy: proxy, force: true, animated: true)
                 }
             }
             .onChange(of: scrollToBottomTrigger) { _, _ in
+                autoScrollEnabled = true
+                isNearBottom = true
                 scrollBottom(proxy: proxy, force: true, animated: true)
             }
             .onChange(of: scrollToMessageIDTrigger) { _, newValue in
@@ -269,7 +300,7 @@ struct ChatMessagesScrollView: View {
     }
     
     private func scrollBottom(proxy: ScrollViewProxy, force: Bool = false, animated: Bool = true) {
-        if force || (latestScrollState?.nearBottom ?? false) {
+        if force || autoScrollEnabled || (latestScrollState?.nearBottom ?? false) {
             if animated && !reduceMotionEnabled {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     proxy.scrollTo("bottom-spacer", anchor: .bottom)
