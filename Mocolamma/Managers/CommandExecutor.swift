@@ -57,6 +57,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度 (B/s)
     var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
+    
+    /// モデルの検証（ハッシュ検証）中かどうか
+    var isPullVerifying: Bool {
+        isPulling && pullStatus.lowercased().contains("verifying")
+    }
     private var urlSession: URLSession!
     private var connectionCheckSession: URLSession! // 接続確認専用（30秒固定）
     private var pullTask: URLSessionDataTask?

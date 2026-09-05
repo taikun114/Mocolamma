@@ -840,8 +840,19 @@ struct PullProgressView: View {
     var executor: CommandExecutor
     let isSelected: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var isBreathing = false // 検証中の呼吸アニメーション状態
+    
+    /// プログレスバーに表示する進捗値（検証中は100%）
+    private var displayProgress: Double {
+        executor.isPullVerifying ? 1.0 : executor.pullProgress
+    }
     
     private var pullProgressString: String {
+        if executor.isPullVerifying {
+            let percentString = (1.0).formatted(.percent.precision(.fractionLength(1)))
+            return String(localized: "\(percentString) completed",
+                          comment: "ダウンロード完了後の検証中の進捗メッセージ。ダウンロード完了のパーセンテージ")
+        }
         let percentString = executor.pullProgress.formatted(.percent.precision(.fractionLength(1)))
         let completed = ByteCountFormatter().string(fromByteCount: executor.pullCompleted)
         let total = ByteCountFormatter().string(fromByteCount: executor.pullTotal)
@@ -854,7 +865,7 @@ struct PullProgressView: View {
 #if os(visionOS)
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
-                    ProgressView(value: executor.pullProgress) {
+                    ProgressView(value: displayProgress) {
                         Text(executor.pullStatus)
                             .animation(nil, value: executor.pullStatus)
                     } currentValueLabel: {
@@ -862,6 +873,7 @@ struct PullProgressView: View {
                             .animation(nil, value: executor.pullProgress)
                     }
                     .progressViewStyle(.linear)
+                    .opacity(executor.isPullVerifying && isBreathing ? 0.5 : 1.0)
                     .animation(.default, value: executor.pullProgress)
                     
                     if let errorText = parseError(from: executor.output) {
@@ -897,9 +909,15 @@ struct PullProgressView: View {
             .accessibilityElement()
             .accessibilityLabel(String(localized: "Download Progress: \(executor.pullStatus)"))
             .accessibilityValue(pullProgressString)
+            .onAppear {
+                updateBreathingAnimation(isVerifying: executor.isPullVerifying)
+            }
+            .onChange(of: executor.isPullVerifying) { _, isVerifying in
+                updateBreathingAnimation(isVerifying: isVerifying)
+            }
 #else
             VStack(alignment: .center, spacing: 8) {
-                ProgressView(value: executor.pullProgress) {
+                ProgressView(value: displayProgress) {
                     HStack(alignment: .bottom) {
                         Text(executor.pullStatus)
                             .animation(nil, value: executor.pullStatus)
@@ -935,6 +953,7 @@ struct PullProgressView: View {
                         .animation(nil, value: executor.pullProgress)
                 }
                 .progressViewStyle(.linear)
+                .opacity(executor.isPullVerifying && isBreathing ? 0.5 : 1.0)
                 .animation(.default, value: executor.pullProgress)
                 
                 if let errorText = parseError(from: executor.output) {
@@ -950,7 +969,26 @@ struct PullProgressView: View {
             .accessibilityElement()
             .accessibilityLabel(String(localized: "Download Progress: \(executor.pullStatus)"))
             .accessibilityValue(pullProgressString)
+            .onAppear {
+                updateBreathingAnimation(isVerifying: executor.isPullVerifying)
+            }
+            .onChange(of: executor.isPullVerifying) { _, isVerifying in
+                updateBreathingAnimation(isVerifying: isVerifying)
+            }
 #endif
+        }
+    }
+    
+    /// 検証状態に応じた呼吸アニメーションの開始・停止
+    private func updateBreathingAnimation(isVerifying: Bool) {
+        if isVerifying {
+            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                isBreathing = true
+            }
+        } else {
+            withAnimation(.default) {
+                isBreathing = false
+            }
         }
     }
     
@@ -961,7 +999,7 @@ struct PullProgressView: View {
             Text(pullProgressString)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer()
-            if executor.pullSpeedBytesPerSec > 0 {
+            if executor.pullSpeedBytesPerSec > 0 && !executor.isPullVerifying {
                 speedAndETASection
             }
         }
@@ -970,7 +1008,7 @@ struct PullProgressView: View {
             VStack(alignment: .leading) {
                 Text(pullProgressString)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                if executor.pullSpeedBytesPerSec > 0 {
+                if executor.pullSpeedBytesPerSec > 0 && !executor.isPullVerifying {
                     speedAndETASection
                 }
             }
@@ -979,7 +1017,7 @@ struct PullProgressView: View {
                 Text(pullProgressString)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
-                if executor.pullSpeedBytesPerSec > 0 {
+                if executor.pullSpeedBytesPerSec > 0 && !executor.isPullVerifying {
                     speedAndETASection
                 }
             }

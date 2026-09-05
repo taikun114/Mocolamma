@@ -8,10 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */ = {isa = PBXBuildFile; productRef = 6D7D84A02E3B68FA006EDB4D /* CompactSlider */; };
-		6DBD07DA2F754DFA00F794CE /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6DBD07D92F754DFA00F794CE /* Textual */; };
-		6DBDFCCF2F752E8700F794CE /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6DBDFCCE2F752E8700F794CE /* Textual */; };
-		6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */; };
-		6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */; };
+		6DB00F7C304C1919005EB6F9 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 6DB00F7B304C1919005EB6F9 /* Textual */; };
 		6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */; };
 /* End PBXBuildFile section */
 
@@ -77,12 +74,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6DBD07DA2F754DFA00F794CE /* Textual in Frameworks */,
-				6DE408EA2F6598FC00318457 /* UniversalSFSymbolsPicker in Frameworks */,
+				6DB00F7C304C1919005EB6F9 /* Textual in Frameworks */,
 				6DE409692F6599F000318457 /* UniversalSFSymbolsPicker in Frameworks */,
-				6DE408E72F6598CB00318457 /* UniversalSFSymbolsPicker in Frameworks */,
 				6D7D84A12E3B68FA006EDB4D /* CompactSlider in Frameworks */,
-				6DBDFCCF2F752E8700F794CE /* Textual in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,11 +138,8 @@
 			name = Mocolamma;
 			packageProductDependencies = (
 				6D7D84A02E3B68FA006EDB4D /* CompactSlider */,
-				6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */,
-				6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */,
 				6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */,
-				6DBDFCCE2F752E8700F794CE /* Textual */,
-				6DBD07D92F754DFA00F794CE /* Textual */,
+				6DB00F7B304C1919005EB6F9 /* Textual */,
 			);
 			productName = Mocolamma;
 			productReference = 6DC81A322E3236B3005F2E03 /* Mocolamma.app */;
@@ -246,7 +237,7 @@
 			packageReferences = (
 				6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */,
 				6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */,
-				6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */,
+				6DB00F7A304C1919005EB6F9 /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6DC81A332E3236B3005F2E03 /* Products */;
@@ -461,7 +452,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -527,7 +518,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -587,7 +578,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -606,7 +597,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -624,7 +615,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -641,7 +632,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4992;
+				CURRENT_PROJECT_VERSION = 4999;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -704,12 +695,12 @@
 				version = 2.1.0;
 			};
 		};
-		6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */ = {
+		6DB00F7A304C1919005EB6F9 /* XCRemoteSwiftPackageReference "textual" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/taikun114/textual";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.1;
+				version = 1.1.2;
 			};
 		};
 		6DE409672F6599F000318457 /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */ = {
@@ -728,22 +719,10 @@
 			package = 6D7D849F2E3B68FA006EDB4D /* XCRemoteSwiftPackageReference "CompactSlider" */;
 			productName = CompactSlider;
 		};
-		6DBD07D92F754DFA00F794CE /* Textual */ = {
+		6DB00F7B304C1919005EB6F9 /* Textual */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 6DBD07D82F754DFA00F794CE /* XCRemoteSwiftPackageReference "textual" */;
+			package = 6DB00F7A304C1919005EB6F9 /* XCRemoteSwiftPackageReference "textual" */;
 			productName = Textual;
-		};
-		6DBDFCCE2F752E8700F794CE /* Textual */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Textual;
-		};
-		6DE408E62F6598CB00318457 /* UniversalSFSymbolsPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UniversalSFSymbolsPicker;
-		};
-		6DE408E92F6598FC00318457 /* UniversalSFSymbolsPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UniversalSFSymbolsPicker;
 		};
 		6DE409682F6599F000318457 /* UniversalSFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;

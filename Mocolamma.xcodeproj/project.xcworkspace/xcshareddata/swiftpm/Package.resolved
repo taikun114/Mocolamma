@@ -1,5 +1,5 @@
 {
-  "originHash" : "600b9d2cd6619530c16d0a145314619a033f682253339dcd07b2b58d2079b616",
+  "originHash" : "599575ee4b3317e918a10e3cd1c0df7b3f02eaa01a9c1e8b063f464754953676",
   "pins" : [
     {
       "identity" : "compactslider",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "5a3825302b1a0d744183200915a47b508c828e6f",
-        "version" : "1.3.2"
+        "revision" : "5fa253428866f2360c3754e88537f700ed2656b5",
+        "version" : "1.4.1"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/taikun114/textual",
       "state" : {
-        "revision" : "98a80cdddd247d3eb40cde3c0f1a25391458d521",
-        "version" : "1.1.1"
+        "revision" : "1c8f841ac7d52af7f87bb5cf676e64584fac4d5a",
+        "version" : "1.1.2"
       }
     },
     {
