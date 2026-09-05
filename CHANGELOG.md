@@ -63,10 +63,11 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### General
 - **Refresh the app icon**
   - Redesigned the app icon and the design displayed on the iOS launch screen.
+- **Fix issue where the window position and size could be reset on macOS**
 - **Improve the appearance of the license screens**
+- **Improve the host input on the server add/edit screen and the model name input on the add model screen so spelling is not autocorrected**
 - **Change default API timeout to 5 minutes**
   - Reduced the likelihood of timeout errors when loading large models or when prompt processing takes longer.
-- **Fix issue where the window position and size could be reset on macOS**
 
 #### Model
 - **Fix issue where the modified date of models was not displayed correctly depending on the environment**

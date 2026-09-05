@@ -90,6 +90,10 @@ struct ServerFormView: View {
                         .font(.headline)
                     TextField("e.g., localhost:11434 or 192.168.1.50:11434", text: $serverHostInput)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocorrectionDisabled()
+#if !os(macOS)
+                        .textInputAutocapitalization(.never)
+#endif
                         .onSubmit {
                             save()
                         }
