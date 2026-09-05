@@ -69,8 +69,9 @@ struct AboutView: View {
                             .resizable()
                     }
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 96, height: 96)
+                    .frame(width: 128, height: 128)
                     .clipShape(Circle())
+                    .padding(.trailing, 8)
 #elseif os(macOS)
                     let appIcon = NSWorkspace.shared.icon(forFile: Bundle.main.bundlePath)
                     Image(nsImage: appIcon)
@@ -85,12 +86,14 @@ struct AboutView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
+                            .padding(8)
                             .id(colorScheme)
                     } else if isOS26OrLater {
                         Image("AppIconLiquidGlass26")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 96, height: 96)
+                            .padding(8)
                             .id(colorScheme)
                     } else {
                         Image("AppIconLiquidGlass26")
