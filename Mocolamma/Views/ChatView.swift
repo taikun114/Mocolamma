@@ -131,6 +131,8 @@ struct ChatView: View {
             messagesEmpty: executor.chatMessages.isEmpty,
             scrollToBottomTrigger: $scrollToBottomTrigger
         )
+        .animation(.spring(duration: 0.3), value: isNearBottom)
+        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
     }
     
     var body: some View {
@@ -172,7 +174,7 @@ struct ChatView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 chatContent
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
@@ -180,7 +182,7 @@ struct ChatView: View {
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -191,17 +193,9 @@ struct ChatView: View {
                     }
             }
 #else
-            if #available(macOS 27.0, *) {
+            if #available(macOS 26.0, *) {
                 chatContent
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        scrollToBottomArea
-                    }
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
-                        chatInputArea
-                    }
-            } else if #available(macOS 26.0, *) {
-                chatContent
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
@@ -209,7 +203,7 @@ struct ChatView: View {
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -1146,6 +1140,8 @@ struct ImageGenerationView: View {
             messagesEmpty: executor.imageMessages.isEmpty,
             scrollToBottomTrigger: $scrollToBottomTrigger
         )
+        .animation(.spring(duration: 0.3), value: isNearBottom)
+        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
     }
     
     var body: some View {
@@ -1187,7 +1183,7 @@ struct ImageGenerationView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 content
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
@@ -1195,7 +1191,7 @@ struct ImageGenerationView: View {
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -1206,17 +1202,9 @@ struct ImageGenerationView: View {
                     }
             }
 #else
-            if #available(macOS 27.0, *) {
+            if #available(macOS 26.0, *) {
                 content
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        scrollToBottomArea
-                    }
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
-                        imageInputArea
-                    }
-            } else if #available(macOS 26.0, *) {
-                content
-                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
@@ -1224,7 +1212,7 @@ struct ImageGenerationView: View {
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                    .overlay(alignment: .bottom) {
                         scrollToBottomArea
                     }
                     .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -1600,17 +1588,72 @@ struct ScrollToBottomButton: View {
 
     var body: some View {
         if !isNearBottom && !messagesEmpty {
-            Button {
-                scrollToBottomTrigger += 1
-            } label: {
-                Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
-                    .font(.subheadline.bold())
-                    .padding()
+#if !os(visionOS)
+            if #available(iOS 26, macOS 26, *) {
+#if os(macOS)
+                macOSButton
+#else
+                iOSButton
+#endif
+            } else {
+                fallbackButton
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
-            .frame(maxWidth: .infinity)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+#else
+            fallbackButton
+#endif
         }
+    }
+
+#if os(macOS)
+    @available(macOS 26, *)
+    private var macOSButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+        }
+        .buttonStyle(.glass(.clear))
+        .tint(.accentColor)
+        .controlSize(.large)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
+    }
+#endif
+
+#if os(iOS)
+    @available(iOS 26, *)
+    private var iOSButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.clear.tint(.accentColor).interactive())
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
+    }
+#endif
+
+    private var fallbackButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.accentColor, in: Capsule())
+                .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+        }
+        .buttonStyle(.plain)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
     }
 }

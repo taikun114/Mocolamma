@@ -10,10 +10,19 @@ struct ContainerHeightKey: EnvironmentKey {
     static let defaultValue: CGFloat = 600
 }
 
+struct ContainerWidthKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
 extension EnvironmentValues {
     var containerHeight: CGFloat {
         get { self[ContainerHeightKey.self] }
         set { self[ContainerHeightKey.self] = newValue }
+    }
+    
+    var containerWidth: CGFloat {
+        get { self[ContainerWidthKey.self] }
+        set { self[ContainerWidthKey.self] = newValue }
     }
 }
 
@@ -33,7 +42,6 @@ struct ChatMessagesView: View {
     let emptyStateImage: String
     
     @State private var selectionCoordinator = TextSelectionCoordinator()
-    @State private var stableContainerHeight: CGFloat = 0
     
     private var reduceMotionEnabled: Bool {
 #if !os(macOS)
@@ -54,15 +62,10 @@ struct ChatMessagesView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let currentHeight = geometry.size.height
-            let isButtonShowing = !isNearBottom && !messages.isEmpty
-            let effectiveHeight: CGFloat = {
-                if isButtonShowing && stableContainerHeight > 0 {
-                    return max(stableContainerHeight, currentHeight)
-                }
-                return currentHeight
-            }()
-            
+            let totalWindowSize = CGSize(
+                width: geometry.size.width + geometry.safeAreaInsets.leading + geometry.safeAreaInsets.trailing,
+                height: geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
+            )
             ZStack {
                 ChatMessagesScrollView(
                     messages: $messages,
@@ -74,7 +77,8 @@ struct ChatMessagesView: View {
                     isModelSelected: isModelSelected,
                     supportsEffects: supportsEffects,
                     reduceMotionEnabled: reduceMotionEnabled,
-                    bottomInset: bottomInset
+                    bottomInset: bottomInset,
+                    windowSize: totalWindowSize
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
@@ -102,19 +106,10 @@ struct ChatMessagesView: View {
                 selectionCoordinator.deselectAll()
             }
 #endif
-            .environment(\.containerHeight, effectiveHeight)
+            .environment(\.containerHeight, geometry.size.height)
+            .environment(\.containerWidth, geometry.size.width)
             .environment(selectionCoordinator)
             .modifier(TextSelectionCoordination())
-            .onChange(of: currentHeight) { _, newValue in
-                if !isButtonShowing && newValue > 0 {
-                    stableContainerHeight = newValue
-                }
-            }
-            .onAppear {
-                if !isButtonShowing && currentHeight > 0 {
-                    stableContainerHeight = currentHeight
-                }
-            }
         }
         .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
@@ -122,8 +117,10 @@ struct ChatMessagesView: View {
 
 struct ScrollState: Hashable, Equatable {
     let nearBottom: Bool
+    let distanceFromBottom: CGFloat
     let contentHeight: CGFloat
     let containerHeight: CGFloat
+    let containerWidth: CGFloat
     let contentOffset: CGPoint
 }
 
@@ -140,6 +137,7 @@ struct ChatMessagesScrollView: View {
     let supportsEffects: Bool
     let reduceMotionEnabled: Bool
     var bottomInset: CGFloat = 0
+    var windowSize: CGSize = .zero
     
     @Environment(\.containerHeight) var containerHeight
     @Environment(TextSelectionCoordinator.self) var selectionCoordinator
@@ -147,10 +145,12 @@ struct ChatMessagesScrollView: View {
     @State private var lastScrollTime: Date = .distantPast
     @State private var lastStateUpdateTime: Date = .distantPast
     @State private var isUserInteracting: Bool = false
-    @GestureState private var isTouching: Bool = false
     @State private var latestScrollState: ScrollState? = nil
     @State private var autoScrollEnabled: Bool = true
     @State private var previousScrollOffset: CGFloat = 0
+    @State private var savedIsAtBottom: Bool = true
+    @State private var isResizing: Bool = false
+    @State private var resizeEndTask: Task<Void, Never>? = nil
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -186,37 +186,63 @@ struct ChatMessagesScrollView: View {
                 if newPhase == .interacting || newPhase == .decelerating {
                     isUserInteracting = true
                 } else if newPhase == .idle {
+                    let wasInteracting = isUserInteracting
                     Task { @MainActor in
-                        try? await Task.sleep(for: .milliseconds(300))
+                        try? await Task.sleep(for: .milliseconds(150))
                         isUserInteracting = false
+                    }
+                    // ユーザー手動スクロール停止時にのみ最下部判定を確定
+                    if wasInteracting && !isResizing, let state = latestScrollState, state.contentHeight > 0 {
+                        savedIsAtBottom = state.distanceFromBottom <= 40 || autoScrollEnabled
                     }
                 }
             }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .updating($isTouching) { _, state, _ in
-                        state = true
-                    }
-            )
+            .onChange(of: windowSize) { oldSize, newSize in
+                guard oldSize.width > 0 && oldSize.height > 0 else { return }
+                let widthChanged = abs(oldSize.width - newSize.width) > 2.0
+                let heightChanged = abs(oldSize.height - newSize.height) > 2.0
+                guard widthChanged || heightChanged else { return }
+                
+                isResizing = true
+                resizeEndTask?.cancel()
+                resizeEndTask = Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(300))
+                    isResizing = false
+                }
+                
+                // 最下部にいる状態でのリサイズ時のみ、最下部（bottom-spacer）へ追従して下基準を維持する。
+                // 途中にいるときは余計なスクロールを発生させず、自然なスクロール位置を維持する。
+                if !isUserInteracting && (savedIsAtBottom || autoScrollEnabled || (latestScrollState?.nearBottom ?? false)) {
+                    proxy.scrollTo("bottom-spacer", anchor: .bottom)
+                    autoScrollEnabled = true
+                    isNearBottom = true
+                }
+            }
             .onScrollGeometryChange(for: ScrollState.self) { geometry in
                 let contentHeight = geometry.contentSize.height
                 let visibleHeight = geometry.containerSize.height
-                let scrollOffset = geometry.contentOffset.y
-                let maxOffset = max(0, contentHeight - visibleHeight)
-                let distanceFromBottom = maxOffset - scrollOffset
+                let containerWidth = geometry.containerSize.width
                 
-                let threshold: CGFloat = 100 + bottomInset
-                let nearBottom = distanceFromBottom < threshold || scrollOffset > maxOffset - 10
+                // 可視領域の下端（visibleRect.maxY）から下部インセット（セーフエリア・入力欄）を除いた位置が、
+                // コンテンツの最下部（contentHeight）からどれだけ離れているかを正確に計算する。
+                // 最下部にいる時は 0（またはオーバースクロール/バウンス時は負の値）。
+                // 最下部から上へスクロールすると正の値（離れたポイント数）になる。
+                let effectiveBottomInset = geometry.contentInsets.bottom + bottomInset
+                let distanceFromBottom = contentHeight - geometry.visibleRect.maxY + effectiveBottomInset
+                
+                let threshold: CGFloat = 100
+                let nearBottom = distanceFromBottom <= threshold
                 
                 return ScrollState(
                     nearBottom: nearBottom,
+                    distanceFromBottom: distanceFromBottom,
                     contentHeight: contentHeight,
                     containerHeight: visibleHeight,
+                    containerWidth: containerWidth,
                     contentOffset: geometry.contentOffset
                 )
-            } action: { _, newValue in
+            } action: { oldValue, newValue in
                 let currentOffset = newValue.contentOffset.y
-                let isInteracting = isUserInteracting || isTouching
                 
                 if newValue.nearBottom {
                     // 最下部（100pt以内）に到達している場合は追従モードを維持・復帰
@@ -226,7 +252,7 @@ struct ChatMessagesScrollView: View {
                     // 最下部から100pt以上離れている場合：
                     // ユーザーが手動で操作中、または自発的に上方向へスクロール（オフセット減少）した場合は追従を解除
                     let scrolledUp = currentOffset < previousScrollOffset - 2
-                    if isInteracting || scrolledUp {
+                    if isUserInteracting || scrolledUp {
                         autoScrollEnabled = false
                         isNearBottom = false
                     } else if !autoScrollEnabled {
@@ -237,6 +263,12 @@ struct ChatMessagesScrollView: View {
                         // 追従を維持する
                         isNearBottom = true
                     }
+                }
+                
+                // ユーザーが手動でスクロール操作中（isUserInteracting == true）かつリサイズ中でない時にのみ、
+                // 次回のリサイズに備えて最下部判定を記録・更新する
+                if isUserInteracting && !isResizing && newValue.contentHeight > 0 {
+                    savedIsAtBottom = newValue.distanceFromBottom <= 40 || autoScrollEnabled
                 }
                 
                 previousScrollOffset = currentOffset
@@ -262,7 +294,7 @@ struct ChatMessagesScrollView: View {
                                 let now = Date()
                                 let shouldScroll = isUserSent || autoScrollEnabled || state.nearBottom
                                 
-                                if shouldScroll && !isTouching && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.05 {
+                                if shouldScroll && !isUserInteracting && state.contentHeight > 0 && now.timeIntervalSince(lastScrollTime) >= 0.05 {
                                     lastScrollTime = now
                                     // [CRITICAL] ストリーミング中はアニメーションなしでスクロール
                                     // 30Hz近くでアニメーションを開始し続けると、visionOSのレイアウトエンジンが飽和し、
@@ -284,8 +316,12 @@ struct ChatMessagesScrollView: View {
                 }
             }
             .onChange(of: scrollToBottomTrigger) { _, _ in
+                // 下スクロールボタン押下時は、リサイズフラグを即座にリセットして確実に最下部へ移動
+                isResizing = false
+                resizeEndTask?.cancel()
                 autoScrollEnabled = true
                 isNearBottom = true
+                savedIsAtBottom = true
                 scrollBottom(proxy: proxy, force: true, animated: true)
             }
             .onChange(of: scrollToMessageIDTrigger) { _, newValue in

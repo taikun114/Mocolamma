@@ -48,6 +48,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 ## 1.4.0
 ### New Features
 #### General
+- **Support resizing the iPhone app**
 - **Add action buttons to the toolbar on the Server and Model screens**
   - You can now access context menus without having to right-click or long-press list items.
 
@@ -76,7 +77,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Chat and Image Generation
 - **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
 - **Fix issue where picker contents could shrink on macOS Tahoe or later**
-- **Improve the appearance of the message input area and scroll to bottom button on macOS Golden Gate**
+- **Improve the appearance of the message input area on macOS Golden Gate**
+- **Improve the appearance of the scroll to bottom button**
 - **Improve handling so that entered text and attached files are not reset when clearing chat or image generation history**
 - **Improve auto-scroll behavior**
 

@@ -22,6 +22,7 @@ struct MessageView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.containerHeight) private var containerHeight
+    @Environment(\.containerWidth) private var containerWidth
     
     // 編集用画像および添付ファイルの状態
     @State private var editingImages: [ChatInputImage] = []
@@ -195,10 +196,30 @@ struct MessageView: View {
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
-                        Text(dateString)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        if message.role == "assistant" { tokenAndSpeed }
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 6) {
+                                Text(dateString)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                if message.role == "assistant" {
+                                    tokenAndSpeed
+                                }
+                            }
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                            
+                            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
+                                Text(dateString)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                if message.role == "assistant" {
+                                    tokenAndSpeed
+                                }
+                            }
+                            .lineLimit(1)
+                        }
                         if message.role == "assistant" { Spacer() }
                     }
                     HStack(spacing: 6) {
@@ -286,7 +307,7 @@ struct MessageView: View {
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-        .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
+        .padding(message.role == "user" ? .leading : .trailing, bubbleHorizontalPadding)
         .contentShape(Rectangle())
         .sheet(isPresented: $showingPhotoPicker) {
             PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $editingImages)
@@ -310,6 +331,14 @@ struct MessageView: View {
 #if os(macOS)
         .onHover { isHovering = $0 }
 #endif
+    }
+    
+    /// コンテナ幅が500pt未満（サイドバーやインスペクタ展開時など）の場合は余白をなくし、十分な幅がある場合は大画面用の余白を適用
+    private var bubbleHorizontalPadding: CGFloat {
+        if containerWidth > 0 && containerWidth < 500 {
+            return 0
+        }
+        return (horizontalSizeClass == .regular) ? 64 : 0
     }
     
     private var dateString: String {
@@ -599,20 +628,24 @@ struct MessageView: View {
             Text("Stopped")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
         } else if message.isImageGeneration {
             if let duration = message.totalDuration {
                 Text(formatDuration(nanoseconds: duration))
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
             }
         } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
             Text("\(evalCount) Tokens")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
             let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
             Text(String(format: "%.2f Tok/s", tokensPerSecond))
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
         }
     }
     
