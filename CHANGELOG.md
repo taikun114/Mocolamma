@@ -49,6 +49,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 ### New Features
 #### General
 - **Support resizing the iPhone app**
+  - Full support for iPhone Duo is planned for a future update.
 - **Add action buttons to the toolbar on the Server and Model screens**
   - You can now access context menus without having to right-click or long-press list items.
 
