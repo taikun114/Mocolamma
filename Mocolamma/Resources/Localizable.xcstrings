@@ -406,6 +406,83 @@
         }
       }
     },
+    "%@ completed" : {
+      "comment" : "ダウンロード完了後の検証中の進捗メッセージ。ダウンロード完了のパーセンテージ",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم اكتمال %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ completed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ completado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 완료"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ завершено"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ завершено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 已完成"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 已完成"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 已完成"
+          }
+        }
+      }
+    },
     "%@ completed (%@ / %@)" : {
       "comment" : "ダウンロードの進捗メッセージ。ダウンロード完了のパーセンテージ (ダウンロード中の容量 / 全体の容量)",
       "localizations" : {
@@ -6362,79 +6439,78 @@
         }
       }
     },
-    "Attach Images" : {
-      "comment" : "チャット入力欄の+ボタンをタップしたときに表示される、画像添付アクションシートのタイトル。",
+    "Attach File" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إرفاق صور"
+            "value" : "إرفاق ملف"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilder anhängen"
+            "value" : "Datei anhängen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attach Images"
+            "value" : "Attach File"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adjuntar imágenes"
+            "value" : "Adjuntar archivo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Joindre des images"
+            "value" : "Joindre un fichier"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像を添付"
+            "value" : "ファイルを添付"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이미지 첨부"
+            "value" : "파일 첨부"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прикрепить изображения"
+            "value" : "Прикрепить файл"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прикріпити зображення"
+            "value" : "Прикріпити файл"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加图像"
+            "value" : "附加文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加圖像"
+            "value" : "附加檔案"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "附加圖像"
+            "value" : "附加檔案"
           }
         }
       }
@@ -7357,83 +7433,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "檢查中…"
-          }
-        }
-      }
-    },
-    "Choose Files..." : {
-      "comment" : "画像添付アクションシート内に表示される、ファイル管理アプリから画像ファイルを選択するためのボタン。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اختر ملفات..."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dateien auswählen..."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Files..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir archivos..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir des fichiers..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルを選択..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "파일 선택..."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать файлы..."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вибрати файли..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择文件..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇檔案..."
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇檔案..."
           }
         }
       }
@@ -11535,79 +11534,78 @@
         }
       }
     },
-    "Drop here to add images" : {
-      "comment" : "ドラッグ&ドロップエリアに表示される、画像をドロップして追加するように促すテキスト。",
+    "Drop here to add files" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "قم بالسحب والإفلات هنا لإضافة الصور"
+            "value" : "أفلت هنا لإضافة ملفات"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hier ablegen, um Bilder hinzuzufügen"
+            "value" : "Hier ablegen, um Dateien hinzuzufügen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drop here to add images"
+            "value" : "Drop here to add files"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suelta aquí para añadir imágenes"
+            "value" : "Suelta aquí para añadir archivos"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Déposez ici pour ajouter des images"
+            "value" : "Déposer ici pour ajouter des fichiers"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ここにドロップして画像を追加"
+            "value" : "ファイルを追加するにはここにドロップ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "여기에 드롭하여 이미지 추가"
+            "value" : "파일을 추가하려면 여기에 드롭하세요"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетащите сюда, чтобы добавить изображения"
+            "value" : "Перетащите сюда, чтобы добавить файлы"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перетягніть сюди, щоб додати зображення"
+            "value" : "Перетягніть сюди, щоб додати файли"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此处以添加图像"
+            "value" : "拖放到此处以添加文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此處以添加圖像"
+            "value" : "拖放至此以新增檔案"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "拖放到此處以添加圖像"
+            "value" : "拖放至此以新增檔案"
           }
         }
       }
@@ -19946,6 +19944,83 @@
         }
       }
     },
+    "Model Actions" : {
+      "comment" : "モデル操作メニューのアクセシビリティラベルおよびツールチップ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجراءات النموذج"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modellaktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Actions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acciones del modelo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions du modèle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モデルアクション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모델 작업"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действия модели"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дії моделі"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型操作"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型動作"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型動作"
+          }
+        }
+      }
+    },
     "Model deletion failed: " : {
       "comment" : "Ollamaサーバーからモデルの削除に失敗した場合のプレフィックスメッセージ。",
       "localizations" : {
@@ -23414,6 +23489,83 @@
         }
       }
     },
+    "Only text, PDF, or image files (vision-capable models only) can be attached." : {
+      "comment" : "ユーザーが非対応のファイルをドロップしたときに表示されるエラーアラートのメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكن فقط إرفاق ملفات النصوص أو PDF أو الصور (النماذج الداعمة للرؤية فقط)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es können nur Text-, PDF- oder Bilddateien (nur Modelle mit Vision-Unterstützung) angehängt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only text, PDF, or image files (vision-capable models only) can be attached."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se pueden adjuntar archivos de texto, PDF o imagen (solo modelos con visión)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seuls les fichiers texte, PDF ou image (modèles avec vision uniquement) peuvent être joints."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト、PDF、または画像ファイル（ビジョン対応モデルのみ）の添付にのみ対応しています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "텍스트, PDF 또는 이미지 파일(비전 지원 모델 전용)만 첨부할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно прикреплять только текстовые файлы, PDF или изображения (только для моделей с поддержкой Vision)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можна прикріплювати лише текстові файли, PDF або зображення (лише для моделей із підтримкою Vision)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅支持附加文本、PDF 或图像文件（仅限支持视觉的模型）。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅支援附加文字、PDF 或影像檔案（僅限支援視覺的模型）。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只支援附加文字、PDF 或圖像檔案（只限支援視覺的模型）。"
+          }
+        }
+      }
+    },
     "Open" : {
       "comment" : "開くボタン。",
       "localizations" : {
@@ -26119,83 +26271,6 @@
         }
       }
     },
-    "Please select the location of the images you want to attach." : {
-      "comment" : "チャット入力欄の+ボタンをタップしたときに表示される、画像添付アクションシートのメッセージ。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يرجى تحديد موقع الصور التي تريد إرفاقها."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte wählen Sie den Speicherort der Bilder aus, die Sie anhängen möchten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please select the location of the images you want to attach."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleccione la ubicación de las imágenes que desea adjuntar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veuillez sélectionner l'emplacement des images que vous souhaitez joindre."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "添付したい画像の場所を選択してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "첨부할 이미지의 위치를 선택하십시오."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выберите местоположение изображений, которые вы хотите прикрепить."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Будь ласка, виберіть розташування зображень, які ви хочете прикріпити."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请选择要附加的图像的位置。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請選擇要附加的圖像的位置。"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請選擇要附加的圖像的位置。"
-          }
-        }
-      }
-    },
     "Please select where to save this image." : {
       "comment" : "A message displayed when the user taps the \"Save as File...\" button in the message view. It instructs the user to select a destination for saving the downloaded image.",
       "isCommentAutoGenerated" : true,
@@ -26500,83 +26575,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前一版本"
-          }
-        }
-      }
-    },
-    "Processing images..." : {
-      "comment" : "チャットメッセージ送信後、画像がバックグラウンドでPNG形式に変換・リサイズ処理されている間に表示されるメッセージ。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "جاري معالجة الصور..."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bilder werden verarbeitet..."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Processing images..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Procesando imágenes..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Traitement des images..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像を処理中..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이미지 처리 중..."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обработка изображений..."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обробка зображень..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在处理图片..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在處理圖片..."
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在處理圖片..."
           }
         }
       }
@@ -28674,6 +28672,82 @@
         }
       }
     },
+    "Select File..." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد ملف..."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei auswählen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select File..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar archivo..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner un fichier..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルを選択..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 선택..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать файл..."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрати файл..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择文件..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取檔案..."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取檔案..."
+          }
+        }
+      }
+    },
     "Select Icon" : {
       "comment" : "サーバーアイコンを選択するボタンのツールチップ。",
       "localizations" : {
@@ -28981,6 +29055,83 @@
         }
       }
     },
+    "Select the location of the file you want to attach." : {
+      "comment" : "添付するファイルの場所（ファイルまたは写真ライブラリ）を選択するためのアクションシートのメッセージ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدد موقع الملف الذي تريد إرفاقه."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie den Ort der Datei aus, die Sie anhängen möchten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the location of the file you want to attach."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione la ubicación del archivo que desea adjuntar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez l'emplacement du fichier que vous souhaitez joindre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付したいファイルの場所を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부할 파일의 위치를 선택하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите расположение файла, который хотите прикрепить."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть розташування файлу, який потрібно прикріпити."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择您要附加的文件所在的位置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取您要附加的檔案所在的位置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取您想附加的檔案所在位置。"
+          }
+        }
+      }
+    },
     "Send" : {
       "localizations" : {
         "ar" : {
@@ -29207,6 +29358,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "伺服器"
+          }
+        }
+      }
+    },
+    "Server Actions" : {
+      "comment" : "サーバー操作メニューのアクセシビリティラベルおよびツールチップ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجراءات الخادم"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveraktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server Actions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acciones del servidor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions du serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバーアクション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버 작업"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действия сервера"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дії сервера"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器操作"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器動作"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器動作"
           }
         }
       }
@@ -30286,6 +30514,83 @@
         }
       }
     },
+    "Some files could not be attached" : {
+      "comment" : "ユーザーがドロップしたファイル群の中に非対応のファイルが一部含まれていたときに表示されるエラーアラートのタイトル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذر إرفاق بعض الملفات"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Dateien konnten nicht angehängt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some files could not be attached"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron adjuntar algunos archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains fichiers n'ont pas pu être joints"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部のファイルは添付できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일부 파일을 첨부할 수 없었습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось прикрепить некоторые файлы"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося прикріпити деякі файли"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分文件无法附加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分檔案無法附加"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "部分檔案無法附加"
+          }
+        }
+      }
+    },
     "Sort" : {
       "comment" : "並び順。",
       "localizations" : {
@@ -30978,6 +31283,83 @@
         }
       }
     },
+    "Specifies the thinking level when using a thinking model." : {
+      "comment" : "思考に対応したモデルで、思考レベルを指定する設定項目の説明テキスト。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحدد مستوى التفكير عند استخدام نموذج تفكير."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt die Denkstufe bei der Verwendung eines Denkmodells an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies the thinking level when using a thinking model."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica el nivel de pensamiento al usar un modelo de pensamiento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie le niveau de réflexion lors de l'utilisation d'un modèle de réflexion."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考対応モデルで思考レベルを指定します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생각(Thinking) 지원 모델에서 생각 수준을 지정합니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указывает уровень размышлений при использовании модели рассуждений."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказує рівень міркувань при використанні моделі міркування."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定在使用思考模型时的思考级别。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定在使用思考模型時的思考層級。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指定在使用思考模型時的思考層級。"
+          }
+        }
+      }
+    },
     "Specifies the width of the image you want to generate." : {
       "comment" : "生成する画像の幅に関する説明テキスト。",
       "localizations" : {
@@ -31051,83 +31433,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指定您要生成的圖片寬度。"
-          }
-        }
-      }
-    },
-    "Specifies whether to perform inference when using a reasoning model." : {
-      "comment" : "思考に対応したモデルで、思考を使うかどうかを切り替える設定項目の説明テキスト。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يحدد ما إذا كان سيتم إجراء الاستدلال عند استخدام نموذج تفكير."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gibt an, ob bei der Verwendung eines Denkmodells Inferenzen durchgeführt werden sollen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Specifies whether to perform inference when using a reasoning model."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Especifica si se debe realizar la inferencia al usar un modelo de razonamiento."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spécifie s'il faut effectuer une inférence lors de l'utilisation d'un modèle de raisonnement."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一部の推論モデルを使う場合に推論を行うかどうかを指定します。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "추론 모델을 사용할 때 추론(Reasoning)을 수행할지 여부를 지정합니다."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Указывает, следует ли выполнять рассуждение при использовании модели рассуждения."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вказує, чи слід виконувати міркування при використанні моделі міркування."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "指定在使用推理模型时是否进行推理。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "指定在使用推理模型時是否進行推理。"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "指定在使用推理模型時是否進行推理。"
           }
         }
       }
@@ -32058,6 +32363,83 @@
     "Textual by Guillermo Gonzalez and Taiga Imaura" : {
       "shouldTranslate" : false
     },
+    "The selected model \"%@\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text." : {
+      "comment" : "ビジョン非対応モデルでPDFが添付されている場合の警告アラートメッセージ（モデル名あり）。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار \"%@\" لا يدعم التعرف على الصور، لذا سيتم إرسال ملفات PDF المرفقة كنصوص مستخرجة فقط. هل أنت متأكد من أنك تريد الإرسال كما هو؟\n\nتلميح: يتيح لك التبديل إلى نموذج يدعم الرؤية إمكانية التعرف على الصور والتنسيقات بالإضافة إلى النصوص."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell „%@“ unterstützt keine Bilderkennung, daher werden angehängte PDF-Dateien nur als extrahierter Text gesendet. Sind Sie sicher, dass Sie den Text so senden möchten?\n\nTipp: Wenn Sie zu einem bildfähigen Modell wechseln, können neben Text auch Bilder und Layouts erkannt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model \"%@\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado \"%@\" no admite el reconocimiento de imágenes, por lo que los archivos PDF adjuntos solo se enviarán como texto extraído. ¿Está seguro de que desea enviarlo tal cual?\n\nSugerencia: Si cambia a un modelo compatible con visión, podrá reconocer imágenes y diseños además del texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné « %@ » ne prend pas en charge la reconnaissance d'images, les fichiers PDF joints ne seront donc envoyés que sous forme de texte extrait. Êtes-vous sûr de vouloir l'envoyer tel quel ?\n\nAstuce : Passer à un modèle prenant en charge la vision permettra de reconnaître les images et les mises en page en plus du texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル「%@」は画像認識に対応していないため、添付されたPDFファイルは抽出されたテキストのみが送信されます。このまま送信してもよろしいですか？\n\nヒント: 画像認識対応モデルに切り替えると、テキストに加えて画像やレイアウトなども確認できるようになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델 \"%@\"은(는) 이미지 인식을 지원하지 않으므로 첨부된 PDF 파일은 추출된 텍스트만 전송됩니다. 이대로 전송하시겠습니까?\n\n힌트: 비전 지원 모델로 전환하면 텍스트 외에 이미지와 레이아웃 등도 확인할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель «%@» не поддерживает распознавание изображений, поэтому прикрепленные PDF-файлы будут отправлены только в виде извлеченного текста. Вы уверены, что хотите отправить как есть?\n\nСовет: переключение на модель с поддержкой зрения позволит распознавать изображения и разметку в дополнение к тексту."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель «%@» не підтримує розпізнавання зображень, тому прикріплені PDF-файли буде надіслано лише у вигляді вилученого тексту. Ви впевнені, що хочете надіслати як є?\n\nПорада: перехід на модель із підтримкою зору дозволить розпізнавати зображення та макети на додаток до тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型“%@”不支持图像识别，因此附加的PDF文件将仅发送提取的文本。您确定要按原样发送吗？\n\n提示：切换到支持视觉的模型后，除了文本之外，还可以识别图像和布局。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        }
+      }
+    },
     "The selected model \"%@\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
       "localizations" : {
         "ar" : {
@@ -32134,6 +32516,83 @@
         }
       }
     },
+    "The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text." : {
+      "comment" : "ビジョン非対応モデルでPDFが添付されている場合の警告アラートメッセージ（モデル名なし）。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المختار لا يدعم التعرف على الصور، لذا سيتم إرسال ملفات PDF المرفقة كنصوص مستخرجة فقط. هل أنت متأكد من أنك تريد الإرسال كما هو؟\n\nتلميح: يتيح لك التبديل إلى نموذج يدعم الرؤية إمكانية التعرف على الصور والتنسيقات بالإضافة إلى النصوص."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell unterstützt keine Bilderkennung, daher werden angehängte PDF-Dateien nur als extrahierter Text gesendet. Sind Sie sicher, dass Sie den Text so senden möchten?\n\nTipp: Wenn Sie zu einem bildfähigen Modell wechseln, können neben Text auch Bilder und Layouts erkannt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado no admite el reconocimiento de imágenes, por lo que los archivos PDF adjuntos solo se enviarán como texto extraído. ¿Está seguro de que desea enviarlo tal cual?\n\nSugerencia: Si cambia a un modelo compatible con visión, podrá reconocer imágenes y diseños además del texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné ne prend pas en charge la reconnaissance d'images, les fichiers PDF joints ne seront donc envoyés que sous forme de texte extrait. Êtes-vous sûr de vouloir l'envoyer tel quel ?\n\nAstuce : Passer à un modèle prenant en charge la vision permettra de reconnaître les images et les mises en page en plus du texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルは画像認識に対応していないため、添付されたPDFファイルは抽出されたテキストのみが送信されます。このまま送信してもよろしいですか？\n\nヒント: 画像認識対応モデルに切り替えると、テキストに加えて画像やレイアウトなども確認できるようになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델은 이미지 인식을 지원하지 않으므로 첨부된 PDF 파일은 추출된 텍스트만 전송됩니다. 이대로 전송하시겠습니까?\n\n힌트: 비전 지원 모델로 전환하면 텍스트 외에 이미지와 레이아웃 등도 확인할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель не поддерживает распознавание изображений, поэтому прикрепленные PDF-файлы будут отправлены только в виде извлеченного текста. Вы уверены, что хотите отправить как есть?\n\nСовет: переключение на модель с поддержкой зрения позволит распознавать изображения и разметку в дополнение к тексту."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель не підтримує розпізнавання зображень, тому прикріплені PDF-файли буде надіслано лише у вигляді вилученого тексту. Ви впевнені, що хочете надіслати як є?\n\nПорада: перехід на модель із підтримкою зору дозволить розпізнавати зображення та макети на додаток до тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型不支持图像识别，因此附加的PDF文件将仅发送提取的文本。您确定要按原样发送吗？\n\n提示：切换到支持视觉的模型后，除了文本之外，还可以识别图像和布局。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像識別，因此附加的PDF檔案將僅發送擷取的文字。您確定要按原樣發送嗎？\n\n提示：切換至支援視覺的模型後，除了文字之外，還可以識別圖像和版面配置。"
+          }
+        }
+      }
+    },
     "The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?" : {
       "localizations" : {
         "ar" : {
@@ -32206,6 +32665,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "所選模型不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        }
+      }
+    },
+    "These files cannot be attached" : {
+      "comment" : "ユーザーが複数の非対応ファイルのみをドロップしたときに表示されるエラーアラートのタイトル。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرفاق هذه الملفات"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Dateien können nicht angehängt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These files cannot be attached"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pueden adjuntar estos archivos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre ces fichiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これらのファイルは添付できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 파일들은 첨부할 수 없습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эти файлы невозможно прикрепить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ці файли неможливо прикріпити"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这些文件无法附加"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這些檔案無法附加"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這些檔案無法附加"
           }
         }
       }
@@ -32441,80 +32977,392 @@
         }
       }
     },
-    "ThinkingOption_None" : {
-      "comment" : "思考機能を指定しないオプション項目。",
+    "ThinkingOption_Default" : {
+      "comment" : "思考機能をモデルのデフォルト動作にするオプション項目。",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "غير محدد"
+            "value" : "افتراضي"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine"
+            "value" : "Standard"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "None"
+            "value" : "Default"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ninguno"
+            "value" : "Predeterminado"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucun"
+            "value" : "Par défaut"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "指定なし"
+            "value" : "デフォルト"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "지정 안 함"
+            "value" : "기본값"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не указано"
+            "value" : "По умолчанию"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вказано"
+            "value" : "За замовчуванням"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未指定"
+            "value" : "默认"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未指定"
+            "value" : "預設"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未指定"
+            "value" : "預設"
+          }
+        }
+      }
+    },
+    "ThinkingOption_High" : {
+      "comment" : "思考レベルを「高」に指定するオプション項目。",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مرتفع"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Élevé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "높음"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высокий"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Високий"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高"
+          }
+        }
+      }
+    },
+    "ThinkingOption_Low" : {
+      "comment" : "思考レベルを「低」に指定するオプション項目。",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منخفض"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niedrig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faible"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "낮음"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Низкий"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Низький"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低"
+          }
+        }
+      }
+    },
+    "ThinkingOption_Max" : {
+      "comment" : "思考レベルを「最高」に指定するオプション項目。",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحد الأقصى"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máximo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최대"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Максимум"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Максимум"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高"
+          }
+        }
+      }
+    },
+    "ThinkingOption_Medium" : {
+      "comment" : "思考レベルを「中」に指定するオプション項目。",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متوسط"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중간"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Средний"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Середній"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
           }
         }
       }
@@ -32597,80 +33445,79 @@
         }
       }
     },
-    "ThinkingOption_On" : {
-      "comment" : "思考機能をオンにしてするオプション項目。",
-      "extractionState" : "manual",
+    "This file cannot be attached" : {
+      "comment" : "ユーザーが非対応のファイル1件のみをドロップしたときに表示されるエラーアラートのタイトル。",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تشغيل"
+            "value" : "لا يمكن إرفاق هذا الملف"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An"
+            "value" : "Diese Datei kann nicht angehängt werden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "On"
+            "value" : "This file cannot be attached"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activado"
+            "value" : "No se puede adjuntar este archivo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activé"
+            "value" : "Impossible de joindre ce fichier"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オン"
+            "value" : "このファイルは添付できません"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "켜기"
+            "value" : "이 파일은 첨부할 수 없습니다"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вкл"
+            "value" : "Этот файл невозможно прикрепить"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Увімк"
+            "value" : "Цей файл неможливо прикріпити"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开启"
+            "value" : "无法附加此文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "開啟"
+            "value" : "無法附加此檔案"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "開啟"
+            "value" : "無法附加此檔案"
           }
         }
       }

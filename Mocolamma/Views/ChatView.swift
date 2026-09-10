@@ -14,12 +14,14 @@ struct ChatView: View {
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
     @State private var showingVisionWarningAlert: Bool = false
+    @State private var showingVisionPDFWarningAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
     @State private var showingNewChatConfirm: Bool = false
     @State private var inputAreaHeight: CGFloat = 0
     @State private var isNearBottom: Bool = true
     @State private var scrollToBottomTrigger: Int = 0
     @State private var scrollToMessageIDTrigger: UUID? = nil
+    @State private var currentAssistantStreamTask: Task<Void, Never>? = nil
     private var modelSettings = ModelSettingsManager.shared
     @State private var selectionCoordinator = TextSelectionCoordinator()
 
@@ -32,6 +34,18 @@ struct ChatView: View {
         self.onToggleInspector = onToggleInspector
     }
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private func stopChatStreaming() {
+        currentAssistantStreamTask?.cancel()
+        currentAssistantStreamTask = nil
+        if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
+            executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
+            executor.chatMessages[lastAssistantMessageIndex].isStopped = true
+            executor.updateIsChatStreaming()
+        }
+        executor.isChatStreaming = false
+        executor.cancelChatStreaming()
+    }
     
     private var currentSelectedModel: OllamaModel? {
         if let id = chatSettings.selectedModelID {
@@ -84,26 +98,21 @@ struct ChatView: View {
     }
     
     @ViewBuilder
-    private func makeSafeAreaBarContent() -> some View {
+    private var chatInputArea: some View {
         @Bindable var executor = executor
-        VStack(spacing: 0) {
-#if !os(visionOS)
-            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.chatMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-#endif
-            
-            ChatInputView(inputText: $executor.chatInputText, selectedImages: $executor.chatInputImages, isStreaming: $executor.isChatStreaming, showingInspector: $showingInspector, placeholder: "Type your message...", selectedModel: currentSelectedModel) {
-                sendMessage()
-            } stopMessage: {
-                if let lastAssistantMessageIndex = executor.chatMessages.lastIndex(where: { $0.role == "assistant" && $0.isStreaming }) {
-                    executor.chatMessages[lastAssistantMessageIndex].isStreaming = false
-                    executor.chatMessages[lastAssistantMessageIndex].isStopped = true
-                    executor.updateIsChatStreaming()
-                }
-                executor.isChatStreaming = false
-                executor.cancelChatStreaming()
-            }
+        ChatInputView(
+            inputText: $executor.chatInputText,
+            selectedImages: $executor.chatInputImages,
+            selectedAttachments: $executor.chatInputAttachments,
+            isStreaming: $executor.isChatStreaming,
+            showingInspector: $showingInspector,
+            placeholder: "Type your message...",
+            selectedModel: currentSelectedModel
+        ) {
+            sendMessage()
+        } stopMessage: {
+            stopChatStreaming()
         }
-        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -114,6 +123,18 @@ struct ChatView: View {
             inputAreaHeight = newValue
         }
 #endif
+    }
+    
+    @ViewBuilder
+    private var scrollToBottomArea: some View {
+        @Bindable var executor = executor
+        ScrollToBottomButton(
+            isNearBottom: isNearBottom,
+            messagesEmpty: executor.chatMessages.isEmpty,
+            scrollToBottomTrigger: $scrollToBottomTrigger
+        )
+        .animation(.spring(duration: 0.3), value: isNearBottom)
+        .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
     }
     
     var body: some View {
@@ -147,7 +168,7 @@ struct ChatView: View {
                 .animation(.spring(duration: 0.3), value: executor.chatMessages.isEmpty)
             }
             .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                makeSafeAreaBarContent()
+                chatInputArea
                     .frame(width: 600)
                     .padding(16)
                     .glassBackgroundEffect()
@@ -155,13 +176,19 @@ struct ChatView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 chatContent
-                    .safeAreaBar(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        chatInputArea
                             .if(horizontalSizeClass != .compact) { view in
                                 view.ignoresSafeArea(.container, edges: [.bottom])
                             }
@@ -170,13 +197,19 @@ struct ChatView: View {
 #else
             if #available(macOS 26.0, *) {
                 chatContent
-                    .safeAreaBar(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             } else {
                 chatContent
-                    .safeAreaInset(edge: .bottom) {
-                        makeSafeAreaBarContent()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        chatInputArea
                     }
             }
 #endif
@@ -197,7 +230,7 @@ struct ChatView: View {
                 chatSettings.selectedModelID = nil
             }
         }
-        .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsVision ?? false))
+        .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true))
         .task {
             // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
             if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
@@ -235,6 +268,21 @@ struct ChatView: View {
                 Text("The selected model \"\(modelName)\" does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             } else {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
+            }
+        }
+        .alert("This model does not support images", isPresented: $showingVisionPDFWarningAlert) {
+            Button("Send") {
+                if let model = currentSelectedModel {
+                    performSendMessage(model: model, skipImages: true)
+                }
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = currentSelectedModel?.name {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            } else {
+                Text("The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
             }
         }
         .alert(Text("Error Occurred"), isPresented: Binding<Bool>(
@@ -343,6 +391,8 @@ struct ChatView: View {
                 }
             }
             .pickerStyle(.menu)
+            .labelStyle(.titleAndIcon)
+            .buttonSizingFlexibleIfAvailable()
             .frame(width: 150)
         }
         
@@ -459,12 +509,20 @@ struct ChatView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty else { return }
+        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty || !executor.chatInputAttachments.isEmpty else { return }
         
-        // ビジョン非対応モデルで画像がある場合の警告チェック
-        if !executor.chatInputImages.isEmpty && !model.supportsVision {
-            showingVisionWarningAlert = true
-            return
+        let hasPDFs = executor.chatInputAttachments.contains { $0.isPDF }
+        let hasImages = !executor.chatInputImages.isEmpty
+        
+        // ビジョン非対応モデルの場合の警告チェック
+        if !model.supportsVision {
+            if hasPDFs {
+                showingVisionPDFWarningAlert = true
+                return
+            } else if hasImages {
+                showingVisionWarningAlert = true
+                return
+            }
         }
         
         performSendMessage(model: model)
@@ -472,16 +530,21 @@ struct ChatView: View {
     
     private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
         let text = executor.chatInputText
-        let imagesData = skipImages ? [] : executor.chatInputImages.map { $0.data }
+        let rawInputImages = executor.chatInputImages
+        let rawAttachments = executor.chatInputAttachments
         
         executor.chatInputText = ""
-        if !skipImages {
-            executor.chatInputImages = []
-        }
+        executor.chatInputImages = []
+        executor.chatInputAttachments = []
         executor.isChatStreaming = true
         
-        let userMessage = ChatMessage(role: "user", content: text, images: nil, createdAt: MessageView.iso8601Formatter.string(from: Date()))
-        userMessage.isProcessingImages = !imagesData.isEmpty
+        let hasPDFs = rawAttachments.contains { $0.isPDF }
+        let hasImages = !skipImages && !rawInputImages.isEmpty
+        let userMessage = ChatMessage(role: "user", content: text, images: nil, attachments: rawAttachments.isEmpty ? nil : rawAttachments, createdAt: MessageView.iso8601Formatter.string(from: Date()))
+        userMessage.isProcessingPDF = hasPDFs
+        userMessage.isProcessingImages = !hasPDFs && hasImages
+        userMessage.rawInputAttachments = rawAttachments
+        userMessage.rawInputImages = rawInputImages
         executor.chatMessages.append(userMessage)
         
         let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
@@ -492,15 +555,27 @@ struct ChatView: View {
         executor.chatMessages.append(placeholderMessage)
         let assistantMessageId = placeholderMessage.id
         
-        Task {
-            // 画像がある場合はバックグラウンドでPNG変換処理を行う
-            if !imagesData.isEmpty {
-                let base64Images = await ChatInputImage.processImages(imagesData)
-                await MainActor.run {
-                    userMessage.images = base64Images
-                    userMessage.isProcessingImages = false
-                }
+        currentAssistantStreamTask?.cancel()
+        currentAssistantStreamTask = Task {
+            // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
+            let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision && !skipImages)
+            
+            // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
+            var directImages: [String] = []
+            if hasImages {
+                directImages = await rawInputImages.resolveBase64Images()
             }
+            
+            await MainActor.run {
+                userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                userMessage.images = directImages.isEmpty ? nil : directImages
+                userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                userMessage.isProcessingPDF = false
+                userMessage.isProcessingImages = false
+            }
+            
+            // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+            guard executor.isChatStreaming, !Task.isCancelled else { return }
             
             var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
             if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
@@ -522,23 +597,15 @@ struct ChatView: View {
         
         // ユーザーメッセージのリトライの場合
         if executor.chatMessages[indexToRetry].role == "user" {
-            // 編集されたユーザーメッセージを履歴の最後に移動
-            let userMessage = executor.chatMessages.remove(at: indexToRetry)
-            executor.chatMessages.append(userMessage)
-            let scrollId = userMessage.id
-            
-            // ユーザーメッセージ以降のアシスタントメッセージを削除
-            executor.chatMessages.removeAll(where: { (message: ChatMessage) -> Bool in
-                guard let messageCreatedAt = message.createdAt,
-                      let userMessageCreatedAt = userMessage.createdAt else { return false }
-                return messageCreatedAt > userMessageCreatedAt && message.role == "assistant"
-            })
-            
-            var apiMessages = executor.chatMessages
-            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
-                apiMessages.insert(systemMessage, at: 0)
+            // 編集されたユーザーメッセージ以降の後続メッセージ（直後の返答など）をすべて削除
+            if indexToRetry + 1 < executor.chatMessages.count {
+                executor.chatMessages.removeSubrange((indexToRetry + 1)...)
             }
+            
+            // 編集されたユーザーメッセージで置き換え
+            executor.chatMessages[indexToRetry] = messageToRetry
+            let userMessage = executor.chatMessages[indexToRetry]
+            let scrollId = userMessage.id
             
             let placeholderMessage = ChatMessage(role: "assistant", content: "", createdAt: MessageView.iso8601Formatter.string(from: Date()), isStreaming: true)
             placeholderMessage.revisions = []
@@ -555,7 +622,43 @@ struct ChatView: View {
             
             executor.isChatStreaming = true
             scrollToMessageIDTrigger = scrollId
-            Task { await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model) }
+            
+            let rawAttachments = userMessage.rawInputAttachments ?? (userMessage.attachments ?? [])
+            let rawEditingImages = userMessage.rawInputImages ?? []
+            let hasImages = userMessage.isProcessingImages && !rawEditingImages.isEmpty
+            
+            currentAssistantStreamTask?.cancel()
+            currentAssistantStreamTask = Task {
+                // PDFファイルのテキスト抽出および画像化（非同期完了を待機）
+                let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision)
+                
+                // 直接添付された画像の処理（まだリサイズ中の画像があれば完了を待機し、サムネイルを事前キャッシュ）
+                var directImages: [String] = []
+                if hasImages {
+                    directImages = await rawEditingImages.resolveBase64Images()
+                }
+                
+                await MainActor.run {
+                    userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                    if !directImages.isEmpty {
+                        userMessage.images = directImages
+                    }
+                    userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                    userMessage.isProcessingPDF = false
+                    userMessage.isProcessingImages = false
+                }
+                
+                // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+                guard executor.isChatStreaming, !Task.isCancelled else { return }
+                
+                var apiMessages = executor.chatMessages.filter { $0.id != assistantMessageId }
+                if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                    let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
+                    apiMessages.insert(systemMessage, at: 0)
+                }
+                
+                await streamAssistantResponse(for: assistantMessageId, with: apiMessages, model: model)
+            }
             
         } else { // アシスタントメッセージのリトライの場合 (既存ロジック)
             guard indexToRetry == executor.chatMessages.count - 1 else {
@@ -572,7 +675,8 @@ struct ChatView: View {
                 return
             }
             let userMessageIndex = indexToRetry - 1
-            let scrollId = executor.chatMessages[userMessageIndex].id
+            let userMessage = executor.chatMessages[userMessageIndex]
+            let scrollId = userMessage.id
             
             // 1) 最新の完成版を厳密に選ぶ（参照中の状態に依存しない）
             // 本文は latestContent > content の順
@@ -598,6 +702,7 @@ struct ChatView: View {
                 content: archiveContent,
                 thinking: archiveThinking,
                 images: executor.chatMessages[indexToRetry].images,
+                attachments: executor.chatMessages[indexToRetry].attachments,
                 toolCalls: executor.chatMessages[indexToRetry].toolCalls,
                 toolName: executor.chatMessages[indexToRetry].toolName,
                 createdAt: executor.chatMessages[indexToRetry].createdAt,
@@ -635,13 +740,6 @@ struct ChatView: View {
             executor.chatMessages[indexToRetry].evalCount = nil
             executor.chatMessages[indexToRetry].evalDuration = nil
             
-            // 4) APIに出すメッセージ（ユーザー発話まで）
-            var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
-            if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
-                let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
-                apiMessages.insert(systemMessage, at: 0)
-            }
-            
             guard let model = currentSelectedModel else {
                 generalErrorMessage = "Please select a model first."
                 return
@@ -649,7 +747,54 @@ struct ChatView: View {
             
             executor.isChatStreaming = true
             scrollToMessageIDTrigger = scrollId
-            Task { await streamAssistantResponse(for: messageId, with: apiMessages, model: model) }
+            
+            // 4) 直前のユーザーメッセージの添付・画像処理が未完了または未解決の場合は完了を待機
+            let rawAttachments = userMessage.rawInputAttachments ?? (userMessage.attachments ?? [])
+            let rawEditingImages = userMessage.rawInputImages ?? []
+            let hasPDFs = rawAttachments.contains { $0.isPDF }
+            let hasImages = !rawEditingImages.isEmpty
+            
+            // まだPDF抽出や画像Base64変換が終わっていない場合（抽出テキストがない、画像がない、または処理中フラグが残っている場合）
+            let isPDFUnresolved = hasPDFs && (userMessage.attachments?.allSatisfy { $0.content.isEmpty || !$0.content.hasPrefix("===") } ?? true)
+            let isImageUnresolved = hasImages && (userMessage.images == nil || userMessage.images?.isEmpty == true)
+            let needsProcessing = isPDFUnresolved || isImageUnresolved || userMessage.isProcessingPDF || userMessage.isProcessingImages
+            
+            currentAssistantStreamTask?.cancel()
+            currentAssistantStreamTask = Task {
+                if needsProcessing {
+                    await MainActor.run {
+                        userMessage.isProcessingPDF = hasPDFs
+                        userMessage.isProcessingImages = !hasPDFs && hasImages
+                    }
+                    
+                    let (processedAttachments, pdfPageImages) = await rawAttachments.resolveProcessedAttachments(renderImages: model.supportsVision)
+                    var directImages: [String] = []
+                    if hasImages {
+                        directImages = await rawEditingImages.resolveBase64Images()
+                    }
+                    
+                    await MainActor.run {
+                        userMessage.attachments = processedAttachments.isEmpty ? nil : processedAttachments
+                        if !directImages.isEmpty {
+                            userMessage.images = directImages
+                        }
+                        userMessage.pdfImages = pdfPageImages.isEmpty ? nil : pdfPageImages
+                        userMessage.isProcessingPDF = false
+                        userMessage.isProcessingImages = false
+                    }
+                }
+                
+                // リサイズ・PDF処理待機中に停止ボタンが押されていた場合は、API送信を中止する
+                guard executor.isChatStreaming, !Task.isCancelled else { return }
+                
+                var apiMessages = Array(executor.chatMessages.prefix(userMessageIndex + 1))
+                if chatSettings.isSystemPromptEnabled && !chatSettings.systemPrompt.isEmpty {
+                    let systemMessage = ChatMessage(role: "system", content: chatSettings.systemPrompt)
+                    apiMessages.insert(systemMessage, at: 0)
+                }
+                
+                await streamAssistantResponse(for: messageId, with: apiMessages, model: model)
+            }
         }
     }
     
@@ -682,6 +827,10 @@ struct ChatView: View {
             var charsPerTick: Int = 30
             
             while true {
+                if Task.isCancelled || !executor.isChatStreaming {
+                    break
+                }
+                
                 if buffer.isStreamingFinished && 
                    buffer.rawContent.count <= displayedContentLength && 
                    buffer.rawThinking.count <= displayedThinkingLength {
@@ -700,15 +849,17 @@ struct ChatView: View {
                 let nextT = String(buffer.rawThinking.prefix(targetT))
                 
                 if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }) {
-                    // プロパティ更新を一括化してObservationの通知回数を削減
-                    executor.chatMessages[index].updateStreamingContent(
-                        content: nextC,
-                        thinking: nextT.isEmpty ? nil : nextT,
-                        isThinkingCompleted: buffer.isThinkingCompleted
-                    )
-                    
-                    displayedContentLength = targetC
-                    displayedThinkingLength = targetT
+                    if !Task.isCancelled && executor.isChatStreaming {
+                        // プロパティ更新を一括化してObservationの通知回数を削減
+                        executor.chatMessages[index].updateStreamingContent(
+                            content: nextC,
+                            thinking: nextT.isEmpty ? nil : nextT,
+                            isThinkingCompleted: buffer.isThinkingCompleted
+                        )
+                        
+                        displayedContentLength = targetC
+                        displayedThinkingLength = targetT
+                    }
                 } else {
                     break
                 }
@@ -726,11 +877,12 @@ struct ChatView: View {
                 }
                 
                 try? await Task.sleep(nanoseconds: UInt64(currentInterval * 1_000_000_000))
-                if Task.isCancelled { break }
+                if Task.isCancelled || !executor.isChatStreaming { break }
             }
             
             // 最終確定処理
-            if let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
+            if !Task.isCancelled && executor.isChatStreaming,
+               let index = executor.chatMessages.firstIndex(where: { $0.id == messageId }), 
                let chunk = buffer.finalChunk {
                 let isThinkingCompleted = buffer.isThinkingCompleted || !buffer.rawThinking.isEmpty
                 
@@ -798,13 +950,13 @@ struct ChatView: View {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
                 
                 if let messageChunk = chunk.message {
-                    if chatSettings.thinkingOption == .on {
-                        if let apiThinking = messageChunk.thinking { buffer.rawThinking += apiThinking }
-                        if !messageChunk.content.isEmpty {
-                            buffer.rawContent += messageChunk.content
-                            buffer.isThinkingCompleted = true
-                        }
-                    } else {
+                    // APIから返されたネイティブな思考テキストの処理
+                    if let apiThinking = messageChunk.thinking, !apiThinking.isEmpty {
+                        buffer.rawThinking += apiThinking
+                    }
+                    
+                    // 本文コンテンツおよびインライン<think>タグの処理
+                    if !messageChunk.content.isEmpty {
                         var current = messageChunk.content
                         if let start = current.range(of: "<think>") {
                             isInsideThinkingBlock = true
@@ -820,6 +972,10 @@ struct ChatView: View {
                             buffer.rawThinking += current
                         } else {
                             buffer.rawContent += current
+                            // 本文が届き始めた時点で、思考テキストが存在していれば思考完了とみなす
+                            if !buffer.rawThinking.isEmpty {
+                                buffer.isThinkingCompleted = true
+                            }
                         }
                     }
                     
@@ -950,32 +1106,25 @@ struct ImageGenerationView: View {
     }
     
     @ViewBuilder
-    private func makeInputArea() -> some View {
+    private var imageInputArea: some View {
         @Bindable var executor = executor
-        VStack(spacing: 0) {
-#if !os(visionOS)
-            ScrollToBottomButton(isNearBottom: isNearBottom, messagesEmpty: executor.imageMessages.isEmpty, scrollToBottomTrigger: $scrollToBottomTrigger)
-#endif
-            
-            ChatInputView(
-                inputText: $executor.chatInputText,
-                selectedImages: $executor.imageInputImages,
-                isStreaming: $executor.isImageStreaming,
-                showingInspector: $showingInspector,
-                placeholder: "Enter a prompt...",
-                selectedModel: currentSelectedModel
-            ) {
-                generateImage()
-            } stopMessage: {
-                if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
-                    last.isStreaming = false
-                    last.isStopped = true
-                }
-                executor.isImageStreaming = false
-                executor.cancelImageGeneration()
+        ChatInputView(
+            inputText: $executor.chatInputText,
+            selectedImages: $executor.imageInputImages,
+            isStreaming: $executor.isImageStreaming,
+            showingInspector: $showingInspector,
+            placeholder: "Enter a prompt...",
+            selectedModel: currentSelectedModel
+        ) {
+            generateImage()
+        } stopMessage: {
+            if let last = executor.imageMessages.last, last.role == "assistant" && last.isStreaming {
+                last.isStreaming = false
+                last.isStopped = true
             }
+            executor.isImageStreaming = false
+            executor.cancelImageGeneration()
         }
-        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
 #if !os(visionOS)
         .padding()
 #endif
@@ -986,6 +1135,18 @@ struct ImageGenerationView: View {
             inputAreaHeight = newValue
         }
 #endif
+    }
+    
+    @ViewBuilder
+    private var scrollToBottomArea: some View {
+        @Bindable var executor = executor
+        ScrollToBottomButton(
+            isNearBottom: isNearBottom,
+            messagesEmpty: executor.imageMessages.isEmpty,
+            scrollToBottomTrigger: $scrollToBottomTrigger
+        )
+        .animation(.spring(duration: 0.3), value: isNearBottom)
+        .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
     }
     
     var body: some View {
@@ -1019,7 +1180,7 @@ struct ImageGenerationView: View {
                 .animation(.spring(duration: 0.3), value: executor.imageMessages.isEmpty)
             }
             .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
-                makeInputArea()
+                imageInputArea
                     .frame(width: 600)
                     .padding(16)
                     .glassBackgroundEffect()
@@ -1027,25 +1188,40 @@ struct ImageGenerationView: View {
 #elseif os(iOS)
             if #available(iOS 26.0, *) {
                 content
-                    .safeAreaBar(edge: .bottom) {
-                        makeInputArea()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom) {
-                        makeInputArea()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        imageInputArea
+                            .if(horizontalSizeClass != .compact) { view in
+                                view.ignoresSafeArea(.container, edges: [.bottom])
+                            }
                     }
             }
 #else
             if #available(macOS 26.0, *) {
                 content
-                    .safeAreaBar(edge: .bottom) {
-                        makeInputArea()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaBar(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             } else {
                 content
-                    .safeAreaInset(edge: .bottom) {
-                        makeInputArea()
+                    .overlay(alignment: .bottom) {
+                        scrollToBottomArea
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        imageInputArea
                     }
             }
 #endif
@@ -1136,6 +1312,8 @@ struct ImageGenerationView: View {
                 }
             }
             .pickerStyle(.menu)
+            .labelStyle(.titleAndIcon)
+            .buttonSizingFlexibleIfAvailable()
             .frame(width: 150)
         }
 #else
@@ -1207,7 +1385,6 @@ struct ImageGenerationView: View {
             .confirmationDialog(String(localized: "Are you sure you want to clear the generation history?"), isPresented: $showingClearConfirm, titleVisibility: .visible) {
                 Button(String(localized: "Clear History"), role: .destructive) {
                     executor.clearImageGeneration()
-                    executor.chatInputText = ""
                 }
                 Button(String(localized: "Cancel"), role: .cancel) { }
             }
@@ -1419,17 +1596,72 @@ struct ScrollToBottomButton: View {
 
     var body: some View {
         if !isNearBottom && !messagesEmpty {
-            Button {
-                scrollToBottomTrigger += 1
-            } label: {
-                Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
-                    .font(.subheadline.bold())
-                    .padding()
+#if !os(visionOS)
+            if #available(iOS 26, macOS 26, *) {
+#if os(macOS)
+                macOSButton
+#else
+                iOSButton
+#endif
+            } else {
+                fallbackButton
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
-            .frame(maxWidth: .infinity)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+#else
+            fallbackButton
+#endif
         }
+    }
+
+#if os(macOS)
+    @available(macOS 26, *)
+    private var macOSButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+        }
+        .buttonStyle(.glass(.clear))
+        .tint(.accentColor)
+        .controlSize(.large)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
+    }
+#endif
+
+#if os(iOS)
+    @available(iOS 26, *)
+    private var iOSButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.clear.tint(.accentColor).interactive())
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
+    }
+#endif
+
+    private var fallbackButton: some View {
+        Button {
+            scrollToBottomTrigger += 1
+        } label: {
+            Label(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."), systemImage: "arrow.down.to.line.compact")
+                .font(.subheadline.bold())
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.accentColor, in: Capsule())
+                .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+        }
+        .buttonStyle(.plain)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .help(String(localized: "Scroll to Bottom", comment: "Button text to scroll to the bottom of the chat or image generation view."))
     }
 }

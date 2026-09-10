@@ -108,10 +108,10 @@ struct InspectorContentView: View {
                             .disabled(!(chatSettings.selectedModelCapabilities?.contains("thinking") ?? false))
                             .onChange(of: chatSettings.selectedModelCapabilities) { _, caps in
                                 let hasThinking = caps?.contains("thinking") ?? false
-                                if !hasThinking { chatSettings.thinkingOption = .none }
+                                if !hasThinking { chatSettings.thinkingOption = .defaultOption }
                             }
                             
-                            Text("Specifies whether to perform inference when using a reasoning model.")
+                            Text("Specifies the thinking level when using a thinking model.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

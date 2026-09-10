@@ -19,6 +19,8 @@
 	</dict>
 	<key>UILaunchScreen</key>
 	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackgroundColor</string>
 		<key>UIImageName</key>
 		<string>Launch</string>
 	</dict>

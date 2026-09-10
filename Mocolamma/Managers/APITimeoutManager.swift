@@ -23,7 +23,7 @@ final class APITimeoutManager {
     static let shared = APITimeoutManager()
     private let key = "api_timeout_option"
     
-    @Published private(set) var currentOption: APITimeoutOption = .seconds30
+    @Published private(set) var currentOption: APITimeoutOption = .minutes5
     
     private init() {
         Task {

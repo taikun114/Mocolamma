@@ -45,6 +45,54 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
+## 1.4.0
+### New Features
+#### General
+- **Support resizing the iPhone app**
+  - Full support for iPhone Duo is planned for a future update.
+- **Add action buttons to the toolbar on the Server and Model screens**
+  - You can now access context menus without having to right-click or long-press list items.
+
+#### Chat
+- **Support attaching text files**
+  - You can now attach various text files, including `.txt` and `.md`, to all models that support chat.
+- **Support attaching PDF files**
+  - You can now attach PDF files to all models that support chat. In addition, for models that support vision, each page is also sent as an image, allowing them to recognize images, diagrams, and layouts in addition to text.
+- **Support selecting thinking levels**
+  - You can now select thinking levels from "Off", "Low", "Medium", "High", and "Max" for thinking-capable models. In addition, "None" has been renamed to "Default".
+
+### Bug Fixes and Improvements
+#### General
+- **Refresh the app icon**
+  - Redesigned the app icon and the design displayed on the iOS launch screen.
+- **Fix issue where the window position and size could be reset on macOS**
+- **Improve the appearance of the license screens**
+- **Improve the host input on the server add/edit screen and the model name input on the add model screen so spelling is not autocorrected**
+- **Change default API timeout to 5 minutes**
+  - Reduced the likelihood of timeout errors when loading large models or when prompt processing takes longer.
+
+#### Model
+- **Fix issue where the modified date of models was not displayed correctly depending on the environment**
+- **Improve verification display after model download completion**
+
+#### Chat and Image Generation
+- **Fix issue where the model picker could sometimes be empty on macOS Golden Gate**
+- **Fix issue where picker contents could shrink on macOS Tahoe or later**
+- **Improve the appearance of the message input area on macOS Golden Gate**
+- **Improve the appearance of the scroll to bottom button**
+- **Improve handling so that entered text and attached files are not reset when clearing chat or image generation history**
+- **Improve auto-scroll behavior**
+
+#### Chat
+- **Fix issue where thinking messages were not displayed when "Thinking" was set to "None"**
+- **Fix issue where scrolling would sometimes jump when streaming completed**
+- **Fix issue where files could not be dropped onto attached file icons**
+- **Fix issue where attaching images could cause performance to degrade**
+- **Fix issue where empty message bubbles could remain after stopping a chat, then editing and resending a message**
+
+#### Image Generation
+- **Fix issue where images would shrink when the scroll to bottom button appeared**
+
 ## 1.3.0
 ### New Features
 #### Model

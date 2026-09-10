@@ -41,57 +41,29 @@ struct LicenseTextView: View {
             licenseTextViewContent
         }
         .frame(width: 700, height: 500)
-        .safeAreaInset(edge: .bottom, spacing: 0) { // 下部にセーフエリアインセットとしてVisualEffectViewとボタンを配置
-                ZStack(alignment: .center) {
-                    if #available(macOS 26, *) {
-                        Color.clear
-                            .glassEffect()
-                            .edgesIgnoringSafeArea(.horizontal)
-                    } else {
-                        VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                            .edgesIgnoringSafeArea(.horizontal)
-                    }
-                    HStack {
-                        if let link = licenseLink, let _ = URL(string: link) {
-                            Button {
-                                showingLicenseLinkAlert = true
-                            } label: {
-                                Label("Open License Page", systemImage: "paperclip")
-                            }
-                            .controlSize(.large)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                        }
-                        
-                        Spacer()
-                        
-                        Button("Close") {
-                            dismiss()
-                        }
-                        .buttonStyle(.borderedProminent)
-#if os(visionOS)
-                        .tint(.accentColor)
-                        .foregroundStyle(.white)
-#endif
-                        .controlSize(.large)
-                        .keyboardShortcut(.cancelAction)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                    }
+        .licenseBottomBar(dismissAction: {
+            dismiss()
+        }, leading: {
+            if let link = licenseLink, let _ = URL(string: link) {
+                Button {
+                    showingLicenseLinkAlert = true
+                } label: {
+                    Label("Open License Page", systemImage: "paperclip")
                 }
-                .frame(height: 60) // インセットの固定高さ
+                .controlSize(.large)
             }
-            .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
-                Button("Open") {
-                    if let link = licenseLink, let url = URL(string: link) {
-                        openURL(url)
-                    }
+        })
+        .alert("Open License Page?", isPresented: $showingLicenseLinkAlert) {
+            Button("Open") {
+                if let link = licenseLink, let url = URL(string: link) {
+                    openURL(url)
                 }
-                .keyboardShortcut(.defaultAction)
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Are you sure you want to open the page with license information?")
             }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to open the page with license information?")
+        }
 #else
         NavigationStack {
             licenseScrollView

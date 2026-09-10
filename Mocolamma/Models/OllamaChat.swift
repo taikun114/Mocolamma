@@ -3,6 +3,7 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 import Observation
+import PDFKit
 
 #if os(macOS)
 typealias PlatformImage = NSImage
@@ -23,19 +24,137 @@ extension Image {
 // MARK: - チャット入力用画像モデル
 
 /// ドラッグ&ドロップやリスト表示を効率化するために、画像データをIDでラップします。
-struct ChatInputImage: Identifiable, Equatable {
-    let id = UUID()
-    let data: Data
-    let thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+struct ChatInputImage: Identifiable, Equatable, @unchecked Sendable {
+    let id: UUID
+    var data: Data
+    var thumbnail: PlatformImage? // プレビュー用の軽量なサムネイル
+    var isLoading: Bool = false // 読み込み・リサイズ中フラグ
+    var loadTask: Task<ChatInputImage?, Never>? = nil // 非同期リサイズ処理タスク
+    
+    init(id: UUID = UUID(), data: Data = Data(), thumbnail: PlatformImage? = nil, isLoading: Bool = false, loadTask: Task<ChatInputImage?, Never>? = nil) {
+        self.id = id
+        self.data = data
+        self.thumbnail = thumbnail
+        self.isLoading = isLoading
+        self.loadTask = loadTask
+    }
     
     static func == (lhs: ChatInputImage, rhs: ChatInputImage) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.isLoading == rhs.isLoading
+    }
+}
+
+extension [ChatInputImage] {
+    /// 読み込み中の画像も含め、すべての画像リサイズ処理が完了するのを待機して画像データを取得します
+    func resolveImagesData() async -> [Data] {
+        var results: [Data] = []
+        for item in self {
+            if item.isLoading, let task = item.loadTask {
+                if let readyImage = await task.value, !readyImage.data.isEmpty {
+                    results.append(readyImage.data)
+                }
+            } else if !item.data.isEmpty {
+                results.append(item.data)
+            }
+        }
+        return results
+    }
+
+    /// 読み込み中の画像も含め、すべての画像リサイズ処理が完了するのを待機してBase64文字列配列を取得します。
+    /// （同時に生成済みのサムネイルを ImageThumbnailLoader のキャッシュに事前登録してチャット描画を高速化します）
+    func resolveBase64Images() async -> [String] {
+        var base64List: [String] = []
+        for item in self {
+            var finalData: Data? = nil
+            var thumbnail: PlatformImage? = item.thumbnail
+            
+            if item.isLoading, let task = item.loadTask {
+                if let readyImage = await task.value, !readyImage.data.isEmpty {
+                    finalData = readyImage.data
+                    thumbnail = readyImage.thumbnail ?? thumbnail
+                }
+            } else if !item.data.isEmpty {
+                finalData = item.data
+            }
+            
+            if let data = finalData {
+                let base64 = data.base64EncodedString()
+                base64List.append(base64)
+                if let thumbnail = thumbnail {
+                    ImageThumbnailLoader.setThumbnail(thumbnail, for: base64)
+                }
+            }
+        }
+        return base64List
     }
 }
 
 // MARK: - 画像処理ユーティリティ
 
 extension ChatInputImage {
+    /// 添付元の画像データを最大2048pxのPNGにリサイズし、プレビュー用サムネイルを生成します（非同期）
+    static func create(from rawData: Data, id: UUID = UUID()) async -> ChatInputImage? {
+        return await Task.detached(priority: .medium) {
+            let options: [CFString: Any] = [
+                kCGImageSourceShouldCache: false
+            ]
+            guard let source = CGImageSourceCreateWithData(rawData as CFData, options as CFDictionary) else {
+                return nil
+            }
+            
+            // 1. 最大2048pxにリサイズしたPNGデータを生成
+            let resizeOptions: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 2048
+            ]
+            guard let resizedCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, resizeOptions as CFDictionary) else {
+                return nil
+            }
+            
+            let outputData = NSMutableData()
+            guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
+                return nil
+            }
+            CGImageDestinationAddImage(destination, resizedCGImage, nil)
+            guard CGImageDestinationFinalize(destination) else {
+                return nil
+            }
+            let processedData = outputData as Data
+            
+            // 2. 正方形サムネイル（最大240px）を生成
+            let thumbOptions: [CFString: Any] = [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 240
+            ]
+            guard let thumbSource = CGImageSourceCreateWithData(processedData as CFData, nil),
+                  let thumbCGImage = CGImageSourceCreateThumbnailAtIndex(thumbSource, 0, thumbOptions as CFDictionary) else {
+                return ChatInputImage(id: id, data: processedData, thumbnail: nil, isLoading: false)
+            }
+            
+            let width = CGFloat(thumbCGImage.width)
+            let height = CGFloat(thumbCGImage.height)
+            let size = min(width, height)
+            let x = (width - size) / 2
+            let y = (height - size) / 2
+            let cropRect = CGRect(x: x, y: y, width: size, height: size)
+            
+            let finalThumbnail: PlatformImage?
+            if let croppedCGImage = thumbCGImage.cropping(to: cropRect) {
+                #if os(macOS)
+                finalThumbnail = NSImage(cgImage: croppedCGImage, size: NSSize(width: 60, height: 60))
+                #else
+                finalThumbnail = UIImage(cgImage: croppedCGImage)
+                #endif
+            } else {
+                finalThumbnail = nil
+            }
+            
+            return ChatInputImage(id: id, data: processedData, thumbnail: finalThumbnail, isLoading: false)
+        }.value
+    }
+
     /// データからサムネイルを作成します（非同期）
     static func createThumbnail(from data: Data) async -> PlatformImage? {
         return await Task.detached(priority: .medium) {
@@ -70,38 +189,167 @@ extension ChatInputImage {
         }.value
     }
     
-    /// 複数の画像をバックグラウンドでPNGに変換し、リサイズします
+    /// 添付された画像データをBase64文字列に変換します
     static func processImages(_ imagesData: [Data]) async -> [String] {
         return await Task.detached(priority: .medium) {
-            var results: [String] = []
-            for data in imagesData {
-                let options: [CFString: Any] = [
-                    kCGImageSourceShouldCache: false
-                ]
-                guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else { continue }
-                
-                let thumbnailOptions: [CFString: Any] = [
-                    kCGImageSourceCreateThumbnailFromImageAlways: true,
-                    kCGImageSourceCreateThumbnailWithTransform: true,
-                    kCGImageSourceThumbnailMaxPixelSize: 2048
-                ]
-                
-                guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) else {
-                    continue
-                }
-                
-                let outputData = NSMutableData()
-                guard let destination = CGImageDestinationCreateWithData(outputData, UTType.png.identifier as CFString, 1, nil) else {
-                    continue
-                }
-                
-                CGImageDestinationAddImage(destination, cgImage, nil)
-                if CGImageDestinationFinalize(destination) {
-                    results.append((outputData as Data).base64EncodedString())
+            imagesData.map { $0.base64EncodedString() }
+        }.value
+    }
+}
+
+// MARK: - チャット入力用添付ファイルモデル
+
+/// テキストやMarkdown、PDFなどの添付ファイルを管理するモデル
+struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendable {
+    let id: UUID
+    let name: String
+    var content: String
+    var thumbnailBase64: String?
+    var thumbnail: PlatformImage?
+    var pageImagesPNGData: [Data]
+    var isLoading: Bool
+    
+    var loadTask: Task<ChatInputAttachment?, Never>? = nil
+    
+    init(
+        id: UUID = UUID(),
+        name: String,
+        content: String,
+        thumbnailBase64: String? = nil,
+        thumbnail: PlatformImage? = nil,
+        pageImagesPNGData: [Data] = [],
+        isLoading: Bool = false,
+        loadTask: Task<ChatInputAttachment?, Never>? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.content = content
+        self.thumbnailBase64 = thumbnailBase64
+        self.thumbnail = thumbnail
+        self.pageImagesPNGData = pageImagesPNGData
+        self.isLoading = isLoading
+        self.loadTask = loadTask
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, content, thumbnailBase64
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.content = try container.decode(String.self, forKey: .content)
+        self.thumbnailBase64 = try container.decodeIfPresent(String.self, forKey: .thumbnailBase64)
+        self.thumbnail = nil
+        self.pageImagesPNGData = []
+        self.isLoading = false
+        self.loadTask = nil
+    }
+    
+    /// この添付ファイルがPDFかどうかを判定します
+    var isPDF: Bool {
+        name.lowercased().hasSuffix(".pdf")
+    }
+    
+    /// 添付可能なファイル（テキスト系、PDF、画像）のUTType一覧
+    static let allowedContentTypes: [UTType] = [
+        .plainText,
+        .utf8PlainText,
+        .sourceCode,
+        .json,
+        .commaSeparatedText,
+        .tabSeparatedText,
+        .yaml,
+        .html,
+        .xml,
+        .text,
+        .pdf,
+        .image
+    ]
+    
+    static func == (lhs: ChatInputAttachment, rhs: ChatInputAttachment) -> Bool {
+        lhs.id == rhs.id && lhs.isLoading == rhs.isLoading && lhs.thumbnailBase64 == rhs.thumbnailBase64
+    }
+}
+
+extension Data {
+    /// このデータがPDF（%PDFマジックナンバー）かどうかを判定します
+    var isPDFData: Bool {
+        count >= 4 && self[0] == 0x25 && self[1] == 0x50 && self[2] == 0x44 && self[3] == 0x46
+    }
+}
+
+extension ChatInputAttachment {
+    /// PDFデータから非同期にテキスト抽出・OCR・ページ画像化およびサムネイル生成を行います（添付時先行処理）
+    static func createPDF(from pdfData: Data, fileName: String, id: UUID = UUID()) async -> ChatInputAttachment? {
+        let result = await PDFAttachmentProcessor.shared.processPDF(
+            pdfData: pdfData,
+            fileName: fileName,
+            renderImages: true
+        )
+        let thumbBase64 = result.thumbnailPNGData?.base64EncodedString()
+        var platformThumb: PlatformImage? = nil
+        
+        if let thumbData = result.thumbnailPNGData {
+            #if os(macOS)
+            platformThumb = NSImage(data: thumbData)
+            #else
+            platformThumb = UIImage(data: thumbData)
+            #endif
+        }
+        
+        // 万一thumbnailPNGDataから生成できなかった場合の直接レンダリング
+        if platformThumb == nil, let doc = PDFDocument(data: pdfData), doc.pageCount > 0, let page = doc.page(at: 0) {
+            if let cgImage = PDFAttachmentProcessor.shared.renderPageToCGImage(page: page, targetMaxDimension: 240) {
+                #if os(macOS)
+                platformThumb = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width / 2, height: cgImage.height / 2))
+                #else
+                platformThumb = UIImage(cgImage: cgImage)
+                #endif
+            }
+        }
+        
+        if let platformThumb = platformThumb, let thumbBase64 = thumbBase64 {
+            PDFThumbnailLoader.setThumbnail(platformThumb, for: thumbBase64)
+        }
+        
+        return ChatInputAttachment(
+            id: id,
+            name: fileName,
+            content: result.formattedPromptText,
+            thumbnailBase64: thumbBase64,
+            thumbnail: platformThumb,
+            pageImagesPNGData: result.pageImagesPNGData,
+            isLoading: false
+        )
+    }
+}
+
+extension [ChatInputAttachment] {
+    /// 読み込み中の添付ファイル（PDF等）の処理完了を待機し、整形済み添付ファイル配列とPDF画像配列を返します
+    func resolveProcessedAttachments(renderImages: Bool) async -> (attachments: [ChatInputAttachment], pdfPageImages: [String]) {
+        var processedAttachments: [ChatInputAttachment] = []
+        var pdfPageImages: [String] = []
+        
+        for item in self {
+            var readyItem = item
+            if item.isLoading, let task = item.loadTask {
+                if let resolved = await task.value {
+                    readyItem = resolved
                 }
             }
-            return results
-        }.value
+            
+            processedAttachments.append(readyItem)
+            
+            if readyItem.isPDF && renderImages {
+                for pngData in readyItem.pageImagesPNGData {
+                    pdfPageImages.append(pngData.base64EncodedString())
+                }
+            }
+        }
+        
+        return (processedAttachments, pdfPageImages)
     }
 }
 
@@ -114,7 +362,9 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var role: String
     var content: String
     var thinking: String?
-    var images: [String]? // Base64でエンコードされた画像
+    var images: [String]? // Base64でエンコードされた画像（ユーザが直接添付した画像）
+    var pdfImages: [String]? // PDFファイルから生成されたページ画像（API送信用）
+    var attachments: [ChatInputAttachment]? // 添付されたテキスト/Markdown/PDFファイル
     var toolCalls: [ToolCall]?
     var toolName: String?
     var createdAt: String? // メッセージが作成された日時
@@ -125,6 +375,9 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var isStopped: Bool = false // ストリーミングがユーザーによって停止されたかどうかを示すフラグ
     var isThinkingCompleted: Bool = false // シンキングが完了したかどうかを示すフラグ
     var isProcessingImages: Bool = false // 画像の変換処理中かどうかを示すフラグ
+    var isProcessingPDF: Bool = false // PDFの抽出・変換処理中かどうかを示すフラグ
+    var rawInputImages: [ChatInputImage]? = nil // 処理前の生入力画像（リトライ・送信時の一時受け渡し用）
+    var rawInputAttachments: [ChatInputAttachment]? = nil // 処理前の生入力添付ファイル（リトライ・送信時の一時受け渡し用）
     
     // 画像生成関連のプロパティ
     var generatedImage: String? // 生成された画像 (Base64)
@@ -145,6 +398,45 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalEvalCount: Int? // 最終的なトークン数
     var finalEvalDuration: Int? // 最終的な評価時間
     var finalIsStopped: Bool = false // 最終的な停止状態
+    
+    /// 添付ファイルの内容をフォーマットしてプロンプトテキストを構築します（添付ファイルがある場合はサンドイッチ構成）
+    static func buildFullPrompt(userText: String, attachments: [ChatInputAttachment]?) -> String {
+        guard let attachments = attachments, !attachments.isEmpty else {
+            return userText
+        }
+        let trimmedUserText = userText.trimmingCharacters(in: .whitespacesAndNewlines)
+        var fullText = userText
+        for attachment in attachments {
+            if !fullText.isEmpty {
+                fullText += "\n\n"
+            }
+            if attachment.isPDF && attachment.content.hasPrefix("===") {
+                // すでにPDF用フォーマットで整形されている場合
+                fullText += attachment.content
+            } else {
+                // 通常のテキスト添付ファイル
+                fullText += """
+                ===
+                
+                Attached File: \(attachment.name)
+                
+                ``````````
+                \(attachment.content)
+                ``````````
+                """
+            }
+        }
+        // 添付ファイルがあり、ユーザープロンプトが存在する場合は末尾にも配置してサンドイッチ構成にする
+        if !trimmedUserText.isEmpty {
+            fullText += "\n\n===\n\n" + userText
+        }
+        return fullText
+    }
+    
+    /// このメッセージのAPI送信用コンテンツ（添付ファイル展開済み）を取得します
+    var promptForAPI: String {
+        ChatMessage.buildFullPrompt(userText: content, attachments: attachments)
+    }
     
     /// ストリーミング中のコンテンツを一括更新します（Observationの通知を最小限に抑えるため）
     @MainActor
@@ -176,6 +468,8 @@ class ChatMessage: Identifiable, Codable, Equatable {
         case content
         case thinking
         case images
+        case pdfImages = "pdf_images"
+        case attachments
         case toolCalls = "tool_calls"
         case toolName = "tool_name"
         case createdAt = "created_at"
@@ -191,6 +485,8 @@ class ChatMessage: Identifiable, Codable, Equatable {
         self.content = try container.decode(String.self, forKey: .content)
         self.thinking = try container.decodeIfPresent(String.self, forKey: .thinking)
         self.images = try container.decodeIfPresent([String].self, forKey: .images)
+        self.pdfImages = try container.decodeIfPresent([String].self, forKey: .pdfImages)
+        self.attachments = try container.decodeIfPresent([ChatInputAttachment].self, forKey: .attachments)
         self.toolCalls = try container.decodeIfPresent([ToolCall].self, forKey: .toolCalls)
         self.toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
         self.createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
@@ -203,9 +499,18 @@ class ChatMessage: Identifiable, Codable, Equatable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(role, forKey: .role)
-        try container.encode(content, forKey: .content)
+        let encodedContent = (role == "user" && attachments?.isEmpty == false) ? promptForAPI : content
+        try container.encode(encodedContent, forKey: .content)
         try container.encodeIfPresent(thinking, forKey: .thinking)
-        try container.encodeIfPresent(images, forKey: .images)
+        
+        // API送信時にはユーザ直接添付画像とPDFページ画像を結合して送信
+        let combinedImages: [String]? = {
+            let direct = images ?? []
+            let pdf = pdfImages ?? []
+            let combined = direct + pdf
+            return combined.isEmpty ? nil : combined
+        }()
+        try container.encodeIfPresent(combinedImages, forKey: .images)
         try container.encodeIfPresent(toolCalls, forKey: .toolCalls)
         try container.encodeIfPresent(toolName, forKey: .toolName)
         try container.encodeIfPresent(createdAt, forKey: .createdAt)
@@ -216,11 +521,13 @@ class ChatMessage: Identifiable, Codable, Equatable {
     }
     
     // 新しいメッセージを作成するためのデフォルトイニシャライザ
-    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
+    init(role: String, content: String, thinking: String? = nil, images: [String]? = nil, pdfImages: [String]? = nil, attachments: [ChatInputAttachment]? = nil, toolCalls: [ToolCall]? = nil, toolName: String? = nil, createdAt: String? = nil, totalDuration: Int? = nil, evalCount: Int? = nil, evalDuration: Int? = nil, isStreaming: Bool = false, isStopped: Bool = false, isThinkingCompleted: Bool = false, generatedImage: String? = nil, isImageGeneration: Bool = false) {
         self.role = role
         self.content = content
         self.thinking = thinking
         self.images = images
+        self.pdfImages = pdfImages
+        self.attachments = attachments
         self.toolCalls = toolCalls
         self.toolName = toolName
         self.createdAt = createdAt
@@ -255,7 +562,7 @@ struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
     let stream: Bool
-    let think: Bool?
+    let think: JSONValue?
     let keepAlive: JSONValue?
     let options: ChatRequestOptions?
     let tools: [ToolDefinition]?
@@ -284,14 +591,44 @@ struct ChatRequest: Codable {
 
 /// チャットリクエストの思考オプションを表します。
 enum ThinkingOption: String, CaseIterable, Identifiable {
-    case none = "ThinkingOption_None"
-    case on = "ThinkingOption_On"
+    case defaultOption = "ThinkingOption_Default"
     case off = "ThinkingOption_Off"
+    case low = "ThinkingOption_Low"
+    case medium = "ThinkingOption_Medium"
+    case high = "ThinkingOption_High"
+    case max = "ThinkingOption_Max"
     
     var id: String { self.rawValue }
     
     var localizedName: LocalizedStringKey {
         LocalizedStringKey(rawValue)
+    }
+    
+    var apiValue: JSONValue? {
+        switch self {
+        case .defaultOption:
+            return nil
+        case .off:
+            return .bool(false)
+        case .low:
+            return .string("low")
+        case .medium:
+            return .string("medium")
+        case .high:
+            return .string("high")
+        case .max:
+            return .string("max")
+        }
+    }
+    
+    /// デモ環境などで思考出力を行うべきかどうかを判定します。
+    var isThinkingRequested: Bool {
+        switch self {
+        case .defaultOption, .off:
+            return false
+        case .low, .medium, .high, .max:
+            return true
+        }
     }
 }
 
@@ -673,7 +1010,7 @@ class ChatSettings {
     var contextWindowValue: Double = 2048.0
     var isSystemPromptEnabled: Bool = false
     var systemPrompt: String = ""
-    var thinkingOption: ThinkingOption = .none
+    var thinkingOption: ThinkingOption = .defaultOption
     
     // 追加のカスタム設定
     var repeatLastNOption: RepeatLastNOption = .none

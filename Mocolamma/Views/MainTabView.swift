@@ -24,64 +24,64 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            NavigationStack {
-                ServerView(
-                    serverManager: serverManager,
-                    executor: executor,
-                    onTogglePreview: toggleInspector,
-                    selectedServerForInspector: $selectedServerForInspector
-                )
+            Tab("Server", systemImage: "server.rack", value: "server") {
+                NavigationStack {
+                    ServerView(
+                        serverManager: serverManager,
+                        executor: executor,
+                        onTogglePreview: toggleInspector,
+                        selectedServerForInspector: $selectedServerForInspector
+                    )
+                }
+                .environment(serverManager)
+                .environment(executor)
             }
-            .environment(serverManager)
-            .environment(executor)
-            .tabItem { Label("Server", systemImage: "server.rack") }
-            .tag("server")
             
-            NavigationStack {
-                ModelListView(
-                    executor: executor,
-                    selectedModel: $selectedModel,
-                    sortOrder: $sortOrder,
-                    showingAddSheet: $showingAddModelsSheet,
-                    selectedFilterTag: $selectedFilterTag,
-                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                    modelToDelete: $modelToDelete,
-                    isSelected: selection == "models",
-                    onTogglePreview: toggleInspector
-                )
+            Tab("Models", systemImage: "tray.full", value: "models") {
+                NavigationStack {
+                    ModelListView(
+                        executor: executor,
+                        selectedModel: $selectedModel,
+                        sortOrder: $sortOrder,
+                        showingAddSheet: $showingAddModelsSheet,
+                        selectedFilterTag: $selectedFilterTag,
+                        showingDeleteConfirmation: $showingDeleteConfirmation,
+                        modelToDelete: $modelToDelete,
+                        isSelected: selection == "models",
+                        onTogglePreview: toggleInspector
+                    )
+                }
+                .environment(serverManager)
+                .environment(executor)
             }
-            .environment(serverManager)
-            .environment(executor)
-            .tabItem { Label("Models", systemImage: "tray.full") }
-            .tag("models")
             
-            NavigationStack {
-                ChatView(
-                    showingInspector: $showingInspector,
-                    onToggleInspector: toggleInspector
-                )
+            Tab("Chat", systemImage: "message", value: "chat") {
+                NavigationStack {
+                    ChatView(
+                        showingInspector: $showingInspector,
+                        onToggleInspector: toggleInspector
+                    )
+                }
+                .environment(serverManager)
+                .environment(executor)
             }
-            .environment(serverManager)
-            .environment(executor)
-            .tabItem { Label("Chat", systemImage: "message") }
-            .tag("chat")
             
-            NavigationStack {
-                ImageGenerationView(
-                    showingInspector: $showingInspector,
-                    onToggleInspector: toggleInspector
-                )
+            Tab("Image Generation", systemImage: "photo", value: "image_generation") {
+                NavigationStack {
+                    ImageGenerationView(
+                        showingInspector: $showingInspector,
+                        onToggleInspector: toggleInspector
+                    )
+                }
+                .environment(serverManager)
+                .environment(executor)
             }
-            .environment(serverManager)
-            .environment(executor)
-            .tabItem { Label("Image Generation", systemImage: "photo") }
-            .tag("image_generation")
             
-            NavigationStack {
-                SettingsView()
+            Tab("Settings", systemImage: "gear", value: "settings") {
+                NavigationStack {
+                    SettingsView()
+                }
             }
-            .tabItem { Label("Settings", systemImage: "gear") }
-            .tag("settings")
         }
         .onChange(of: selection) { _, newSelection in
             // タブが切り替えられたときに、重い状態更新を非同期化してメインスレッドの占有を避け、アニメーションをスムーズにする
@@ -102,6 +102,9 @@ struct MainTabView: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
+#if os(iOS)
+        .defaultTabBarPlacementIfAvailable(.sidebar)
+#endif
 #if !os(visionOS)
         .inspector(isPresented: (isiOSAppOnVision) ? .constant(false) : $showingInspector) {
             inspectorContent
@@ -221,3 +224,19 @@ struct MainTabView: View {
         }
     }
 }
+
+#if os(iOS)
+// MARK: - View拡張
+
+extension View {
+    /// 利用可能な場合にタブバーのデフォルト配置を設定
+    @ViewBuilder
+    func defaultTabBarPlacementIfAvailable(_ placement: AdaptableTabBarPlacement) -> some View {
+        if #available(iOS 27.0, *) {
+            self.defaultTabBarPlacement(placement)
+        } else {
+            self
+        }
+    }
+}
+#endif

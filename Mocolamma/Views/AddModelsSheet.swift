@@ -30,6 +30,10 @@ struct AddModelsSheet: View {
                 
                 TextField("e.g., gemma3:4b, phi4:latest", text: $modelNameInput) // モデル追加入力フィールドのプレースホルダーテキスト。
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocorrectionDisabled()
+#if !os(macOS)
+                    .textInputAutocapitalization(.never)
+#endif
                     .focused($isTextFieldFocused)
                     .onSubmit {
                         // モデル追加ボタンが無効な場合は何もしない
@@ -172,7 +176,8 @@ struct AddModelsSheet: View {
             executor.pullHttpErrorTriggered = false
             executor.pullHttpErrorMessage = ""
             executor.pullModel(modelName: name)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(50))
                 if !executor.pullHttpErrorTriggered {
                     showingAddSheet = false
                 }

@@ -22,6 +22,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         var chatMessages: [ChatMessage] = []
         var chatInputText: String = ""
         var chatInputImages: [ChatInputImage] = []
+        var chatInputAttachments: [ChatInputAttachment] = []
         var isChatStreaming: Bool = false
         
         var imageMessages: [ChatMessage] = []
@@ -56,6 +57,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     var pullSpeedBytesPerSec: Double = 0.0 // 現在のダウンロード速度 (B/s)
     var pullETARemaining: TimeInterval = 0 // 残り推定時間(秒)
     var lastPulledModelName: String = "" // 最後にプルリクエストを送ったモデル名
+    
+    /// モデルの検証（ハッシュ検証）中かどうか
+    var isPullVerifying: Bool {
+        isPulling && pullStatus.lowercased().contains("verifying")
+    }
     private var urlSession: URLSession!
     private var connectionCheckSession: URLSession! // 接続確認専用（30秒固定）
     private var pullTask: URLSessionDataTask?
@@ -136,13 +142,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 if currentChangeCount != self.lastDragPasteboardChangeCount {
                     self.lastDragPasteboardChangeCount = currentChangeCount
                     
-                    // ファイルが含まれており、かつそれが画像として読み込み可能か確認
+                    // ファイルまたは画像が含まれているか確認
                     let hasFiles = pb.types?.contains(.fileURL) == true || 
                                  pb.types?.contains(NSPasteboard.PasteboardType("NSFilenamesPboardType")) == true
                     
                     let hasImages = pb.canReadObject(forClasses: [PlatformImage.self], options: nil)
                     
-                    if hasFiles && hasImages {
+                    if hasFiles || hasImages {
                         self.startDragging()
                     }
                 }
@@ -1274,7 +1280,8 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
+                    do {
+                        let lastUserMessage = messages.last(where: { $0.role == "user" })?.content ?? ""
                     let isMarkdownTest = lastUserMessage == "Test Markdown" || lastUserMessage == "Markdownをテスト" || lastUserMessage == "マークダウンをテスト"
                     
                     let created_at = Date()
@@ -1390,7 +1397,7 @@ struct MarkdownTestView: View {
 これがMarkdownでサポートされる最小レベルの見出しです。通常、本文に近いサイズになりますが、太字や色などのスタイリングで構造が維持されていることを確認してください。
 """#
                         
-                        let thinkingResponse = thinkingOption == .on ? markdownText : nil
+                        let thinkingResponse = thinkingOption.isThinkingRequested ? markdownText : nil
                         
                         let responseChunk = ChatResponseChunk(
                             model: model,
@@ -1420,8 +1427,8 @@ struct MarkdownTestView: View {
                     if stream {
                         // ストリーミングモード（stream: true）
                         
-                        // チンキングオプションがONの場合、Thinkingメッセージを送信
-                        if thinkingOption == .on {
+                        // 思考オプションが有効な場合、Thinkingメッセージを送信
+                        if thinkingOption.isThinkingRequested {
                             let thinkingMessages = ["Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".  ", "Test", "ing", ".", ".", ".!"]
                             
                             for thinkingMessage in thinkingMessages {
@@ -1503,7 +1510,7 @@ struct MarkdownTestView: View {
                         
                         // 思考モードが有効な場合、thinkingプロパティを持つメッセージを含める
                         let fullResponse = "This is a test!"
-                        let thinkingResponse = thinkingOption == .on ? "Testing... Testing... Testing...!" : nil
+                        let thinkingResponse = thinkingOption.isThinkingRequested ? "Testing... Testing... Testing...!" : nil
                         
                         let responseChunk = ChatResponseChunk(
                             model: model,
@@ -1526,11 +1533,14 @@ struct MarkdownTestView: View {
                         continuation.yield(responseChunk)
                         continuation.finish()
                     }
+                } catch {
+                    continuation.finish(throwing: error)
                 }
             }
         }
+    }
         
-        return AsyncThrowingStream { continuation in
+    return AsyncThrowingStream { continuation in
             Task { @MainActor in // UIプロパティを安全に更新するためにMainActorで実行することを保証
                 guard let apiBaseURL = self.apiBaseURL else {
                     continuation.finish(throwing: URLError(.badURL))
@@ -1588,15 +1598,15 @@ struct MarkdownTestView: View {
                         }
                     }
                     
-                    let chatRequest: ChatRequest
-                    switch thinkingOption {
-                    case .none:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: nil, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    case .on:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: true, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    case .off:
-                        chatRequest = ChatRequest(model: model, messages: finalMessages, stream: stream, think: false, keepAlive: keepAlive, options: chatOptions, tools: tools)
-                    }
+                    let chatRequest = ChatRequest(
+                        model: model,
+                        messages: finalMessages,
+                        stream: stream,
+                        think: thinkingOption.apiValue,
+                        keepAlive: keepAlive,
+                        options: chatOptions,
+                        tools: tools
+                    )
                     
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化
@@ -1633,11 +1643,9 @@ struct MarkdownTestView: View {
         print("Image generation cancelled.")
     }
     
-    /// チャット履歴と入力テキストをクリアします。
+    /// チャット履歴をクリアします。
     func clearChat() {
         chatMessages.removeAll()
-        chatInputText = ""
-        chatInputImages = []
         updateIsChatStreaming()
         cancelChatStreaming()
     }
@@ -1645,8 +1653,6 @@ struct MarkdownTestView: View {
     /// 画像生成履歴をクリアします。
     func clearImageGeneration() {
         imageMessages.removeAll()
-        chatInputText = ""
-        imageInputImages = []
         updateIsImageStreaming()
         cancelImageGeneration()
     }
@@ -1655,10 +1661,10 @@ struct MarkdownTestView: View {
     func generateImage(model: String, prompt: String, stream: Bool, width: Int, height: Int, steps: Int, seed: Int? = nil, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ImageGenerationResponseChunk, Error> {
         if isDemoServer() {
             ReviewManager.shared.logAction()
-            // ... (demo logic)
             return AsyncThrowingStream { continuation in
                 Task { @MainActor in
-                    let created_at = Date()
+                    do {
+                        let created_at = Date()
                     let formatter = ISO8601DateFormatter()
                     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
                     let createdAtString = formatter.string(from: created_at)
@@ -1740,11 +1746,14 @@ struct MarkdownTestView: View {
                         continuation.yield(finalChunk)
                         continuation.finish()
                     }
+                } catch {
+                    continuation.finish(throwing: error)
                 }
             }
         }
-        
-        return AsyncThrowingStream { continuation in
+    }
+    
+    return AsyncThrowingStream { continuation in
             Task { @MainActor in
                 guard let apiBaseURL = self.apiBaseURL else {
                     continuation.finish(throwing: URLError(.badURL))

@@ -67,7 +67,7 @@ struct MocolammaApp: App {
     }
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             // ContentViewにrefreshTriggerのPublisherを渡します。
             ContentView(
                 serverManager: serverManager,
@@ -82,6 +82,7 @@ struct MocolammaApp: App {
             )
 #if os(macOS)
             .frame(minWidth: 1000, minHeight: 500)
+            .windowFrameAutosaveName("MainWindow")
 #elseif os(visionOS)
             .frame(minWidth: 700, maxWidth: 1200, minHeight: 500, maxHeight: 900)
 #endif

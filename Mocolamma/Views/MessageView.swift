@@ -18,24 +18,29 @@ struct MessageView: View {
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
     @State private var showingVisionWarningAlert = false
+    @State private var showingVisionPDFWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.containerHeight) private var containerHeight
+    @Environment(\.containerWidth) private var containerWidth
     
-    // 編集用画像の状態
+    // 編集用画像および添付ファイルの状態
     @State private var editingImages: [ChatInputImage] = []
+    @State private var editingAttachments: [ChatInputAttachment] = []
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
     @State private var draggingItem: ChatInputImage?
+    @State private var draggingAttachment: ChatInputAttachment?
     @State private var isDraggingOver = false
+    @State private var showingUnsupportedFileAlert = false
+    @State private var unsupportedFileAlertTitle = "This file cannot be attached"
     
     // 保存関連の状態
     @State private var isSaveOptionsPresented: Bool = false
     @State private var isFileExporterPresented: Bool = false
     @State private var imageDocument: ImageDocument?
     @State private var isThinkingExpanded: Bool = false
-    @State private var isStreamingSettled: Bool = true
     
     private var isDownloadSuccessful: Bool {
         message.isDownloadSuccessful
@@ -49,11 +54,42 @@ struct MessageView: View {
         chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "vision" }) ?? false
     }
     
+    private var supportsCompletion: Bool {
+        chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "completion" }) ?? false
+    }
+    
+    private var canAttach: Bool {
+        isModelSelected && (supportsCompletion || supportsVision)
+    }
+    
+    private var isDoneDisabled: Bool {
+        guard isModelSelected && !isStreamingAny else { return true }
+        let hasText = !message.content.isEmpty
+        let hasAttachments = !editingAttachments.isEmpty
+        let hasImages = !editingImages.isEmpty
+        
+        if supportsVision {
+            return !hasText && !hasAttachments && !hasImages
+        } else {
+            return !hasText && !hasAttachments
+        }
+    }
+    
     static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone]
         return formatter
     }()
+    
+    static let iso8601StandardFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withTimeZone]
+        return formatter
+    }()
+    
+    static func parseDate(from string: String) -> Date? {
+        iso8601Formatter.date(from: string) ?? iso8601StandardFormatter.date(from: string)
+    }
     
     var body: some View {
         @Bindable var message = message
@@ -78,7 +114,7 @@ struct MessageView: View {
                 )
                 .cornerRadius(16)
                 .overlay {
-                    if isEditing && isDraggingOver && supportsVision {
+                    if isEditing && isDraggingOver {
                         ZStack {
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(Color.white.opacity(0.2))
@@ -90,20 +126,21 @@ struct MessageView: View {
                             HStack {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title3)
-                                Text("Drop here to add images")
+                                Text("Drop here to add files")
                                     .font(.system(.body, design: .rounded))
                                     .fontWeight(.bold)
                             }
                             .foregroundColor(.white)
                         }
+                        .allowsHitTesting(false)
                     }
                 }
-                .onDrop(of: [.fileURL, .image], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: supportsVision, onURLsDropped: { urls in
-                    if isEditing && supportsVision {
-                        addImages(from: urls)
+                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                    if isEditing {
+                        handleDroppedURLs(urls)
                     }
                 }, onDataDropped: { data in
-                    if isEditing && supportsVision {
+                    if isEditing {
                         addImages(from: data)
                     }
                 }))
@@ -159,10 +196,30 @@ struct MessageView: View {
                 VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
                     HStack {
                         if message.role == "user" { Spacer() }
-                        Text(dateString)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        if message.role == "assistant" { tokenAndSpeed }
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 6) {
+                                Text(dateString)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                if message.role == "assistant" {
+                                    tokenAndSpeed
+                                }
+                            }
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                            
+                            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
+                                Text(dateString)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                if message.role == "assistant" {
+                                    tokenAndSpeed
+                                }
+                            }
+                            .lineLimit(1)
+                        }
                         if message.role == "assistant" { Spacer() }
                     }
                     HStack(spacing: 6) {
@@ -248,18 +305,9 @@ struct MessageView: View {
             .opacity(1.0)
 #endif
             .onChange(of: isEditing) { _, _ in withAnimation { } } // isEditing用にこのonChangeを保持
-            .onChange(of: message.isStreaming) { _, newValue in
-                if !newValue {
-                    // ストリーミング終了後、マークダウンの再描画などが安定するまで少し待ってから機能を有効化
-                    isStreamingSettled = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        isStreamingSettled = true
-                    }
-                }
-            }
         }
         .frame(maxWidth: .infinity, alignment: message.role == "user" ? .trailing : .leading)
-        .padding(message.role == "user" ? .leading : .trailing, (horizontalSizeClass == .regular) ? 64 : 0)
+        .padding(message.role == "user" ? .leading : .trailing, bubbleHorizontalPadding)
         .contentShape(Rectangle())
         .sheet(isPresented: $showingPhotoPicker) {
             PhotoLibraryPicker(isPresented: $showingPhotoPicker, selectedImages: $editingImages)
@@ -270,12 +318,12 @@ struct MessageView: View {
         }
         .fileImporter(
             isPresented: $showingFilePicker,
-            allowedContentTypes: [.image],
+            allowedContentTypes: ChatInputAttachment.allowedContentTypes,
             allowsMultipleSelection: true
         ) { result in
             switch result {
             case .success(let urls):
-                addImages(from: urls)
+                addFiles(from: urls)
             case .failure(let error):
                 print("Error picking files: \(error.localizedDescription)")
             }
@@ -285,10 +333,18 @@ struct MessageView: View {
 #endif
     }
     
+    /// コンテナ幅が500pt未満（サイドバーやインスペクタ展開時など）の場合は余白をなくし、十分な幅がある場合は大画面用の余白を適用
+    private var bubbleHorizontalPadding: CGFloat {
+        if containerWidth > 0 && containerWidth < 500 {
+            return 0
+        }
+        return (horizontalSizeClass == .regular) ? 64 : 0
+    }
+    
     private var dateString: String {
         dateFormatter.string(from: {
             if let createdAtString = message.createdAt,
-               let createdAtDate = MessageView.iso8601Formatter.date(from: createdAtString) {
+               let createdAtDate = MessageView.parseDate(from: createdAtString) {
                 if message.role == "assistant", !message.isStopped, let evalDuration = message.evalDuration {
                     return createdAtDate.addingTimeInterval(Double(evalDuration) / 1_000_000_000.0)
                 } else {
@@ -299,41 +355,267 @@ struct MessageView: View {
         }())
     }
     
-    private func addImages(from urls: [URL]) {
+    private func addFiles(from urls: [URL]) {
         Task {
             for url in urls {
-                let data: Data? = if url.startAccessingSecurityScopedResource() {
-                    try? Data(contentsOf: url)
-                } else {
-                    try? Data(contentsOf: url)
+                let accessing = url.startAccessingSecurityScopedResource()
+                let data = try? Data(contentsOf: url)
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
                 }
                 
-                if let urlData = data, PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                guard let data = data else { continue }
+                
+                if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: data, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
                         }
                     }
-                    url.stopAccessingSecurityScopedResource()
-                    // 少しだけ待機して、左から順に現れるようにする
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if PlatformImage(data: data) != nil {
+                    // 画像ファイルの場合: 即座にスピナー付きプレースホルダーを追加
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                    let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
+                        }
+                    }
                     try? await Task.sleep(nanoseconds: 20_000_000)
                 }
             }
         }
     }
+    
+    private func handleDroppedURLs(_ urls: [URL]) {
+        Task {
+            var successCount = 0
+            var failureCount = 0
+            
+            for url in urls {
+                let accessing = url.startAccessingSecurityScopedResource()
+                let data = try? Data(contentsOf: url)
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+                
+                guard let data = data else {
+                    failureCount += 1
+                    continue
+                }
+                
+                if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
+                    let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: data, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    successCount += 1
+                } else if PlatformImage(data: data) != nil {
+                    // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: data, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    successCount += 1
+                } else if supportsCompletion, let textContent = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .shiftJIS) ?? String(data: data, encoding: .japaneseEUC) ?? String(data: data, encoding: .utf16) {
+                    let attachment = ChatInputAttachment(name: url.lastPathComponent, content: textContent)
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingAttachments.append(attachment)
+                        }
+                    }
+                    successCount += 1
+                } else {
+                    failureCount += 1
+                }
+                try? await Task.sleep(nanoseconds: 20_000_000)
+            }
+            
+            if failureCount > 0 {
+                await MainActor.run {
+                    if successCount > 0 {
+                        unsupportedFileAlertTitle = "Some files could not be attached"
+                    } else if failureCount > 1 {
+                        unsupportedFileAlertTitle = "These files cannot be attached"
+                    } else {
+                        unsupportedFileAlertTitle = "This file cannot be attached"
+                    }
+                    showingUnsupportedFileAlert = true
+                }
+            }
+        }
+    }
+    
+    private func addImages(from urls: [URL]) {
+        addFiles(from: urls)
+    }
 
     private func addImages(from data: [Data]) {
         Task {
             for urlData in data {
-                if PlatformImage(data: urlData) != nil {
-                    let thumbnail = await ChatInputImage.createThumbnail(from: urlData)
+                if urlData.isPDFData {
+                    let placeholderId = UUID()
+                    let pdfFileName = "Document.pdf"
+                    let task = Task<ChatInputAttachment?, Never> {
+                        await ChatInputAttachment.createPDF(from: urlData, fileName: pdfFileName, id: placeholderId)
+                    }
+                    
                     await MainActor.run {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            editingImages.append(ChatInputImage(data: urlData, thumbnail: thumbnail))
+                            editingAttachments.append(ChatInputAttachment(id: placeholderId, name: pdfFileName, content: "", isLoading: true, loadTask: task))
                         }
                     }
-                    // 少しだけ待機して、左から順に現れるようにする
+                    
+                    Task {
+                        if let attachment = await task.value {
+                            await MainActor.run {
+                                if let index = editingAttachments.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingAttachments[index] = attachment
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingAttachments.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                } else if PlatformImage(data: urlData) != nil {
+                    let placeholderId = UUID()
+                    let task = Task<ChatInputImage?, Never> {
+                        await ChatInputImage.create(from: urlData, id: placeholderId)
+                    }
+                    
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            editingImages.append(ChatInputImage(id: placeholderId, isLoading: true, loadTask: task))
+                        }
+                    }
+                    
+                    Task {
+                        if let chatInputImage = await task.value {
+                            await MainActor.run {
+                                if let index = editingImages.firstIndex(where: { $0.id == placeholderId }) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        editingImages[index] = chatInputImage
+                                    }
+                                }
+                            }
+                        } else {
+                            await MainActor.run {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editingImages.removeAll(where: { $0.id == placeholderId })
+                                }
+                            }
+                        }
+                    }
                     try? await Task.sleep(nanoseconds: 20_000_000)
                 }
             }
@@ -346,20 +628,24 @@ struct MessageView: View {
             Text("Stopped")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
         } else if message.isImageGeneration {
             if let duration = message.totalDuration {
                 Text(formatDuration(nanoseconds: duration))
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
             }
         } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
             Text("\(evalCount) Tokens")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
             let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
             Text(String(format: "%.2f Tok/s", tokensPerSecond))
                 .font(.caption2)
                 .foregroundColor(.secondary)
+                .lineLimit(1)
         }
     }
     
@@ -608,7 +894,8 @@ struct MessageView: View {
         
 #if os(macOS)
         // アクションシートが閉じるのを待つための遅延
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(200))
             let savePanel = NSSavePanel()
             savePanel.allowedContentTypes = [.png]
             savePanel.nameFieldStringValue = "generated_image.png"
@@ -765,9 +1052,14 @@ struct MessageView: View {
                 isEditingFocused = true
                 message.content = message.content
                 
-                // 画像を編集用にコピー
-                Task {
-                    if let images = message.images {
+                // 添付ファイルの初期化（rawInputAttachments または attachments を復元）
+                editingAttachments = message.rawInputAttachments ?? message.attachments ?? []
+                
+                // 画像の初期化（rawInputImages があれば即座に全件復元、なければ images の Base64 から非同期生成）
+                if let rawImages = message.rawInputImages, !rawImages.isEmpty {
+                    editingImages = rawImages
+                } else if let images = message.images, !images.isEmpty {
+                    Task {
                         editingImages = await withTaskGroup(of: (Int, ChatInputImage?).self) { group in
                             for (index, base64) in images.enumerated() {
                                 group.addTask {
@@ -787,9 +1079,9 @@ struct MessageView: View {
                             }
                             return results.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
                         }
-                    } else {
-                        editingImages = []
                     }
+                } else {
+                    editingImages = []
                 }
             }) {
                 Image(systemName: "pencil")
@@ -848,9 +1140,17 @@ struct MessageView: View {
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
-            if !editingImages.isEmpty && !supportsVision {
-                showingVisionWarningAlert = true
-                return
+            let hasPDFs = editingAttachments.contains { $0.isPDF }
+            let hasImages = !editingImages.isEmpty
+            
+            if !supportsVision {
+                if hasPDFs {
+                    showingVisionPDFWarningAlert = true
+                    return
+                } else if hasImages {
+                    showingVisionWarningAlert = true
+                    return
+                }
             }
             performDone()
         }) {
@@ -879,7 +1179,7 @@ struct MessageView: View {
         .buttonStyle(.plain)
 #endif
         .help(String(localized: "Complete editing and retry."))
-        .disabled(!isModelSelected || isStreamingAny || (message.content.isEmpty && (editingImages.isEmpty || !supportsVision)))
+        .disabled(isDoneDisabled)
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
@@ -895,52 +1195,66 @@ struct MessageView: View {
                 Text("The selected model does not support image recognition, so images will not be sent. Are you sure you want to send it as is?")
             }
         }
+        .alert("This model does not support images", isPresented: $showingVisionPDFWarningAlert) {
+            Button("Send") {
+                performDone(skipImages: true)
+            }
+            .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let modelName = selectedModelName {
+                Text("The selected model \"\(modelName)\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            } else {
+                Text("The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
+            }
+        }
+        .alert(
+            Text(LocalizedStringKey(unsupportedFileAlertTitle)),
+            isPresented: $showingUnsupportedFileAlert
+        ) {
+            Button("OK") { }
+        } message: {
+            Text("Only text, PDF, or image files (vision-capable models only) can be attached.")
+        }
     }
     
     private func performDone(skipImages: Bool = false) {
         isEditing = false
         
-        // 編集内容を反映させるためのTaskを開始
-        Task {
-            // 画像の変更を反映
-            if editingImages.isEmpty || skipImages {
-                message.images = nil
-            } else {
-                // 画像の処理が必要な場合はフラグを立てる
-                message.isProcessingImages = true
-                
-                let imagesData = editingImages.map { $0.data }
-                let base64Images = await ChatInputImage.processImages(imagesData)
-                
-                await MainActor.run {
-                    message.images = base64Images
-                    message.isProcessingImages = false
-                }
-            }
-            
-            onRetry?(message.id, message)
-        }
+        let rawAttachments = editingAttachments
+        let rawEditingImages = editingImages
+        let hasPDFs = rawAttachments.contains { $0.isPDF }
+        let hasImages = !skipImages && !rawEditingImages.isEmpty
+        
+        message.isProcessingPDF = hasPDFs
+        message.isProcessingImages = !hasPDFs && hasImages
+        message.rawInputAttachments = rawAttachments
+        message.rawInputImages = rawEditingImages
+        message.attachments = rawAttachments.isEmpty ? nil : rawAttachments
+        message.images = nil
+        message.pdfImages = nil
+        
+        onRetry?(message.id, message)
     }
     
     @ViewBuilder
     private var messageContentView: some View {
         @Bindable var message = message
         VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 8) {
-            if message.isProcessingImages {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text("Processing images...")
-                        .font(.caption)
-                        .foregroundColor(message.role == "user" ? .white.opacity(0.8) : .secondary)
-                }
-                .padding(.vertical, 4)
-            } else if isEditing && message.role == "user" && (supportsVision || !editingImages.isEmpty) {
+            if isEditing && message.role == "user" {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(editingImages) { imageContainer in
                             ZStack(alignment: .topLeading) {
-                                if let image = imageContainer.thumbnail {
+                                if imageContainer.isLoading {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.gray.opacity(0.15))
+                                        .frame(width: 80, height: 80)
+                                        .overlay {
+                                            ProgressView()
+                                                .controlSize(.small)
+                                        }
+                                } else if let image = imageContainer.thumbnail {
                                     Image(platformImage: image)
                                         .resizable()
                                         .scaledToFill()
@@ -960,6 +1274,7 @@ struct MessageView: View {
                                 }
                                 
                                 Button(action: {
+                                    imageContainer.loadTask?.cancel()
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         editingImages.removeAll(where: { $0.id == imageContainer.id })
                                     }
@@ -969,21 +1284,61 @@ struct MessageView: View {
                                         .font(.system(size: 20))
                                 }
                                 .buttonStyle(.plain)
-                                                                .offset(x: -8, y: -8)
-                                                                }
-                                                                .padding(.top, 0)
-                                                                .padding(.leading, 0)
-                                                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                                
+                                .offset(x: -8, y: -8)
+                            }
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
                             .onDrag {
                                 self.draggingItem = imageContainer
                                 return NSItemProvider(object: imageContainer.id.uuidString as NSString)
                             }
-                            .onDrop(of: [.text], delegate: ImageDropDelegate(item: imageContainer, items: $editingImages, draggingItem: $draggingItem, isDraggingOver: .constant(false)))
+                            .onDrop(of: [.fileURL, .image, .text], delegate: ImageDropDelegate(
+                                item: imageContainer,
+                                items: $editingImages,
+                                draggingItem: $draggingItem,
+                                isDraggingOver: $isDraggingOver,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
                         }
                         
-                        // 画像追加タイル (ビジョン対応モデルが選択されている場合のみ表示)
-                        if supportsVision {
+                        ForEach(editingAttachments) { attachment in
+                            ZStack(alignment: .topLeading) {
+                                FileAttachmentTileView(attachment: attachment, size: 80, isUserBubble: true)
+                                
+                                Button(action: {
+                                    attachment.loadTask?.cancel()
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        editingAttachments.removeAll(where: { $0.id == attachment.id })
+                                    }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.white, .black.opacity(0.6))
+                                        .font(.system(size: 20))
+                                }
+                                .buttonStyle(.plain)
+                                .offset(x: -8, y: -8)
+                            }
+                            .padding(.top, 0)
+                            .padding(.leading, 0)
+                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+                            .onDrag {
+                                self.draggingAttachment = attachment
+                                return NSItemProvider(object: attachment.id.uuidString as NSString)
+                            }
+                            .onDrop(of: [.fileURL, .image, .text], delegate: AttachmentDropDelegate(
+                                item: attachment,
+                                items: $editingAttachments,
+                                draggingItem: $draggingAttachment,
+                                isDraggingOver: $isDraggingOver,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
+                        }
+                        
+                        // ファイルおよび画像追加タイル
+                        if canAttach {
                             Button(action: {
                                 showingAttachSheet = true
                             }) {
@@ -1000,73 +1355,37 @@ struct MessageView: View {
                             .buttonStyle(.plain)
                             .padding(.top, 0)
                             .padding(.leading, 0)
-                            .confirmationDialog(
-                                Text("Attach Images"),
+                            .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+                                items: $editingImages,
+                                isDraggingOver: $isDraggingOver,
+                                isEnabled: isEditing && canAttach,
+                                onURLsDropped: { handleDroppedURLs($0) },
+                                onDataDropped: { addImages(from: $0) }
+                            ))
+                            .attachFileConfirmationDialog(
                                 isPresented: $showingAttachSheet,
-                                titleVisibility: .visible
-                            ) {
-                                Button(String(localized: "Photo Library...")) {
-                                    showingPhotoPicker = true
-                                }
-                                Button(String(localized: "Choose Files...")) {
-                                    showingFilePicker = true
-                                }
-                                Button(String(localized: "Cancel"), role: .cancel) { }
-                            } message: {
-                                Text("Please select the location of the images you want to attach.")
-                            }
+                                showingFilePicker: $showingFilePicker,
+                                showingPhotoPicker: $showingPhotoPicker,
+                                supportsCompletion: supportsCompletion,
+                                supportsVision: supportsVision
+                            )
                         }
                     }
                     .padding(.horizontal, 4)
                 }
                 .frame(height: 90)
                 .scrollClipDisabled()
-            } else if let images = message.images, !images.isEmpty {
-                // 画像が少ないときはバブルを画像幅に合わせ、多いときはスクロールさせる
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(images, id: \.self) { base64 in
-                            if let data = Data(base64Encoded: base64),
-                               let image = PlatformImage(data: data) {
-                                Image(platformImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            onPreviewImage?(image)
-                                        }
-                                    }
-                            }
-                        }
+                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                    if isEditing {
+                        handleDroppedURLs(urls)
                     }
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 8) {
-                            ForEach(images, id: \.self) { base64 in
-                                if let data = Data(base64Encoded: base64),
-                                   let image = PlatformImage(data: data) {
-                                    Image(platformImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 100, height: 100)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .contentShape(Rectangle())
-#if os(visionOS)
-                                        .hoverEffect()
-#endif
-                                        .onTapGesture {
-                                            withAnimation(.easeInOut(duration: 0.2)) {
-                                                onPreviewImage?(image)
-                                            }
-                                        }
-                                }
-                            }
-                        }
+                }, onDataDropped: { data in
+                    if isEditing {
+                        addImages(from: data)
                     }
-                }
-                .frame(height: 100)
+                }))
+            } else if hasMessageMedia {
+                messageMediaView
             }
             
             if isEditing && message.role == "user" {
@@ -1110,8 +1429,8 @@ struct MessageView: View {
                         // 変換確定後にEnterが押されたら改行を挿入
                         message.content += "\n"
                     }
-            }
-        } else if message.isImageGeneration && message.role == "assistant" {
+                }
+            } else if message.isImageGeneration && message.role == "assistant" {
             VStack(alignment: .leading, spacing: 10) {
                 if let base64String = message.generatedImage,
                    let data = Data(base64Encoded: base64String),
@@ -1166,8 +1485,8 @@ struct MessageView: View {
                     StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                         .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                         .textual.structuredTextStyle(SimpleStyle(message: message))
-                        .textualSelection(enabled: isStreamingSettled && !message.isStreaming && !isStreamingAny) // 全体ストリーミング中も無効化
-                        .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming && !isStreamingAny)
+                        .textualSelection(enabled: true)
+                        .textual.syntaxHighlightingEnabled(true)
                         .textual.overflowMode(.scroll)
                 } else {
                     Text("Failed to generate image.")
@@ -1176,48 +1495,110 @@ struct MessageView: View {
             }
         } else if !(message.thinking ?? "").isEmpty {
             VStack(alignment: .leading) {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isThinkingExpanded.toggle()
-                    }
-                }) {
-                    HStack {
-                        Label(message.isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
-                            .foregroundColor(.secondary)
-                            .symbolEffect(.pulse, isActive: message.isStreaming && !message.isThinkingCompleted)
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .rotationEffect(.degrees(isThinkingExpanded ? 90 : 0))
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help(isThinkingExpanded ? "Collapse thinking process" : "Expand thinking process")
-                .padding(.bottom, 4)
-                
-                if isThinkingExpanded {
-                    if let thinking = message.thinking, !thinking.isEmpty {
-                        StructuredText.Streaming(markdown: thinking, isStreaming: message.isStreaming && !message.isThinkingCompleted)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
-                            .textualSelection(enabled: isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
-                            .textual.syntaxHighlightingEnabled(isStreamingSettled && !(message.isStreaming && !message.isThinkingCompleted) && !isStreamingAny)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
+                MessageThinkingSectionView(
+                    thinking: message.thinking ?? "",
+                    isStreaming: message.isStreaming,
+                    isThinkingCompleted: message.isThinkingCompleted,
+                    message: message,
+                    isExpanded: $isThinkingExpanded
+                )
                 
                 streamingContentBody
             }
         } else {
             streamingContentBody
         }
+        }
     }
-}
+    
+    private var hasMessageMedia: Bool {
+        let hasImages = (message.images != nil && !message.images!.isEmpty) || (message.rawInputImages != nil && !message.rawInputImages!.isEmpty)
+        let hasAttachments = (message.attachments != nil && !message.attachments!.isEmpty) || (message.rawInputAttachments != nil && !message.rawInputAttachments!.isEmpty)
+        return hasImages || hasAttachments
+    }
+    
+    @ViewBuilder
+    private var messageMediaView: some View {
+        let directImages = message.images ?? []
+        let rawImages = message.rawInputImages ?? []
+        let attachments = message.attachments ?? message.rawInputAttachments ?? []
+        let isUser = message.role == "user"
+        
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
+            }
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
+                }
+            }
+            .scrollClipDisabled()
+        }
+        .frame(height: 100)
+    }
+    
+    @ViewBuilder
+    private func mediaTiles(directImages: [String], rawImages: [ChatInputImage], attachments: [ChatInputAttachment], isUser: Bool) -> some View {
+        if !directImages.isEmpty {
+            ForEach(Array(directImages.enumerated()), id: \.offset) { index, base64 in
+                MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
+#if os(visionOS)
+                    .hoverEffect()
+#endif
+            }
+        } else if !rawImages.isEmpty {
+            ForEach(rawImages) { rawImage in
+                ZStack {
+                    if let thumb = rawImage.thumbnail {
+                        Image(platformImage: thumb)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if let fullImage = PlatformImage(data: rawImage.data) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        onPreviewImage?(fullImage)
+                                    }
+                                }
+                            }
+                        
+                        if rawImage.isLoading || message.isProcessingImages {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.black.opacity(0.35))
+                                .overlay {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                        }
+                    } else {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(isUser ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
+                            .frame(width: 100, height: 100)
+                            .overlay {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                    }
+                }
+#if os(visionOS)
+                .hoverEffect()
+#endif
+            }
+        }
+        
+        ForEach(attachments) { attachment in
+            FileAttachmentTileView(
+                attachment: attachment,
+                size: 100,
+                isUserBubble: isUser,
+                isProcessing: message.isProcessingPDF && attachment.isPDF
+            )
+        }
+    }
     
     @ViewBuilder
     private var streamingContentBody: some View {
@@ -1239,8 +1620,8 @@ struct MessageView: View {
                 StructuredText.Streaming(markdown: displayContent, isStreaming: message.isStreaming)
                     .foregroundStyle(message.role == "user" ? Color.white : Color.primary)
                     .textual.structuredTextStyle(SimpleStyle(message: message))
-                    .textualSelection(enabled: isStreamingSettled && !message.isStreaming)
-                    .textual.syntaxHighlightingEnabled(isStreamingSettled && !message.isStreaming)
+                    .textualSelection(enabled: true)
+                    .textual.syntaxHighlightingEnabled(true)
                     .textual.overflowMode(.scroll)
             }
         } else {
@@ -1524,7 +1905,8 @@ struct CopyCodeButton: View {
             withAnimation {
                 isCopied = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
                 withAnimation {
                     isCopied = false
                 }
@@ -1571,6 +1953,61 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 // MARK: - Document Support
 
 // MARK: - Dedicated Style for Thinking Text
+
+struct MessageThinkingSectionView: View, Equatable {
+    let thinking: String
+    let isStreaming: Bool
+    let isThinkingCompleted: Bool
+    let message: ChatMessage
+    @Binding var isExpanded: Bool
+
+    static func == (lhs: MessageThinkingSectionView, rhs: MessageThinkingSectionView) -> Bool {
+        lhs.thinking == rhs.thinking &&
+        lhs.isStreaming == rhs.isStreaming &&
+        lhs.isThinkingCompleted == rhs.isThinkingCompleted &&
+        lhs.isExpanded == rhs.isExpanded
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    Label(isThinkingCompleted ? "Thinking completed" : "Thinking...", systemImage: "brain.filled.head.profile")
+                        .foregroundColor(.secondary)
+                        .symbolEffect(.pulse, isActive: isStreaming && !isThinkingCompleted)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(isExpanded ? "Collapse thinking process" : "Expand thinking process")
+            
+            if isExpanded && !thinking.isEmpty {
+                StructuredText.Streaming(
+                    markdown: thinking,
+                    isStreaming: isStreaming && !isThinkingCompleted
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .textual.structuredTextStyle(SimpleThinkingStyle(message: message))
+                .textualSelection(enabled: true)
+                .textual.syntaxHighlightingEnabled(true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .transition(.opacity)
+            }
+        }
+    }
+}
 
 struct SimpleThinkingStyle: StructuredText.Style {
     let message: ChatMessage

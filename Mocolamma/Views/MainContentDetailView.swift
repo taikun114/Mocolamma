@@ -65,7 +65,7 @@ struct MainContentDetailView: View {
                     ScrollView {
                         Color.clear.frame(height: 1)
                     }
-                    .modifier(SoftEdgeIfAvailable(enabled: true))
+                    .adaptiveScrollEdgeEffect()
                     
                     ContentUnavailableView {
                         Label("Select a Menu", systemImage: "sidebar.leading")

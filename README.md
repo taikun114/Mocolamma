@@ -102,11 +102,11 @@ The differences are as follows:
 |-------------------|------------------------|-------------------------------|
 | Platforms         | macOS                  | macOS, iOS / iPadOS, visionOS |
 | Price             | Free                   | $1.99                         |
-| All App Features  | 〇                     | 〇                             |
-| Automatic Updates | ×                      | 〇 (App Store feature)        |
-| Donation Link     | 〇                     | × (Due to App Store review)   |
-| Review Requests   | ×                      | 〇 (Can be disabled)          |
-| Support Developer | 〇 (via Donation Link) | 〇 (via Purchase)              |
+| All App Features  | ✓                      | ✓                             |
+| Automatic Updates | -                      | ✓ (App Store feature)        |
+| Donation Link     | ✓                      | - (Due to App Store review)   |
+| Review Requests   | -                      | ✓ (Can be disabled)          |
+| Support Developer | ✓ (via Donation Link) | ✓ (via Purchase)              |
 
 I would appreciate it if you purchase from the App Store, but feel free to download for free first, and if you find it very useful, please consider purchasing or [**donating**](#donate)!
 
@@ -136,11 +136,11 @@ The image generation tab allows you to generate images using image models stored
 
 > [!NOTE]
 > Ollama's image generation feature is currently in beta. It may stop working due to future changes in the Ollama API specification.\
-> Also, as of March 2026, using the image generation feature with Ollama requires using a Mac computer with Apple silicon as the Ollama server.
+> Also, as of May 2026, using the image generation feature with Ollama requires using a Mac computer with Apple silicon as the Ollama server.
 
 ### Privacy and Security
 Mocolamma **does not collect any information about users**.\
-Usage data and crash reports of users who have enabled "Share with App Developers" in the system settings "Analytics & Improvements" may be shared, but **the app itself doesn't have any functionality to collect and send information**. You can安心 use it even if you're concerned about privacy.
+Usage data and crash reports of users who have enabled "Share with App Developers" in the system settings "Analytics & Improvements" may be shared, but **the app itself doesn't have any functionality to collect and send information**. You can use it with peace of mind even if you're concerned about privacy.
 
 ### App Store Review Requests
 The App Store version periodically (but very infrequently) displays a screen asking users to review the app on the App Store (Review Request Screen).

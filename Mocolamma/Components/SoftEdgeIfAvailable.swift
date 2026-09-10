@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct SoftEdgeIfAvailable: ViewModifier {
-    let enabled: Bool
+    var enabled: Bool = true
+    
     @ViewBuilder
     func body(content: Content) -> some View {
 #if os(macOS) || os(iOS)
@@ -17,5 +18,19 @@ struct SoftEdgeIfAvailable: ViewModifier {
 #else
         content
 #endif
+    }
+}
+
+extension View {
+    /// 利用可能な場合にソフトなスクロールエッジエフェクトを適用
+    @ViewBuilder
+    func adaptiveScrollEdgeEffect(enabled: Bool = true) -> some View {
+        self.modifier(SoftEdgeIfAvailable(enabled: enabled))
+    }
+    
+    /// 利用可能な場合にソフトなスクロールエッジエフェクトを適用
+    @ViewBuilder
+    func softEdgeIfAvailable(enabled: Bool = true) -> some View {
+        self.modifier(SoftEdgeIfAvailable(enabled: enabled))
     }
 }

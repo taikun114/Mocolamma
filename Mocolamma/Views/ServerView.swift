@@ -20,6 +20,23 @@ struct ServerView: View {
     
     @Binding var selectedServerForInspector: ServerInfo?
     
+    // リストで選択（ハイライト）されているサーバーを取得
+    private var currentlySelectedServer: ServerInfo? {
+        if let id = listSelection {
+            return serverManager.servers.first(where: { $0.id == id })
+        }
+        return nil
+    }
+    
+    // サーバーアクションのアイコン名を返す（macOS 26以降は枠なしのellipsis、それ未満はellipsis.circle）
+    private var serverActionIconName: String {
+        if #available(macOS 26.0, iOS 26.0, visionOS 26.0, *) {
+            return "ellipsis"
+        } else {
+            return "ellipsis.circle"
+        }
+    }
+    
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
             return Text(LocalizedStringKey(serverName))
@@ -30,6 +47,30 @@ struct ServerView: View {
     
     @ToolbarContentBuilder
     private var serverToolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Menu {
+                if let selectedServer = currentlySelectedServer {
+                    ServerActionMenuContent(
+                        server: selectedServer,
+                        serverManager: serverManager,
+                        onEdit: { server in
+                            serverToEdit = server
+                        },
+                        onDelete: { server in
+                            serverToDelete = server
+                            showingDeleteConfirmationServer = true
+                        }
+                    )
+                }
+            } label: {
+                Label("Server Actions", systemImage: serverActionIconName)
+            }
+            .menuIndicator(.hidden)
+            .accessibilityLabel("Server Actions")
+            .help(String(localized: "Server Actions"))
+            .disabled(currentlySelectedServer == nil || serverManager.servers.isEmpty)
+        }
+
 #if os(macOS) || os(visionOS)
         ToolbarItem(placement: .primaryAction) {
             Button(action: { appRefreshTrigger.send() }) {
@@ -301,22 +342,18 @@ private struct ServerRowContent: View {
         .contentShape(Rectangle())
         
 #endif
-        .contextMenu { // 右クリックコンテキストメニュー
-            Button("Select", systemImage: "checkmark.circle") {
-                serverManager.selectedServerID = server.id
-            }
-            
-            
-            Button("Edit...", systemImage: "pencil") { // 編集ボタン
-                serverToEdit = server
-            }
-            
-            
-            Button("Delete...", systemImage: "trash", role: .destructive) { // 削除ボタン
-                serverToDelete = server
-                showingDeleteConfirmationServer = true
-            }
-            
+        .contextMenu {
+            ServerActionMenuContent(
+                server: server,
+                serverManager: serverManager,
+                onEdit: { s in
+                    serverToEdit = s
+                },
+                onDelete: { s in
+                    serverToDelete = s
+                    showingDeleteConfirmationServer = true
+                }
+            )
         }
     }
 }

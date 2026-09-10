@@ -16,7 +16,7 @@ Mocolammaは、オープンソースのAIソフトウェアである「Ollama」
 
 Mocolammaは主に`Swift`と`SwiftUI`を使って開発され、必要に応じて外部パッケージを活用して機能の実装が行われている（例: `CompactSlider`など）。
 
-新機能を実装する際など、Ollama APIの詳細や使い方が知りたい場合は、`/docs/for-ai/Ollama-API-Document_For-AI.md`を参照のこと。このドキュメントはOllamaの公式リポジトリで提供されているAPIドキュメントの特定の時点のコピーである（オリジナルリンクはドキュメント内の上部に記載されている）。
+新機能を実装する際など、Ollama APIの詳細や使い方が知りたい場合は、`https://github.com/ollama/ollama/blob/main/docs/api.md`を参照のこと。
 
 ## 開発方針と注意事項について
 
