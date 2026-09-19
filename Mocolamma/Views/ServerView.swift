@@ -28,15 +28,6 @@ struct ServerView: View {
         return nil
     }
     
-    // サーバーアクションのアイコン名を返す（macOS 26以降は枠なしのellipsis、それ未満はellipsis.circle）
-    private var serverActionIconName: String {
-        if #available(macOS 26.0, iOS 26.0, visionOS 26.0, *) {
-            return "ellipsis"
-        } else {
-            return "ellipsis.circle"
-        }
-    }
-    
     private var subtitle: Text {
         if let serverName = serverManager.selectedServer?.name {
             return Text(LocalizedStringKey(serverName))
@@ -45,31 +36,49 @@ struct ServerView: View {
         }
     }
     
+    @ViewBuilder
+    private var serverActionMenu: some View {
+        Menu {
+            if let selectedServer = currentlySelectedServer {
+                ServerActionMenuContent(
+                    server: selectedServer,
+                    serverManager: serverManager,
+                    onEdit: { server in
+                        serverToEdit = server
+                    },
+                    onDelete: { server in
+                        serverToDelete = server
+                        showingDeleteConfirmationServer = true
+                    }
+                )
+            }
+        } label: {
+            Label("Server Actions", systemImage: "ellipsis.circle")
+        }
+        .menuIndicator(.hidden)
+        .accessibilityLabel("Server Actions")
+        .help(String(localized: "Server Actions"))
+        .disabled(currentlySelectedServer == nil || serverManager.servers.isEmpty)
+    }
+    
     @ToolbarContentBuilder
     private var serverToolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Menu {
-                if let selectedServer = currentlySelectedServer {
-                    ServerActionMenuContent(
-                        server: selectedServer,
-                        serverManager: serverManager,
-                        onEdit: { server in
-                            serverToEdit = server
-                        },
-                        onDelete: { server in
-                            serverToDelete = server
-                            showingDeleteConfirmationServer = true
-                        }
-                    )
-                }
-            } label: {
-                Label("Server Actions", systemImage: serverActionIconName)
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .primaryAction) {
+                serverActionMenu
             }
-            .menuIndicator(.hidden)
-            .accessibilityLabel("Server Actions")
-            .help(String(localized: "Server Actions"))
-            .disabled(currentlySelectedServer == nil || serverManager.servers.isEmpty)
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                serverActionMenu
+            }
         }
+#else
+        ToolbarItem(placement: .primaryAction) {
+            serverActionMenu
+        }
+#endif
 
 #if os(macOS) || os(visionOS)
         ToolbarItem(placement: .primaryAction) {
@@ -80,12 +89,31 @@ struct ServerView: View {
         }
 #endif
         
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { showingAddServerSheet = true }) {
+                    Label("Add Server", systemImage: "plus")
+                }
+                .accessibilityLabel("Add Server")
+            }
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { showingAddServerSheet = true }) {
+                    Label("Add Server", systemImage: "plus")
+                }
+                .accessibilityLabel("Add Server")
+            }
+        }
+#else
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showingAddServerSheet = true }) {
                 Label("Add Server", systemImage: "plus")
             }
             .accessibilityLabel("Add Server")
         }
+#endif
 
 #if os(iOS)
         if #available(iOS 26.0, *) {

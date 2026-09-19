@@ -114,15 +114,7 @@ struct ModelListView: View {
         }
         return "line.3.horizontal.decrease"
     }
-    
-    // モデルアクションのアイコン名を返す（macOS 26以降は枠なしのellipsis、それ未満はellipsis.circle）
-    private var modelActionIconName: String {
-        if #available(macOS 26.0, iOS 26.0, visionOS 26.0, *) {
-            return "ellipsis"
-        } else {
-            return "ellipsis.circle"
-        }
-    }
+
     
     // ソート項目のアイコン名を返す
     private func criterionIconName(_ criterion: SortCriterion) -> String {
@@ -202,6 +194,73 @@ struct ModelListView: View {
         return nil
     }
     
+#if !os(macOS)
+    @ViewBuilder
+    private var sortAndFilterMenu: some View {
+        Menu {
+            Picker("Sort by", selection: $sortCriterion) {
+                ForEach(SortCriterion.allCases) { criterion in
+                    Label(LocalizedStringKey(criterion.rawValue), systemImage: criterionIconName(criterion)).tag(criterion)
+                }
+            }
+            Divider()
+            Menu {
+                Picker("Filter", selection: $selectedFilterTag) {
+                    Label("All Models", systemImage: "tray.full").tag(nil as String?)
+                    ForEach(cachedAvailableTags, id: \.self) { tag in
+                        Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
+                    }
+                }
+                .labelStyle(.titleAndIcon)
+                .pickerStyle(.inline)
+            } label: {
+                Label("Filter", systemImage: filterIconName)
+            }
+            Divider()
+            Picker("Order", selection: $sortOrderOption) {
+                ForEach(SortOrder.allCases) { order in
+                    Label(LocalizedStringKey(order.rawValue), systemImage: orderIconName(order)).tag(order)
+                }
+            }
+        } label: {
+            Label("Sort", systemImage: filterIconName)
+        }
+        .accessibilityLabel("Sort and Filter")
+        .help(String(localized: "Sort and Filter"))
+        .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
+    }
+#endif
+
+    @ViewBuilder
+    private var modelActionMenu: some View {
+        Menu {
+            if let selectedModelObject = currentlySelectedModel {
+                ModelActionMenuContent(
+                    model: selectedModelObject,
+                    executor: executor,
+                    isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError,
+                    onCustomKeepAlive: { model in
+                        modelForCustomKeepAlive = model
+                    },
+                    onDelete: { model in
+                        modelToDelete = model
+                        showingDeleteConfirmation = true
+                    },
+                    onError: { errorText in
+                        loadErrorMessage = errorText
+                        showingLoadErrorAlert = true
+                    }
+                )
+            }
+        } label: {
+            Label("Model Actions", systemImage: "ellipsis.circle")
+        }
+        .menuIndicator(.hidden)
+        .accessibilityLabel("Model Actions")
+        .help(String(localized: "Model Actions"))
+        .disabled(currentlySelectedModel == nil || executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+    }
+    
     @ToolbarContentBuilder
     private var modelToolbarContent: some ToolbarContent {
 #if os(macOS)
@@ -222,39 +281,22 @@ struct ModelListView: View {
             .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
 #else
-        ToolbarItem(placement: .primaryAction) {
-            Menu {
-                Picker("Sort by", selection: $sortCriterion) {
-                    ForEach(SortCriterion.allCases) { criterion in
-                        Label(LocalizedStringKey(criterion.rawValue), systemImage: criterionIconName(criterion)).tag(criterion)
-                    }
-                }
-                Divider()
-                Menu {
-                    Picker("Filter", selection: $selectedFilterTag) {
-                        Label("All Models", systemImage: "tray.full").tag(nil as String?)
-                        ForEach(cachedAvailableTags, id: \.self) { tag in
-                            Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
-                        }
-                    }
-                    .labelStyle(.titleAndIcon)
-                    .pickerStyle(.inline)
-                } label: {
-                    Label("Filter", systemImage: filterIconName)
-                }
-                Divider()
-                Picker("Order", selection: $sortOrderOption) {
-                    ForEach(SortOrder.allCases) { order in
-                        Label(LocalizedStringKey(order.rawValue), systemImage: orderIconName(order)).tag(order)
-                    }
-                }
-            } label: {
-                Label("Sort", systemImage: filterIconName)
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .primaryAction) {
+                sortAndFilterMenu
             }
-            .accessibilityLabel("Sort and Filter")
-            .help(String(localized: "Sort and Filter"))
-            .disabled(executor.isRunning || serverManager.selectedServer == nil || executor.apiConnectionError)
+            .visibilityPriority(.low)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                sortAndFilterMenu
+            }
         }
+#else
+        ToolbarItem(placement: .primaryAction) {
+            sortAndFilterMenu
+        }
+#endif
 #endif
 
 #if !os(visionOS)
@@ -263,34 +305,22 @@ struct ModelListView: View {
         }
 #endif
 
-        ToolbarItem(placement: .primaryAction) {
-            Menu {
-                if let selectedModelObject = currentlySelectedModel {
-                    ModelActionMenuContent(
-                        model: selectedModelObject,
-                        executor: executor,
-                        isActionsDisabled: executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError,
-                        onCustomKeepAlive: { model in
-                            modelForCustomKeepAlive = model
-                        },
-                        onDelete: { model in
-                            modelToDelete = model
-                            showingDeleteConfirmation = true
-                        },
-                        onError: { errorText in
-                            loadErrorMessage = errorText
-                            showingLoadErrorAlert = true
-                        }
-                    )
-                }
-            } label: {
-                Label("Model Actions", systemImage: modelActionIconName)
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .primaryAction) {
+                modelActionMenu
             }
-            .menuIndicator(.hidden)
-            .accessibilityLabel("Model Actions")
-            .help(String(localized: "Model Actions"))
-            .disabled(currentlySelectedModel == nil || executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                modelActionMenu
+            }
         }
+#else
+        ToolbarItem(placement: .primaryAction) {
+            modelActionMenu
+        }
+#endif
 
 #if os(macOS) || os(visionOS)
         ToolbarItem(placement: .primaryAction) {
@@ -301,6 +331,26 @@ struct ModelListView: View {
         }
 #endif
         
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { showingAddSheet = true }) {
+                    Label("Add New", systemImage: "plus")
+                }
+                .accessibilityLabel("Add New Model")
+                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+            }
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: { showingAddSheet = true }) {
+                    Label("Add New", systemImage: "plus")
+                }
+                .accessibilityLabel("Add New Model")
+                .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
+            }
+        }
+#else
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showingAddSheet = true }) {
                 Label("Add New", systemImage: "plus")
@@ -308,6 +358,7 @@ struct ModelListView: View {
             .accessibilityLabel("Add New Model")
             .disabled(executor.isRunning || executor.isPulling || serverManager.selectedServer == nil || executor.apiConnectionError)
         }
+#endif
         
 #if !os(macOS)
         Group {

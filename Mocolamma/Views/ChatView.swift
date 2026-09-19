@@ -350,16 +350,69 @@ struct ChatView: View {
         }
     }
     
+    @ViewBuilder
+    private var chatRefreshButton: some View {
+        Button(action: { appRefreshTrigger.send() }) {
+            Label("Refresh", systemImage: "arrow.clockwise")
+        }
+        .disabled(executor.isRunning || executor.isPulling)
+    }
+    
+    @ViewBuilder
+    private var chatModelPickerMenu: some View {
+        @Bindable var chatSettings = chatSettings
+        Menu {
+            Section {
+                Picker("Select Model", selection: $chatSettings.selectedModelID) {
+                    Text("Select Model").tag(nil as OllamaModel.ID?)
+                }
+                .pickerStyle(.inline)
+            }
+            Section {
+                Picker("Models", selection: $chatSettings.selectedModelID) {
+                    let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
+                    ForEach(sortedModels) { model in
+                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                        HStack {
+                            Text(model.name)
+                            if isRunning { Image(systemName: "tray.and.arrow.down") }
+                        }
+                        .tag(model.id as OllamaModel.ID?)
+                    }
+                }
+                .pickerStyle(.inline)
+            }
+            if executor.models.filter({ $0.supportsCompletion }).isEmpty {
+                Section {
+                    if executor.isRunning {
+                        Button(action: {}) { Text("Loading models...") }.disabled(true)
+                    } else {
+                        Button(action: {}) { Text("No models available") }.disabled(true)
+                    }
+                }
+            }
+        } label: {
+            let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
+            Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                .labelStyle(.titleAndIcon)
+#endif
+        }
+        .help({
+            if let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
+                return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
+            }
+            return String(localized: "Select Model")
+        }())
+    }
+    
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         @Bindable var chatSettings = chatSettings
         @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning || executor.isPulling)
+            chatRefreshButton
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -411,56 +464,25 @@ struct ChatView: View {
             }
         }
 #else
-        ToolbarItemGroup(placement: .primaryAction) {
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                chatRefreshButton
+                chatModelPickerMenu
             }
-            .disabled(executor.isRunning || executor.isPulling)
-            
-            Menu {
-                Section {
-                    Picker("Select Model", selection: $chatSettings.selectedModelID) {
-                        Text("Select Model").tag(nil as OllamaModel.ID?)
-                    }
-                    .pickerStyle(.inline)
-                }
-                Section {
-                    Picker("Models", selection: $chatSettings.selectedModelID) {
-                        let sortedModels = executor.models.filter { $0.supportsCompletion }.sorted(using: modelSettings.sortOrder(forChat: true))
-                        ForEach(sortedModels) { model in
-                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                            HStack {
-                                Text(model.name)
-                                if isRunning { Image(systemName: "tray.and.arrow.down") }
-                            }
-                            .tag(model.id as OllamaModel.ID?)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                }
-                if executor.models.filter({ $0.supportsCompletion }).isEmpty {
-                    Section {
-                        if executor.isRunning {
-                            Button(action: {}) { Text("Loading models...") }.disabled(true)
-                        } else {
-                            Button(action: {}) { Text("No models available") }.disabled(true)
-                        }
-                    }
-                }
-            } label: {
-                let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name
-                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: chatSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
-#if os(visionOS)
-                    .labelStyle(.titleAndIcon)
-#endif
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItemGroup(placement: .primaryAction) {
+                chatRefreshButton
+                chatModelPickerMenu
             }
-            .help({
-                if let selectedModelName = executor.models.first(where: { $0.id == chatSettings.selectedModelID })?.name {
-                    return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
-                }
-                return String(localized: "Select Model")
-            }())
         }
+#else
+        ToolbarItemGroup(placement: .primaryAction) {
+            chatRefreshButton
+            chatModelPickerMenu
+        }
+#endif
         
 #if os(iOS)
         if #available(iOS 26.0, *) {
@@ -1268,16 +1290,69 @@ struct ImageGenerationView: View {
         }
     }
     
+    @ViewBuilder
+    private var imageRefreshButton: some View {
+        Button(action: { appRefreshTrigger.send() }) {
+            Label("Refresh", systemImage: "arrow.clockwise")
+        }
+        .disabled(executor.isRunning || executor.isPulling)
+    }
+    
+    @ViewBuilder
+    private var imageModelPickerMenu: some View {
+        @Bindable var imageSettings = imageSettings
+        Menu {
+            Section {
+                Picker("Select Model", selection: $imageSettings.selectedModelID) {
+                    Text("Select Model").tag(nil as OllamaModel.ID?)
+                }
+                .pickerStyle(.inline)
+            }
+            Section {
+                Picker("Models", selection: $imageSettings.selectedModelID) {
+                    let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
+                    ForEach(sortedModels) { model in
+                        let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
+                        HStack {
+                            Text(model.name)
+                            if isRunning { Image(systemName: "tray.and.arrow.down") }
+                        }
+                        .tag(model.id as OllamaModel.ID?)
+                    }
+                }
+                .pickerStyle(.inline)
+            }
+            if executor.models.filter({ $0.isImageModel }).isEmpty {
+                Section {
+                    if executor.isRunning {
+                        Button(action: {}) { Text("Loading models...") }.disabled(true)
+                    } else {
+                        Button(action: {}) { Text("No models available") }.disabled(true)
+                    }
+                }
+            }
+        } label: {
+            let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
+            Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
+#if os(visionOS)
+                .labelStyle(.titleAndIcon)
+#endif
+        }
+        .help({
+            if let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name {
+                return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
+            }
+            return String(localized: "Select Model")
+        }())
+    }
+
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         @Bindable var imageSettings = imageSettings
         @Bindable var executor = executor
 #if os(macOS)
         ToolbarItem(placement: .primaryAction) {
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }
-            .disabled(executor.isRunning || executor.isPulling)
+            imageRefreshButton
         }
         
         ToolbarItem(placement: .primaryAction) {
@@ -1312,56 +1387,25 @@ struct ImageGenerationView: View {
             .frame(width: 150)
         }
 #else
-        ToolbarItemGroup(placement: .primaryAction) {
-            Button(action: { appRefreshTrigger.send() }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            ToolbarItemGroup(placement: .primaryAction) {
+                imageRefreshButton
+                imageModelPickerMenu
             }
-            .disabled(executor.isRunning || executor.isPulling)
-            
-            Menu {
-                Section {
-                    Picker("Select Model", selection: $imageSettings.selectedModelID) {
-                        Text("Select Model").tag(nil as OllamaModel.ID?)
-                    }
-                    .pickerStyle(.inline)
-                }
-                Section {
-                    Picker("Models", selection: $imageSettings.selectedModelID) {
-                        let sortedModels = executor.models.filter { $0.isImageModel }.sorted(using: modelSettings.sortOrder(forChat: false))
-                        ForEach(sortedModels) { model in
-                            let isRunning = executor.runningModels.contains(where: { $0.name == model.name })
-                            HStack {
-                                Text(model.name)
-                                if isRunning { Image(systemName: "tray.and.arrow.down") }
-                            }
-                            .tag(model.id as OllamaModel.ID?)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                }
-                if executor.models.filter({ $0.isImageModel }).isEmpty {
-                    Section {
-                        if executor.isRunning {
-                            Button(action: {}) { Text("Loading models...") }.disabled(true)
-                        } else {
-                            Button(action: {}) { Text("No models available") }.disabled(true)
-                        }
-                    }
-                }
-            } label: {
-                let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name
-                Label(selectedModelName ?? String(localized: "Select Model"), systemImage: imageSettings.selectedModelID != nil ? "tray.full.fill" : "tray.full")
-#if os(visionOS)
-                    .labelStyle(.titleAndIcon)
-#endif
+            .visibilityPriority(.high)
+        } else {
+            ToolbarItemGroup(placement: .primaryAction) {
+                imageRefreshButton
+                imageModelPickerMenu
             }
-            .help({
-                if let selectedModelName = executor.models.first(where: { $0.id == imageSettings.selectedModelID })?.name {
-                    return String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), selectedModelName)
-                }
-                return String(localized: "Select Model")
-            }())
         }
+#else
+        ToolbarItemGroup(placement: .primaryAction) {
+            imageRefreshButton
+            imageModelPickerMenu
+        }
+#endif
 #endif
 
 #if os(iOS)
