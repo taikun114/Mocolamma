@@ -166,7 +166,14 @@ struct ContentView: View {
         .onChange(of: selectedServerForInspector) { _, newValue in handleServerSelectionChange(newValue) }
         .onChange(of: shouldClearChat) { _, newValue in handleClearChatChange(newValue) }
         .onChange(of: shouldClearGeneration) { _, newValue in handleClearGenerationChange(newValue) }
-        .onChange(of: executor.models) { _, _ in updateSortedModels() }
+        .onChange(of: executor.models) { _, models in
+            updateSortedModels()
+            if ScreenshotConfiguration.isEnabled,
+               let model = models.first(where: { $0.name == "gemma4:12b-mlx" }) {
+                selectedModel = model.id
+                chatSettings.selectedModelID = model.id
+            }
+        }
         .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
         .onChange(of: serverManager.selectedServerID) { _, _ in handleActiveServerChange() }

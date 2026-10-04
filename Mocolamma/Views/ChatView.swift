@@ -227,6 +227,14 @@ struct ChatView: View {
             if let current = chatSettings.selectedModelID, !executor.models.contains(where: { $0.id == current }) {
                 chatSettings.selectedModelID = nil
             }
+            if ScreenshotConfiguration.isEnabled, executor.chatMessages.isEmpty,
+               let model = currentSelectedModel {
+                chatSettings.useCustomChatSettings = true
+                chatSettings.isSeedEnabled = true
+                chatSettings.seed = 1
+                executor.chatInputText = ScreenshotConfiguration.chatPrompt
+                performSendMessage(model: model)
+            }
         }
         .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true))
         .task {
