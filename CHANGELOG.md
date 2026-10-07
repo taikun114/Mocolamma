@@ -59,6 +59,9 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve toolbar icons for server actions and model actions**
   - Changed the toolbar icons for server actions and model actions added in 1.4.0 so that they are less easily confused with the overflow menu.
 
+#### Model
+- **Improve unknown tags to display in title case in the inspector**
+
 ## 1.4.0
 ### New Features
 #### General

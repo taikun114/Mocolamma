@@ -120,7 +120,7 @@ struct ModelInspectorView: View {
             displayText = String(localized: "Decision")
             iconName = "checklist"
         default:
-            displayText = capability
+            displayText = capability.capitalized
             iconName = "tag"
         }
         
