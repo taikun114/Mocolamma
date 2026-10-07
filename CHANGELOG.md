@@ -51,6 +51,9 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Support iPhone Duo**
   - Now displays correctly on iPhone Duo, and toolbar overflow menu priorities have been organized so that key toolbar actions are less likely to be placed into the overflow menu on iPhone Duo or small iPad windows.
 
+#### Model
+- **Support decision model tag**
+
 ### Bug Fixes and Improvements
 #### General
 - **Improve toolbar icons for server actions and model actions**

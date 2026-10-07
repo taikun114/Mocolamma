@@ -116,6 +116,9 @@ struct ModelInspectorView: View {
         case "image":
             displayText = String(localized: "Image")
             iconName = "photo"
+        case "decision":
+            displayText = String(localized: "Decision")
+            iconName = "checklist"
         default:
             displayText = capability
             iconName = "tag"

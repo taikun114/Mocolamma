@@ -75,6 +75,7 @@ struct ModelListView: View {
         case "audio": return 5
         case "embedding": return 6
         case "image": return 7
+        case "decision": return 8
         default: return 100
         }
     }
@@ -89,6 +90,7 @@ struct ModelListView: View {
         case "embedding": return String(localized: "Embedding")
         case "tools": return String(localized: "Tools")
         case "thinking": return String(localized: "Thinking")
+        case "decision": return String(localized: "Decision")
         default: return tag.capitalized
         }
     }
@@ -103,6 +105,7 @@ struct ModelListView: View {
         case "thinking": return "brain.filled.head.profile"
         case "embedding": return "square.stack.3d.up"
         case "image": return "photo"
+        case "decision": return "checklist"
         default: return "tag"
         }
     }
