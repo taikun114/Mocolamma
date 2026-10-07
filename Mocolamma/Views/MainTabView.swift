@@ -66,7 +66,7 @@ struct MainTabView: View {
                 .environment(executor)
             }
             
-            Tab("Image Generation", systemImage: "photo", value: "image_generation") {
+            Tab("Image", systemImage: "photo", value: "image_generation") {
                 NavigationStack {
                     ImageGenerationView(
                         showingInspector: $showingInspector,

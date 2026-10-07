@@ -62,6 +62,10 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### Model
 - **Improve unknown tags to display in title case in the inspector**
 
+#### Image Generation
+- **Change the tab name to "Image"**
+  - Shortened the tab name to prevent layout issues on narrow screens such as iPhone. The navigation title continues to display "Image Generation".
+
 ## 1.4.0
 ### New Features
 #### General

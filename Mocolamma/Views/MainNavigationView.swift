@@ -22,7 +22,7 @@ struct MainNavigationView: View {
                 Label("Server", systemImage: "server.rack").tag("server")
                 Label("Models", systemImage: "tray.full").tag("models")
                 Label("Chat", systemImage: "message").tag("chat")
-                Label("Image Generation", systemImage: "photo").tag("image_generation")
+                Label("Image", systemImage: "photo").tag("image_generation")
             }
             .navigationTitle("Menu")
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250) // サイドバーの幅を固定
