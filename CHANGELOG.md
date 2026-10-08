@@ -45,6 +45,27 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
+## 1.4.1
+### New Features
+#### General
+- **Support iPhone Duo**
+  - Now displays correctly on iPhone Duo, and toolbar overflow menu priorities have been organized so that key toolbar actions are less likely to be placed into the overflow menu on iPhone Duo or small iPad windows.
+
+#### Model
+- **Support decision model tag**
+
+### Bug Fixes and Improvements
+#### General
+- **Improve toolbar icons for server actions and model actions**
+  - Changed the toolbar icons for server actions and model actions added in 1.4.0 so that they are less easily confused with the overflow menu.
+
+#### Model
+- **Improve unknown tags to display in title case in the inspector**
+
+#### Image Generation
+- **Change the tab name to "Image"**
+  - Shortened the tab name to prevent layout issues on narrow screens such as iPhone. The navigation title continues to display "Image Generation".
+
 ## 1.4.0
 ### New Features
 #### General

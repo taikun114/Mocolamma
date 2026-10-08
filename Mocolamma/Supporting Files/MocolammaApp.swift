@@ -59,6 +59,7 @@ struct MocolammaApp: App {
     
     init() {
         let sm = ServerManager()
+        ScreenshotConfiguration.configure(sm)
         _serverManager = State(wrappedValue: sm)
         _executor = State(wrappedValue: CommandExecutor(serverManager: sm))
 #if os(macOS)
@@ -93,6 +94,7 @@ struct MocolammaApp: App {
             .environment(executor)
             .onAppear {
                 localNetworkChecker.refresh()
+                ScreenshotConfiguration.loadImage(into: executor)
             }
             .sheet(isPresented: $showingAboutSheet) {
                 AboutView()
