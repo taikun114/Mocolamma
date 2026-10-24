@@ -24,6 +24,7 @@ struct PDFAttachmentProcessor: Sendable {
         let rawExtractedText: String
         /// 各ページのPNG画像データ（ビジョン対応モデル向け、ページ順）
         let pageImagesPNGData: [Data]
+        let pages: [PDFPromptPage]
         /// 総ページ数
         let totalPages: Int
         /// 1ページ目のサムネイル用PNG画像データ（UIタイル表示用）
@@ -54,6 +55,7 @@ struct PDFAttachmentProcessor: Sendable {
                 formattedPromptText: fallbackText,
                 rawExtractedText: "[No Text Detected by OCR]",
                 pageImagesPNGData: [],
+                pages: [],
                 totalPages: 0,
                 thumbnailPNGData: nil
             )
@@ -76,12 +78,14 @@ struct PDFAttachmentProcessor: Sendable {
                 formattedPromptText: emptyText,
                 rawExtractedText: "[No Text Detected by OCR]",
                 pageImagesPNGData: [],
+                pages: [],
                 totalPages: 0,
                 thumbnailPNGData: nil
             )
         }
         
         var pageBlocks: [String] = []
+        var pages: [PDFPromptPage] = []
         var rawTexts: [String] = []
         var pageImages: [Data] = []
         var thumbnailPNGData: Data? = nil
@@ -116,22 +120,13 @@ struct PDFAttachmentProcessor: Sendable {
             
             rawTexts.append(finalText)
             
-            // ページ番号ヘッダー
-            let pageHeader = isOCR ? "Page: \(pageNumber) / \(totalPages) (Extracted by OCR)" : "Page: \(pageNumber) / \(totalPages)"
-            
-            let pageBlock = """
-            \(pageHeader)
-            
-            ``````````
-            \(finalText)
-            ``````````
-            """
-            pageBlocks.append(pageBlock)
-            
+            var imageIndex: Int?
+
             // 3. ビジョン対応モデル向けのページ画像化（ページ順序を維持）
             if renderImages {
                 if let cgImage = renderPageToCGImage(page: page, targetMaxDimension: 2048),
                    let pngData = convertCGImageToPNGData(cgImage) {
+                    imageIndex = pageImages.count
                     pageImages.append(pngData)
                     if pageIndex == 0 {
                         thumbnailPNGData = pngData
@@ -144,6 +139,9 @@ struct PDFAttachmentProcessor: Sendable {
                     thumbnailPNGData = pngData
                 }
             }
+            let promptPage = PDFPromptPage(number: pageNumber, totalPages: totalPages, text: finalText, isOCR: isOCR, imageIndex: imageIndex)
+            pages.append(promptPage)
+            pageBlocks.append(promptPage.formattedPrompt())
         }
         
         let formattedPromptText = """
@@ -158,6 +156,7 @@ struct PDFAttachmentProcessor: Sendable {
             formattedPromptText: formattedPromptText,
             rawExtractedText: rawTexts.joined(separator: "\n\n"),
             pageImagesPNGData: pageImages,
+            pages: pages,
             totalPages: totalPages,
             thumbnailPNGData: thumbnailPNGData
         )

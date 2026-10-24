@@ -17,6 +17,7 @@ struct MessageView: View {
     @State private var isHovering: Bool = false
     @State private var isEditing: Bool = false
     @FocusState private var isEditingFocused: Bool
+    @State private var showingAudioWarningAlert = false
     @State private var showingVisionWarningAlert = false
     @State private var showingVisionPDFWarningAlert = false
     @Environment(\.colorScheme) private var colorScheme
@@ -54,25 +55,24 @@ struct MessageView: View {
         chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "vision" }) ?? false
     }
     
+    private var supportsAudio: Bool {
+        chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "audio" }) ?? false
+    }
+
     private var supportsCompletion: Bool {
         chatSettings.selectedModelCapabilities?.contains(where: { $0.lowercased() == "completion" }) ?? false
     }
     
     private var canAttach: Bool {
-        isModelSelected && (supportsCompletion || supportsVision)
+        isModelSelected && (supportsCompletion || supportsVision || supportsAudio)
     }
     
     private var isDoneDisabled: Bool {
         guard isModelSelected && !isStreamingAny else { return true }
-        let hasText = !message.content.isEmpty
-        let hasAttachments = !editingAttachments.isEmpty
-        let hasImages = !editingImages.isEmpty
-        
-        if supportsVision {
-            return !hasText && !hasAttachments && !hasImages
-        } else {
-            return !hasText && !hasAttachments
-        }
+        return !ChatAttachmentSendPolicy.canSend(
+            text: message.content, imageCount: editingImages.count, attachments: editingAttachments,
+            supportsVision: supportsVision, supportsAudio: supportsAudio
+        )
     }
     
     static let iso8601Formatter: ISO8601DateFormatter = {
@@ -135,7 +135,7 @@ struct MessageView: View {
                         .allowsHitTesting(false)
                     }
                 }
-                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
                     if isEditing {
                         handleDroppedURLs(urls)
                     }
@@ -354,7 +354,125 @@ struct MessageView: View {
             return Date()
         }())
     }
-    
+
+    @ViewBuilder
+    private var editableImageTiles: some View {
+        ForEach(editingImages) { imageContainer in
+            ZStack(alignment: .topLeading) {
+                if imageContainer.isLoading {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.15))
+                        .frame(width: 80, height: 80)
+                        .overlay {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                } else if let image = imageContainer.thumbnail {
+                    Image(platformImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 80, height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .contentShape(Rectangle())
+#if os(visionOS)
+                        .hoverEffect()
+#endif
+                        .onTapGesture {
+                            if let fullImage = PlatformImage(data: imageContainer.data) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    onPreviewImage?(fullImage)
+                                }
+                            }
+                        }
+                }
+
+                Button(action: {
+                    imageContainer.loadTask?.cancel()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        editingImages.removeAll(where: { $0.id == imageContainer.id })
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.white, .black.opacity(0.6))
+                        .font(.system(size: 20))
+                }
+                .buttonStyle(.plain)
+                .offset(x: -8, y: -8)
+            }
+            .padding(.top, 0)
+            .padding(.leading, 0)
+            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+            .onDrag {
+                self.draggingAttachment = nil
+                self.draggingItem = imageContainer
+                return AttachmentReorderDrag.provider(for: imageContainer.id)
+            }
+            .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: ImageDropDelegate(
+                item: imageContainer,
+                items: $editingImages,
+                draggingItem: $draggingItem,
+                isDraggingOver: $isDraggingOver,
+                isDraggingAnotherGroup: draggingAttachment != nil,
+                onURLsDropped: { handleDroppedURLs($0) },
+                onDataDropped: { addImages(from: $0) }
+            ))
+        }
+    }
+
+    @ViewBuilder
+    private func editableAttachmentTiles(isAudio: Bool) -> some View {
+        ForEach(editingAttachments.filter { $0.isAudio == isAudio }) { attachment in
+            ZStack(alignment: .topLeading) {
+                FileAttachmentTileView(attachment: attachment, size: 80, isUserBubble: true)
+
+                Button(action: {
+                    attachment.loadTask?.cancel()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        editingAttachments.removeAll(where: { $0.id == attachment.id })
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.white, .black.opacity(0.6))
+                        .font(.system(size: 20))
+                }
+                .buttonStyle(.plain)
+                .offset(x: -8, y: -8)
+            }
+            .padding(.top, 0)
+            .padding(.leading, 0)
+            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+            .onDrag {
+                self.draggingItem = nil
+                self.draggingAttachment = attachment
+                return AttachmentReorderDrag.provider(for: attachment.id)
+            }
+            .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AttachmentDropDelegate(
+                item: attachment,
+                items: $editingAttachments,
+                draggingItem: $draggingAttachment,
+                isDraggingOver: $isDraggingOver,
+                isDraggingAnotherGroup: draggingItem != nil,
+                canReorder: { $0.isAudio == $1.isAudio },
+                onURLsDropped: { handleDroppedURLs($0) },
+                onDataDropped: { addImages(from: $0) }
+            ))
+        }
+    }
+
+    @MainActor
+    private func addAudioAttachment(data: Data, fileName: String) async throws {
+        let id = UUID()
+        editingAttachments.append(ChatInputAttachment(id: id, name: fileName, content: "", audioData: Data(), isLoading: true))
+        do {
+            let attachment = try await AudioAttachmentConverter.prepare(data: data, fileName: fileName)
+            guard let index = editingAttachments.firstIndex(where: { $0.id == id }) else { return }
+            editingAttachments[index] = attachment
+        } catch {
+            editingAttachments.removeAll(where: { $0.id == id })
+            throw error
+        }
+    }
+
     private func addFiles(from urls: [URL]) {
         Task {
             for url in urls {
@@ -366,6 +484,17 @@ struct MessageView: View {
                 
                 guard let data = data else { continue }
                 
+                if AudioAttachmentValidator.isAudioFile(url: url, data: data) {
+                    do {
+                        try await addAudioAttachment(data: data, fileName: url.lastPathComponent)
+                    } catch {
+                        print("Audio attachment rejected: \(error.localizedDescription)")
+                        unsupportedFileAlertTitle = error.localizedDescription
+                        showingUnsupportedFileAlert = true
+                    }
+                    continue
+                }
+
                 if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
                     let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
                     let placeholderId = UUID()
@@ -458,6 +587,18 @@ struct MessageView: View {
                     continue
                 }
                 
+                if AudioAttachmentValidator.isAudioFile(url: url, data: data) {
+                    do {
+                        try await addAudioAttachment(data: data, fileName: url.lastPathComponent)
+                        successCount += 1
+                    } catch {
+                        print("Audio attachment rejected: \(error.localizedDescription)")
+                        unsupportedFileAlertTitle = error.localizedDescription
+                        showingUnsupportedFileAlert = true
+                    }
+                    continue
+                }
+
                 if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
                     let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
                     let placeholderId = UUID()
@@ -1140,6 +1281,10 @@ struct MessageView: View {
     @ViewBuilder
     private var doneButton: some View {
         Button(action: {
+            if editingAttachments.contains(where: { $0.isAudio }) && !supportsAudio {
+                showingAudioWarningAlert = true
+                return
+            }
             let hasPDFs = editingAttachments.contains { $0.isPDF }
             let hasImages = !editingImages.isEmpty
             
@@ -1182,6 +1327,13 @@ struct MessageView: View {
         .disabled(isDoneDisabled)
         .allowsHitTesting(!isStreamingAny)
         .transaction { $0.disablesAnimations = true }
+        .modifier(AudioInputWarning(
+            isPresented: $showingAudioWarningAlert,
+            modelName: selectedModelName,
+            alsoOmitImages: !supportsVision && (!editingImages.isEmpty || editingAttachments.contains(where: \.isPDF)),
+            hasPDFs: editingAttachments.contains(where: \.isPDF),
+            sendWithoutAudio: { performDone(skipImages: !supportsVision, skipAudio: true) }
+        ))
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
             Button("Send") {
                 performDone(skipImages: true)
@@ -1214,15 +1366,16 @@ struct MessageView: View {
         ) {
             Button("OK") { }
         } message: {
-            Text("Only text, PDF, or image files (vision-capable models only) can be attached.")
+            Text("You can attach text and PDF files, images for vision-capable models, and audio files for audio-capable models.")
         }
     }
     
-    private func performDone(skipImages: Bool = false) {
+    private func performDone(skipImages: Bool = false, skipAudio: Bool = false) {
         isEditing = false
         
-        let rawAttachments = editingAttachments
-        let rawEditingImages = editingImages
+        let submission = ChatAttachmentSendPolicy.prepare(images: editingImages, attachments: editingAttachments, skipImages: skipImages, skipAudio: skipAudio)
+        let rawAttachments = submission.attachments
+        let rawEditingImages = submission.images
         let hasPDFs = rawAttachments.contains { $0.isPDF }
         let hasImages = !skipImages && !rawEditingImages.isEmpty
         
@@ -1244,99 +1397,18 @@ struct MessageView: View {
             if isEditing && message.role == "user" {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        ForEach(editingImages) { imageContainer in
-                            ZStack(alignment: .topLeading) {
-                                if imageContainer.isLoading {
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.gray.opacity(0.15))
-                                        .frame(width: 80, height: 80)
-                                        .overlay {
-                                            ProgressView()
-                                                .controlSize(.small)
-                                        }
-                                } else if let image = imageContainer.thumbnail {
-                                    Image(platformImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .contentShape(Rectangle())
-#if os(visionOS)
-                                        .hoverEffect()
-#endif
-                                        .onTapGesture {
-                                            if let fullImage = PlatformImage(data: imageContainer.data) {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    onPreviewImage?(fullImage)
-                                                }
-                                            }
-                                        }
-                                }
-                                
-                                Button(action: {
-                                    imageContainer.loadTask?.cancel()
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        editingImages.removeAll(where: { $0.id == imageContainer.id })
-                                    }
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundStyle(.white, .black.opacity(0.6))
-                                        .font(.system(size: 20))
-                                }
-                                .buttonStyle(.plain)
-                                .offset(x: -8, y: -8)
-                            }
-                            .padding(.top, 0)
-                            .padding(.leading, 0)
-                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                            .onDrag {
-                                self.draggingItem = imageContainer
-                                return NSItemProvider(object: imageContainer.id.uuidString as NSString)
-                            }
-                            .onDrop(of: [.fileURL, .image, .text], delegate: ImageDropDelegate(
-                                item: imageContainer,
-                                items: $editingImages,
-                                draggingItem: $draggingItem,
-                                isDraggingOver: $isDraggingOver,
-                                onURLsDropped: { handleDroppedURLs($0) },
-                                onDataDropped: { addImages(from: $0) }
-                            ))
+                        ChatAttachmentGroups(
+                            hasAudio: editingAttachments.contains(where: \.isAudio),
+                            hasImages: !editingImages.isEmpty,
+                            hasDocuments: editingAttachments.contains(where: { !$0.isAudio }),
+                            tileSize: 80
+                        ) {
+                            editableAttachmentTiles(isAudio: true)
+                        } images: {
+                            editableImageTiles
+                        } documents: {
+                            editableAttachmentTiles(isAudio: false)
                         }
-                        
-                        ForEach(editingAttachments) { attachment in
-                            ZStack(alignment: .topLeading) {
-                                FileAttachmentTileView(attachment: attachment, size: 80, isUserBubble: true)
-                                
-                                Button(action: {
-                                    attachment.loadTask?.cancel()
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        editingAttachments.removeAll(where: { $0.id == attachment.id })
-                                    }
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundStyle(.white, .black.opacity(0.6))
-                                        .font(.system(size: 20))
-                                }
-                                .buttonStyle(.plain)
-                                .offset(x: -8, y: -8)
-                            }
-                            .padding(.top, 0)
-                            .padding(.leading, 0)
-                            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                            .onDrag {
-                                self.draggingAttachment = attachment
-                                return NSItemProvider(object: attachment.id.uuidString as NSString)
-                            }
-                            .onDrop(of: [.fileURL, .image, .text], delegate: AttachmentDropDelegate(
-                                item: attachment,
-                                items: $editingAttachments,
-                                draggingItem: $draggingAttachment,
-                                isDraggingOver: $isDraggingOver,
-                                onURLsDropped: { handleDroppedURLs($0) },
-                                onDataDropped: { addImages(from: $0) }
-                            ))
-                        }
-                        
                         // ファイルおよび画像追加タイル
                         if canAttach {
                             Button(action: {
@@ -1355,7 +1427,7 @@ struct MessageView: View {
                             .buttonStyle(.plain)
                             .padding(.top, 0)
                             .padding(.leading, 0)
-                            .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+                            .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
                                 items: $editingImages,
                                 isDraggingOver: $isDraggingOver,
                                 isEnabled: isEditing && canAttach,
@@ -1366,7 +1438,7 @@ struct MessageView: View {
                                 isPresented: $showingAttachSheet,
                                 showingFilePicker: $showingFilePicker,
                                 showingPhotoPicker: $showingPhotoPicker,
-                                supportsCompletion: supportsCompletion,
+                                supportsCompletion: supportsCompletion || supportsAudio,
                                 supportsVision: supportsVision
                             )
                         }
@@ -1375,7 +1447,7 @@ struct MessageView: View {
                 }
                 .frame(height: 90)
                 .scrollClipDisabled()
-                .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
+                .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(items: $editingImages, isDraggingOver: $isDraggingOver, isEnabled: isEditing && canAttach, onURLsDropped: { urls in
                     if isEditing {
                         handleDroppedURLs(urls)
                     }
@@ -1528,7 +1600,7 @@ struct MessageView: View {
             HStack(spacing: 8) {
                 mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
             }
-            
+
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     mediaTiles(directImages: directImages, rawImages: rawImages, attachments: attachments, isUser: isUser)
@@ -1538,58 +1610,72 @@ struct MessageView: View {
         }
         .frame(height: 100)
     }
-    
+
     @ViewBuilder
     private func mediaTiles(directImages: [String], rawImages: [ChatInputImage], attachments: [ChatInputAttachment], isUser: Bool) -> some View {
-        if !directImages.isEmpty {
-            ForEach(Array(directImages.enumerated()), id: \.offset) { index, base64 in
-                MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
+        ChatAttachmentGroups(
+            hasAudio: attachments.contains(where: \.isAudio),
+            hasImages: !directImages.isEmpty || !rawImages.isEmpty,
+            hasDocuments: attachments.contains(where: { !$0.isAudio }),
+            tileSize: 100
+        ) {
+            messageAttachmentTiles(attachments.filter(\.isAudio), isUser: isUser)
+        } images: {
+            if !directImages.isEmpty {
+                ForEach(Array(directImages.enumerated()), id: \.offset) { index, base64 in
+                    MessageThumbnailImageView(base64String: base64, size: 100, onPreview: onPreviewImage)
 #if os(visionOS)
-                    .hoverEffect()
+                        .hoverEffect()
 #endif
-            }
-        } else if !rawImages.isEmpty {
-            ForEach(rawImages) { rawImage in
-                ZStack {
-                    if let thumb = rawImage.thumbnail {
-                        Image(platformImage: thumb)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if let fullImage = PlatformImage(data: rawImage.data) {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        onPreviewImage?(fullImage)
+                }
+            } else if !rawImages.isEmpty {
+                ForEach(rawImages) { rawImage in
+                    ZStack {
+                        if let thumb = rawImage.thumbnail {
+                            Image(platformImage: thumb)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if let fullImage = PlatformImage(data: rawImage.data) {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            onPreviewImage?(fullImage)
+                                        }
                                     }
                                 }
+
+                            if rawImage.isLoading || message.isProcessingImages {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.black.opacity(0.35))
+                                    .overlay {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    }
                             }
-                        
-                        if rawImage.isLoading || message.isProcessingImages {
+                        } else {
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.black.opacity(0.35))
+                                .fill(isUser ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
+                                .frame(width: 100, height: 100)
                                 .overlay {
                                     ProgressView()
                                         .controlSize(.small)
                                 }
                         }
-                    } else {
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(isUser ? Color.white.opacity(0.2) : Color.gray.opacity(0.15))
-                            .frame(width: 100, height: 100)
-                            .overlay {
-                                ProgressView()
-                                    .controlSize(.small)
-                            }
                     }
-                }
 #if os(visionOS)
-                .hoverEffect()
+                    .hoverEffect()
 #endif
+                }
             }
+        } documents: {
+            messageAttachmentTiles(attachments.filter { !$0.isAudio }, isUser: isUser)
         }
-        
+    }
+
+    @ViewBuilder
+    private func messageAttachmentTiles(_ attachments: [ChatInputAttachment], isUser: Bool) -> some View {
         ForEach(attachments) { attachment in
             FileAttachmentTileView(
                 attachment: attachment,
@@ -1599,7 +1685,7 @@ struct MessageView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private var streamingContentBody: some View {
         if message.isStreaming && message.content.isEmpty {

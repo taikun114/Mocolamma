@@ -2,6 +2,25 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
+/// アプリ内の並べ替えドラッグを、外部ファイルの追加と区別します。
+enum AttachmentReorderDrag {
+    static let contentType = UTType(exportedAs: "design.taikun.Mocolamma.attachment-reorder", conformingTo: .data)
+    static let acceptedContentTypes: [UTType] = [contentType, .fileURL, .image, .text]
+
+    static func provider(for id: UUID) -> NSItemProvider {
+        let provider = NSItemProvider(object: id.uuidString as NSString)
+        provider.registerDataRepresentation(forTypeIdentifier: contentType.identifier, visibility: .ownProcess) { completion in
+            completion(Data(id.uuidString.utf8), nil)
+            return nil
+        }
+        return provider
+    }
+
+    static func isInternal(_ info: DropInfo) -> Bool {
+        info.hasItemsConforming(to: [contentType])
+    }
+}
+
 // MARK: - 並び替え用DropDelegate
 
 /// アイテムの並び替えを行う汎用DropDelegate
@@ -10,22 +29,22 @@ struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
     @Binding var items: [T]
     @Binding var draggingItem: T?
     @Binding var isDraggingOver: Bool
+    var isDraggingAnotherGroup: Bool = false
+    var canReorder: (T, T) -> Bool = { _, _ in true }
     var executor: CommandExecutor? = nil
     var onURLsDropped: (([URL]) -> Void)? = nil
     var onDataDropped: (([Data]) -> Void)? = nil
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
-        if draggingItem != nil {
+        if AttachmentReorderDrag.isInternal(info) {
+            guard !isDraggingAnotherGroup, let draggingItem, canReorder(draggingItem, item) else {
+                return DropProposal(operation: .forbidden)
+            }
             // アプリ内アイテムの並び替え時
             return DropProposal(operation: .move)
         } else {
             // 外部からのファイル/画像ドラッグ時
-            let providers = info.itemProviders(for: [.image, .fileURL, .text])
-            let hasValidItem = providers.contains { provider in
-                provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
-                provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
-                provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
-            }
+            let hasValidItem = info.hasItemsConforming(to: [.image, .fileURL, .text])
             guard hasValidItem else { return nil }
             executor?.notifyDragActivity()
             return DropProposal(operation: .copy)
@@ -33,7 +52,8 @@ struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        if draggingItem != nil {
+        if AttachmentReorderDrag.isInternal(info) {
+            guard !isDraggingAnotherGroup, let draggingItem, canReorder(draggingItem, item) else { return false }
             self.draggingItem = nil
             self.isDraggingOver = false
             return true
@@ -68,26 +88,22 @@ struct ItemReorderDropDelegate<T: Identifiable & Equatable>: DropDelegate {
         return false
     }
 
-    func dropEntered(info: DropInfo) {
-        if let draggingItem = draggingItem {
-            // 並び替え時
-            guard draggingItem != item,
-                  let from = items.firstIndex(where: { $0.id == draggingItem.id }),
-                  let to = items.firstIndex(where: { $0.id == item.id }) else { return }
+    func reorderItem(_ draggingItem: T) {
+        guard !isDraggingAnotherGroup, canReorder(draggingItem, item),
+              draggingItem.id != item.id,
+              let from = items.firstIndex(where: { $0.id == draggingItem.id }),
+              let to = items.firstIndex(where: { $0.id == item.id }) else { return }
+        withAnimation {
+            items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+        }
+    }
 
-            if items[to].id != draggingItem.id {
-                withAnimation {
-                    items.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
-                }
-            }
+    func dropEntered(info: DropInfo) {
+        if AttachmentReorderDrag.isInternal(info) {
+            if let draggingItem { reorderItem(draggingItem) }
         } else {
             // 外部ファイルドラッグ時
-            let providers = info.itemProviders(for: [.image, .fileURL, .text])
-            let hasValidItem = providers.contains { provider in
-                provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
-                provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
-                provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
-            }
+            let hasValidItem = info.hasItemsConforming(to: [.image, .fileURL, .text])
             guard hasValidItem else { return }
             withAnimation(.easeInOut(duration: 0.2)) {
                 self.isDraggingOver = true
@@ -117,15 +133,11 @@ struct AreaImageDropDelegate: DropDelegate {
     var onDataDropped: (([Data]) -> Void)?
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
+        guard !AttachmentReorderDrag.isInternal(info) else { return DropProposal(operation: .forbidden) }
         guard isEnabled else { return nil }
         
         // ドラッグされているアイテムに画像、ファイルURL、テキストが含まれているか確認
-        let providers = info.itemProviders(for: [.image, .fileURL, .text])
-        let hasValidItem = providers.contains { provider in
-            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
-            provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
-            provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
-        }
+        let hasValidItem = info.hasItemsConforming(to: [.image, .fileURL, .text])
         
         guard hasValidItem else { return nil }
         
@@ -134,7 +146,7 @@ struct AreaImageDropDelegate: DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        guard isEnabled else { return false }
+        guard isEnabled, !AttachmentReorderDrag.isInternal(info) else { return false }
         isDraggingOver = false
         executor?.stopDragging(immediate: true)
 
@@ -165,15 +177,10 @@ struct AreaImageDropDelegate: DropDelegate {
     }
 
     func dropEntered(info: DropInfo) {
-        guard isEnabled else { return }
+        guard isEnabled, !AttachmentReorderDrag.isInternal(info) else { return }
         
         // ドラッグされているアイテムに画像、ファイルURL、テキストが含まれているか確認
-        let providers = info.itemProviders(for: [.image, .fileURL, .text])
-        let hasValidItem = providers.contains { provider in
-            provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
-            provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) ||
-            provider.hasItemConformingToTypeIdentifier(UTType.text.identifier)
-        }
+        let hasValidItem = info.hasItemsConforming(to: [.image, .fileURL, .text])
         
         guard hasValidItem else { return }
         

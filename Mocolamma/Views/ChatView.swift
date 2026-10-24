@@ -11,6 +11,7 @@ struct ChatView: View {
     
     @State private var errorMessage: String?
     @State private var showUnsupportedModelAlert: Bool = false
+    @State private var showingAudioWarningAlert = false
     @State private var showingVisionWarningAlert: Bool = false
     @State private var showingVisionPDFWarningAlert: Bool = false
     @State private var generalErrorMessage: String? = nil
@@ -236,7 +237,7 @@ struct ChatView: View {
                 performSendMessage(model: model)
             }
         }
-        .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true))
+        .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true || currentSelectedModel?.supportsAudio == true))
         .task {
             // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
             if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
@@ -261,6 +262,17 @@ struct ChatView: View {
         } message: {
             Text(String(localized: "This model does not support chat.", comment: "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。"))
         }
+        .modifier(AudioInputWarning(
+            isPresented: $showingAudioWarningAlert,
+            modelName: currentSelectedModel?.name,
+            alsoOmitImages: currentSelectedModel?.supportsVision == false && (!executor.chatInputImages.isEmpty || executor.chatInputAttachments.contains(where: \.isPDF)),
+            hasPDFs: executor.chatInputAttachments.contains(where: \.isPDF),
+            sendWithoutAudio: {
+                if let model = currentSelectedModel {
+                    performSendMessage(model: model, skipImages: !model.supportsVision, skipAudio: true)
+                }
+            }
+        ))
         .alert("This model does not support images", isPresented: $showingVisionWarningAlert) {
             Button("Send") {
                 if let model = currentSelectedModel {
@@ -535,8 +547,15 @@ struct ChatView: View {
             generalErrorMessage = "Please select a model first."
             return
         }
-        guard !executor.chatInputText.isEmpty || !executor.chatInputImages.isEmpty || !executor.chatInputAttachments.isEmpty else { return }
-        
+        guard ChatAttachmentSendPolicy.canSend(
+            text: executor.chatInputText, imageCount: executor.chatInputImages.count, attachments: executor.chatInputAttachments,
+            supportsVision: model.supportsVision, supportsAudio: model.supportsAudio
+        ) else { return }
+
+        if executor.chatInputAttachments.contains(where: { $0.isAudio }) && !model.supportsAudio {
+            showingAudioWarningAlert = true
+            return
+        }
         let hasPDFs = executor.chatInputAttachments.contains { $0.isPDF }
         let hasImages = !executor.chatInputImages.isEmpty
         
@@ -554,10 +573,11 @@ struct ChatView: View {
         performSendMessage(model: model)
     }
     
-    private func performSendMessage(model: OllamaModel, skipImages: Bool = false) {
+    private func performSendMessage(model: OllamaModel, skipImages: Bool = false, skipAudio: Bool = false) {
         let text = executor.chatInputText
-        let rawInputImages = executor.chatInputImages
-        let rawAttachments = executor.chatInputAttachments
+        let submission = ChatAttachmentSendPolicy.prepare(images: executor.chatInputImages, attachments: executor.chatInputAttachments, skipImages: skipImages, skipAudio: skipAudio)
+        let rawInputImages = submission.images
+        let rawAttachments = submission.attachments
         
         executor.chatInputText = ""
         executor.chatInputImages = []
@@ -651,7 +671,7 @@ struct ChatView: View {
             
             let rawAttachments = userMessage.rawInputAttachments ?? (userMessage.attachments ?? [])
             let rawEditingImages = userMessage.rawInputImages ?? []
-            let hasImages = userMessage.isProcessingImages && !rawEditingImages.isEmpty
+            let hasImages = model.supportsVision && !rawEditingImages.isEmpty
             
             currentAssistantStreamTask?.cancel()
             currentAssistantStreamTask = Task {
@@ -932,6 +952,7 @@ struct ChatView: View {
         }
         
         do {
+            try AudioAttachmentValidator.validate(messages: apiMessages, supportsAudio: model.supportsAudio)
             // パラメータの計算
             let repeatLastNValue: Int? = {
                 switch chatSettings.repeatLastNOption {
@@ -971,7 +992,8 @@ struct ChatView: View {
                 systemPrompt: chatSettings.systemPrompt,
                 thinkingOption: chatSettings.thinkingOption,
                 tools: nil,
-                keepAlive: chatSettings.finalKeepAlive
+                keepAlive: chatSettings.finalKeepAlive,
+                supportsAudioInput: model.supportsAudio
             ) {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
                 

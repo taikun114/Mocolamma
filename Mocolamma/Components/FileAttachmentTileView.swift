@@ -1,5 +1,6 @@
 import SwiftUI
 import PDFKit
+import UniformTypeIdentifiers
 #if canImport(AppKit)
 import AppKit
 #endif
@@ -121,11 +122,12 @@ struct FileAttachmentTileView: View {
     var size: CGFloat = 60
     var isUserBubble: Bool = false
     var isLoading: Bool = false
+    var isAudio: Bool = false
     
     @State private var loadedThumbnail: PlatformImage? = nil
     
     private var isPDF: Bool {
-        fileName.lowercased().hasSuffix(".pdf")
+        !isAudio && fileName.lowercased().hasSuffix(".pdf")
     }
     
     private var effectiveThumbnail: PlatformImage? {
@@ -133,6 +135,9 @@ struct FileAttachmentTileView: View {
     }
     
     private var fileIconName: String {
+        if isAudio || UTType(filenameExtension: (fileName as NSString).pathExtension)?.conforms(to: .audio) == true {
+            return ModelCapabilityTag("audio").iconName
+        }
         if isPDF {
             if #available(iOS 18.0, macOS 15.0, visionOS 2.0, *) {
                 return "richtext.page"
@@ -154,7 +159,8 @@ struct FileAttachmentTileView: View {
         thumbnail: PlatformImage? = nil,
         size: CGFloat = 60,
         isUserBubble: Bool = false,
-        isLoading: Bool = false
+        isLoading: Bool = false,
+        isAudio: Bool = false
     ) {
         self.fileName = fileName
         self.content = content
@@ -162,6 +168,7 @@ struct FileAttachmentTileView: View {
         self.size = size
         self.isUserBubble = isUserBubble
         self.isLoading = isLoading
+        self.isAudio = isAudio
         if thumbnail == nil, let content = content, !content.isEmpty, fileName.lowercased().hasSuffix(".pdf") {
             self._loadedThumbnail = State(initialValue: PDFThumbnailLoader.cachedThumbnail(for: content))
         }
@@ -175,7 +182,8 @@ struct FileAttachmentTileView: View {
             thumbnail: attachment.thumbnail,
             size: size,
             isUserBubble: isUserBubble,
-            isLoading: attachment.isLoading || isProcessing
+            isLoading: attachment.isLoading || isProcessing,
+            isAudio: attachment.isAudio
         )
     }
     
@@ -268,4 +276,12 @@ struct FileAttachmentTileView: View {
             }
         }
     }
+}
+
+#Preview("Audio Attachments") {
+    HStack(spacing: 16) {
+        FileAttachmentTileView(fileName: "recording.m4a")
+        FileAttachmentTileView(fileName: "recording.mp3", size: 100, isUserBubble: true)
+    }
+    .padding()
 }

@@ -1272,7 +1272,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// Ollamaの /api/chat エンドポイントにリクエストを送信し、ストリーミングレスポンスを処理します。
     /// - Parameter chatRequest: 送信するChatRequestオブジェクト。
     /// - Returns: ChatResponseChunkのAsyncThrowingStream。
-    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSeedEnabled: Bool, seed: Int, repeatLastN: Int?, repeatPenalty: Double?, numPredict: Int?, topK: Int?, topP: Double?, minP: Double?, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil) -> AsyncThrowingStream<ChatResponseChunk, Error> {
+    func chat(model: String, messages: [ChatMessage], stream: Bool, useCustomChatSettings: Bool, isTemperatureEnabled: Bool, chatTemperature: Double, isContextWindowEnabled: Bool, contextWindowValue: Double, isSeedEnabled: Bool, seed: Int, repeatLastN: Int?, repeatPenalty: Double?, numPredict: Int?, topK: Int?, topP: Double?, minP: Double?, isSystemPromptEnabled: Bool, systemPrompt: String, thinkingOption: ThinkingOption, tools: [ToolDefinition]?, keepAlive: JSONValue? = nil, supportsAudioInput: Bool = true) -> AsyncThrowingStream<ChatResponseChunk, Error> {
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             return AsyncThrowingStream { continuation in
@@ -1607,6 +1607,7 @@ struct MarkdownTestView: View {
                     
                     let encoder = JSONEncoder()
                     encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes] // デバッグ用に整形しつつスラッシュエスケープを無効化
+                    encoder.userInfo[.includesAudioAttachments] = supportsAudioInput
                     request.httpBody = try encoder.encode(chatRequest)
 #if DEBUG
                     print("DEBUG: Final Chat Request Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "Invalid Body")")

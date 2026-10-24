@@ -6363,6 +6363,82 @@
         }
       }
     },
+    "Attached PDF files will only be sent as extracted text." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ستُرسل ملفات PDF المرفقة كنص مستخرج فقط."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehängte PDF-Dateien werden nur als extrahierter Text gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attached PDF files will only be sent as extracted text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los archivos PDF adjuntos solo se enviarán como texto extraído."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fichiers PDF joints seront envoyés uniquement sous forme de texte extrait."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付されたPDFファイルは、抽出されたテキストのみ送信されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부된 PDF 파일은 추출된 텍스트만 전송됩니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикреплённые PDF-файлы будут отправлены только в виде извлечённого текста."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикріплені PDF-файли буде надіслано лише у вигляді видобутого тексту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附加的 PDF 文件将仅以提取的文本形式发送。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附加的 PDF 檔案將僅以擷取的文字形式傳送。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附加的 PDF 檔案將僅以擷取的文字形式傳送。"
+          }
+        }
+      }
+    },
     "Audio Input" : {
       "comment" : "オーディオを入力として受け取れるモデルの機能タグ。読み上げ生成とは区別します。",
       "localizations" : {
@@ -23110,83 +23186,6 @@
         }
       }
     },
-    "Only text, PDF, or image files (vision-capable models only) can be attached." : {
-      "comment" : "ユーザーが非対応のファイルをドロップしたときに表示されるエラーアラートのメッセージ。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكن فقط إرفاق ملفات النصوص أو PDF أو الصور (النماذج الداعمة للرؤية فقط)."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es können nur Text-, PDF- oder Bilddateien (nur Modelle mit Vision-Unterstützung) angehängt werden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only text, PDF, or image files (vision-capable models only) can be attached."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solo se pueden adjuntar archivos de texto, PDF o imagen (solo modelos con visión)."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seuls les fichiers texte, PDF ou image (modèles avec vision uniquement) peuvent être joints."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "テキスト、PDF、または画像ファイル（ビジョン対応モデルのみ）の添付にのみ対応しています。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "텍스트, PDF 또는 이미지 파일(비전 지원 모델 전용)만 첨부할 수 있습니다."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Можно прикреплять только текстовые файлы, PDF или изображения (только для моделей с поддержкой Vision)."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Можна прикріплювати лише текстові файли, PDF або зображення (лише для моделей із підтримкою Vision)."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仅支持附加文本、PDF 或图像文件（仅限支持视觉的模型）。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "僅支援附加文字、PDF 或影像檔案（僅限支援視覺的模型）。"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "只支援附加文字、PDF 或圖像檔案（只限支援視覺的模型）。"
-          }
-        }
-      }
-    },
     "Open" : {
       "comment" : "開くボタン。",
       "localizations" : {
@@ -31910,6 +31909,158 @@
     "Textual by Guillermo Gonzalez and Taiga Imaura" : {
       "shouldTranslate" : false
     },
+    "The selected model \"%@\" does not support audio input. Audio attachments will be removed before sending. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المحدد «%@» لا يدعم إدخال الصوت. ستُزال المرفقات الصوتية قبل الإرسال. هل تريد إرسال الرسالة على أي حال؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell „%@“ unterstützt keine Audioeingabe. Audioanhänge werden vor dem Senden entfernt. Möchten Sie trotzdem senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model \"%@\" does not support audio input. Audio attachments will be removed before sending. Are you sure you want to send it as is?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado «%@» no admite entrada de audio. Los archivos de audio adjuntos se eliminarán antes del envío. ¿Desea enviarlo de todos modos?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné « %@ » ne prend pas en charge l’entrée audio. Les pièces jointes audio seront supprimées avant l’envoi. Voulez-vous quand même envoyer le message ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル「%@」はオーディオ入力に対応していません。オーディオの添付ファイルを削除してから送信します。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델 “%@”은(는) 오디오 입력을 지원하지 않습니다. 오디오 첨부 파일을 제거한 후 전송합니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель «%@» не поддерживает ввод аудио. Аудиовложения будут удалены перед отправкой. Всё равно отправить сообщение?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель «%@» не підтримує введення аудіо. Аудіовкладення буде видалено перед надсиланням. Усе одно надіслати повідомлення?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型“%@”不支持音频输入。发送前将移除音频附件。您确定要继续发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援音訊輸入。傳送前將移除音訊附件。您確定要繼續傳送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援音訊輸入。傳送前將移除音訊附件。你確定要繼續傳送嗎？"
+          }
+        }
+      }
+    },
+    "The selected model \"%@\" does not support image or audio input. Image and audio attachments will be removed before sending. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المحدد «%@» لا يدعم إدخال الصور أو الصوت. ستُزال مرفقات الصور والصوت قبل الإرسال. هل تريد إرسال الرسالة على أي حال؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell „%@“ unterstützt weder Bild- noch Audioeingaben. Bild- und Audioanhänge werden vor dem Senden entfernt. Möchten Sie trotzdem senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model \"%@\" does not support image or audio input. Image and audio attachments will be removed before sending. Are you sure you want to send it as is?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado «%@» no admite entrada de imágenes ni de audio. Las imágenes y los archivos de audio adjuntos se eliminarán antes del envío. ¿Desea enviarlo de todos modos?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné « %@ » ne prend en charge ni les images ni l’audio en entrée. Les images et les pièces jointes audio seront supprimées avant l’envoi. Voulez-vous quand même envoyer le message ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデル「%@」は画像入力とオーディオ入力に対応していません。画像とオーディオの添付ファイルを削除してから送信します。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델 “%@”은(는) 이미지 및 오디오 입력을 지원하지 않습니다. 이미지와 오디오 첨부 파일을 제거한 후 전송합니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель «%@» не поддерживает ввод изображений и аудио. Изображения и аудиовложения будут удалены перед отправкой. Всё равно отправить сообщение?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель «%@» не підтримує введення зображень та аудіо. Зображення й аудіовкладення буде видалено перед надсиланням. Усе одно надіслати повідомлення?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型“%@”不支持图像或音频输入。发送前将移除图像和音频附件。您确定要继续发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像或音訊輸入。傳送前將移除圖像和音訊附件。您確定要繼續傳送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型「%@」不支援圖像或音訊輸入。傳送前將移除圖像和音訊附件。你確定要繼續傳送嗎？"
+          }
+        }
+      }
+    },
     "The selected model \"%@\" does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text." : {
       "comment" : "ビジョン非対応モデルでPDFが添付されている場合の警告アラートメッセージ（モデル名あり）。",
       "localizations" : {
@@ -32059,6 +32210,158 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "所選模型「%@」不支援圖像識別，因此不會發送圖像。您確定要按原樣發送嗎？"
+          }
+        }
+      }
+    },
+    "The selected model does not support audio input. Audio attachments will be removed before sending. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المحدد لا يدعم إدخال الصوت. ستُزال المرفقات الصوتية قبل الإرسال. هل تريد إرسال الرسالة على أي حال؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell unterstützt keine Audioeingabe. Audioanhänge werden vor dem Senden entfernt. Möchten Sie trotzdem senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model does not support audio input. Audio attachments will be removed before sending. Are you sure you want to send it as is?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado no admite entrada de audio. Los archivos de audio adjuntos se eliminarán antes del envío. ¿Desea enviarlo de todos modos?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné ne prend pas en charge l’entrée audio. Les pièces jointes audio seront supprimées avant l’envoi. Voulez-vous quand même envoyer le message ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルはオーディオ入力に対応していません。オーディオの添付ファイルを削除してから送信します。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델은 오디오 입력을 지원하지 않습니다. 오디오 첨부 파일을 제거한 후 전송합니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель не поддерживает ввод аудио. Аудиовложения будут удалены перед отправкой. Всё равно отправить сообщение?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель не підтримує введення аудіо. Аудіовкладення буде видалено перед надсиланням. Усе одно надіслати повідомлення?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型不支持音频输入。发送前将移除音频附件。您确定要继续发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援音訊輸入。傳送前將移除音訊附件。您確定要繼續傳送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援音訊輸入。傳送前將移除音訊附件。你確定要繼續傳送嗎？"
+          }
+        }
+      }
+    },
+    "The selected model does not support image or audio input. Image and audio attachments will be removed before sending. Are you sure you want to send it as is?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النموذج المحدد لا يدعم إدخال الصور أو الصوت. ستُزال مرفقات الصور والصوت قبل الإرسال. هل تريد إرسال الرسالة على أي حال؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Modell unterstützt weder Bild- noch Audioeingaben. Bild- und Audioanhänge werden vor dem Senden entfernt. Möchten Sie trotzdem senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected model does not support image or audio input. Image and audio attachments will be removed before sending. Are you sure you want to send it as is?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo seleccionado no admite entrada de imágenes ni de audio. Las imágenes y los archivos de audio adjuntos se eliminarán antes del envío. ¿Desea enviarlo de todos modos?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le modèle sélectionné ne prend en charge ni les images ni l’audio en entrée. Les images et les pièces jointes audio seront supprimées avant l’envoi. Voulez-vous quand même envoyer le message ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されたモデルは画像入力とオーディオ入力に対応していません。画像とオーディオの添付ファイルを削除してから送信します。このまま送信してもよろしいですか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택된 모델은 이미지 및 오디오 입력을 지원하지 않습니다. 이미지와 오디오 첨부 파일을 제거한 후 전송합니다. 이대로 전송하시겠습니까?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранная модель не поддерживает ввод изображений и аудио. Изображения и аудиовложения будут удалены перед отправкой. Всё равно отправить сообщение?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вибрана модель не підтримує введення зображень та аудіо. Зображення й аудіовкладення буде видалено перед надсиланням. Усе одно надіслати повідомлення?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型不支持图像或音频输入。发送前将移除图像和音频附件。您确定要继续发送吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像或音訊輸入。傳送前將移除圖像和音訊附件。您確定要繼續傳送嗎？"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所選模型不支援圖像或音訊輸入。傳送前將移除圖像和音訊附件。你確定要繼續傳送嗎？"
           }
         }
       }
@@ -32992,6 +33295,158 @@
         }
       }
     },
+    "This audio file cannot be attached. Use a valid PCM WAV file." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن إرفاق هذا الملف الصوتي. استخدم ملف WAV صالحًا بترميز PCM."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Audiodatei kann nicht angehängt werden. Verwenden Sie eine gültige PCM-WAV-Datei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This audio file cannot be attached. Use a valid PCM WAV file."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede adjuntar este archivo de audio. Utilice un archivo WAV PCM válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier audio ne peut pas être joint. Utilisez un fichier WAV PCM valide."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このオーディオファイルは添付できません。有効なPCM形式のWAVファイルを使用してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 오디오 파일을 첨부할 수 없습니다. 올바른 PCM WAV 파일을 사용하세요."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось прикрепить этот аудиофайл. Используйте корректный WAV-файл в формате PCM."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося прикріпити цей аудіофайл. Використайте коректний WAV-файл у форматі PCM."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法附加此音频文件。请使用有效的 PCM 格式 WAV 文件。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法附加此音訊檔案。請使用有效的 PCM 格式 WAV 檔案。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法附加此音訊檔案。請使用有效的 PCM 格式 WAV 檔案。"
+          }
+        }
+      }
+    },
+    "This audio file could not be converted to WAV. The format may be unsupported or the file may be damaged." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحويل هذا الملف الصوتي إلى WAV. قد يكون التنسيق غير مدعوم أو قد يكون الملف تالفًا."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Audiodatei konnte nicht in WAV konvertiert werden. Das Format wird möglicherweise nicht unterstützt oder die Datei ist beschädigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This audio file could not be converted to WAV. The format may be unsupported or the file may be damaged."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo convertir este archivo de audio a WAV. Es posible que el formato no sea compatible o que el archivo esté dañado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier audio n’a pas pu être converti en WAV. Le format n’est peut-être pas pris en charge ou le fichier est endommagé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このオーディオファイルをWAVに変換できませんでした。対応していない形式か、ファイルが破損している可能性があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 오디오 파일을 WAV로 변환하지 못했습니다. 지원하지 않는 형식이거나 파일이 손상되었을 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось преобразовать этот аудиофайл в WAV. Возможно, формат не поддерживается или файл повреждён."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося перетворити цей аудіофайл на WAV. Можливо, формат не підтримується або файл пошкоджено."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法将此音频文件转换为 WAV。文件格式可能不受支持，或者文件已损坏。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法將此音訊檔案轉換為 WAV。檔案格式可能不受支援，或檔案已損壞。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法將此音訊檔案轉換為 WAV。檔案格式可能不受支援，或檔案已損壞。"
+          }
+        }
+      }
+    },
     "This file cannot be attached" : {
       "comment" : "ユーザーが非対応のファイル1件のみをドロップしたときに表示されるエラーアラートのタイトル。",
       "localizations" : {
@@ -33146,6 +33601,82 @@
         }
       }
     },
+    "This model does not support audio input" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا النموذج لا يدعم إدخال الصوت"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell unterstützt keine Audioeingabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This model does not support audio input"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este modelo no admite entrada de audio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce modèle ne prend pas en charge l’entrée audio"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルはオーディオ入力に対応していません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 모델은 오디오 입력을 지원하지 않습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта модель не поддерживает ввод аудио"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ця модель не підтримує введення аудіо"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支持音频输入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援音訊輸入"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援音訊輸入"
+          }
+        }
+      }
+    },
     "This model does not support chat." : {
       "comment" : "ユーザがチャットに埋め込み専用モデルを使用しようとしたときのエラーメッセージ。",
       "localizations" : {
@@ -33219,6 +33750,82 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此模型不支援聊天。"
+          }
+        }
+      }
+    },
+    "This model does not support image or audio input" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا النموذج لا يدعم إدخال الصور أو الصوت"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Modell unterstützt weder Bild- noch Audioeingaben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This model does not support image or audio input"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este modelo no admite entrada de imágenes ni de audio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce modèle ne prend en charge ni les images ni l’audio en entrée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このモデルは画像入力とオーディオ入力に対応していません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 모델은 이미지 및 오디오 입력을 지원하지 않습니다"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эта модель не поддерживает ввод изображений и аудио"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ця модель не підтримує введення зображень та аудіо"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支持图像或音频输入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援圖像或音訊輸入"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此模型不支援圖像或音訊輸入"
           }
         }
       }
@@ -35226,6 +35833,82 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您也可以直接透過 PayPal 進行捐助。"
+          }
+        }
+      }
+    },
+    "You can attach text and PDF files, images for vision-capable models, and audio files for audio-capable models." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك إرفاق ملفات نصية وملفات PDF، وصور للنماذج التي تدعم الصور، وملفات صوتية للنماذج التي تدعم الصوت."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können Text- und PDF-Dateien anhängen. Bilder können an Modelle mit Bildunterstützung und Audiodateien an Modelle mit Audiounterstützung angehängt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can attach text and PDF files, images for vision-capable models, and audio files for audio-capable models."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede adjuntar archivos de texto y PDF, imágenes para los modelos que admiten imágenes y archivos de audio para los modelos que admiten audio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez joindre des fichiers texte et PDF, des images pour les modèles prenant en charge les images et des fichiers audio pour les modèles prenant en charge l’audio."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストとPDFファイル、画像入力に対応したモデルには画像、オーディオ入力に対応したモデルにはオーディオファイルを添付できます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "텍스트 및 PDF 파일을 첨부할 수 있습니다. 이미지 입력을 지원하는 모델에는 이미지를, 오디오 입력을 지원하는 모델에는 오디오 파일을 첨부할 수 있습니다."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можно прикреплять текстовые и PDF-файлы, изображения для моделей с поддержкой изображений и аудиофайлы для моделей с поддержкой аудио."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Можна прикріплювати текстові та PDF-файли, зображення для моделей із підтримкою зображень і аудіофайли для моделей із підтримкою аудіо."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您可以附加文本和 PDF 文件，向支持图像输入的模型附加图像，以及向支持音频输入的模型附加音频文件。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您可以附加文字和 PDF 檔案，向支援圖像輸入的模型附加圖像，以及向支援音訊輸入的模型附加音訊檔案。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以附加文字和 PDF 檔案、向支援圖像輸入的模型附加圖像，以及向支援音訊輸入的模型附加音訊檔案。"
           }
         }
       }

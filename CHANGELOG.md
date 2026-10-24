@@ -51,6 +51,10 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Support speech model tag**
   - Speech models are displayed as "Speech Generation".
 
+#### Chat
+- **Support attaching audio files**
+  - You can now attach audio files to models that support audio input.
+
 ### Bug Fixes and Improvements
 #### Model
 - **Fix issue where inspector fields returning empty strings were not hidden**
@@ -61,6 +65,10 @@ In version 1.2.2 or earlier, it was listed as follows:
     - Vision → Image Input
     - Audio → Audio Input
     - Image → Image Generation
+
+#### Chat
+- **Improve PDF file processing**
+  - When sending PDF files to models that support image input, the corresponding image number is now included for each page. This helps models associate images with the correct PDF pages and distinguish them from separately attached images.
 
 ## 1.4.1
 ### New Features

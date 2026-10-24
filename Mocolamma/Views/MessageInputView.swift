@@ -50,25 +50,17 @@ struct MessageInputView: View {
     /// 添付（ファイルまたは画像）が可能かどうかを判定します
     private var canAttach: Bool {
         guard let model = selectedModel else { return false }
-        return model.supportsCompletion || model.supportsVision
+        return model.supportsCompletion || model.supportsVision || model.supportsAudio
     }
     
     /// 送信ボタンを無効化するかどうかを判定します
     private var isSendDisabled: Bool {
         if isStreaming { return false }
         guard let model = selectedModel else { return true }
-        
-        let hasText = !inputText.isEmpty
-        let hasAttachments = !selectedAttachments.isEmpty
-        let hasImages = !selectedImages.isEmpty
-        
-        if model.supportsVision {
-            // ビジョン対応モデル: テキスト、添付ファイル、画像のいずれかがあれば送信可能
-            return !hasText && !hasAttachments && !hasImages
-        } else {
-            // ビジョン非対応モデル: テキストまたは添付ファイルのいずれかが必要（画像のみは不可）
-            return !hasText && !hasAttachments
-        }
+        return !ChatAttachmentSendPolicy.canSend(
+            text: inputText, imageCount: selectedImages.count, attachments: selectedAttachments,
+            supportsVision: model.supportsVision, supportsAudio: model.supportsAudio
+        )
     }
     
     var body: some View {
@@ -79,106 +71,25 @@ struct MessageInputView: View {
                 if hasPreviewItems || executor.isDraggingFile {
                     ScrollView(.horizontal) {
                         HStack(spacing: 8) {
-                            ForEach(selectedImages) { imageContainer in
-                                ZStack(alignment: .topLeading) {
-                                    if imageContainer.isLoading {
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color.gray.opacity(0.15))
-                                            .frame(width: 60, height: 60)
-                                            .overlay {
-                                                ProgressView()
-                                                    .controlSize(.small)
-                                            }
-                                    } else if let image = imageContainer.thumbnail {
-                                        Image(platformImage: image)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 60, height: 60)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            .contentShape(Rectangle())
-#if os(visionOS)
-                                            .hoverEffect()
-#endif
-                                            .onTapGesture {
-                                                if let fullImage = PlatformImage(data: imageContainer.data) {
-                                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                                        executor.previewImage = fullImage
-                                                    }
-                                                }
-                                            }
-                                    }
-                                    
-                                    Button(action: {
-                                        imageContainer.loadTask?.cancel()
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            selectedImages.removeAll(where: { $0.id == imageContainer.id })
-                                        }
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.white, .black.opacity(0.6))
-                                            .font(.system(size: 20))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .offset(x: -8, y: -8)
-                                }
-                                .padding(.top, 8)
-                                .padding(.leading, 8)
-                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                                .onDrag {
-                                    self.draggingItem = imageContainer
-                                    return NSItemProvider(object: imageContainer.id.uuidString as NSString)
-                                }
-                                .onDrop(of: [.fileURL, .image, .text], delegate: ImageDropDelegate(
-                                    item: imageContainer,
-                                    items: $selectedImages,
-                                    draggingItem: $draggingItem,
-                                    isDraggingOver: $isDraggingOver,
-                                    executor: executor,
-                                    onURLsDropped: { handleDroppedURLs($0) },
-                                    onDataDropped: { addImages(from: $0) }
-                                ))
+                            ChatAttachmentGroups(
+                                hasAudio: selectedAttachments.contains(where: \.isAudio),
+                                hasImages: !selectedImages.isEmpty,
+                                hasDocuments: selectedAttachments.contains(where: { !$0.isAudio }),
+                                tileSize: 60
+                            ) {
+                                editableAttachmentTiles(isAudio: true)
+                            } images: {
+                                editableImageTiles
+                            } documents: {
+                                editableAttachmentTiles(isAudio: false)
                             }
-                            
-                            ForEach(selectedAttachments) { attachment in
-                                ZStack(alignment: .topLeading) {
-                                    FileAttachmentTileView(attachment: attachment, size: 60)
-                                    
-                                    Button(action: {
-                                        attachment.loadTask?.cancel()
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            selectedAttachments.removeAll(where: { $0.id == attachment.id })
-                                        }
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.white, .black.opacity(0.6))
-                                            .font(.system(size: 20))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .offset(x: -8, y: -8)
-                                }
-                                .padding(.top, 8)
-                                .padding(.leading, 8)
-                                .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
-                                .onDrag {
-                                    self.draggingAttachment = attachment
-                                    return NSItemProvider(object: attachment.id.uuidString as NSString)
-                                }
-                                .onDrop(of: [.fileURL, .image, .text], delegate: AttachmentDropDelegate(
-                                    item: attachment,
-                                    items: $selectedAttachments,
-                                    draggingItem: $draggingAttachment,
-                                    isDraggingOver: $isDraggingOver,
-                                    executor: executor,
-                                    onURLsDropped: { handleDroppedURLs($0) },
-                                    onDataDropped: { addImages(from: $0) }
-                                ))
-                            }
+
                         }
                         .padding(.horizontal, 4)
                     }
                     .frame(height: 76)
                     .scrollClipDisabled()
-                    .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+                    .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
                         items: $selectedImages,
                         isDraggingOver: $isDraggingOver,
                         executor: executor,
@@ -268,7 +179,7 @@ struct MessageInputView: View {
                     isPresented: $showingAttachSheet,
                     showingFilePicker: $showingFilePicker,
                     showingPhotoPicker: $showingPhotoPicker,
-                    supportsCompletion: selectedModel?.supportsCompletion == true,
+                    supportsCompletion: selectedModel?.supportsCompletion == true || selectedModel?.supportsAudio == true,
                     supportsVision: selectedModel?.supportsVision == true
                 )
                 
@@ -445,7 +356,7 @@ struct MessageInputView: View {
         .opacity(selectedModel == nil ? 0.5 : 1.0)
         .allowsHitTesting(selectedModel != nil)
         .background(Color.clear)
-        .onDrop(of: [.fileURL, .image, .text], delegate: AreaImageDropDelegate(
+        .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
             items: $selectedImages,
             isDraggingOver: $isDraggingOver,
             executor: executor,
@@ -483,10 +394,130 @@ struct MessageInputView: View {
         ) {
             Button("OK") { }
         } message: {
-            Text("Only text, PDF, or image files (vision-capable models only) can be attached.")
+            Text("You can attach text and PDF files, images for vision-capable models, and audio files for audio-capable models.")
         }
     }
-    
+
+    @ViewBuilder
+    private var editableImageTiles: some View {
+        ForEach(selectedImages) { imageContainer in
+            ZStack(alignment: .topLeading) {
+                if imageContainer.isLoading {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.15))
+                        .frame(width: 60, height: 60)
+                        .overlay {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                } else if let image = imageContainer.thumbnail {
+                    Image(platformImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .contentShape(Rectangle())
+#if os(visionOS)
+                        .hoverEffect()
+#endif
+                        .onTapGesture {
+                            if let fullImage = PlatformImage(data: imageContainer.data) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    executor.previewImage = fullImage
+                                }
+                            }
+                        }
+                }
+
+                Button(action: {
+                    imageContainer.loadTask?.cancel()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        selectedImages.removeAll(where: { $0.id == imageContainer.id })
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.white, .black.opacity(0.6))
+                        .font(.system(size: 20))
+                }
+                .buttonStyle(.plain)
+                .offset(x: -8, y: -8)
+            }
+            .padding(.top, 8)
+            .padding(.leading, 8)
+            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+            .onDrag {
+                self.draggingAttachment = nil
+                self.draggingItem = imageContainer
+                return AttachmentReorderDrag.provider(for: imageContainer.id)
+            }
+            .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: ImageDropDelegate(
+                item: imageContainer,
+                items: $selectedImages,
+                draggingItem: $draggingItem,
+                isDraggingOver: $isDraggingOver,
+                isDraggingAnotherGroup: draggingAttachment != nil,
+                executor: executor,
+                onURLsDropped: { handleDroppedURLs($0) },
+                onDataDropped: { addImages(from: $0) }
+            ))
+        }
+    }
+
+    @ViewBuilder
+    private func editableAttachmentTiles(isAudio: Bool) -> some View {
+        ForEach(selectedAttachments.filter { $0.isAudio == isAudio }) { attachment in
+            ZStack(alignment: .topLeading) {
+                FileAttachmentTileView(attachment: attachment, size: 60)
+
+                Button(action: {
+                    attachment.loadTask?.cancel()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        selectedAttachments.removeAll(where: { $0.id == attachment.id })
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.white, .black.opacity(0.6))
+                        .font(.system(size: 20))
+                }
+                .buttonStyle(.plain)
+                .offset(x: -8, y: -8)
+            }
+            .padding(.top, 8)
+            .padding(.leading, 8)
+            .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+            .onDrag {
+                self.draggingItem = nil
+                self.draggingAttachment = attachment
+                return AttachmentReorderDrag.provider(for: attachment.id)
+            }
+            .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AttachmentDropDelegate(
+                item: attachment,
+                items: $selectedAttachments,
+                draggingItem: $draggingAttachment,
+                isDraggingOver: $isDraggingOver,
+                isDraggingAnotherGroup: draggingItem != nil,
+                canReorder: { $0.isAudio == $1.isAudio },
+                executor: executor,
+                onURLsDropped: { handleDroppedURLs($0) },
+                onDataDropped: { addImages(from: $0) }
+            ))
+        }
+    }
+
+    @MainActor
+    private func addAudioAttachment(data: Data, fileName: String) async throws {
+        let id = UUID()
+        selectedAttachments.append(ChatInputAttachment(id: id, name: fileName, content: "", audioData: Data(), isLoading: true))
+        do {
+            let attachment = try await AudioAttachmentConverter.prepare(data: data, fileName: fileName)
+            guard let index = selectedAttachments.firstIndex(where: { $0.id == id }) else { return }
+            selectedAttachments[index] = attachment
+        } catch {
+            selectedAttachments.removeAll(where: { $0.id == id })
+            throw error
+        }
+    }
+
     private func addFiles(from urls: [URL]) {
         Task {
             for url in urls {
@@ -498,6 +529,17 @@ struct MessageInputView: View {
                 
                 guard let data = data else { continue }
                 
+                if AudioAttachmentValidator.isAudioFile(url: url, data: data) {
+                    do {
+                        try await addAudioAttachment(data: data, fileName: url.lastPathComponent)
+                    } catch {
+                        print("Audio attachment rejected: \(error.localizedDescription)")
+                        unsupportedFileAlertTitle = error.localizedDescription
+                        showingUnsupportedFileAlert = true
+                    }
+                    continue
+                }
+
                 if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
                     let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
                     let placeholderId = UUID()
@@ -590,6 +632,18 @@ struct MessageInputView: View {
                     continue
                 }
                 
+                if AudioAttachmentValidator.isAudioFile(url: url, data: data) {
+                    do {
+                        try await addAudioAttachment(data: data, fileName: url.lastPathComponent)
+                        successCount += 1
+                    } catch {
+                        print("Audio attachment rejected: \(error.localizedDescription)")
+                        unsupportedFileAlertTitle = error.localizedDescription
+                        showingUnsupportedFileAlert = true
+                    }
+                    continue
+                }
+
                 if url.pathExtension.lowercased() == "pdf" || data.isPDFData {
                     let pdfFileName = url.pathExtension.lowercased() == "pdf" ? url.lastPathComponent : "\(url.deletingPathExtension().lastPathComponent).pdf"
                     let placeholderId = UUID()

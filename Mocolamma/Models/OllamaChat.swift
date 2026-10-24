@@ -204,9 +204,11 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendabl
     let id: UUID
     let name: String
     var content: String
+    var audioData: Data?
     var thumbnailBase64: String?
     var thumbnail: PlatformImage?
     var pageImagesPNGData: [Data]
+    var pdfPages: [PDFPromptPage]
     var isLoading: Bool
     
     var loadTask: Task<ChatInputAttachment?, Never>? = nil
@@ -215,24 +217,28 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendabl
         id: UUID = UUID(),
         name: String,
         content: String,
+        audioData: Data? = nil,
         thumbnailBase64: String? = nil,
         thumbnail: PlatformImage? = nil,
         pageImagesPNGData: [Data] = [],
+        pdfPages: [PDFPromptPage] = [],
         isLoading: Bool = false,
         loadTask: Task<ChatInputAttachment?, Never>? = nil
     ) {
         self.id = id
         self.name = name
         self.content = content
+        self.audioData = audioData
         self.thumbnailBase64 = thumbnailBase64
         self.thumbnail = thumbnail
         self.pageImagesPNGData = pageImagesPNGData
+        self.pdfPages = pdfPages
         self.isLoading = isLoading
         self.loadTask = loadTask
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, name, content, thumbnailBase64
+        case id, name, content, audioData, thumbnailBase64, pdfPages
     }
     
     init(from decoder: Decoder) throws {
@@ -240,8 +246,10 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendabl
         self.id = try container.decode(UUID.self, forKey: .id)
         self.name = try container.decode(String.self, forKey: .name)
         self.content = try container.decode(String.self, forKey: .content)
+        self.audioData = try container.decodeIfPresent(Data.self, forKey: .audioData)
         self.thumbnailBase64 = try container.decodeIfPresent(String.self, forKey: .thumbnailBase64)
         self.thumbnail = nil
+        self.pdfPages = try container.decodeIfPresent([PDFPromptPage].self, forKey: .pdfPages) ?? []
         self.pageImagesPNGData = []
         self.isLoading = false
         self.loadTask = nil
@@ -249,10 +257,12 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendabl
     
     /// この添付ファイルがPDFかどうかを判定します
     var isPDF: Bool {
-        name.lowercased().hasSuffix(".pdf")
+        !isAudio && name.lowercased().hasSuffix(".pdf")
     }
     
-    /// 添付可能なファイル（テキスト系、PDF、画像）のUTType一覧
+    var isAudio: Bool { audioData != nil }
+
+    /// 添付可能なファイル（テキスト系、PDF、画像、音声）のUTType一覧
     static let allowedContentTypes: [UTType] = [
         .plainText,
         .utf8PlainText,
@@ -265,6 +275,7 @@ struct ChatInputAttachment: Identifiable, Equatable, Codable, @unchecked Sendabl
         .xml,
         .text,
         .pdf,
+        .audio,
         .image
     ]
     
@@ -321,6 +332,7 @@ extension ChatInputAttachment {
             thumbnailBase64: thumbBase64,
             thumbnail: platformThumb,
             pageImagesPNGData: result.pageImagesPNGData,
+            pdfPages: result.pages,
             isLoading: false
         )
     }
@@ -351,6 +363,10 @@ extension [ChatInputAttachment] {
         
         return (processedAttachments, pdfPageImages)
     }
+}
+
+extension CodingUserInfoKey {
+    static let includesAudioAttachments = CodingUserInfoKey(rawValue: "Mocolamma.includesAudioAttachments")!
 }
 
 // MARK: - チャットAPI リクエスト/レスポンス モデル
@@ -400,17 +416,41 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var finalIsStopped: Bool = false // 最終的な停止状態
     
     /// 添付ファイルの内容をフォーマットしてプロンプトテキストを構築します（添付ファイルがある場合はサンドイッチ構成）
-    static func buildFullPrompt(userText: String, attachments: [ChatInputAttachment]?) -> String {
+    static func buildFullPrompt(userText: String, attachments: [ChatInputAttachment]?, directImageCount: Int = 0, pdfImageCount: Int = 0) -> String {
         guard let attachments = attachments, !attachments.isEmpty else {
             return userText
         }
         let trimmedUserText = userText.trimmingCharacters(in: .whitespacesAndNewlines)
         var fullText = userText
+        var audioIndex = 0
+        var usedPDFImages = 0
+        if pdfImageCount > 0 && attachments.contains(where: { $0.isPDF && !$0.pdfPages.isEmpty }) {
+            if !fullText.isEmpty { fullText += "\n\n" }
+            fullText += "===\n\nImage numbers refer to visual images in submission order, excluding audio attachments."
+            if directImageCount == 1 {
+                fullText += "\nImage 1 is a directly attached image."
+            } else if directImageCount > 1 {
+                fullText += "\nImages 1-\(directImageCount) are directly attached images."
+            }
+            fullText += "\nPDF page image numbers are listed with each page below."
+        }
         for attachment in attachments {
+            let pageImageCount = attachment.isPDF ? (attachment.pdfPages.isEmpty ? attachment.pageImagesPNGData.count : attachment.pdfPages.compactMap(\.imageIndex).count) : 0
+            let sentImageCount = min(pageImageCount, max(pdfImageCount - usedPDFImages, 0))
             if !fullText.isEmpty {
                 fullText += "\n\n"
             }
-            if attachment.isPDF && attachment.content.hasPrefix("===") {
+            if attachment.isAudio {
+                audioIndex += 1
+                fullText += "===\n\nAttached Audio \(audioIndex): \(attachment.name)"
+            } else if attachment.isPDF && !attachment.pdfPages.isEmpty {
+                let firstImageNumber = directImageCount + usedPDFImages + 1
+                let pages = attachment.pdfPages.map { page in
+                    let imageNumber = page.imageIndex.flatMap { $0 >= 0 && $0 < sentImageCount ? firstImageNumber + $0 : nil }
+                    return page.formattedPrompt(imageNumber: imageNumber)
+                }
+                fullText += "===\n\nAttached File: \(attachment.name)\n\n" + pages.joined(separator: "\n\n---\n\n")
+            } else if attachment.isPDF && attachment.content.hasPrefix("===") {
                 // すでにPDF用フォーマットで整形されている場合
                 fullText += attachment.content
             } else {
@@ -425,6 +465,7 @@ class ChatMessage: Identifiable, Codable, Equatable {
                 ``````````
                 """
             }
+            usedPDFImages += sentImageCount
         }
         // 添付ファイルがあり、ユーザープロンプトが存在する場合は末尾にも配置してサンドイッチ構成にする
         if !trimmedUserText.isEmpty {
@@ -435,9 +476,14 @@ class ChatMessage: Identifiable, Codable, Equatable {
     
     /// このメッセージのAPI送信用コンテンツ（添付ファイル展開済み）を取得します
     var promptForAPI: String {
-        ChatMessage.buildFullPrompt(userText: content, attachments: attachments)
+        promptForAPI(includesAudio: true)
     }
     
+    private func promptForAPI(includesAudio: Bool) -> String {
+        let requestAttachments = includesAudio ? attachments : attachments?.filter { !$0.isAudio }
+        return ChatMessage.buildFullPrompt(userText: content, attachments: requestAttachments, directImageCount: images?.count ?? 0, pdfImageCount: pdfImages?.count ?? 0)
+    }
+
     /// ストリーミング中のコンテンツを一括更新します（Observationの通知を最小限に抑えるため）
     @MainActor
     func updateStreamingContent(content: String, thinking: String?, isThinkingCompleted: Bool) {
@@ -499,15 +545,17 @@ class ChatMessage: Identifiable, Codable, Equatable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(role, forKey: .role)
-        let encodedContent = (role == "user" && attachments?.isEmpty == false) ? promptForAPI : content
+        let includesAudio = encoder.userInfo[.includesAudioAttachments] as? Bool ?? true
+        let encodedContent = (role == "user" && attachments?.isEmpty == false) ? promptForAPI(includesAudio: includesAudio) : content
         try container.encode(encodedContent, forKey: .content)
         try container.encodeIfPresent(thinking, forKey: .thinking)
         
-        // API送信時にはユーザ直接添付画像とPDFページ画像を結合して送信
+        // 音声を先頭に配置し、その後に直接添付画像とPDFページ画像を送信
         let combinedImages: [String]? = {
             let direct = images ?? []
             let pdf = pdfImages ?? []
-            let combined = direct + pdf
+            let audio = includesAudio ? (attachments ?? []).compactMap { $0.audioData?.base64EncodedString() } : []
+            let combined = audio + direct + pdf
             return combined.isEmpty ? nil : combined
         }()
         try container.encodeIfPresent(combinedImages, forKey: .images)
