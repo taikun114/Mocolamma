@@ -49,8 +49,32 @@ struct ModelInspectorView: View {
     }
     
     
+    private func nonEmptyString(_ value: String?) -> String? {
+        guard let value, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return value
+    }
+
+    private var detailFamilies: [String] {
+        model.details?.families?.compactMap { nonEmptyString($0) } ?? []
+    }
+
+    private var hasDetailsInformation: Bool {
+        guard let details = model.details else { return false }
+        let values = [details.parent_model, details.format, details.family,
+                      details.parameter_size, details.quantization_level]
+        return values.contains { nonEmptyString($0) != nil } || !detailFamilies.isEmpty
+    }
+
+    private var explicitLicenseName: String? {
+        nonEmptyString(response?.model_info?["general.license"]?.stringValue)
+    }
+
+    private var hasLicense: Bool {
+        explicitLicenseName != nil || licenseBody != nil
+    }
+
     private var licenseBody: String? {
-        response?.license
+        nonEmptyString(response?.license)
     }
     
     private var licenseLink: String? {
@@ -58,12 +82,12 @@ struct ModelInspectorView: View {
         if model.name == "demo:0b" || model.name == "demo2:0b" {
             return "https://example.com/"
         }
-        return response?.model_info?["general.license.link"]?.stringValue
+        return nonEmptyString(response?.model_info?["general.license.link"]?.stringValue)
     }
     
     private var licenseName: String {
         // 1. model_infoに明示的なライセンス名がある場合
-        if let rawLicense = response?.model_info?["general.license"]?.stringValue {
+        if let rawLicense = explicitLicenseName {
             switch rawLicense.lowercased() {
             case "mit":
                 return "MIT License"
@@ -148,15 +172,18 @@ struct ModelInspectorView: View {
         
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                Text(model.name)
-                    .font(.title2)
-                    .bold()
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .help(model.name) // モデル名のフルテキストをツールチップに表示
+                if nonEmptyString(model.name) != nil {
+                    Text(model.name)
+                        .font(.title2)
+                        .bold()
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(model.name) // モデル名のフルテキストをツールチップに表示
+                }
                 
                 // 機能セクション
-                if let capabilities = response?.capabilities, !capabilities.isEmpty {
+                let capabilities = response?.capabilities?.compactMap { nonEmptyString($0) } ?? []
+                if !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(capabilities, id: \.self) { capability in
@@ -205,26 +232,28 @@ struct ModelInspectorView: View {
                 Divider()
                 
                 Group {
-                    VStack(alignment: .leading) {
-                        Text("Model Name:") // モデル名。
-                        Text(model.model)
-                            .font(.title3)
-                            .bold()
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .help(model.model) // ツールチップにフルテキストを表示
-                            .contextMenu {
-                                Button("Copy", systemImage: copyIconName) {
+                    if nonEmptyString(model.model) != nil {
+                        VStack(alignment: .leading) {
+                            Text("Model Name:") // モデル名。
+                            Text(model.model)
+                                .font(.title3)
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .help(model.model) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(model.model, forType: .string)
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(model.model, forType: .string)
 #else
-                                    UIPasteboard.general.string = model.model
+                                        UIPasteboard.general.string = model.model
 #endif
+                                    }
                                 }
-                            }
+                        }
+                        .accessibilityElement(children: .combine)
                     }
-                    .accessibilityElement(children: .combine)
                     VStack(alignment: .leading) {
                         Text("Size:") // サイズ。
                         Text(model.formattedSize)
@@ -245,46 +274,50 @@ struct ModelInspectorView: View {
                             }
                     }
                     .accessibilityElement(children: .combine)
-                    VStack(alignment: .leading) {
-                        Text("Modified At:") // 変更日
-                        Text(model.formattedModifiedAt)
-                            .font(.title3)
-                            .bold()
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
-                            .contextMenu {
-                                Button("Copy", systemImage: copyIconName) {
+                    if nonEmptyString(model.modified_at) != nil {
+                        VStack(alignment: .leading) {
+                            Text("Modified At:") // 変更日
+                            Text(model.formattedModifiedAt)
+                                .font(.title3)
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .help(model.formattedModifiedAt) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(model.formattedModifiedAt, forType: .string)
 #else
-                                    UIPasteboard.general.string = model.formattedModifiedAt
+                                        UIPasteboard.general.string = model.formattedModifiedAt
 #endif
+                                    }
                                 }
-                            }
+                        }
+                        .accessibilityElement(children: .combine)
                     }
-                    .accessibilityElement(children: .combine)
-                    VStack(alignment: .leading) {
-                        Text("Digest:") // ダイジェスト。
-                        Text(model.digest)
-                            .font(.title3)
-                            .bold()
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .help(model.digest) // ツールチップにフルテキストを表示
-                            .contextMenu {
-                                Button("Copy", systemImage: copyIconName) {
+                    if nonEmptyString(model.digest) != nil {
+                        VStack(alignment: .leading) {
+                            Text("Digest:") // ダイジェスト。
+                            Text(model.digest)
+                                .font(.title3)
+                                .bold()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .help(model.digest) // ツールチップにフルテキストを表示
+                                .contextMenu {
+                                    Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(model.digest, forType: .string)
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString(model.digest, forType: .string)
 #else
-                                    UIPasteboard.general.string = model.digest
+                                        UIPasteboard.general.string = model.digest
 #endif
+                                    }
                                 }
-                            }
+                        }
+                        .accessibilityElement(children: .combine)
                     }
-                    .accessibilityElement(children: .combine)
                 }
                 .font(.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -295,9 +328,9 @@ struct ModelInspectorView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                if let details = model.details { // ここでOptionalをアンラップします
+                if let details = model.details, hasDetailsInformation {
                     VStack(alignment: .leading, spacing: 10) {
-                        if let parentModel = details.parent_model, !parentModel.isEmpty {
+                        if let parentModel = nonEmptyString(details.parent_model) {
                             VStack(alignment: .leading) {
                                 Text("Parent Model:") // 親モデル。
                                 Text(parentModel)
@@ -318,7 +351,7 @@ struct ModelInspectorView: View {
                                     }
                             }
                         }
-                        if let format = details.format {
+                        if let format = nonEmptyString(details.format) {
                             VStack(alignment: .leading) {
                                 Text("Format:") // フォーマット。
                                 Text(format)
@@ -339,7 +372,7 @@ struct ModelInspectorView: View {
                                     }
                             }
                         }
-                        if let family = details.family {
+                        if let family = nonEmptyString(details.family) {
                             VStack(alignment: .leading) {
                                 Text("Family:") // ファミリー。
                                 Text(family)
@@ -360,10 +393,10 @@ struct ModelInspectorView: View {
                                     }
                             }
                         }
-                        if let families = details.families, !families.isEmpty {
+                        if !detailFamilies.isEmpty {
                             VStack(alignment: .leading) {
                                 Text("Families:") // ファミリーズ。
-                                let familiesText = families.joined(separator: ", ")
+                                let familiesText = detailFamilies.joined(separator: ", ")
                                 Text(familiesText)
                                     .font(.title3)
                                     .bold()
@@ -382,7 +415,7 @@ struct ModelInspectorView: View {
                                     }
                             }
                         }
-                        if let parameterSize = details.parameter_size {
+                        if let parameterSize = nonEmptyString(details.parameter_size) {
                             VStack(alignment: .leading) {
                                 Text("Parameter Size:") // パラメータサイズ。
                                 Text(parameterSize)
@@ -403,7 +436,7 @@ struct ModelInspectorView: View {
                                     }
                             }
                         }
-                        if let quantizationLevel = details.quantization_level {
+                        if let quantizationLevel = nonEmptyString(details.quantization_level) {
                             VStack(alignment: .leading) {
                                 Text("Quantization Level:") // 量子化レベル。
                                 Text(quantizationLevel)
@@ -451,8 +484,8 @@ struct ModelInspectorView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         
                         // ライセンス情報がある場合のみ表示
-                        // model_infoにlicenseキーがあるか、licenseBodyがある場合
-                        if response?.model_info?["general.license"] != nil || licenseBody != nil {
+                        // 空でないライセンス名または本文がある場合
+                        if hasLicense {
                             VStack(alignment: .leading) {
                                 Text("License:") // ライセンス
                                 if licenseBody != nil {
@@ -538,7 +571,6 @@ struct ModelInspectorView: View {
                         }
                         
                         // 全ての詳細項目が空の場合のみ「モデル情報がありません」を表示
-                        let hasLicense = response?.model_info?["general.license"] != nil || licenseBody != nil
                         let hasAnyInfo = parameterCount != nil || contextLength != nil || embeddingLength != nil || hasLicense
                         
                         if !hasAnyInfo {

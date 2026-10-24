@@ -53,6 +53,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 ### Bug Fixes and Improvements
 #### Model
+- **Fix issue where inspector fields returning empty strings were not hidden**
 - **Improve tag names**
   - Tags representing model capabilities now have clearer names. The tag names have been changed as follows:
     - Completion → Text Generation
