@@ -8,7 +8,7 @@ enum ScreenshotConfiguration {
     }
 
     static var isEnabled: Bool {
-#if DEBUG && targetEnvironment(simulator)
+#if DEBUG
         ProcessInfo.processInfo.arguments.contains("-ScreenshotMode")
 #else
         false
