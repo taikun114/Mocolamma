@@ -65,55 +65,10 @@ struct ModelListView: View {
     
     @State private var cachedAvailableTags: [String] = [] // タグ一覧のキャッシュ用ステータス
     
-    // タグの表示順序を制御するための重み付け
-    private func tagWeight(_ tag: String) -> Int {
-        switch tag.lowercased() {
-        case "completion": return 1
-        case "thinking": return 2
-        case "tools": return 3
-        case "vision": return 4
-        case "audio": return 5
-        case "embedding": return 6
-        case "image": return 7
-        case "decision": return 8
-        default: return 100
-        }
-    }
-    
-    // タグの表示名をローカライズして返すヘルパー
-    private func localizedTagName(_ tag: String) -> String {
-        switch tag.lowercased() {
-        case "completion": return String(localized: "Completion")
-        case "vision": return String(localized: "Vision")
-        case "audio": return String(localized: "Audio")
-        case "image": return String(localized: "Image")
-        case "embedding": return String(localized: "Embedding")
-        case "tools": return String(localized: "Tools")
-        case "thinking": return String(localized: "Thinking")
-        case "decision": return String(localized: "Decision")
-        default: return tag.capitalized
-        }
-    }
-    
-    // タグのアイコン名を返すヘルパー
-    private func tagIconName(_ tag: String) -> String {
-        switch tag.lowercased() {
-        case "completion": return "character.cursor.ibeam"
-        case "vision": return "eye"
-        case "audio": return "music.note"
-        case "tools": return "wrench.and.screwdriver"
-        case "thinking": return "brain.filled.head.profile"
-        case "embedding": return "square.stack.3d.up"
-        case "image": return "photo"
-        case "decision": return "checklist"
-        default: return "tag"
-        }
-    }
-    
     // 現在のフィルター状態に基づいたアイコン名を返す
     private var filterIconName: String {
         if let tag = selectedFilterTag {
-            return tagIconName(tag)
+            return ModelCapabilityTag(tag).iconName
         }
         return "line.3.horizontal.decrease"
     }
@@ -154,7 +109,7 @@ struct ModelListView: View {
         // タグ一覧のキャッシュを更新
         let tags = allModels.compactMap { $0.capabilities }.flatMap { $0 }
         cachedAvailableTags = Array(Set(tags)).sorted { tag1, tag2 in
-            tagWeight(tag1) < tagWeight(tag2)
+            ModelCapabilityTag(tag1).sortOrder < ModelCapabilityTag(tag2).sortOrder
         }
     }
     
@@ -211,7 +166,7 @@ struct ModelListView: View {
                 Picker("Filter", selection: $selectedFilterTag) {
                     Label("All Models", systemImage: "tray.full").tag(nil as String?)
                     ForEach(cachedAvailableTags, id: \.self) { tag in
-                        Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
+                        Label(ModelCapabilityTag(tag).displayName, systemImage: ModelCapabilityTag(tag).iconName).tag(tag as String?)
                     }
                 }
                 .labelStyle(.titleAndIcon)
@@ -272,7 +227,7 @@ struct ModelListView: View {
                 Picker("Filter", selection: $selectedFilterTag) {
                     Label("All Models", systemImage: "tray.full").tag(nil as String?)
                     ForEach(cachedAvailableTags, id: \.self) { tag in
-                        Label(localizedTagName(tag), systemImage: tagIconName(tag)).tag(tag as String?)
+                        Label(ModelCapabilityTag(tag).displayName, systemImage: ModelCapabilityTag(tag).iconName).tag(tag as String?)
                     }
                 }
                 .labelStyle(.titleAndIcon)

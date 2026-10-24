@@ -6363,79 +6363,79 @@
         }
       }
     },
-    "Audio" : {
-      "comment" : "モデルの持っている機能として表示されるタグ。このモデルがオーディオ(音声認識/生成)に対応している場合はこのタグが表示されます。",
+    "Audio Input" : {
+      "comment" : "オーディオを入力として受け取れるモデルの機能タグ。読み上げ生成とは区別します。",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "صوت"
+            "value" : "إدخال الصوت"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio"
+            "value" : "Audioeingabe"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio"
+            "value" : "Audio Input"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio"
+            "value" : "Entrada de audio"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio"
+            "value" : "Entrée audio"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオ"
+            "value" : "オーディオ入力"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "오디오"
+            "value" : "오디오 입력"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудио"
+            "value" : "Ввод аудио"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Аудіо"
+            "value" : "Введення аудіо"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音频"
+            "value" : "音频输入"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音訊"
+            "value" : "音訊輸入"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音訊"
+            "value" : "音訊輸入"
           }
         }
       }
@@ -7909,83 +7909,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已完成"
-          }
-        }
-      }
-    },
-    "Completion" : {
-      "comment" : "モデルの持っている機能として表示されるタグ。このモデルがコンプリーション(テキスト補完)に対応している場合はこのタグが表示されます。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إكمال"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vervollständigung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completion"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Complétion"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コンプリーション"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완성"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завершение"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завершення"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "补全"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "補全"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "補全"
           }
         }
       }
@@ -17009,6 +16932,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "圖片生成設定"
+          }
+        }
+      }
+    },
+    "Image Input" : {
+      "comment" : "画像を入力として受け取れるモデルの機能タグ。画像生成とは区別します。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إدخال الصور"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildeingabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Input"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrada de imágenes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrée d’images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像入力"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 입력"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ввод изображений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введення зображень"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "图像输入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片輸入"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖片輸入"
           }
         }
       }
@@ -30906,6 +30906,83 @@
         }
       }
     },
+    "Speech Generation" : {
+      "comment" : "テキストから読み上げ音声を生成するモデルの機能タグ。音声の入力や再生とは区別します。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "توليد الكلام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprachsynthese"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speech Generation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generación de voz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synthèse vocale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み上げ生成"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "음성 생성"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синтез речи"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синтез мовлення"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音合成"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "語音合成"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "語音合成"
+          }
+        }
+      }
+    },
     "Status" : {
       "localizations" : {
         "ar" : {
@@ -31749,6 +31826,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "溫度"
+          }
+        }
+      }
+    },
+    "Text Generation" : {
+      "comment" : "テキストを生成できるモデルの機能タグ。",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "توليد النصوص"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textgenerierung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Generation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generación de texto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Génération de texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト生成"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "텍스트 생성"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерация текста"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Генерація тексту"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文本生成"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字生成"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字生成"
           }
         }
       }
@@ -33530,79 +33684,79 @@
         }
       }
     },
-    "Tools" : {
-      "comment" : "モデルの持っている機能として表示されるタグ。このモデルがツールの呼び出しに対応している場合はこのタグが表示されます。",
+    "Tool Calling" : {
+      "comment" : "外部ツールの呼び出しを要求できるモデルの機能タグ。",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أدوات"
+            "value" : "استدعاء الأدوات"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tools"
+            "value" : "Tool-Aufrufe"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tools"
+            "value" : "Tool Calling"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Herramientas"
+            "value" : "Llamada a herramientas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Outils"
+            "value" : "Appel d’outils"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ツール"
+            "value" : "ツール呼び出し"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "도구"
+            "value" : "도구 호출"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Инструменты"
+            "value" : "Вызов инструментов"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Інструменти"
+            "value" : "Виклик інструментів"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "工具"
+            "value" : "工具调用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "工具"
+            "value" : "工具呼叫"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "工具"
+            "value" : "工具呼叫"
           }
         }
       }
@@ -34764,83 +34918,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示"
-          }
-        }
-      }
-    },
-    "Vision" : {
-      "comment" : "モデルの持っている機能として表示されるタグ。このモデルがビジョン(画像認識)に対応している場合はこのタグが表示されます。",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رؤية"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vision"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vision"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visión"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vision"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ビジョン"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "비전"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зрение"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зір"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "视觉"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "視覺"
-          }
-        },
-        "zh-HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "視覺"
           }
         }
       }

@@ -45,6 +45,22 @@ In version 1.2.2 or earlier, it was listed as follows:
   - Removals
 -->
 
+## 1.5.0
+### New Features
+#### Model
+- **Support speech model tag**
+  - Speech models are displayed as "Speech Generation".
+
+### Bug Fixes and Improvements
+#### Model
+- **Improve tag names**
+  - Tags representing model capabilities now have clearer names. The tag names have been changed as follows:
+    - Completion → Text Generation
+    - Tools → Tool Calling
+    - Vision → Image Input
+    - Audio → Audio Input
+    - Image → Image Generation
+
 ## 1.4.1
 ### New Features
 #### General

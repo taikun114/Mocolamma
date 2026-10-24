@@ -90,40 +90,9 @@ struct ModelInspectorView: View {
     // MARK: - ヘルパー関数
     
     private func tagView(for capability: String) -> some View {
-        let displayText: String
-        let iconName: String
+        let tag = ModelCapabilityTag(capability)
         let isSelected = selectedFilterTag == capability
-        
-        switch capability.lowercased() {
-        case "completion":
-            displayText = String(localized: "Completion")
-            iconName = "character.cursor.ibeam"
-        case "vision":
-            displayText = String(localized: "Vision")
-            iconName = "eye"
-        case "audio":
-            displayText = String(localized: "Audio")
-            iconName = "music.note"
-        case "tools":
-            displayText = String(localized: "Tools")
-            iconName = "wrench.and.screwdriver"
-        case "thinking":
-            displayText = String(localized: "Thinking")
-            iconName = "brain.filled.head.profile"
-        case "embedding":
-            displayText = String(localized: "Embedding")
-            iconName = "square.stack.3d.up"
-        case "image":
-            displayText = String(localized: "Image")
-            iconName = "photo"
-        case "decision":
-            displayText = String(localized: "Decision")
-            iconName = "checklist"
-        default:
-            displayText = capability.capitalized
-            iconName = "tag"
-        }
-        
+
         return Button(action: {
             if selectedFilterTag == capability {
                 selectedFilterTag = nil
@@ -132,8 +101,8 @@ struct ModelInspectorView: View {
             }
         }) {
             HStack(spacing: 4) {
-                Image(systemName: iconName)
-                Text(displayText)
+                Image(systemName: tag.iconName)
+                Text(tag.displayName)
             }
             .font(.caption)
             .bold()
