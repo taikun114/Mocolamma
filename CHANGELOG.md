@@ -66,6 +66,10 @@ In version 1.2.2 or earlier, it was listed as follows:
     - Audio → Audio Input
     - Image → Image Generation
 
+#### Chat and Image Generation
+- **Improve the send button to remain disabled for 1 second after sending a message**
+  - This prevents accidental cancellation immediately after sending, such as when double-clicking or double-tapping the send button.
+
 #### Chat
 - **Improve PDF file processing**
   - When sending PDF files to models that support image input, the corresponding image number is now included for each page. This helps models associate images with the correct PDF pages and distinguish them from separately attached images.

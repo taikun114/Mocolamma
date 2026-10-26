@@ -38,6 +38,7 @@ struct MessageInputView: View {
     }
     
     // 添付オプション関連の状態
+    @State private var stopCooldown = StopButtonCooldown()
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
@@ -55,7 +56,7 @@ struct MessageInputView: View {
     
     /// 送信ボタンを無効化するかどうかを判定します
     private var isSendDisabled: Bool {
-        if isStreaming { return false }
+        if isStreaming { return stopCooldown.isLocked }
         guard let model = selectedModel else { return true }
         return !ChatAttachmentSendPolicy.canSend(
             text: inputText, imageCount: selectedImages.count, attachments: selectedAttachments,
@@ -222,11 +223,11 @@ struct MessageInputView: View {
                         .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
 #if os(macOS)
                             if !isStreaming {
-                                sendMessage()
+                                sendOrStop()
                             }
 #else
                             if !isStreaming {
-                                sendMessage()
+                                sendOrStop()
                             }
 #endif
                         }
@@ -245,7 +246,7 @@ struct MessageInputView: View {
                             if isStreaming {
                                 return .handled
                             } else {
-                                sendMessage()
+                                sendOrStop()
                                 return .handled
                             }
 #endif
@@ -270,7 +271,7 @@ struct MessageInputView: View {
                 
 #if !os(macOS)
                 if #available(iOS 26, visionOS 26.0, *) {
-                    Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    Button(action: sendOrStop) {
 #if os(visionOS)
                         Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                             .font(.title2)
@@ -294,9 +295,9 @@ struct MessageInputView: View {
 #else
                     .buttonStyle(.plain)
 #endif
-                    .disabled(isSendDisabled)
+                    .modifier(DisabledStateFade(isDisabled: isSendDisabled))
                 } else {
-                    Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    Button(action: sendOrStop) {
                         ZStack {
                             Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                                 .font(.title2)
@@ -307,11 +308,11 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isSendDisabled)
+                    .modifier(DisabledStateFade(isDisabled: isSendDisabled))
                 }
 #else
                 if #available(macOS 26, *) {
-                    Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    Button(action: sendOrStop) {
 #if os(visionOS)
                         Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                             .font(.title2)
@@ -335,9 +336,9 @@ struct MessageInputView: View {
 #else
                     .buttonStyle(.plain)
 #endif
-                    .disabled(isSendDisabled)
+                    .modifier(DisabledStateFade(isDisabled: isSendDisabled))
                 } else {
-                    Button(action: isStreaming ? (stopMessage ?? {}) : sendMessage) {
+                    Button(action: sendOrStop) {
                         ZStack {
                             Image(systemName: isStreaming ? "stop.fill" : "arrow.up")
                                 .font(.title2)
@@ -348,10 +349,27 @@ struct MessageInputView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(isSendDisabled)
+                    .modifier(DisabledStateFade(isDisabled: isSendDisabled))
                 }
 #endif
             }
+        }
+        .onChange(of: isStreaming) { _, streaming in
+            if streaming {
+                if !stopCooldown.isLocked { stopCooldown.begin() }
+            } else {
+                stopCooldown.reset()
+            }
+        }
+        .task(id: stopCooldown.deadline) {
+            guard let deadline = stopCooldown.deadline else { return }
+            do {
+                try await ContinuousClock().sleep(until: deadline)
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
+            stopCooldown.release(ifDeadline: deadline)
         }
         .opacity(selectedModel == nil ? 0.5 : 1.0)
         .allowsHitTesting(selectedModel != nil)
@@ -395,6 +413,18 @@ struct MessageInputView: View {
             Button("OK") { }
         } message: {
             Text("You can attach text and PDF files, images for vision-capable models, and audio files for audio-capable models.")
+        }
+    }
+
+    private func sendOrStop() {
+        if isStreaming {
+            guard stopCooldown.canStop() else { return }
+            stopMessage?()
+        } else {
+            guard !isSendDisabled else { return }
+            sendMessage()
+            // 送信処理が同期的に開始した場合は、次のクリックより先に停止をロックします。
+            if isStreaming { stopCooldown.begin() }
         }
     }
 
