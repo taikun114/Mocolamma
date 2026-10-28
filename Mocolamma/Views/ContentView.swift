@@ -221,7 +221,7 @@ struct ContentView: View {
         serverManager.inspectorSelection = newSelection
         
         // 実行中モデルの更新（サーバー、モデル、チャット、画像生成タブ切り替え時に最新状態を確認）
-        if let sel = newSelection, ["server", "models", "chat", "image_generation"].contains(sel) && serverManager.selectedServer != nil {
+        if let sel = newSelection, ["server", "models", "generation", "chat", "image_generation"].contains(sel) && serverManager.selectedServer != nil {
             Task {
                 _ = await executor.fetchRunningModels()
             }

@@ -21,6 +21,33 @@ struct MainTabView: View {
     @Binding var modelToDelete: OllamaModel?
     var sortedModels: [OllamaModel]
     @State private var isInspectorSheetPresented = false
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var generationPath: [String] = []
+    @State private var tabBarPlacement: TabBarPlacement?
+
+    private var usesCompactGeneration: Bool {
+#if os(iOS)
+        horizontalSizeClass == .compact && !isiOSAppOnVision
+#else
+        false
+#endif
+    }
+
+    private var inspectorSelection: String? {
+        selection == "generation" ? generationPath.last : selection
+    }
+
+    private var showsGenerationTab: Bool {
+#if os(iOS)
+        !isiOSAppOnVision && (usesCompactGeneration || tabBarPlacement != .sidebar || selection == "generation")
+#else
+        false
+#endif
+    }
+
+    private var usesGenerationTab: Bool {
+        usesCompactGeneration || (showsGenerationTab && tabBarPlacement == .topBar)
+    }
 
     var body: some View {
         TabView(selection: $selection) {
@@ -33,6 +60,7 @@ struct MainTabView: View {
                         selectedServerForInspector: $selectedServerForInspector
                     )
                 }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
                 .environment(serverManager)
                 .environment(executor)
             }
@@ -51,10 +79,59 @@ struct MainTabView: View {
                         onTogglePreview: toggleInspector
                     )
                 }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
                 .environment(serverManager)
                 .environment(executor)
             }
             
+            Tab("Generation", systemImage: "sparkles", value: "generation") {
+                NavigationStack(path: $generationPath) {
+                    List {
+                        NavigationLink(value: "chat") {
+                            Label {
+                                VStack(alignment: .leading) {
+                                    Text("Chat")
+                                        .fontWeight(.bold)
+                                        .lineLimit(1)
+                                    Text("Easily test your model's capabilities.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "message").foregroundStyle(.green)
+                            }
+                        }
+                        NavigationLink(value: "image_generation") {
+                            Label {
+                                VStack(alignment: .leading) {
+                                    Text("Image Generation")
+                                        .fontWeight(.bold)
+                                        .lineLimit(1)
+                                    Text("Create a variety of images using image generation models.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: "photo").foregroundStyle(.blue)
+                            }
+                        }
+                    }
+                    .navigationTitle("Generation")
+                    .modifier(NavSubtitleIfAvailable(subtitle: serverManager.selectedServer.map { Text(verbatim: $0.name) } ?? Text("No Server Selected")))
+                    .navigationDestination(for: String.self) { destination in
+                        if destination == "chat" {
+                            ChatView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+                        } else if destination == "image_generation" {
+                            ImageGenerationView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+                        }
+                    }
+                }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .environment(serverManager)
+                .environment(executor)
+            }
+            .hidden(!showsGenerationTab)
+
             Tab("Chat", systemImage: "message", value: "chat") {
                 NavigationStack {
                     ChatView(
@@ -62,25 +139,46 @@ struct MainTabView: View {
                         onToggleInspector: toggleInspector
                     )
                 }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
                 .environment(serverManager)
                 .environment(executor)
             }
+            .hidden(usesGenerationTab && selection != "chat")
             
-            Tab("Image", systemImage: "photo", value: "image_generation") {
+            Tab("Image Generation", systemImage: "photo", value: "image_generation") {
                 NavigationStack {
                     ImageGenerationView(
                         showingInspector: $showingInspector,
                         onToggleInspector: toggleInspector
                     )
                 }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
                 .environment(serverManager)
                 .environment(executor)
             }
+            .hidden(usesGenerationTab && selection != "image_generation")
             
             Tab("Settings", systemImage: "gear", value: "settings") {
                 NavigationStack {
                     SettingsView()
                 }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+            }
+        }
+        .onChange(of: usesGenerationTab, initial: true) { _, grouped in
+            if grouped, let selection, selection == "chat" || selection == "image_generation" {
+                generationPath = [selection]
+                self.selection = "generation"
+            }
+        }
+        .onChange(of: tabBarPlacement, initial: true) { _, placement in
+            if placement == .sidebar, !usesCompactGeneration, selection == "generation" {
+                selection = generationPath.last ?? "chat"
+            }
+        }
+        .onChange(of: usesCompactGeneration) { _, compact in
+            if !compact, tabBarPlacement == .sidebar, selection == "generation" {
+                selection = generationPath.last ?? "chat"
             }
         }
         .onChange(of: selection) { _, newSelection in
@@ -194,7 +292,7 @@ struct MainTabView: View {
     
     private var inspectorContent: some View {
         InspectorContentView(
-            selection: selection,
+            selection: inspectorSelection,
             selectedModel: $selectedModel,
             sortedModels: sortedModels,
             selectedServerForInspector: selectedServerForInspector,
@@ -222,6 +320,20 @@ struct MainTabView: View {
         default:
             return ""
         }
+    }
+}
+
+private struct TabBarPlacementObserver: View {
+    @Environment(\.tabBarPlacement) private var currentPlacement
+    @Binding var placement: TabBarPlacement?
+
+    var body: some View {
+        Color.clear
+            .onChange(of: currentPlacement, initial: true) { _, newValue in
+                if let newValue {
+                    placement = newValue
+                }
+            }
     }
 }
 
