@@ -24,5 +24,18 @@
 		<key>UIImageName</key>
 		<string>Launch</string>
 	</dict>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Attachment Reorder Data</string>
+			<key>UTTypeIdentifier</key>
+			<string>design.taikun.Mocolamma.attachment-reorder</string>
+		</dict>
+	</array>
 </dict>
 </plist>
