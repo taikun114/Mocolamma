@@ -328,6 +328,18 @@ private struct TabBarPlacementObserver: View {
     @Binding var placement: TabBarPlacement?
 
     var body: some View {
+#if os(iOS)
+        if #available(iOS 27.0, *) {
+            AdaptiveTabBarPlacementObserver(placement: $placement)
+        } else {
+            placementObserver
+        }
+#else
+        placementObserver
+#endif
+    }
+
+    private var placementObserver: some View {
         Color.clear
             .onChange(of: currentPlacement, initial: true) { _, newValue in
                 if let newValue {
@@ -336,6 +348,33 @@ private struct TabBarPlacementObserver: View {
             }
     }
 }
+
+#if os(iOS)
+@available(iOS 27.0, *)
+private struct AdaptiveTabBarPlacementObserver: View {
+    @Environment(\.tabBarPlacement) private var currentPlacement
+    @Environment(\.isTabViewSidebarAvailable) private var isSidebarAvailable
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Binding var placement: TabBarPlacement?
+
+    private var resolvedPlacement: TabBarPlacement? {
+        // サイドバー優先時にbottomBarが報告される環境では、利用可否と表示領域で補正する。
+        isSidebarAvailable && horizontalSizeClass == .regular && currentPlacement == .bottomBar ? .sidebar : currentPlacement
+    }
+
+    var body: some View {
+        Color.clear
+            .onChange(of: resolvedPlacement, initial: true) { _, newValue in
+                if let newValue {
+#if DEBUG
+                    print("Adaptive tab placement: \(newValue), sidebar available: \(isSidebarAvailable)")
+#endif
+                    placement = newValue
+                }
+            }
+    }
+}
+#endif
 
 #if os(iOS)
 // MARK: - View拡張

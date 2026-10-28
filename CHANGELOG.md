@@ -56,6 +56,10 @@ In version 1.2.2 or earlier, it was listed as follows:
   - You can now attach audio files to models that support audio input.
 
 ### Bug Fixes and Improvements
+#### General
+- **Improve navigation to display a "Generation" tab in narrow layouts on iOS and iPadOS**
+  - Generation features such as Chat and Image Generation are now grouped together in the "Generation" tab. As part of this change, the "Image" tab, renamed in version 1.4.1, has been restored to "Image Generation".
+
 #### Model
 - **Fix issue where inspector fields returning empty strings were not hidden**
 - **Improve tag names**
