@@ -29,6 +29,12 @@ struct DecisionConditionEditor: View {
     @ScaledMetric(relativeTo: .body) private var scoreRowHeight = 56
 #endif
 
+    private var kindPicker: some View {
+        Picker("Decision Type", selection: $condition.kind) {
+            ForEach(DecisionCondition.Kind.allCases) { kind in Text(kind.title).tag(kind) }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Button {
@@ -70,18 +76,19 @@ struct DecisionConditionEditor: View {
                     }
                     .padding(.vertical, 12)
                     Divider()
+                    Group {
+#if os(macOS)
+                    AdaptiveSegmentedPickerRow(title: "Decision Type") {
+                        kindPicker
+                    }
+#else
                     HStack {
                         Text("Decision Type")
                         Spacer()
-                        Picker("Decision Type", selection: $condition.kind) {
-                            ForEach(DecisionCondition.Kind.allCases) { kind in Text(kind.title).tag(kind) }
-                        }
-#if os(macOS)
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-#else
+                        kindPicker
                         .pickerStyle(.menu)
                         .labelsHidden()
+                    }
 #endif
                     }
                     .padding(.vertical, 12)

@@ -31,8 +31,8 @@ struct DecisionView: View {
     }
 
     var body: some View {
-        Group {
-            if isCompact {
+        GeometryReader { geometry in
+            if isCompact || geometry.size.width < 760 {
                 compactContent
             } else {
                 HStack(alignment: .top, spacing: 0) {
@@ -55,6 +55,9 @@ struct DecisionView: View {
             }
         }
         .navigationTitle("Decision")
+#if os(iOS)
+        .navigationBarTitleDisplayMode(isCompact ? .automatic : .inline)
+#endif
         .modifier(NavSubtitleIfAvailable(subtitle: serverManager.selectedServer.map { Text(verbatim: $0.name) } ?? Text("No Server Selected")))
         .toolbar { toolbarContent }
         .confirmationDialog("Reset decision input and results?", isPresented: $showingResetConfirmation, titleVisibility: .visible) {
@@ -108,19 +111,19 @@ struct DecisionView: View {
         Form {
             inputSection
             conditionsSection
+#if os(macOS)
+            Section {} footer: {
+                inlineEvaluateButton
+                    .padding(.horizontal, -10)
+                    .padding(.bottom, -20)
+            }
+#else
             Section {
-                evaluateButton
-                    .frame(height: 76, alignment: .center)
-                    .opacity(isEvaluateButtonPinned ? 0 : 1)
-                    .allowsHitTesting(!isEvaluateButtonPinned)
-                    .accessibilityHidden(isEvaluateButtonPinned)
-                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
-                        buttonPosition = $0.minY
-                        buttonWidth = $0.width
-                    }
+                inlineEvaluateButton
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
             }
+#endif
             resultsSection
         }
         .formStyle(.grouped)
@@ -138,14 +141,34 @@ struct DecisionView: View {
                 evaluateButton
                     .frame(width: buttonWidth)
                     .padding(.horizontal, buttonWidth == nil ? 16 : 0)
-                    .frame(height: 76, alignment: .center)
+                    .frame(height: evaluateButtonAreaHeight, alignment: .center)
             }
         }
         }
     }
 
+    private var evaluateButtonAreaHeight: CGFloat {
+#if os(macOS)
+        56
+#else
+        76
+#endif
+    }
+
+    private var inlineEvaluateButton: some View {
+        evaluateButton
+            .frame(height: evaluateButtonAreaHeight, alignment: .center)
+            .opacity(isEvaluateButtonPinned ? 0 : 1)
+            .allowsHitTesting(!isEvaluateButtonPinned)
+            .accessibilityHidden(isEvaluateButtonPinned)
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
+                buttonPosition = $0.minY
+                buttonWidth = $0.width
+            }
+    }
+
     private var isEvaluateButtonPinned: Bool {
-        !buttonPosition.isFinite || buttonPosition - viewportFrame.minY > viewportFrame.height - 76
+        !buttonPosition.isFinite || buttonPosition - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
     }
 
     @ToolbarContentBuilder
@@ -287,16 +310,13 @@ struct DecisionView: View {
         @Bindable var session = session
         return Section("Decision Content") {
             VStack(alignment: .leading, spacing: 12) {
-                    Picker("Content to Evaluate", selection: Binding(get: { session.isJSON }, set: { value in
-                        if value && !session.attachments.isEmpty { showingModeConfirmation = true } else { session.isJSON = value }
-                    })) {
-                        Text("Text").tag(false)
-                        Text("JSON").tag(true)
-                    }
 #if os(macOS)
-                    .pickerStyle(.segmented)
+                    AdaptiveSegmentedPickerRow(title: "Content to Evaluate") {
+                        inputModePicker
+                    }
                     .padding(.top, 6)
 #else
+                    inputModePicker
                     .pickerStyle(.menu)
 #endif
                 TextEditor(text: $session.input)
@@ -319,6 +339,15 @@ struct DecisionView: View {
 #endif
             }
             .disabled(session.isRunning)
+        }
+    }
+
+    private var inputModePicker: some View {
+        Picker("Content to Evaluate", selection: Binding(get: { session.isJSON }, set: { value in
+            if value && !session.attachments.isEmpty { showingModeConfirmation = true } else { session.isJSON = value }
+        })) {
+            Text("Text").tag(false)
+            Text("JSON").tag(true)
         }
     }
 

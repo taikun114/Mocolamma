@@ -39,7 +39,7 @@ struct MainTabView: View {
 
     private var showsGenerationTab: Bool {
 #if os(iOS)
-        !isiOSAppOnVision && (usesCompactGeneration || tabBarPlacement != .sidebar || selection == "generation")
+        !isiOSAppOnVision && (usesCompactGeneration || tabBarPlacement != .sidebar || selection == "generation") && !usesSelectedGenerationTab
 #else
         false
 #endif
@@ -47,6 +47,14 @@ struct MainTabView: View {
 
     private var usesGenerationTab: Bool {
         usesCompactGeneration || (showsGenerationTab && tabBarPlacement == .topBar)
+    }
+
+    private var usesSelectedGenerationTab: Bool {
+#if os(iOS)
+        !isiOSAppOnVision && !usesCompactGeneration && tabBarPlacement == .topBar && ["chat", "decision", "image_generation"].contains(selection ?? "")
+#else
+        false
+#endif
     }
 
     var body: some View {
@@ -60,7 +68,7 @@ struct MainTabView: View {
                         selectedServerForInspector: $selectedServerForInspector
                     )
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "server"))
                 .environment(serverManager)
                 .environment(executor)
             }
@@ -79,7 +87,7 @@ struct MainTabView: View {
                         onTogglePreview: toggleInspector
                     )
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "models"))
                 .environment(serverManager)
                 .environment(executor)
             }
@@ -136,67 +144,91 @@ struct MainTabView: View {
                         }
                     }
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "generation"))
                 .environment(serverManager)
                 .environment(executor)
             }
             .hidden(!showsGenerationTab)
 
-            Tab("Chat", systemImage: "message", value: "chat") {
+            Tab(usesSelectedGenerationTab && selection == "chat" ? "Generation" : "Chat", systemImage: usesSelectedGenerationTab && selection == "chat" ? "sparkles" : "message", value: "chat") {
                 NavigationStack {
                     ChatView(
                         showingInspector: $showingInspector,
                         onToggleInspector: toggleInspector
                     )
+#if os(iOS)
+                    .toolbar { generationBackButton }
+#endif
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "chat"))
                 .environment(serverManager)
                 .environment(executor)
             }
-            .hidden(usesGenerationTab && selection != "chat")
+#if os(iOS)
+            .tabPlacement(usesSelectedGenerationTab && selection == "chat" ? .automatic : .sidebarOnly)
+#endif
+            .hidden((usesCompactGeneration || tabBarPlacement == .topBar) && selection != "chat")
             
-            Tab("Decision", systemImage: ModelCapabilityTag("decision").iconName, value: "decision") {
+            Tab(usesSelectedGenerationTab && selection == "decision" ? "Generation" : "Decision", systemImage: usesSelectedGenerationTab && selection == "decision" ? "sparkles" : ModelCapabilityTag("decision").iconName, value: "decision") {
                 NavigationStack {
                     DecisionView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+#if os(iOS)
+                        .toolbar { generationBackButton }
+#endif
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "decision"))
             }
-            .hidden(usesGenerationTab && selection != "decision")
+#if os(iOS)
+            .tabPlacement(usesSelectedGenerationTab && selection == "decision" ? .automatic : .sidebarOnly)
+#endif
+            .hidden((usesCompactGeneration || tabBarPlacement == .topBar) && selection != "decision")
 
-            Tab("Image Generation", systemImage: "photo", value: "image_generation") {
+            Tab(usesSelectedGenerationTab && selection == "image_generation" ? "Generation" : "Image Generation", systemImage: usesSelectedGenerationTab && selection == "image_generation" ? "sparkles" : "photo", value: "image_generation") {
                 NavigationStack {
                     ImageGenerationView(
                         showingInspector: $showingInspector,
                         onToggleInspector: toggleInspector
                     )
+#if os(iOS)
+                    .toolbar { generationBackButton }
+#endif
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "image_generation"))
                 .environment(serverManager)
                 .environment(executor)
             }
-            .hidden(usesGenerationTab && selection != "image_generation")
+#if os(iOS)
+            .tabPlacement(usesSelectedGenerationTab && selection == "image_generation" ? .automatic : .sidebarOnly)
+#endif
+            .hidden((usesCompactGeneration || tabBarPlacement == .topBar) && selection != "image_generation")
             
             Tab("Settings", systemImage: "gear", value: "settings") {
                 NavigationStack {
                     SettingsView()
                 }
-                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "settings"))
             }
         }
         .onChange(of: usesGenerationTab, initial: true) { _, grouped in
-            if grouped, let selection, ["chat", "decision", "image_generation"].contains(selection) {
-                generationPath = [selection]
-                self.selection = "generation"
+            if grouped, usesCompactGeneration, let selection, ["chat", "decision", "image_generation"].contains(selection) {
+                withTransaction(Transaction(animation: nil)) {
+                    generationPath = [selection]
+                    self.selection = "generation"
+                }
             }
         }
         .onChange(of: tabBarPlacement, initial: true) { _, placement in
             if placement == .sidebar, !usesCompactGeneration, selection == "generation" {
-                selection = generationPath.last ?? "chat"
+                withTransaction(Transaction(animation: nil)) {
+                    selection = generationPath.last ?? "chat"
+                }
             }
         }
         .onChange(of: usesCompactGeneration) { _, compact in
             if !compact, tabBarPlacement == .sidebar, selection == "generation" {
-                selection = generationPath.last ?? "chat"
+                withTransaction(Transaction(animation: nil)) {
+                    selection = generationPath.last ?? "chat"
+                }
             }
         }
         .onChange(of: selection) { _, newSelection in
@@ -278,6 +310,20 @@ struct MainTabView: View {
 #endif
     }
     
+#if os(iOS)
+    @ToolbarContentBuilder
+    private var generationBackButton: some ToolbarContent {
+        if usesSelectedGenerationTab {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Generation", systemImage: "chevron.backward") {
+                    generationPath = []
+                    selection = "generation"
+                }
+            }
+        }
+    }
+#endif
+
     private func toggleInspector() {
         if isNativeVisionOS {
             // visionOS用：インスペクタに表示する内容を同期
@@ -344,25 +390,32 @@ struct MainTabView: View {
 private struct TabBarPlacementObserver: View {
     @Environment(\.tabBarPlacement) private var currentPlacement
     @Binding var placement: TabBarPlacement?
+    var isActive: Bool
 
     var body: some View {
+        Group {
 #if os(iOS)
         if #available(iOS 27.0, *) {
-            AdaptiveTabBarPlacementObserver(placement: $placement)
+            AdaptiveTabBarPlacementObserver(placement: $placement, isActive: isActive)
         } else {
             placementObserver
         }
 #else
         placementObserver
 #endif
+        }
+        .allowsHitTesting(false)
     }
 
     private var placementObserver: some View {
         Color.clear
             .onChange(of: currentPlacement, initial: true) { _, newValue in
-                if let newValue {
+                if isActive, let newValue {
                     placement = newValue
                 }
+            }
+            .onChange(of: isActive, initial: true) { _, active in
+                if active, let currentPlacement { placement = currentPlacement }
             }
     }
 }
@@ -374,6 +427,7 @@ private struct AdaptiveTabBarPlacementObserver: View {
     @Environment(\.isTabViewSidebarAvailable) private var isSidebarAvailable
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var placement: TabBarPlacement?
+    var isActive: Bool
 
     private var resolvedPlacement: TabBarPlacement? {
         // サイドバー優先時にbottomBarが報告される環境では、利用可否と表示領域で補正する。
@@ -383,12 +437,15 @@ private struct AdaptiveTabBarPlacementObserver: View {
     var body: some View {
         Color.clear
             .onChange(of: resolvedPlacement, initial: true) { _, newValue in
-                if let newValue {
+                if isActive, let newValue {
 #if DEBUG
                     print("Adaptive tab placement: \(newValue), sidebar available: \(isSidebarAvailable)")
 #endif
                     placement = newValue
                 }
+            }
+            .onChange(of: isActive, initial: true) { _, active in
+                if active, let resolvedPlacement { placement = resolvedPlacement }
             }
     }
 }
