@@ -101,6 +101,14 @@ struct MainTabView: View {
                                 Image(systemName: "message").foregroundStyle(.green)
                             }
                         }
+                        NavigationLink(value: "decision") {
+                            Label {
+                                VStack(alignment: .leading) {
+                                    Text("Decision").fontWeight(.bold).lineLimit(1)
+                                    Text("Classify and evaluate with decision models.").font(.caption).foregroundStyle(.secondary)
+                                }
+                            } icon: { Image(systemName: ModelCapabilityTag("decision").iconName).foregroundStyle(.orange) }
+                        }
                         NavigationLink(value: "image_generation") {
                             Label {
                                 VStack(alignment: .leading) {
@@ -121,6 +129,8 @@ struct MainTabView: View {
                     .navigationDestination(for: String.self) { destination in
                         if destination == "chat" {
                             ChatView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+                        } else if destination == "decision" {
+                            DecisionView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
                         } else if destination == "image_generation" {
                             ImageGenerationView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
                         }
@@ -145,6 +155,14 @@ struct MainTabView: View {
             }
             .hidden(usesGenerationTab && selection != "chat")
             
+            Tab("Decision", systemImage: ModelCapabilityTag("decision").iconName, value: "decision") {
+                NavigationStack {
+                    DecisionView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+                }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement))
+            }
+            .hidden(usesGenerationTab && selection != "decision")
+
             Tab("Image Generation", systemImage: "photo", value: "image_generation") {
                 NavigationStack {
                     ImageGenerationView(
@@ -166,7 +184,7 @@ struct MainTabView: View {
             }
         }
         .onChange(of: usesGenerationTab, initial: true) { _, grouped in
-            if grouped, let selection, selection == "chat" || selection == "image_generation" {
+            if grouped, let selection, ["chat", "decision", "image_generation"].contains(selection) {
                 generationPath = [selection]
                 self.selection = "generation"
             }

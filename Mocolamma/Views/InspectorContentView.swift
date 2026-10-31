@@ -7,6 +7,7 @@ struct InspectorContentView: View {
     @Environment(CommandExecutor.self) var commandExecutor
     @Environment(ChatSettings.self) var chatSettings
     @Environment(ImageGenerationSettings.self) var imageSettings
+    @Environment(DecisionSession.self) private var decisionSession
     let selection: String?
     @Binding var selectedModel: OllamaModel.ID?
     let sortedModels: [OllamaModel]
@@ -85,6 +86,14 @@ struct InspectorContentView: View {
                         .id("server_selection_placeholder")
                         .padding()
                 }
+            } else if selection == "decision" {
+                @Bindable var decisionSession = decisionSession
+                Form {
+                    Section("Decision Settings") {
+                        keepAlivePicker(option: $decisionSession.keepAliveOption, customValue: $decisionSession.customKeepAliveValue, customUnit: $decisionSession.customKeepAliveUnit)
+                    }
+                }
+                .formStyle(.grouped)
             } else if selection == "chat" {
                 Form {
                     Section("Chat Settings") {

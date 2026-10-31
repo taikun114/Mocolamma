@@ -36,6 +36,16 @@
 			<key>UTTypeIdentifier</key>
 			<string>design.taikun.Mocolamma.attachment-reorder</string>
 		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Decision Score Reorder Data</string>
+			<key>UTTypeIdentifier</key>
+			<string>design.taikun.Mocolamma.decision-score-reorder</string>
+		</dict>
 	</array>
 </dict>
 </plist>

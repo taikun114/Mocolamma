@@ -51,6 +51,10 @@ struct MainContentDetailView: View {
                 }
                 .environment(serverManager)
                 .environment(executor)
+            } else if sidebarSelection == "decision" {
+                NavigationStack {
+                    DecisionView(showingInspector: $showingInspector, onToggleInspector: { showingInspector.toggle() })
+                }
             } else if sidebarSelection == "image_generation" {
                 NavigationStack {
                     ImageGenerationView(

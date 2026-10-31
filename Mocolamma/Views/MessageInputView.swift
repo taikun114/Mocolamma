@@ -10,6 +10,8 @@ struct MessageInputView: View {
     @Binding var selectedAttachments: [ChatInputAttachment]
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
+    var attachmentOnly = false
+    var imagesOnly = false
     var placeholder: String = "Type your message..."
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
@@ -17,6 +19,8 @@ struct MessageInputView: View {
     
     init(
         inputText: Binding<String>,
+        attachmentOnly: Bool = false,
+        imagesOnly: Bool = false,
         selectedImages: Binding<[ChatInputImage]>,
         selectedAttachments: Binding<[ChatInputAttachment]> = .constant([]),
         isStreaming: Binding<Bool>,
@@ -26,6 +30,8 @@ struct MessageInputView: View {
         sendMessage: @escaping () -> Void,
         stopMessage: (() -> Void)? = nil
     ) {
+        self.attachmentOnly = attachmentOnly
+        self.imagesOnly = imagesOnly
         self._inputText = inputText
         self._selectedImages = selectedImages
         self._selectedAttachments = selectedAttachments
@@ -51,7 +57,7 @@ struct MessageInputView: View {
     /// 添付（ファイルまたは画像）が可能かどうかを判定します
     private var canAttach: Bool {
         guard let model = selectedModel else { return false }
-        return model.supportsCompletion || model.supportsVision || model.supportsAudio
+        return imagesOnly ? model.supportsVision : (attachmentOnly || model.supportsCompletion || model.supportsVision || model.supportsAudio)
     }
     
     /// 送信ボタンを無効化するかどうかを判定します
@@ -125,6 +131,25 @@ struct MessageInputView: View {
                     }
                 }
                 
+                if attachmentOnly {
+                    Button(imagesOnly ? "Add Images..." : "Add Files...", systemImage: "plus") {
+                        showingAttachSheet = true
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(Color.accentColor)
+#if os(iOS)
+                    .padding(.vertical, 4)
+#endif
+                    .disabled(!canAttach || isStreaming)
+                    .help(imagesOnly ? "Add images to evaluate." : "Add files to evaluate.")
+                    .attachFileConfirmationDialog(
+                        isPresented: $showingAttachSheet,
+                        showingFilePicker: $showingFilePicker,
+                        showingPhotoPicker: $showingPhotoPicker,
+                        supportsCompletion: true,
+                        supportsVision: selectedModel?.supportsVision == true
+                    )
+                } else {
                 HStack(alignment: .bottom) {
                 // プラスボタン (アクションシートを表示)
                 Button(action: {
@@ -354,6 +379,7 @@ struct MessageInputView: View {
 #endif
             }
         }
+        }
         .onChange(of: isStreaming) { _, streaming in
             if streaming {
                 if !stopCooldown.isLocked { stopCooldown.begin() }
@@ -396,7 +422,7 @@ struct MessageInputView: View {
         }
         .fileImporter(
             isPresented: $showingFilePicker,
-            allowedContentTypes: ChatInputAttachment.allowedContentTypes,
+            allowedContentTypes: imagesOnly ? [.image] : ChatInputAttachment.allowedContentTypes,
             allowsMultipleSelection: true
         ) { result in
             switch result {
@@ -549,6 +575,7 @@ struct MessageInputView: View {
     }
 
     private func addFiles(from urls: [URL]) {
+        let urls = imagesOnly ? urls.filter { (try? $0.resourceValues(forKeys: [.contentTypeKey]).contentType?.conforms(to: .image)) == true } : urls
         Task {
             for url in urls {
                 let accessing = url.startAccessingSecurityScopedResource()
@@ -646,6 +673,7 @@ struct MessageInputView: View {
     }
     
     private func handleDroppedURLs(_ urls: [URL]) {
+        if attachmentOnly { addFiles(from: urls); return }
         Task {
             var successCount = 0
             var failureCount = 0
