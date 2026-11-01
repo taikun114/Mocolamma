@@ -8,8 +8,8 @@ struct DecisionView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
-    @State private var buttonPosition: CGFloat = .infinity
-    @State private var buttonWidth: CGFloat?
+    @State private var buttonFrame: CGRect = .null
+    @State private var conditionRowFrame: CGRect = .null
     @State private var viewportFrame: CGRect = .zero
     @State private var showingResetConfirmation = false
     @State private var showingModeConfirmation = false
@@ -35,16 +35,20 @@ struct DecisionView: View {
             if isCompact || geometry.size.width < 760 {
                 compactContent
             } else {
-                HStack(alignment: .top, spacing: 0) {
+                DecisionColumns {
                     Form { inputSection; conditionsSection }
                     .formStyle(.grouped)
 #if os(iOS)
+                    .contentMargins(.trailing, 16, for: .scrollContent)
                     .scrollDismissesKeyboard(.interactively)
 #endif
                     .modifier(DecisionBottomBar { evaluateButton.padding() })
-                    Divider()
+                } results: {
                     ScrollViewReader { proxy in
                         Form { resultsSection }.formStyle(.grouped)
+#if os(iOS)
+                            .contentMargins(.leading, 16, for: .scrollContent)
+#endif
 #if !os(macOS)
                             .onChange(of: session.resultRevision) { _, _ in
                                 withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
@@ -138,10 +142,18 @@ struct DecisionView: View {
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
         .overlay(alignment: .bottom) {
             if isEvaluateButtonPinned {
-                evaluateButton
-                    .frame(width: buttonWidth)
-                    .padding(.horizontal, buttonWidth == nil ? 16 : 0)
-                    .frame(height: evaluateButtonAreaHeight, alignment: .center)
+                GeometryReader { overlayGeometry in
+                    let overlayFrame = overlayGeometry.frame(in: .global)
+                    let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
+                    evaluateButton
+                        .frame(width: targetFrame.isNull ? max(0, overlayGeometry.size.width - 32) : targetFrame.width)
+                        .frame(height: evaluateButtonAreaHeight, alignment: .center)
+                        .position(
+                            x: targetFrame.isNull ? overlayGeometry.size.width / 2 : targetFrame.midX - overlayFrame.minX,
+                            y: overlayGeometry.size.height - evaluateButtonAreaHeight / 2
+                        )
+                }
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
         }
         }
@@ -162,13 +174,12 @@ struct DecisionView: View {
             .allowsHitTesting(!isEvaluateButtonPinned)
             .accessibilityHidden(isEvaluateButtonPinned)
             .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
-                buttonPosition = $0.minY
-                buttonWidth = $0.width
+                buttonFrame = $0
             }
     }
 
     private var isEvaluateButtonPinned: Bool {
-        !buttonPosition.isFinite || buttonPosition - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
+        buttonFrame.isNull || buttonFrame.minY - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
     }
 
     @ToolbarContentBuilder
@@ -356,6 +367,14 @@ struct DecisionView: View {
         return Section("Decision Conditions") {
             DecisionConditionsEditor(conditions: $session.conditions)
                 .disabled(session.isRunning)
+#if os(iOS)
+                .listRowBackground(
+                    Color(uiColor: .secondarySystemGroupedBackground)
+                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
+                            conditionRowFrame = $0
+                        }
+                )
+#endif
         }
     }
 
