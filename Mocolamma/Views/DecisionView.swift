@@ -38,6 +38,9 @@ struct DecisionView: View {
                 DecisionColumns {
                     Form { inputSection; conditionsSection }
                     .formStyle(.grouped)
+#if os(visionOS)
+                    .environment(\.defaultMinListRowHeight, 0)
+#endif
 #if os(iOS)
                     .contentMargins(.trailing, 16, for: .scrollContent)
                     .scrollDismissesKeyboard(.interactively)
@@ -131,6 +134,9 @@ struct DecisionView: View {
             resultsSection
         }
         .formStyle(.grouped)
+#if os(visionOS)
+        .environment(\.defaultMinListRowHeight, 0)
+#endif
 #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
 #endif
@@ -145,12 +151,21 @@ struct DecisionView: View {
                 GeometryReader { overlayGeometry in
                     let overlayFrame = overlayGeometry.frame(in: .global)
                     let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
+#if os(visionOS)
+                    let bottomInset = targetFrame.isNull ? 16 : max(0, targetFrame.minX - overlayFrame.minX)
+#else
+                    let bottomInset: CGFloat = 0
+#endif
                     evaluateButton
                         .frame(width: targetFrame.isNull ? max(0, overlayGeometry.size.width - 32) : targetFrame.width)
+#if os(visionOS)
+                        .frame(height: evaluateButtonAreaHeight, alignment: .bottom)
+#else
                         .frame(height: evaluateButtonAreaHeight, alignment: .center)
+#endif
                         .position(
                             x: targetFrame.isNull ? overlayGeometry.size.width / 2 : targetFrame.midX - overlayFrame.minX,
-                            y: overlayGeometry.size.height - evaluateButtonAreaHeight / 2
+                            y: overlayGeometry.size.height - evaluateButtonAreaHeight / 2 - bottomInset
                         )
                 }
                 .ignoresSafeArea(.container, edges: .horizontal)
@@ -329,6 +344,9 @@ struct DecisionView: View {
 #else
                     inputModePicker
                     .pickerStyle(.menu)
+#if os(visionOS)
+                    .padding(.bottom, 10)
+#endif
 #endif
                 TextEditor(text: $session.input)
                     .font(session.isJSON ? .system(.body, design: .monospaced) : .body)
@@ -341,16 +359,33 @@ struct DecisionView: View {
                 if session.isJSONInvalid {
                     Text("Enter a valid JSON object or array.").font(.caption).foregroundStyle(.red)
                 }
-                MessageInputView(inputText: .constant(""), attachmentOnly: true, imagesOnly: session.isJSON,
-                                 selectedImages: $session.images, selectedAttachments: $session.attachments,
-                                 isStreaming: $session.isRunning, showingInspector: $showingInspector,
-                                 selectedModel: selectedModel, sendMessage: {})
+#if !os(visionOS)
+                decisionAttachments
 #if os(macOS)
                     .padding(.top, -2)
 #endif
+#endif
             }
             .disabled(session.isRunning)
+#if os(visionOS)
+            .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
+            .listRowSeparator(.hidden)
+#endif
+#if os(visionOS)
+            decisionAttachments
+                .disabled(session.isRunning)
+                .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0))
+                .listRowSeparator(.hidden)
+#endif
         }
+    }
+
+    private var decisionAttachments: some View {
+        @Bindable var session = session
+        return MessageInputView(inputText: .constant(""), attachmentOnly: true, imagesOnly: session.isJSON,
+                                selectedImages: $session.images, selectedAttachments: $session.attachments,
+                                isStreaming: $session.isRunning, showingInspector: $showingInspector,
+                                selectedModel: selectedModel, sendMessage: {})
     }
 
     private var inputModePicker: some View {
@@ -488,7 +523,11 @@ private struct DecisionResultFooter: View {
                             shareButton
                         }
                     }
+#if os(visionOS)
+                    .buttonStyle(.bordered)
+#else
                     .buttonStyle(.borderless)
+#endif
                     .disabled(session.result == nil || session.isRunning)
                     if let result = session.result {
                     VStack(alignment: .leading, spacing: 4) {
@@ -542,6 +581,7 @@ private struct DecisionProminentStyle: ViewModifier {
         }
 #else
         content.buttonStyle(.borderedProminent).controlSize(.extraLarge)
+            .tint(Color.accentColor)
 #endif
     }
 }

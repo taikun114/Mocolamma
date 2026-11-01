@@ -51,13 +51,25 @@ struct DecisionConditionEditor: View {
                         .foregroundStyle(.secondary)
                         .frame(width: disclosureWidth)
                 }
+#if os(visionOS)
+                .padding(.vertical, 20)
+                .padding(.horizontal, 16)
+#else
                 .padding(.vertical, 12)
+#endif
 #if os(iOS)
                 .frame(minHeight: 52)
 #endif
                 .contentShape(Rectangle())
             }
+#if os(visionOS)
+            .buttonStyle(DecisionConditionHeaderStyle())
+            .contentShape(.hoverEffect, Rectangle())
+            .hoverEffect(.highlight)
+            .padding(.horizontal, -16)
+#else
             .buttonStyle(.plain)
+#endif
             .help("Expand or collapse this condition")
             .accessibilityValue(condition.isExpanded ? String(localized: "Expanded") : String(localized: "Collapsed"))
             if condition.isExpanded {
@@ -123,7 +135,9 @@ struct DecisionConditionEditor: View {
                     .frame(maxWidth: .infinity)
 #if os(iOS)
                     .padding(.vertical, 16)
-#else
+#elseif os(visionOS)
+                    .padding(.vertical, 8)
+#elseif os(macOS)
                     .padding(.vertical, 12)
 #endif
                     .help("Delete this decision condition")
@@ -284,6 +298,15 @@ struct DecisionConditionEditor: View {
     }
 }
 
+#if os(visionOS)
+private struct DecisionConditionHeaderStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.6 : 1)
+    }
+}
+#endif
+
 private struct DecisionScoreEditMode: ViewModifier {
     func body(content: Content) -> some View {
 #if os(macOS)
@@ -425,7 +448,9 @@ struct DecisionConditionsEditor: View {
             .frame(maxWidth: .infinity)
 #if os(iOS)
             .padding(.vertical, 16)
-#else
+#elseif os(visionOS)
+            .padding(.vertical, 8)
+#elseif os(macOS)
             .padding(.vertical, 12)
 #endif
             .help("Add a decision condition")
