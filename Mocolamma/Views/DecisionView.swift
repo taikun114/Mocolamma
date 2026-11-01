@@ -332,10 +332,22 @@ struct DecisionView: View {
         .help(selectedModel.map { String(format: NSLocalizedString("Select Model (%@ Selected)", comment: "モデルが選択されている時のツールチップ。"), $0.name) } ?? String(localized: "Select Model"))
     }
 
+    private var decisionAttachmentSpacing: CGFloat {
+        if !session.images.isEmpty || !session.attachments.isEmpty || executor.isDraggingFile {
+            return 4
+        }
+#if os(macOS)
+        return 10
+#else
+        return 12
+#endif
+    }
+
     private var inputSection: some View {
         @Bindable var session = session
         return Section("Decision Content") {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: decisionAttachmentSpacing) {
+                VStack(alignment: .leading, spacing: 12) {
 #if os(macOS)
                     AdaptiveSegmentedPickerRow(title: "Content to Evaluate") {
                         inputModePicker
@@ -359,11 +371,9 @@ struct DecisionView: View {
                 if session.isJSONInvalid {
                     Text("Enter a valid JSON object or array.").font(.caption).foregroundStyle(.red)
                 }
+                }
 #if !os(visionOS)
                 decisionAttachments
-#if os(macOS)
-                    .padding(.top, -2)
-#endif
 #endif
             }
             .disabled(session.isRunning)

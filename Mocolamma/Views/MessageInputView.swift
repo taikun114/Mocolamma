@@ -70,6 +70,22 @@ struct MessageInputView: View {
         )
     }
     
+    private var attachmentPreviewHorizontalPadding: CGFloat {
+#if os(visionOS)
+        4
+#else
+        attachmentOnly ? 0 : 4
+#endif
+    }
+
+    private var attachmentPreviewHeight: CGFloat {
+#if os(visionOS)
+        76
+#else
+        attachmentOnly ? 68 : 76
+#endif
+    }
+
     var body: some View {
         @Bindable var executor = executor
         VStack(alignment: .leading, spacing: 8) {
@@ -92,9 +108,9 @@ struct MessageInputView: View {
                             }
 
                         }
-                        .padding(.horizontal, 4)
+                        .padding(.horizontal, attachmentPreviewHorizontalPadding)
                     }
-                    .frame(height: 76)
+                    .frame(height: attachmentPreviewHeight)
                     .scrollClipDisabled()
                     .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
                         items: $selectedImages,
