@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 @main
 struct MocolammaApp: App {
+    @FocusedValue(\.imagePreviewPresentation) private var imagePreviewPresentation
 #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 #endif
@@ -174,7 +175,7 @@ struct MocolammaApp: App {
                     }
                     .keyboardShortcut("0", modifiers: .command)
                 }
-                .disabled(executor.previewImage == nil)
+                .disabled(imagePreviewPresentation?.image == nil)
                 
                 Divider()
             }
@@ -290,7 +291,7 @@ struct MocolammaApp: App {
                     }
                     .keyboardShortcut("0", modifiers: .command)
                 }
-                .disabled(executor.previewImage == nil)
+                .disabled(imagePreviewPresentation?.image == nil)
                 
                 Divider()
             }

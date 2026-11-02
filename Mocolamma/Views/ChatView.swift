@@ -224,6 +224,7 @@ struct ChatView: View {
         .navigationTitle("Chat")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
+        .modifier(ImagePreviewPresenter(bottomInset: inputAreaHeight))
         .onAppear {
             if let current = chatSettings.selectedModelID, !executor.models.contains(where: { $0.id == current }) {
                 chatSettings.selectedModelID = nil
@@ -1284,6 +1285,7 @@ struct ImageGenerationView: View {
         .navigationTitle("Image Generation")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
+        .modifier(ImagePreviewPresenter(bottomInset: inputAreaHeight))
         .onAppear {
             if let current = imageSettings.selectedModelID, !executor.models.contains(where: { $0.id == current }) {
                 imageSettings.selectedModelID = nil

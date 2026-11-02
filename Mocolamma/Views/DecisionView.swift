@@ -99,6 +99,7 @@ struct DecisionView: View {
 #endif
         .modifier(NavSubtitleIfAvailable(subtitle: serverManager.selectedServer.map { Text(verbatim: $0.name) } ?? Text("No Server Selected")))
         .toolbar { toolbarContent }
+        .modifier(ImagePreviewPresenter())
         .confirmationDialog("Switch to JSON input and remove non-image attachments?", isPresented: $showingModeConfirmation, titleVisibility: .visible) {
             Button("Switch to JSON", role: .destructive) { session.attachments = []; session.isJSON = true }
             Button("Cancel", role: .cancel) { }

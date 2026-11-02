@@ -90,14 +90,7 @@ struct ChatMessagesView: View {
                     }
                 }
                 
-                if let image = executor.previewImage {
-                    ImagePreviewOverlay(image: image, onClose: {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            executor.previewImage = nil
-                        }
-                    }, bottomInset: bottomInset)
-                    .zIndex(100)
-                }
+
             }
             .contentShape(Rectangle())
 #if !os(macOS)
@@ -353,6 +346,7 @@ struct ChatMessagesScrollView: View {
 /// メッセージのリスト表示と高さ監視をカプセル化するビュー
 /// このビュー内での高さ変更による再描画を親（ScrollView）に波及させない
 struct MessagesList: View {
+    @Environment(\.imagePreviewPresentation) private var imagePreviewPresentation
     @Environment(CommandExecutor.self) var executor
     @Environment(ChatSettings.self) var chatSettings
     @Binding var messages: [ChatMessage]
@@ -376,7 +370,7 @@ struct MessagesList: View {
                     onRetry: onRetry,
                     onPreviewImage: { image in
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            executor.previewImage = image
+                            imagePreviewPresentation?.image = image
                         }
                     },
                     isOverallStreaming: $isOverallStreaming,

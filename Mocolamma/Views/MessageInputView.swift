@@ -3,6 +3,7 @@ import PhotosUI
 import UniformTypeIdentifiers
 
 struct MessageInputView: View {
+    @Environment(\.imagePreviewPresentation) private var imagePreviewPresentation
     @Environment(CommandExecutor.self) var executor
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var isInputFocused: Bool
@@ -588,7 +589,7 @@ struct MessageInputView: View {
                         .onTapGesture {
                             if let fullImage = PlatformImage(data: imageContainer.data) {
                                 withAnimation(.easeInOut(duration: 0.2)) {
-                                    executor.previewImage = fullImage
+                                    imagePreviewPresentation?.image = fullImage
                                 }
                             }
                         }

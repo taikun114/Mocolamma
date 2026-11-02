@@ -236,13 +236,11 @@ struct MainTabView: View {
             Task { @MainActor in
 #if os(visionOS)
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    executor.previewImage = nil
                     if newSelection == "settings" && showingInspector {
                         showingInspector = false
                     }
                 }
 #else
-                executor.previewImage = nil
                 if newSelection == "settings" && showingInspector {
                     showingInspector = false
                 }
