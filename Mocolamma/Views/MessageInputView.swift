@@ -77,7 +77,9 @@ struct MessageInputView: View {
     }
     
     private var attachmentPreviewHorizontalPadding: CGFloat {
-#if os(visionOS)
+#if os(macOS)
+        0
+#elseif os(visionOS)
         4
 #else
         attachmentOnly ? 0 : 4
@@ -85,10 +87,28 @@ struct MessageInputView: View {
     }
 
     private var attachmentPreviewHeight: CGFloat {
-#if os(visionOS)
+#if os(macOS)
+        68
+#elseif os(visionOS)
         76
 #else
         attachmentOnly ? 68 : 76
+#endif
+    }
+
+    private var attachmentTilePadding: CGFloat {
+#if os(macOS)
+        attachmentOnly ? 8 : 4
+#else
+        8
+#endif
+    }
+
+    private var attachmentPreviewBottomPadding: CGFloat {
+#if os(macOS)
+        attachmentOnly ? 0 : 4
+#else
+        0
 #endif
     }
 
@@ -134,6 +154,7 @@ struct MessageInputView: View {
 
                         }
                         .padding(.horizontal, attachmentPreviewHorizontalPadding)
+                        .padding(.bottom, attachmentPreviewBottomPadding)
                     }
                     .frame(height: attachmentPreviewHeight)
                     .scrollClipDisabled()
@@ -608,8 +629,8 @@ struct MessageInputView: View {
                 .buttonStyle(.plain)
                 .offset(x: -8, y: -8)
             }
-            .padding(.top, 8)
-            .padding(.leading, 8)
+            .padding(.top, attachmentTilePadding)
+            .padding(.leading, attachmentTilePadding)
             }
             .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
 #if os(macOS)
@@ -666,8 +687,8 @@ struct MessageInputView: View {
                 .buttonStyle(.plain)
                 .offset(x: -8, y: -8)
             }
-            .padding(.top, 8)
-            .padding(.leading, 8)
+            .padding(.top, attachmentTilePadding)
+            .padding(.leading, attachmentTilePadding)
             }
             .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
 #if os(macOS)

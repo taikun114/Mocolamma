@@ -112,7 +112,11 @@ struct ChatView: View {
         } stopMessage: {
             stopChatStreaming()
         }
-#if !os(visionOS)
+#if os(macOS)
+        .padding(.horizontal)
+        .padding(.bottom)
+        .padding(.top, (!executor.chatInputImages.isEmpty || !executor.chatInputAttachments.isEmpty) ? 8 : 16)
+#elseif !os(visionOS)
         .padding()
 #endif
 #if os(visionOS)
@@ -1173,7 +1177,11 @@ struct ImageGenerationView: View {
             executor.isImageStreaming = false
             executor.cancelImageGeneration()
         }
-#if !os(visionOS)
+#if os(macOS)
+        .padding(.horizontal)
+        .padding(.bottom)
+        .padding(.top, executor.imageInputImages.isEmpty ? 16 : 8)
+#elseif !os(visionOS)
         .padding()
 #endif
 #if os(visionOS)
