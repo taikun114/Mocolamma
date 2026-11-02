@@ -82,6 +82,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve the send button to remain disabled for 1 second after sending a message**
   - This prevents accidental cancellation immediately after sending, such as when double-clicking or double-tapping the send button.
 - **Improve attachment display on macOS**
+- **Improve performance when attaching image files via drag and drop**
 
 #### Chat
 - **Improve PDF file processing**

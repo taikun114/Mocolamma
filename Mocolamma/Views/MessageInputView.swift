@@ -734,11 +734,7 @@ struct MessageInputView: View {
         let urls = imagesOnly ? urls.filter { (try? $0.resourceValues(forKeys: [.contentTypeKey]).contentType?.conforms(to: .image)) == true } : urls
         Task {
             for url in urls {
-                let accessing = url.startAccessingSecurityScopedResource()
-                let data = try? Data(contentsOf: url)
-                if accessing {
-                    url.stopAccessingSecurityScopedResource()
-                }
+                let data = await AttachmentInputLoader.read(from: url)
                 
                 guard let data = data else { continue }
                 
@@ -784,7 +780,7 @@ struct MessageInputView: View {
                         }
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000)
-                } else if PlatformImage(data: data) != nil {
+                } else if await AttachmentInputLoader.isImage(data) {
                     // 画像ファイルの場合: 即座にスピナー付きプレースホルダーを追加
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
@@ -835,11 +831,7 @@ struct MessageInputView: View {
             var failureCount = 0
             
             for url in urls {
-                let accessing = url.startAccessingSecurityScopedResource()
-                let data = try? Data(contentsOf: url)
-                if accessing {
-                    url.stopAccessingSecurityScopedResource()
-                }
+                let data = await AttachmentInputLoader.read(from: url)
                 
                 guard let data = data else {
                     failureCount += 1
@@ -889,7 +881,7 @@ struct MessageInputView: View {
                         }
                     }
                     successCount += 1
-                } else if PlatformImage(data: data) != nil {
+                } else if await AttachmentInputLoader.isImage(data) {
                     // 画像ファイルの場合はモデルのVision対応有無に関わらず画像サムネイルとして追加
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
@@ -987,7 +979,7 @@ struct MessageInputView: View {
                         }
                     }
                     try? await Task.sleep(nanoseconds: 20_000_000)
-                } else if PlatformImage(data: urlData) != nil {
+                } else if await AttachmentInputLoader.isImage(urlData) {
                     let placeholderId = UUID()
                     let task = Task<ChatInputImage?, Never> {
                         await ChatInputImage.create(from: urlData, id: placeholderId)
