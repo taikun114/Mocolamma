@@ -10,6 +10,7 @@ The order of listing is as follows (1.3.0 or later):
   - Chat and Image Generation
   - Chat
   - Image Generation
+  - Decision
 - Bug Fixes and Improvements
   - General
   - Server
@@ -17,6 +18,7 @@ The order of listing is as follows (1.3.0 or later):
   - Chat and Image Generation
   - Chat
   - Image Generation
+  - Decision
 
 Each section lists items in the following order:
 - Notable Information
@@ -47,6 +49,10 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 ## 1.5.0
 ### New Features
+#### General
+- **Support decision functionality**
+  - You can now evaluate text and image content using models that support decision-making.
+
 #### Model
 - **Support speech model tag**
   - Speech models are displayed as "Speech Generation".
