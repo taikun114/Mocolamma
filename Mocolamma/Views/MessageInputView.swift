@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct MessageInputView: View {
     @Environment(CommandExecutor.self) var executor
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var isInputFocused: Bool
     @Binding var inputText: String
     @Binding var selectedImages: [ChatInputImage]
@@ -16,6 +17,7 @@ struct MessageInputView: View {
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
     var stopMessage: (() -> Void)? = nil
+    var attachmentDropContext: AttachmentDropContext?
     
     init(
         inputText: Binding<String>,
@@ -28,7 +30,8 @@ struct MessageInputView: View {
         placeholder: String = "Type your message...",
         selectedModel: OllamaModel?,
         sendMessage: @escaping () -> Void,
-        stopMessage: (() -> Void)? = nil
+        stopMessage: (() -> Void)? = nil,
+        attachmentDropContext: AttachmentDropContext? = nil
     ) {
         self.attachmentOnly = attachmentOnly
         self.imagesOnly = imagesOnly
@@ -41,6 +44,7 @@ struct MessageInputView: View {
         self.selectedModel = selectedModel
         self.sendMessage = sendMessage
         self.stopMessage = stopMessage
+        self.attachmentDropContext = attachmentDropContext
     }
     
     // 添付オプション関連の状態
@@ -48,6 +52,7 @@ struct MessageInputView: View {
     @State private var showingAttachSheet = false
     @State private var showingPhotoPicker = false
     @State private var showingFilePicker = false
+    @State private var attachmentDragScope = UUID()
     @State private var draggingItem: ChatInputImage?
     @State private var draggingAttachment: ChatInputAttachment?
     @State private var isDraggingOver = false
@@ -86,12 +91,31 @@ struct MessageInputView: View {
 #endif
     }
 
+    private var isAttachmentDropActive: Bool {
+        attachmentDropContext?.isExternalDragActive == true || executor.isDraggingFile
+    }
+
+    private var attachmentDropHint: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.accentColor.opacity(0.15))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [5]))
+                }
+            Label("Drop here to add files", systemImage: "plus.circle.fill")
+                .font(.system(.body, design: .rounded).bold())
+                .foregroundStyle(Color.accentColor)
+                .padding(8)
+        }
+    }
+
     var body: some View {
         @Bindable var executor = executor
         VStack(alignment: .leading, spacing: 8) {
                 // 添付ファイル＆画像プレビュー
                 let hasPreviewItems = !selectedImages.isEmpty || !selectedAttachments.isEmpty
-                if hasPreviewItems || executor.isDraggingFile {
+                if hasPreviewItems {
                     ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ChatAttachmentGroups(
@@ -112,7 +136,7 @@ struct MessageInputView: View {
                     }
                     .frame(height: attachmentPreviewHeight)
                     .scrollClipDisabled()
-                    .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
+                    .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(
                         items: $selectedImages,
                         isDraggingOver: $isDraggingOver,
                         executor: executor,
@@ -121,30 +145,20 @@ struct MessageInputView: View {
                         onDataDropped: { addImages(from: $0) }
                     ))
                     .overlay {
-                        if executor.isDraggingFile {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.accentColor.opacity(0.15))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [5]))
-                                    )
-                                    .background(isDraggingOver ? Color.accentColor.opacity(0.1) : Color.clear)
-                                
-                                HStack {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.title3)
-                                    Text("Drop here to add files")
-                                        .font(.system(.body, design: .rounded))
-                                        .fontWeight(.bold)
-                                }
-                                .foregroundColor(.accentColor)
-                            }
-                            .padding(.top, 8)
-                            .padding(.horizontal, 4)
-                            .allowsHitTesting(false)
+                        if isAttachmentDropActive {
+                            attachmentDropHint
+                                .padding(.top, 8)
+                                .padding(.horizontal, 4)
+                                .allowsHitTesting(false)
+                                .transition(.opacity)
                         }
                     }
+                } else if isAttachmentDropActive {
+                    attachmentDropHint
+                        .frame(maxWidth: .infinity)
+                        .frame(height: attachmentPreviewHeight)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
                 }
                 
                 if attachmentOnly {
@@ -413,10 +427,18 @@ struct MessageInputView: View {
             guard !Task.isCancelled else { return }
             stopCooldown.release(ifDeadline: deadline)
         }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: isAttachmentDropActive)
         .opacity(selectedModel == nil ? 0.5 : 1.0)
         .allowsHitTesting(selectedModel != nil)
         .background(Color.clear)
-        .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(
+        .onChange(of: attachmentDropContext?.request?.id) { _, _ in
+            guard let request = attachmentDropContext?.request else { return }
+            attachmentDropContext?.request = nil
+            if !request.urls.isEmpty { handleDroppedURLs(request.urls) }
+            if !request.imageData.isEmpty { addImages(from: request.imageData) }
+            if let source = request.sourceID { moveAttachment(source, to: request.location) }
+        }
+        .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(
             items: $selectedImages,
             isDraggingOver: $isDraggingOver,
             executor: executor,
@@ -471,8 +493,79 @@ struct MessageInputView: View {
     }
 
     @ViewBuilder
+    private func isolatedAttachmentTile<Content: View>(id: UUID, isImage: Bool, @ViewBuilder content: @escaping () -> Content) -> some View {
+#if os(iOS) || os(visionOS)
+        AttachmentDragTile(id: id, scope: attachmentDropContext?.scope ?? attachmentDragScope, canMove: { source in
+            if isImage { return selectedImages.contains { $0.id == source } }
+            guard let sourceItem = selectedAttachments.first(where: { $0.id == source }),
+                  let targetItem = selectedAttachments.first(where: { $0.id == id }) else { return false }
+            return sourceItem.isAudio == targetItem.isAudio
+        }, move: { source in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                if isImage {
+                    guard let from = selectedImages.firstIndex(where: { $0.id == source }),
+                          let to = selectedImages.firstIndex(where: { $0.id == id }) else { return }
+                    selectedImages.move(fromOffsets: IndexSet(integer: from), toOffset: from < to ? to + 1 : to)
+                } else {
+                    guard let from = selectedAttachments.firstIndex(where: { $0.id == source }),
+                          let to = selectedAttachments.firstIndex(where: { $0.id == id }) else { return }
+                    selectedAttachments.move(fromOffsets: IndexSet(integer: from), toOffset: from < to ? to + 1 : to)
+                }
+            }
+        }, onBegin: {
+#if os(visionOS)
+            draggingItem = isImage ? selectedImages.first(where: { $0.id == id }) : nil
+            draggingAttachment = isImage ? nil : selectedAttachments.first(where: { $0.id == id })
+#endif
+        }, onEnd: {
+#if os(visionOS)
+            draggingItem = nil
+            draggingAttachment = nil
+            isDraggingOver = false
+#endif
+        }, content: content)
+        .frame(width: 68, height: 68)
+        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+            attachmentDropContext?.tileFrames[id] = frame
+        }
+        .onDisappear { attachmentDropContext?.tileFrames[id] = nil }
+#else
+        content()
+#endif
+    }
+
+    private func moveAttachment(_ source: UUID, to location: CGPoint) {
+        guard let context = attachmentDropContext else { return }
+        let sourceImage = selectedImages.contains { $0.id == source }
+        let sourceFile = selectedAttachments.first { $0.id == source }
+        let candidates = context.tileFrames.filter { id, frame in
+            guard frame.insetBy(dx: 0, dy: -16).minY <= location.y,
+                  frame.insetBy(dx: 0, dy: -16).maxY >= location.y else { return false }
+            if sourceImage { return selectedImages.contains { $0.id == id } }
+            return selectedAttachments.contains { $0.id == id && $0.isAudio == sourceFile?.isAudio }
+        }
+        guard let target = candidates.min(by: { abs($0.value.midX - location.x) < abs($1.value.midX - location.x) })?.key,
+              target != source else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if sourceImage {
+                guard let from = selectedImages.firstIndex(where: { $0.id == source }),
+                      let to = selectedImages.firstIndex(where: { $0.id == target }) else { return }
+                selectedImages.move(fromOffsets: IndexSet(integer: from), toOffset: from < to ? to + 1 : to)
+            } else {
+                guard let from = selectedAttachments.firstIndex(where: { $0.id == source }),
+                      let to = selectedAttachments.firstIndex(where: { $0.id == target }) else { return }
+                selectedAttachments.move(fromOffsets: IndexSet(integer: from), toOffset: from < to ? to + 1 : to)
+            }
+        }
+#if DEBUG
+        print("Attachment drop: applied screen reorder")
+#endif
+    }
+
+    @ViewBuilder
     private var editableImageTiles: some View {
         ForEach(selectedImages) { imageContainer in
+            isolatedAttachmentTile(id: imageContainer.id, isImage: true) {
             ZStack(alignment: .topLeading) {
                 if imageContainer.isLoading {
                     RoundedRectangle(cornerRadius: 8)
@@ -516,12 +609,28 @@ struct MessageInputView: View {
             }
             .padding(.top, 8)
             .padding(.leading, 8)
+            }
             .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+#if os(macOS)
             .onDrag {
                 self.draggingAttachment = nil
                 self.draggingItem = imageContainer
                 return AttachmentReorderDrag.provider(for: imageContainer.id)
+            } preview: {
+                if let image = imageContainer.thumbnail {
+                    Image(platformImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.15))
+                        .frame(width: 60, height: 60)
+                }
             }
+#endif
+#if os(macOS)
             .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: ImageDropDelegate(
                 item: imageContainer,
                 items: $selectedImages,
@@ -532,12 +641,14 @@ struct MessageInputView: View {
                 onURLsDropped: { handleDroppedURLs($0) },
                 onDataDropped: { addImages(from: $0) }
             ))
+#endif
         }
     }
 
     @ViewBuilder
     private func editableAttachmentTiles(isAudio: Bool) -> some View {
         ForEach(selectedAttachments.filter { $0.isAudio == isAudio }) { attachment in
+            isolatedAttachmentTile(id: attachment.id, isImage: false) {
             ZStack(alignment: .topLeading) {
                 FileAttachmentTileView(attachment: attachment, size: 60)
 
@@ -556,12 +667,18 @@ struct MessageInputView: View {
             }
             .padding(.top, 8)
             .padding(.leading, 8)
+            }
             .transition(.scale(0.5).combined(with: .opacity).combined(with: .blurReplace))
+#if os(macOS)
             .onDrag {
                 self.draggingItem = nil
                 self.draggingAttachment = attachment
                 return AttachmentReorderDrag.provider(for: attachment.id)
+            } preview: {
+                FileAttachmentTileView(attachment: attachment, size: 60)
             }
+#endif
+#if os(macOS)
             .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AttachmentDropDelegate(
                 item: attachment,
                 items: $selectedAttachments,
@@ -573,6 +690,7 @@ struct MessageInputView: View {
                 onURLsDropped: { handleDroppedURLs($0) },
                 onDataDropped: { addImages(from: $0) }
             ))
+#endif
         }
     }
 

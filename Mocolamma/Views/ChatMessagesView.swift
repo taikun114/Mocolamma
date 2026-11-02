@@ -111,7 +111,7 @@ struct ChatMessagesView: View {
             .environment(selectionCoordinator)
             .modifier(TextSelectionCoordination())
         }
-        .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
+        .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
     }
 }
 

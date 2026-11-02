@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct DecisionView: View {
     @Environment(DecisionSession.self) private var session
@@ -15,6 +16,8 @@ struct DecisionView: View {
     @State private var showingModeConfirmation = false
     @State private var showingVisionWarning = false
     @State private var showingVisionPDFWarning = false
+    @State private var attachmentDropContext = AttachmentDropContext()
+    @State private var attachmentDropFrame: CGRect = .zero
     private var modelSettings = ModelSettingsManager.shared
 
     private var isCompact: Bool {
@@ -25,6 +28,13 @@ struct DecisionView: View {
 #endif
     }
     private var selectedModel: OllamaModel? { executor.models.first { $0.id == session.selectedModelID } }
+    private var screenDropTypes: [UTType] {
+#if os(visionOS)
+        AttachmentReorderDrag.acceptedContentTypes
+#else
+        AttachmentReorderDrag.externalContentTypes
+#endif
+    }
     private var models: [OllamaModel] {
         executor.models.filter { $0.capabilities?.contains("decision") == true }
             .sorted(using: modelSettings.sortOrder(forChat: true))
@@ -51,7 +61,7 @@ struct DecisionView: View {
                         Form { resultsSection }.formStyle(.grouped)
 #if os(iOS)
                             .contentMargins(.leading, 16, for: .scrollContent)
-#endif
+        #endif
 #if !os(macOS)
                             .onChange(of: session.resultRevision) { _, _ in
                                 withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
@@ -61,16 +71,34 @@ struct DecisionView: View {
                 }
             }
         }
+#if os(visionOS)
+        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { attachmentDropFrame = $0 }
+        .onDrop(of: screenDropTypes, delegate: AttachmentScreenDropDelegate(
+            context: attachmentDropContext, origin: attachmentDropFrame.origin,
+            isEnabled: !session.isRunning && selectedModel != nil && (!session.isJSON || selectedModel?.supportsVision == true),
+            executor: executor
+        ))
+#endif
+#if os(iOS)
+        .background {
+            ExternalAttachmentDropBridge(context: attachmentDropContext, executor: executor,
+                                         isEnabled: !session.isRunning && selectedModel != nil && (!session.isJSON || selectedModel?.supportsVision == true))
+        }
+        .overlay {
+            if attachmentDropContext.isExternalDragActive {
+                ExternalAttachmentDropBridge(context: attachmentDropContext, executor: executor,
+                                             isEnabled: !session.isRunning && selectedModel != nil && (!session.isJSON || selectedModel?.supportsVision == true),
+                                             capturesDrop: true)
+            }
+        }
+        .onDisappear { attachmentDropContext.isExternalDragActive = false }
+#endif
         .navigationTitle("Decision")
 #if os(iOS)
         .navigationBarTitleDisplayMode(isCompact ? .automatic : .inline)
 #endif
         .modifier(NavSubtitleIfAvailable(subtitle: serverManager.selectedServer.map { Text(verbatim: $0.name) } ?? Text("No Server Selected")))
         .toolbar { toolbarContent }
-        .confirmationDialog("Reset decision input and results?", isPresented: $showingResetConfirmation, titleVisibility: .visible) {
-            Button("New Decision", role: .destructive) { session.reset() }
-            Button("Cancel", role: .cancel) { }
-        }
         .confirmationDialog("Switch to JSON input and remove non-image attachments?", isPresented: $showingModeConfirmation, titleVisibility: .visible) {
             Button("Switch to JSON", role: .destructive) { session.attachments = []; session.isJSON = true }
             Button("Cancel", role: .cancel) { }
@@ -259,6 +287,10 @@ struct DecisionView: View {
         Button { showingResetConfirmation = true } label: { Label("New Decision", systemImage: "square.and.pencil") }
             .help("Reset decision input and results")
             .disabled(!session.hasDraft && !session.isRunning)
+            .confirmationDialog("Reset decision input and results?", isPresented: $showingResetConfirmation, titleVisibility: .visible) {
+                Button("New Decision", role: .destructive) { session.reset() }
+                Button("Cancel", role: .cancel) { }
+            }
     }
 
     private var modelPicker: some View {
@@ -333,7 +365,7 @@ struct DecisionView: View {
     }
 
     private var decisionAttachmentSpacing: CGFloat {
-        if !session.images.isEmpty || !session.attachments.isEmpty || executor.isDraggingFile {
+        if !session.images.isEmpty || !session.attachments.isEmpty {
             return 4
         }
 #if os(macOS)
@@ -395,7 +427,8 @@ struct DecisionView: View {
         return MessageInputView(inputText: .constant(""), attachmentOnly: true, imagesOnly: session.isJSON,
                                 selectedImages: $session.images, selectedAttachments: $session.attachments,
                                 isStreaming: $session.isRunning, showingInspector: $showingInspector,
-                                selectedModel: selectedModel, sendMessage: {})
+                                selectedModel: selectedModel, sendMessage: {},
+                                attachmentDropContext: attachmentDropContext)
     }
 
     private var inputModePicker: some View {

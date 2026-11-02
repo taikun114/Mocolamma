@@ -237,7 +237,7 @@ struct ChatView: View {
                 performSendMessage(model: model)
             }
         }
-        .onDrop(of: AttachmentReorderDrag.acceptedContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true || currentSelectedModel?.supportsAudio == true))
+        .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: currentSelectedModel?.supportsCompletion == true || currentSelectedModel?.supportsVision == true || currentSelectedModel?.supportsAudio == true))
         .task {
             // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
             if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {

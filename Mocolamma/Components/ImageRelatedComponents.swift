@@ -5,10 +5,11 @@ import UniformTypeIdentifiers
 /// アプリ内の並べ替えドラッグを、外部ファイルの追加と区別します。
 enum AttachmentReorderDrag {
     static let contentType = UTType(exportedAs: "design.taikun.Mocolamma.attachment-reorder", conformingTo: .data)
-    static let acceptedContentTypes: [UTType] = [contentType, .fileURL, .image, .text]
+    static let externalContentTypes: [UTType] = [.fileURL, .image, .text]
+    static let acceptedContentTypes: [UTType] = [contentType] + externalContentTypes
 
-    static func provider(for id: UUID) -> NSItemProvider {
-        let provider = NSItemProvider(object: id.uuidString as NSString)
+    static func provider(for id: UUID, includesText: Bool = true) -> NSItemProvider {
+        let provider = includesText ? NSItemProvider(object: id.uuidString as NSString) : NSItemProvider()
         provider.registerDataRepresentation(forTypeIdentifier: contentType.identifier, visibility: .ownProcess) { completion in
             completion(Data(id.uuidString.utf8), nil)
             return nil
