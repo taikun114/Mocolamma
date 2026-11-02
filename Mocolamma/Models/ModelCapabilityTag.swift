@@ -12,14 +12,14 @@ struct ModelCapabilityTag {
     var sortOrder: Int {
         switch normalizedValue {
         case "completion": return 1
-        case "thinking": return 2
-        case "tools": return 3
-        case "vision": return 4
-        case "audio": return 5
-        case "embedding": return 6
-        case "image": return 7
-        case "speech": return 8
-        case "decision": return 9
+        case "image": return 2
+        case "speech": return 3
+        case "embedding": return 4
+        case "decision": return 5
+        case "thinking": return 6
+        case "tools": return 7
+        case "vision": return 8
+        case "audio": return 9
         default: return 100
         }
     }

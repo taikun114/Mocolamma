@@ -182,7 +182,9 @@ struct ModelInspectorView: View {
                 }
                 
                 // 機能セクション
-                let capabilities = response?.capabilities?.compactMap { nonEmptyString($0) } ?? []
+                let capabilities = (response?.capabilities?.compactMap { nonEmptyString($0) } ?? []).sorted {
+                    ModelCapabilityTag($0).sortOrder < ModelCapabilityTag($1).sortOrder
+                }
                 if !capabilities.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {

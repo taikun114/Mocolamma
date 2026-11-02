@@ -75,6 +75,8 @@ In version 1.2.2 or earlier, it was listed as follows:
     - Vision → Image Input
     - Audio → Audio Input
     - Image → Image Generation
+- **Improve tag order**
+  - Tags are now displayed in the order of main generation features → additional capabilities → supported inputs. In this version, the order is Text Generation, Image Generation, Speech Generation, Embedding, Decision, Thinking, Tool Calling, Image Input, and Audio Input.
 
 #### Chat and Image Generation
 - **Improve the send button to remain disabled for 1 second after sending a message**
