@@ -62,11 +62,9 @@ struct DecisionView: View {
 #if os(iOS)
                             .contentMargins(.leading, 16, for: .scrollContent)
         #endif
-#if !os(macOS)
                             .onChange(of: session.resultRevision) { _, _ in
                                 withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
                             }
-#endif
                     }
                 }
             }
@@ -177,11 +175,9 @@ struct DecisionView: View {
 #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
 #endif
-#if !os(macOS)
         .onChange(of: session.resultRevision) { _, _ in
             withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
         }
-#endif
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
         .overlay(alignment: .bottom) {
             if isEvaluateButtonPinned {
@@ -529,10 +525,11 @@ struct DecisionView: View {
                     .frame(maxWidth: .infinity, minHeight: 100)
             }
         } header: {
-            Text("Decision Results").id("decision-results")
+            Text("Decision Results")
         } footer: {
             DecisionResultFooter(session: session, resultText: resultText, resultJSON: resultJSON, copy: copy)
         }
+        .id("decision-results")
     }
 
     private var resultText: String {
