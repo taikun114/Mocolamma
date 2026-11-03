@@ -12,6 +12,7 @@ struct DecisionView: View {
     @State private var buttonFrame: CGRect = .null
     @State private var conditionRowFrame: CGRect = .null
     @State private var viewportFrame: CGRect = .zero
+    @State private var isDecisionVisible = false
     @State private var showingResetConfirmation = false
     @State private var showingModeConfirmation = false
     @State private var showingVisionWarning = false
@@ -135,10 +136,14 @@ struct DecisionView: View {
         }
         .onChange(of: executor.modelRequestContext) { _, _ in session.cancel(); session.selectedModelID = nil; session.result = nil; session.error = nil }
         .onAppear {
+            isDecisionVisible = true
             if let id = session.selectedModelID, !executor.models.contains(where: { $0.id == id }) { session.selectedModelID = nil }
+            startScreenshotDecisionIfNeeded()
         }
+        .onDisappear { isDecisionVisible = false }
         .onChange(of: executor.models) { _, models in
             if let id = session.selectedModelID, !models.contains(where: { $0.id == id }) { session.selectedModelID = nil }
+            startScreenshotDecisionIfNeeded()
         }
         .task {
             if serverManager.selectedServer != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
@@ -527,6 +532,17 @@ struct DecisionView: View {
         .disabled(!session.isRunning && (selectedModel.map { !session.canEvaluate(model: $0) } ?? true || executor.apiBaseURL == nil))
         .help(session.isRunning ? "Cancel the current decision" : "Evaluate the content using the selected conditions")
         .accessibilityIdentifier("decision_evaluate")
+    }
+
+    private func startScreenshotDecisionIfNeeded() {
+        guard ScreenshotConfiguration.isEnabled, isDecisionVisible, !session.hasDraft, !session.isRunning,
+              let baseURL = executor.apiBaseURL,
+              let model = models.first(where: { $0.name == ScreenshotConfiguration.decisionModelName }) else { return }
+        let preset = ScreenshotConfiguration.decisionPreset
+        session.selectedModelID = model.id
+        session.input = preset.input
+        session.conditions = preset.conditions
+        evaluate(baseURL: baseURL, model: model)
     }
 
     private func evaluateSkippingImages() {

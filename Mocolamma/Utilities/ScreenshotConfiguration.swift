@@ -7,6 +7,38 @@ enum ScreenshotConfiguration {
             : "こんにちは。あなたが得意なことを1つ教えてください。"
     }
 
+    static let decisionModelName = "d3:4b"
+
+    struct DecisionPreset {
+        let input: String
+        let conditions: [DecisionCondition]
+    }
+
+    static var decisionPreset: DecisionPreset {
+        decisionPreset(language: Locale.preferredLanguages.first ?? "ja")
+    }
+
+    static func decisionPreset(language: String) -> DecisionPreset {
+        if language.hasPrefix("en") {
+            return DecisionPreset(
+                input: "The app suddenly crashes a few seconds after launch. Reinstalling it does not help, and it worked without any issues in the previous version. The app is currently completely unusable.",
+                conditions: [
+                    DecisionCondition(instructions: "Classify this report.", options: ["Bug report", "Feature request", "Suggestion"]),
+                    DecisionCondition(instructions: "Is this a report about a crash?", kind: .noul),
+                    DecisionCondition(instructions: "Evaluate the severity of this issue.", kind: .score, options: ["Minor", "Low", "Medium", "High", "Critical"])
+                ]
+            )
+        }
+        return DecisionPreset(
+            input: "アプリを起動すると、数秒後に突然クラッシュしてしまいます。再インストールしても改善せず、以前のバージョンでは問題なく動作していました。現在、アプリをまったく使用できない状態です。",
+            conditions: [
+                DecisionCondition(instructions: "この報告を分類してください。", options: ["バグ報告", "新機能の要望", "提案"]),
+                DecisionCondition(instructions: "これはクラッシュに関する報告ですか？", kind: .noul),
+                DecisionCondition(instructions: "この問題の深刻度を評価してください。", kind: .score, options: ["軽微", "低", "中", "高", "重大"])
+            ]
+        )
+    }
+
     static var isEnabled: Bool {
 #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-ScreenshotMode")
