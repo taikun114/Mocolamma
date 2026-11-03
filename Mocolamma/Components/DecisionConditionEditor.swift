@@ -255,7 +255,11 @@ struct DecisionConditionEditor: View {
                     }
                 } label: { Image(systemName: "xmark") }
                 .buttonStyle(.borderless)
+#if os(macOS)
+                .padding(.leading, 2)
+#else
                 .padding(.leading, 4)
+#endif
                 .help("Remove option")
             }
         }
