@@ -176,7 +176,7 @@ struct ContentView: View {
         }
         .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
-        .onChange(of: serverManager.selectedServerID) { _, _ in handleActiveServerChange() }
+        .onChange(of: executor.modelRequestContext) { _, _ in handleActiveServerChange() }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
         }
@@ -185,8 +185,8 @@ struct ContentView: View {
     // MARK: - Event Handlers
     
     private func handleActiveServerChange() {
-        executor.resetInitialFetchFlag()
-        executor.models = [] // モデルリストを一旦クリアして「読み込み中」を表示させる
+        executor.invalidateModelRequests()
+        selectedModel = nil
         Task {
             await executor.fetchOllamaModelsFromAPI()
         }
@@ -324,6 +324,7 @@ struct ContentView: View {
                 executor.pullStatus = NSLocalizedString("Preparing...", comment: "プルステータス: 準備中。")
                 executor.clearModelInfoCache()
                 let previousSelection = selectedModel
+                let context = executor.modelRequestContext
                 let selectedServerID = serverManager.selectedServerID
                 selectedModel = nil
                 
@@ -335,6 +336,7 @@ struct ContentView: View {
                 
                 // 明示的なリフレッシュ（ボタン押しなど）の場合はフラグを無視して取得
                 await executor.fetchOllamaModelsFromAPI()
+                guard !Task.isCancelled, executor.modelRequestContext == context else { return }
                 
                 if let sid = selectedServerID, let host = serverManager.servers.first(where: { $0.id == sid })?.host {
                     let status = await executor.checkAPIConnectivity(host: host)
@@ -343,6 +345,7 @@ struct ContentView: View {
                     }
                 }
                 
+                guard !Task.isCancelled, executor.modelRequestContext == context else { return }
                 await MainActor.run {
                     serverManager.inspectorRefreshToken = UUID()
                     NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)

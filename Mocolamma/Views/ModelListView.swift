@@ -667,7 +667,9 @@ struct ModelListContentView: View {
         .sheet(item: $modelForCustomKeepAlive) { model in
             CustomKeepAliveSheet(modelName: model.name, modelForCustomKeepAlive: $modelForCustomKeepAlive) { keepAlive in
                 Task {
+                    let context = executor.modelRequestContext
                     let success = await executor.loadModel(modelName: model.name, keepAlive: keepAlive, ignoreTimeout: true)
+                    guard !Task.isCancelled, context == executor.modelRequestContext else { return }
                     if !success {
                         await MainActor.run {
                             if let errorText = parseError(from: executor.output) {

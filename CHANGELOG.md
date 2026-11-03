@@ -63,6 +63,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 
 ### Bug Fixes and Improvements
 #### General
+- **Fix issue where information could be overwritten after loading**
+  - When switching from a slow-responding server to a faster server while loading, information could be overwritten by the slower server's results when its loading completed. This issue has been fixed.
 - **Improve navigation to display a "Generation" tab in narrow layouts on iOS and iPadOS**
   - Generation features such as Chat and Image Generation are now grouped together in the "Generation" tab. As part of this change, the "Image" tab, renamed in version 1.4.1, has been restored to "Image Generation".
 

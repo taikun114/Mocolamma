@@ -113,7 +113,19 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var hasDownloadedDemoModel: Bool = false
     
     // MARK: - モデル情報キャッシュ
-    private var modelInfoCache: [String: OllamaShowResponse] = [:]
+    private var modelInfoCache: [ModelDetailRequest: OllamaShowResponse] = [:]
+    private var modelListRequestID = UUID()
+    private(set) var modelInfoCacheRevision = UUID()
+    private var runningModelRequestIDs: [String: UUID] = [:]
+
+    var modelRequestContext: ModelRequestContext {
+        ModelRequestContext(serverID: serverManager.selectedServerID, host: apiBaseURL,
+                            revision: serverManager.modelRequestRevision)
+    }
+
+    private func isCurrent(_ context: ModelRequestContext) -> Bool {
+        !Task.isCancelled && modelRequestContext == context
+    }
     
     // isChatStreamingを更新する関数
     func updateIsChatStreaming() {
@@ -235,11 +247,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     /// CommandExecutorのイニシャライザ。ServerManagerのインスタンスを受け取り、APIベースURLを監視します。
     /// - Parameter serverManager: サーバーリストと選択状態を管理するServerManagerのインスタンス。
-    init(serverManager: ServerManager) {
+    init(serverManager: ServerManager, sessionConfiguration: URLSessionConfiguration = .default, monitorsDrag: Bool = true) {
         self.serverManager = serverManager
         super.init()
         // デリゲートキューをnilに設定し、デリゲートメソッドがバックグラウンドスレッドで実行されるようにします
-        let configuration = URLSessionConfiguration.default
+        let configuration = sessionConfiguration
         let opt = APITimeoutManager.shared.currentOption
         configuration.timeoutIntervalForRequest = opt.requestTimeoutUntilFirstByte
         configuration.timeoutIntervalForResource = opt.overallResourceTimeout
@@ -252,7 +264,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         connectionCheckSession = URLSession(configuration: checkConfig)
         
         // ドラッグ監視のセットアップ (ポーリング方式)
-        setupDragMonitoring()
+        if monitorsDrag { setupDragMonitoring() }
         
         // apiBaseURLは計算プロパティとしてServerManagerの状態を直接参照するため、監視は不要。
         
@@ -269,6 +281,17 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     /// Ollama APIからモデルリストを取得します
     func fetchOllamaModelsFromAPI() async {
+        let context = modelRequestContext
+        let requestID = UUID()
+        modelListRequestID = requestID
+        func canApply() -> Bool {
+            let valid = isCurrent(context) && modelListRequestID == requestID
+#if DEBUG
+            if !valid { print("Discarded obsolete model list request.") }
+#endif
+            return valid
+        }
+        guard canApply() else { return }
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             self.output = NSLocalizedString("Fetching models from demo server...", comment: "デモサーバーからモデルリストを取得中のメッセージ。")
@@ -369,7 +392,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             return
         }
         
-        guard let apiBaseURL = self.apiBaseURL else {
+        guard let apiBaseURL = context.host else {
             // apiBaseURLがnilの場合、何もしない
             print("Ollama API base URL is not set. Skipping model list retrieval.")
             self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "Ollamaサーバーが選択されていないときのエラーメッセージ。")
@@ -382,13 +405,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         // UI更新はメインアクターで行います
         self.output = String(format: NSLocalizedString("Fetching models from API (%@)...", comment: "Ollamaサーバーからモデルリストを取得中のメッセージ。API (サーバーURL)...。"), apiBaseURL)
         try? await Task.sleep(nanoseconds: 100_000_000)
-        let targetServerID = serverManager.selectedServerID
+        guard canApply() else { return }
         self.isRunning = true
         self.apiConnectionError = false // 新しいフェッチの前にエラー状態をリセット
         self.isPullingErrorHold = false // プルのエラー状態もリセット
         
         defer {
-            self.isRunning = false
+            if modelRequestContext == context && modelListRequestID == requestID { self.isRunning = false }
         }
         
         let scheme = apiBaseURL.hasPrefix("https://") ? "https" : "http"
@@ -402,18 +425,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         do {
             let (data, response) = try await urlSession.data(from: url)
+            guard canApply() else { return }
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 self.output = NSLocalizedString("API Error: Unknown response type.", comment: "不明なAPIレスポンスタイプのエラーメッセージ。")
                 print("API Error: Unknown response type.")
                 self.models = [] // エラー時もモデルリストをクリア
                 self.apiConnectionError = true // API接続エラーを設定
-                return
-            }
-            
-            // 通信中にサーバーが切り替わった場合は、結果を破棄する
-            if serverManager.selectedServerID != targetServerID {
-                print("Server changed during fetch. Aborting model list update.")
                 return
             }
             
@@ -435,12 +453,12 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let initialModels = apiResponse.models
             
             // 各モデルの詳細情報（capabilitiesなど）を並列で取得
-            self.models = await withTaskGroup(of: (Int, OllamaModel).self) { group in
+            let fetchedModels = await withTaskGroup(of: (Int, OllamaModel).self) { group in
                 for (index, model) in initialModels.enumerated() {
                     group.addTask {
                         var detailedModel = model
                         detailedModel.originalIndex = index
-                        if let info = await self.fetchModelInfo(modelName: model.name) {
+                        if let info = await self.fetchModelInfo(modelName: model.name, context: context, listRequestID: requestID) {
                             detailedModel.capabilities = info.capabilities
                             // 詳細情報（/api/show）のdetailsの方が正確（画像モデルなど）なため、常に上書きする
                             detailedModel.details = info.details
@@ -454,9 +472,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                     updatedModels.append(result)
                 }
                 // 元の順序を維持してソート
-                self.initialFetchCompleted = true
                 return updatedModels.sorted(by: { $0.0 < $1.0 }).map { $0.1 }
             }
+            guard canApply() else { return }
+            self.models = fetchedModels
+            self.initialFetchCompleted = true
             updateModelWeights() // ステータス更新
             
             let successMessage = String(format: NSLocalizedString("Successfully fetched models. Total: %d", comment: "Ollamaサーバー上からモデル情報を取得することができた場合のメッセージ。合計モデル数。"), self.models.count)
@@ -468,6 +488,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             _ = await self.fetchRunningModels()
             
         } catch let decodingError as DecodingError {
+            guard canApply() else { return }
             self.output = NSLocalizedString("API Decode Error: ", comment: "APIデコードエラーのプレフィックスメッセージ。") + decodingError.localizedDescription
             print("API Decoding Error: \(decodingError.localizedDescription)")
             self.models = [] // デコードエラー時もモデルリストをクリア
@@ -491,6 +512,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             }
             
         } catch {
+            guard canApply() else { return }
             self.output = NSLocalizedString("API Request Error: ", comment: "APIリクエストエラーのプレフィックスメッセージ。") + error.localizedDescription
             print("API Request Error (Other): \(error.localizedDescription)")
             self.models = [] // その他のエラー時もモデルリストをクリア
@@ -729,14 +751,15 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// - Returns: 成功した場合はtrue。
     @discardableResult
     func unloadModel(modelName: String, host: String? = nil) async -> Bool {
+        let context = modelRequestContext
         guard let apiBaseURL = host ?? self.apiBaseURL else {
             print("Ollama API base URL is not set. Skipping model unload.")
             return false
         }
         
         // デモモードでのアンロード（リストを空にするだけ）
-        if isDemoServer() || host == "demo-mode" {
-            self.runningModels = []
+        if apiBaseURL == "demo-mode" {
+            if context.host == apiBaseURL { self.runningModels = [] }
             return true
         }
         
@@ -776,7 +799,8 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             // 少し待機してから更新（サーバー側での処理時間を考慮）
             try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
             // 実行中のモデルリストを更新
-            _ = await self.fetchRunningModels(host: host)
+            _ = await self.fetchRunningModels(host: apiBaseURL)
+            guard isCurrent(context) else { return true }
             updateModelWeights() // ステータス更新
             // 通知を送ってUIをリフレッシュさせる
             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
@@ -796,6 +820,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     /// - Returns: 成功した場合はtrue。
     @discardableResult
     func loadModel(modelName: String, keepAlive: JSONValue? = nil, ignoreTimeout: Bool = false) async -> Bool {
+        let context = modelRequestContext
         guard let apiBaseURL = self.apiBaseURL else {
             print("Ollama API base URL is not set. Skipping model load.")
             self.output = NSLocalizedString("Error: No Ollama server selected.", comment: "モデルのロードを行おうとした際にサーバーが選択されていなかった場合のエラー。")
@@ -816,8 +841,10 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         defer {
             // 終了時にロード中状態を解除
-            _ = loadingModelNames.remove(modelName)
-            updateModelWeights() // ステータス更新
+            if modelRequestContext == context {
+                _ = loadingModelNames.remove(modelName)
+                updateModelWeights()
+            }
         }
         
 #if DEBUG
@@ -867,6 +894,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         do {
             let (_, response) = try await sessionToUse.data(for: request)
+            guard isCurrent(context) else { return false }
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 let code = (response as? HTTPURLResponse)?.statusCode ?? -1
@@ -885,17 +913,20 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             Task {
                 try? await Task.sleep(nanoseconds: 3 * 1_000_000_000)
                 await MainActor.run {
+                    guard self.isCurrent(context) else { return }
                     _ = recentLoadedModelNames.remove(modelName)
                     updateModelWeights() // ステータス更新
                 }
             }
             // 実行中のモデルリストを更新
             _ = await self.fetchRunningModels()
+            guard isCurrent(context) else { return true }
             // 通知を送ってUIをリフレッシュさせる
             NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
             return true
             
         } catch {
+            guard isCurrent(context) else { return false }
             let message = NSLocalizedString("Model load request failed: ", comment: "モデルのロードリクエストに失敗した場合のメッセージ。") + error.localizedDescription
             print(message)
             self.output = message
@@ -906,16 +937,38 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     /// キャッシュされたモデルの詳細情報を取得します（同期的）。
     func getCachedModelInfo(modelName: String) -> OllamaShowResponse? {
-        return modelInfoCache[modelName]
+        return modelInfoCache[ModelDetailRequest(context: modelRequestContext, modelName: modelName, cacheRevision: modelInfoCacheRevision)]
     }
     
+    func invalidateModelRequests() {
+        modelListRequestID = UUID()
+        runningModelRequestIDs.removeAll()
+        clearModelInfoCache()
+        models = []
+        runningModels = []
+        loadingModelNames = []
+        recentLoadedModelNames = []
+        initialFetchCompleted = false
+        isRunning = false
+        apiConnectionError = false
+        output = ""
+    }
+
     /// 初期フェッチフラグをリセットします
     func resetInitialFetchFlag() {
         initialFetchCompleted = false
     }
     
     /// モデルの詳細情報を取得します
-    func fetchModelInfo(modelName: String) async -> OllamaShowResponse? {
+    func fetchModelInfo(modelName: String, context requestedContext: ModelRequestContext? = nil, listRequestID: UUID? = nil) async -> OllamaShowResponse? {
+        let context = requestedContext ?? modelRequestContext
+        guard isCurrent(context), listRequestID == nil || modelListRequestID == listRequestID else { return nil }
+        let key = ModelDetailRequest(context: context, modelName: modelName, cacheRevision: modelInfoCacheRevision)
+        let cacheRevision = modelInfoCacheRevision
+        func canApply() -> Bool {
+            isCurrent(context) && modelInfoCacheRevision == cacheRevision &&
+                (listRequestID == nil || modelListRequestID == listRequestID)
+        }
         if isDemoServer() {
             // デモサーバーの場合、固定のデモデータを返す
             print("Fetching model \(modelName) details from demo server.")
@@ -1035,7 +1088,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 )
                 
                 // キャッシュにも保存
-                modelInfoCache[modelName] = response
+                modelInfoCache[key] = response
                 print("Successfully returned demo model \(modelName) details.")
                 
                 return response
@@ -1043,7 +1096,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         }
         
         // キャッシュに存在すればそれを返す
-        if let cachedInfo = modelInfoCache[modelName] {
+        if let cachedInfo = modelInfoCache[key] {
             print("Fetched model \(modelName) details from cache.")
             return cachedInfo
         }
@@ -1052,7 +1105,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         print("Fetching model \(modelName) details from \(String(describing: apiBaseURL))...")
 #endif
         
-        guard let apiBaseURL = self.apiBaseURL else {
+        guard let apiBaseURL = context.host else {
             print("Ollama API base URL is not set. Skipping model details retrieval.")
             return nil
         }
@@ -1080,6 +1133,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         do {
             let (data, response) = try await urlSession.data(for: request)
+            guard canApply() else { return nil }
             
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 print("API Error: /api/show - HTTP status code \((response as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -1102,7 +1156,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             }
             
             // 取得した情報をキャッシュに保存
-            modelInfoCache[modelName] = apiResponse
+            modelInfoCache[key] = apiResponse
             
             return apiResponse
             
@@ -1208,6 +1262,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     /// モデル情報キャッシュをクリアします。
     func clearModelInfoCache() {
+        modelInfoCacheRevision = UUID()
         modelInfoCache.removeAll()
         print("Model information cache cleared.")
     }
@@ -1237,7 +1292,14 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     
     /// 現在メモリにロードされているモデルのリストを取得します。
     func fetchRunningModels(host: String? = nil) async -> [OllamaRunningModel]? {
-        let base = host ?? apiBaseURL
+        let context = modelRequestContext
+        let base = host ?? context.host
+        guard let base else { return nil }
+        let requestID = UUID()
+        runningModelRequestIDs[base] = requestID
+        func canPublish() -> Bool {
+            isCurrent(context) && base == context.host && runningModelRequestIDs[base] == requestID
+        }
         if base == "demo-mode" {
             // デモサーバーの場合は固定の実行中モデルを返す
             let fiveMinutesLater = Date().addingTimeInterval(300) // 5分後
@@ -1246,12 +1308,13 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
                 expires_at: fiveMinutesLater,
                 size_vram: 0 // 0バイト
             )]
-            self.runningModels = demoRunningModels
-            updateModelWeights() // ステータス更新
+            if canPublish() {
+                self.runningModels = demoRunningModels
+                updateModelWeights()
+            }
             return demoRunningModels
         }
         
-        guard let base = base else { return nil }
         let scheme = base.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = base.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
         guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/ps") else { return nil }
@@ -1259,8 +1322,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
             let (data, response) = try await urlSession.data(from: url)
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
             let ps = try JSONDecoder().decode(OllamaPSResponse.self, from: data)
-            self.runningModels = ps.models
-            updateModelWeights() // ステータス更新
+            guard !Task.isCancelled else { return nil }
+            if canPublish() {
+                self.runningModels = ps.models
+                updateModelWeights()
+            }
             return ps.models
         } catch {
             print("Failed to retrieve /api/ps: \(error.localizedDescription)")

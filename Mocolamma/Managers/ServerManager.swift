@@ -48,6 +48,7 @@ enum ServerConnectionStatus {
 /// サーバー情報はUserDefaultsに永続化されます。
 @Observable
 class ServerManager {
+    private let defaults: UserDefaults
     // サーバー情報のUserDefaultsキー
     private let serversKey = "saved_ollama_servers"
     // 選択されたサーバーIDのUserDefaultsキー
@@ -57,9 +58,14 @@ class ServerManager {
     // ユーザーがデモサーバーを削除したかどうかを追跡するUserDefaultsキー
     private let didUserDeleteDemoServerKey = "did_user_delete_demo_server"
     
+    /// 同じサーバーへ戻った場合も、以前の通信と区別します。
+    private(set) var modelRequestRevision = UUID()
+
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     var servers: [ServerInfo] {
         didSet {
+            let previousHost = oldValue.first { $0.id == selectedServerID }?.host
+            if previousHost != selectedServer?.host { modelRequestRevision = UUID() }
             saveServers()
         }
     }
@@ -67,6 +73,7 @@ class ServerManager {
     /// 現在選択されているサーバーのID。
     var selectedServerID: ServerInfo.ID? {
         didSet {
+            if oldValue != selectedServerID { modelRequestRevision = UUID() }
             // 選択されたIDが変更されたときにUserDefaultsに保存
             saveSelectedServerID()
         }
@@ -103,9 +110,10 @@ class ServerManager {
     }
     
     /// ServerManagerのイニシャライザ。保存されたサーバーリストを読み込み、デフォルトサーバーを設定します。
-    init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         // UserDefaultsからサーバーリストを読み込む
-        if let savedServersData = UserDefaults.standard.data(forKey: serversKey),
+        if let savedServersData = defaults.data(forKey: serversKey),
            let decodedServers = try? JSONDecoder().decode([ServerInfo].self, from: savedServersData) {
             self.servers = decodedServers
         } else {
@@ -118,7 +126,7 @@ class ServerManager {
         
         // 1. デフォルトの「Local」サーバーの追加
         let localServer = ServerInfo(id: ServerInfo.defaultServerID, name: "Local", host: "localhost:11434")
-        let didUserDeleteLocal = UserDefaults.standard.bool(forKey: didUserDeleteDefaultServerKey)
+        let didUserDeleteLocal = defaults.bool(forKey: didUserDeleteDefaultServerKey)
         
         #if os(macOS) || DEBUG
         let shouldAddLocal = true
@@ -133,7 +141,7 @@ class ServerManager {
         // 2. デバッグ時の「Demo Mode」サーバーの追加
         #if DEBUG
         let demoServer = ServerInfo(id: ServerInfo.demoServerID, name: "Demo Mode", host: "demo-mode", iconName: "testtube.2", isDemo: true)
-        let didUserDeleteDemo = UserDefaults.standard.bool(forKey: didUserDeleteDemoServerKey)
+        let didUserDeleteDemo = defaults.bool(forKey: didUserDeleteDemoServerKey)
         
         if !servers.contains(where: { $0.id == demoServer.id }) && !didUserDeleteDemo {
             // ローカルサーバーのすぐ次、あるいは先頭に追加
@@ -143,7 +151,7 @@ class ServerManager {
         #endif
         
         // 以前選択されていたサーバーIDを読み込む
-        if let savedSelectedIDString = UserDefaults.standard.string(forKey: selectedServerIDKey),
+        if let savedSelectedIDString = defaults.string(forKey: selectedServerIDKey),
            let savedSelectedID = UUID(uuidString: savedSelectedIDString) {
             self.selectedServerID = savedSelectedID
         }
@@ -185,12 +193,12 @@ class ServerManager {
         
         // 削除されたサーバーがデフォルトサーバーの場合、フラグを設定
         if server.id == ServerInfo.defaultServerID {
-            UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
+            defaults.set(true, forKey: didUserDeleteDefaultServerKey)
         }
         
         // 削除されたサーバーがデモサーバーの場合、フラグを設定
         if server.id == ServerInfo.demoServerID {
-            UserDefaults.standard.set(true, forKey: didUserDeleteDemoServerKey)
+            defaults.set(true, forKey: didUserDeleteDemoServerKey)
         }
     }
     
@@ -202,9 +210,9 @@ class ServerManager {
         // 削除されるサーバーの中にデフォルトまたはデモサーバーが含まれているか確認し、フラグを設定
         for id in deletedServerIDs {
             if id == ServerInfo.defaultServerID {
-                UserDefaults.standard.set(true, forKey: didUserDeleteDefaultServerKey)
+                defaults.set(true, forKey: didUserDeleteDefaultServerKey)
             } else if id == ServerInfo.demoServerID {
-                UserDefaults.standard.set(true, forKey: didUserDeleteDemoServerKey)
+                defaults.set(true, forKey: didUserDeleteDemoServerKey)
             }
         }
         
@@ -227,13 +235,13 @@ class ServerManager {
     /// 現在のサーバーリストをUserDefaultsに保存します。
     private func saveServers() {
         if let encoded = try? JSONEncoder().encode(servers) {
-            UserDefaults.standard.set(encoded, forKey: serversKey)
+            defaults.set(encoded, forKey: serversKey)
         }
     }
     
     /// 現在選択されているサーバーIDをUserDefaultsに保存します。
     private func saveSelectedServerID() {
-        UserDefaults.standard.set(selectedServerID?.uuidString, forKey: selectedServerIDKey)
+        defaults.set(selectedServerID?.uuidString, forKey: selectedServerIDKey)
     }
     
     /// サーバーのリスト内の項目を移動します。

@@ -4,6 +4,7 @@ struct RunningModelsCountView: View {
     @Environment(CommandExecutor.self) var commandExecutor
     let host: String
     let connectionStatus: ServerConnectionStatus?
+    @State private var refreshID = UUID()
     @State private var runningModels: [OllamaRunningModel] = []
     @State private var isLoading: Bool = false
     @State private var isExpanded: Bool = false
@@ -139,11 +140,14 @@ struct RunningModelsCountView: View {
     }
     
     private func refresh() async {
+        let id = UUID()
+        refreshID = id
         await MainActor.run {
             isLoading = true
             runningModels = []
         }
         let models = await commandExecutor.fetchRunningModels(host: host)
+        guard !Task.isCancelled, refreshID == id else { return }
         await MainActor.run {
             if let m = models {
                 runningModels = m

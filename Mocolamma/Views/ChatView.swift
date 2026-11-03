@@ -260,7 +260,10 @@ struct ChatView: View {
             }
         }
         .onChange(of: chatSettings.selectedModelID) { _, _ in
-            handleModelSelectionChange()
+            chatSettings.contextWindowValue = 2048.0
+        }
+        .task(id: ModelDetailRequest(context: executor.modelRequestContext, modelName: chatSettings.selectedModelID ?? "", cacheRevision: executor.modelInfoCacheRevision)) {
+            await handleModelSelectionChange()
         }
         .alert("This model cannot be used", isPresented: $showUnsupportedModelAlert) {
             unsupportedModelAlertContent
@@ -330,51 +333,54 @@ struct ChatView: View {
             .keyboardShortcut(.defaultAction)
     }
 
-    private func handleModelSelectionChange() {
-        chatSettings.contextWindowValue = 2048.0
+    private func handleModelSelectionChange() async {
+        let context = executor.modelRequestContext
+        chatSettings.selectedModelContextLength = nil
+        chatSettings.selectedModelCapabilities = nil
         guard let model = currentSelectedModel else {
             chatSettings.selectedModelContextLength = nil
             chatSettings.selectedModelCapabilities = nil
             return
         }
-        Task {
-            if let response = await executor.fetchModelInfo(modelName: model.name) {
-                let contextLength: Int?
-                if let modelInfo = response.model_info,
-                   let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
-                   case .int(let length) = contextLengthValue {
-                    contextLength = length
-                } else {
-                    contextLength = nil
-                }
-                let isUnsupportedModel = {
-                    let caps = response.capabilities ?? []
-                    let detFamilies = response.details?.families ?? []
-                    
-                    // 埋め込みモデルの判定
-                    let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
-                    let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
-                    
-                    // 画像生成モデルの判定（イメージのみの場合）
-                    let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
-                    
-                    return isEmbedding || isEmbeddingFamily || isImage
-                }()
-                
-                if isUnsupportedModel {
-                    chatSettings.selectedModelID = nil
-                    showUnsupportedModelAlert = true
-                    return
-                }
-                chatSettings.selectedModelContextLength = contextLength
-                chatSettings.selectedModelCapabilities = response.capabilities
+        let response = await executor.fetchModelInfo(modelName: model.name, context: context)
+        guard !Task.isCancelled, context == executor.modelRequestContext,
+              chatSettings.selectedModelID == model.id else { return }
+        if let response {
+            let contextLength: Int?
+            if let modelInfo = response.model_info,
+               let contextLengthValue = modelInfo.first(where: { $0.key.hasSuffix(".context_length") })?.value,
+               case .int(let length) = contextLengthValue {
+                contextLength = length
             } else {
-                chatSettings.selectedModelContextLength = nil
-                chatSettings.selectedModelCapabilities = nil
+                contextLength = nil
             }
+            let isUnsupportedModel = {
+                let caps = response.capabilities ?? []
+                let detFamilies = response.details?.families ?? []
+
+                // 埋め込みモデルの判定
+                let isEmbedding = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "embedding" || $0.lowercased() == "embeddings" }
+                let isEmbeddingFamily = !detFamilies.isEmpty && detFamilies.count == 1 && detFamilies.first?.lowercased() == "embedding"
+
+                // 画像生成モデルの判定（イメージのみの場合）
+                let isImage = !caps.isEmpty && caps.allSatisfy { $0.lowercased() == "image" }
+
+                return isEmbedding || isEmbeddingFamily || isImage
+            }()
+
+            if isUnsupportedModel {
+                chatSettings.selectedModelID = nil
+                showUnsupportedModelAlert = true
+                return
+            }
+            chatSettings.selectedModelContextLength = contextLength
+            chatSettings.selectedModelCapabilities = response.capabilities
+        } else {
+            chatSettings.selectedModelContextLength = nil
+            chatSettings.selectedModelCapabilities = nil
         }
     }
-    
+
     @ViewBuilder
     private var chatRefreshButton: some View {
         Button(action: { appRefreshTrigger.send() }) {

@@ -409,7 +409,7 @@ private struct DecisionScoreDropDelegate: DropDelegate {
     func dropEntered(info: DropInfo) {
         guard let sourceID = draggingID else { return }
         withAnimation(.snappy(duration: 0.25)) {
-            condition.moveOption(id: sourceID, to: destinationID)
+            _ = condition.moveOption(id: sourceID, to: destinationID)
         }
     }
 

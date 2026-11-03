@@ -106,7 +106,9 @@ struct ModelActionMenuContent: View {
                 keepAlive = nil
             }
             
+            let context = executor.modelRequestContext
             let success = await executor.loadModel(modelName: model.name, keepAlive: keepAlive, ignoreTimeout: true)
+            guard !Task.isCancelled, context == executor.modelRequestContext else { return }
             if !success {
                 if let errorText = parseError(from: executor.output) {
                     await MainActor.run {

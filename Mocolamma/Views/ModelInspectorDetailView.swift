@@ -22,13 +22,14 @@ struct ModelInspectorDetailView: View {
             isLoading: isLoadingInfo,
             selectedFilterTag: $selectedFilterTag
         )
-        .onAppear(perform: loadModelInfo)
-        .onChange(of: model.id) { _, _ in
-            loadModelInfo()
+        .task(id: ModelDetailRequest(context: commandExecutor.modelRequestContext, modelName: model.name, cacheRevision: commandExecutor.modelInfoCacheRevision)) {
+            await loadModelInfo()
         }
     }
     
-    private func loadModelInfo() {
+    private func loadModelInfo() async {
+        let context = commandExecutor.modelRequestContext
+        response = nil
         // すでにキャッシュがある場合はそれを使用
         if let cached = commandExecutor.getCachedModelInfo(modelName: model.name) {
             applyResponse(cached)
@@ -42,12 +43,9 @@ struct ModelInspectorDetailView: View {
 #else
         isLoadingInfo = true
 #endif
-        Task {
-            let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name)
-            await MainActor.run {
-                applyResponse(fetchedResponse)
-            }
-        }
+        let fetchedResponse = await commandExecutor.fetchModelInfo(modelName: model.name, context: context)
+        guard !Task.isCancelled, context == commandExecutor.modelRequestContext else { return }
+        applyResponse(fetchedResponse)
     }
     
     private func applyResponse(_ fetchedResponse: OllamaShowResponse?) {

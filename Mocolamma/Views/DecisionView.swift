@@ -127,7 +127,7 @@ struct DecisionView: View {
                 Text("The selected model does not support image recognition, so attached PDF files will only be sent as extracted text. Are you sure you want to send it as is?\n\nTip: Switching to a vision-capable model will allow it to recognize images and layouts in addition to text.")
             }
         }
-        .onChange(of: serverManager.selectedServerID) { _, _ in session.cancel(); session.selectedModelID = nil; session.result = nil }
+        .onChange(of: executor.modelRequestContext) { _, _ in session.cancel(); session.selectedModelID = nil; session.result = nil }
         .onAppear {
             if let id = session.selectedModelID, !executor.models.contains(where: { $0.id == id }) { session.selectedModelID = nil }
         }
