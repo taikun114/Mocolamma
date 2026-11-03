@@ -34,6 +34,35 @@ struct DecisionRequestTests {
         #expect(text.contains("\n\n---\n\n2. Is it valid?\n\n\(String(localized: "No")) (80%)"))
         #expect(text.contains("0.75 / \(DecisionResultFormatter.points(1))\n\n\(DecisionResultFormatter.points(0)) - Low - 25%\n\(DecisionResultFormatter.points(1)) - High - 75%"))
     }
+    @Test func resultJSONIncludesConditionsAndAnswersWithoutStatistics() throws {
+        let choice = DecisionCondition(instructions: "Classify this report", options: ["Bug", "Request", ""])
+        let score = DecisionCondition(instructions: "Rate severity", kind: .score, options: ["Low", "High"])
+        let yesNo = DecisionCondition(instructions: "Is this valid?", kind: .noul)
+        let missing = DecisionCondition(instructions: "Unanswered", kind: .noul)
+        let response = DecisionResponse(model: "sample-model", answers: [
+            choice.id.uuidString: DecisionAnswer(type: "choice", choice: "Bug", noul: nil, score: nil, legend: nil, probabilities: ["Bug": 0.9, "Request": 0.1], confidence: nil),
+            score.id.uuidString: DecisionAnswer(type: "score", choice: nil, noul: nil, score: 0.8, legend: ["0": "Low", "1": "High"], probabilities: ["0": 0.2, "1": 0.8], confidence: nil),
+            yesNo.id.uuidString: DecisionAnswer(type: "noul", choice: nil, noul: 0.7, score: nil, legend: nil, probabilities: nil, confidence: nil)
+        ], usage: .init(input_tokens: 123, output_tokens: 0), prompt_eval_cached_count: 12)
+        let text = DecisionResultFormatter.json(conditions: [choice, score, yesNo, missing], response: response)
+        let rows = try #require(JSONSerialization.jsonObject(with: Data(text.utf8)) as? [[String: Any]])
+        #expect(rows.count == 3)
+        #expect(rows.map { $0["condition"] as? String } == [choice.instructions, score.instructions, yesNo.instructions])
+        #expect(Set(rows[0].keys) == ["condition", "type", "options", "result"])
+        #expect(rows[0]["options"] as? [String] == ["Bug", "Request"])
+        #expect(rows[1]["options"] as? [String] == ["Low", "High"])
+        #expect(rows[2]["options"] == nil)
+        #expect(rows.map { $0["type"] as? String } == ["choice", "score", "noul"])
+        let answers = try rows.map { try #require($0["result"] as? [String: Any]) }
+        #expect(answers.allSatisfy { $0["type"] == nil })
+        #expect(answers[0]["choice"] as? String == "Bug")
+        #expect((answers[0]["probabilities"] as? [String: Double])?["Bug"] == 0.9)
+        #expect(answers[1]["score"] as? Double == 0.8)
+        #expect((answers[1]["legend"] as? [String: String])?["1"] == "High")
+        #expect(answers[2]["noul"] as? Double == 0.7)
+        #expect(DecisionResultFormatter.json(conditions: [choice], response: nil).isEmpty)
+    }
+
     @Test func preservesStructuredJSON() throws {
         let state = try DecisionRequestBuilder.state(text: "{\"count\":2,\"enabled\":true}", json: true)
         let question = DecisionCondition(instructions: "Is this valid?", kind: .noul)

@@ -108,6 +108,48 @@ struct DecisionResponse: Codable {
 }
 
 enum DecisionResultFormatter {
+    private struct ExportedResult: Encodable {
+        let condition: String
+        let type: String
+        let options: [String]?
+        let result: ExportedAnswer
+    }
+
+    private struct ExportedAnswer: Encodable {
+        let answer: DecisionAnswer
+
+        private enum CodingKeys: String, CodingKey {
+            case choice, noul, score, legend, probabilities, confidence
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(answer.choice, forKey: .choice)
+            try container.encodeIfPresent(answer.noul, forKey: .noul)
+            try container.encodeIfPresent(answer.score, forKey: .score)
+            try container.encodeIfPresent(answer.legend, forKey: .legend)
+            try container.encodeIfPresent(answer.probabilities, forKey: .probabilities)
+            try container.encodeIfPresent(answer.confidence, forKey: .confidence)
+        }
+    }
+
+    static func json(conditions: [DecisionCondition], response: DecisionResponse?) -> String {
+        guard let response else { return "" }
+        let results = conditions.compactMap { condition -> ExportedResult? in
+            guard let answer = response.answers[condition.id.uuidString] else { return nil }
+            return ExportedResult(
+                condition: condition.instructions,
+                type: condition.kind.rawValue,
+                options: condition.kind == .noul ? nil : condition.validOptions,
+                result: ExportedAnswer(answer: answer)
+            )
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(results) else { return "" }
+        return String(decoding: data, as: UTF8.self)
+    }
+
     static func points(_ value: Int) -> String {
         value == 1 ? String(localized: "\(value) point") : String(localized: "\(value) points")
     }

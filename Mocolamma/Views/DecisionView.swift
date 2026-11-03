@@ -539,8 +539,7 @@ struct DecisionView: View {
         DecisionResultFormatter.text(conditions: session.resultConditions, response: session.result)
     }
     private var resultJSON: String {
-        guard let result = session.result, let data = try? JSONEncoder().encode(result) else { return "" }
-        return String(decoding: data, as: UTF8.self)
+        DecisionResultFormatter.json(conditions: session.resultConditions, response: session.result)
     }
     private func copy(_ text: String) {
 #if os(macOS)
@@ -581,20 +580,20 @@ private struct DecisionResultFooter: View {
 #endif
                     .disabled(session.result == nil || session.isRunning)
                     if let result = session.result {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 0) {
-                            Text("Model")
-                            Text(verbatim: ": \(result.model)")
+                        let lines = statisticsLines(for: result)
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(lines.indices, id: \.self) { index in
+                                Text(verbatim: lines[index])
+                            }
                         }
-                        .accessibilityElement(children: .combine)
-                        Text("Response time: \(session.elapsed * 1000, format: .number.precision(.fractionLength(2))) ms")
-                        Text("Input tokens: \(result.usage.input_tokens)")
-                        if let cached = result.prompt_eval_cached_count {
-                            Text("Cache hit: \(result.cacheHitRate ?? 0, format: .percent.precision(.fractionLength(2))) (\(cached) tokens)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .contentShape(Rectangle())
+                        .contextMenu {
+                            Button("Copy", systemImage: SFSymbol.copy) {
+                                copy(lines.joined(separator: "\n"))
+                            }
                         }
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                     }
             }
             .textCase(nil)
@@ -602,6 +601,18 @@ private struct DecisionResultFooter: View {
             .padding(.bottom, 24)
 #endif
     }
+    private func statisticsLines(for result: DecisionResponse) -> [String] {
+        var lines = [
+            String(localized: "Model") + ": " + result.model,
+            String(localized: "Response time: \(session.elapsed * 1000, format: .number.precision(.fractionLength(2))) ms"),
+            String(localized: "Input tokens: \(result.usage.input_tokens)")
+        ]
+        if let cached = result.prompt_eval_cached_count {
+            lines.append(String(localized: "Cache hit: \(result.cacheHitRate ?? 0, format: .percent.precision(.fractionLength(2))) (\(cached) tokens)"))
+        }
+        return lines
+    }
+
     @ViewBuilder private var copyButtons: some View {
         Button { copy(resultText) } label: {
             Label("Copy Results", systemImage: SFSymbol.copy).fixedSize(horizontal: true, vertical: false)
