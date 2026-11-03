@@ -179,8 +179,30 @@ struct DecisionView: View {
             withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
         }
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
+#if os(iOS)
+        .overlayPreferenceValue(DecisionButtonAnchors.self) { anchors in
+            GeometryReader { geometry in
+                let viewport = CGRect(origin: .zero, size: geometry.size)
+                let button = anchors["button"].map { geometry[$0] }
+                let conditions = anchors["conditions"].map { geometry[$0] }
+                let target = conditions ?? button
+                let pinned = button.map { $0.minY > viewport.height - evaluateButtonAreaHeight } ?? true
+                if pinned || button?.intersects(viewport) == true {
+                    evaluateButton
+                        .frame(width: target?.width ?? max(0, viewport.width - 32))
+                        .frame(height: evaluateButtonAreaHeight)
+                        .position(
+                            x: target?.midX ?? viewport.midX,
+                            y: pinned ? viewport.height - evaluateButtonAreaHeight / 2 : (button?.midY ?? viewport.midY)
+                        )
+                }
+            }
+            .clipped()
+            .ignoresSafeArea(.container, edges: .horizontal)
+        }
+#else
         .overlay(alignment: .bottom) {
-            if showsEvaluateButtonOverlay {
+            if isEvaluateButtonPinned {
                 GeometryReader { overlayGeometry in
                     let overlayFrame = overlayGeometry.frame(in: .global)
                     let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
@@ -203,12 +225,10 @@ struct DecisionView: View {
                                 : buttonFrame.midY - overlayFrame.minY
                         )
                 }
-#if os(iOS)
-                .clipped()
-#endif
                 .ignoresSafeArea(.container, edges: .horizontal)
             }
         }
+#endif
         }
     }
 
@@ -217,14 +237,6 @@ struct DecisionView: View {
         56
 #else
         76
-#endif
-    }
-
-    private var showsEvaluateButtonOverlay: Bool {
-#if os(iOS)
-        isEvaluateButtonPinned || buttonFrame.intersects(viewportFrame)
-#else
-        isEvaluateButtonPinned
 #endif
     }
 
@@ -242,6 +254,9 @@ struct DecisionView: View {
             .opacity(usesEvaluateButtonOverlay ? 0 : 1)
             .allowsHitTesting(!usesEvaluateButtonOverlay)
             .accessibilityHidden(usesEvaluateButtonOverlay)
+#if os(iOS)
+            .anchorPreference(key: DecisionButtonAnchors.self, value: .bounds) { ["button": $0] }
+#endif
             .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
                 buttonFrame = $0
             }
@@ -474,6 +489,7 @@ struct DecisionView: View {
 #if os(iOS)
                 .listRowBackground(
                     Color(uiColor: .secondarySystemGroupedBackground)
+                        .anchorPreference(key: DecisionButtonAnchors.self, value: .bounds) { ["conditions": $0] }
                         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
                             conditionRowFrame = $0
                         }
@@ -540,6 +556,9 @@ struct DecisionView: View {
                     }
                 }
                 .id(session.resultRevision)
+#if os(iOS)
+                .listRowInsets(EdgeInsets(top: 16, leading: 20, bottom: 20, trailing: 20))
+#endif
             } else {
                 Text("Decision results will appear here.")
                     .foregroundStyle(.secondary)
@@ -566,6 +585,14 @@ struct DecisionView: View {
 #else
         UIPasteboard.general.string = text
 #endif
+    }
+}
+
+private struct DecisionButtonAnchors: PreferenceKey {
+    static var defaultValue: [String: Anchor<CGRect>] { [:] }
+
+    static func reduce(value: inout [String: Anchor<CGRect>], nextValue: () -> [String: Anchor<CGRect>]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, next in next })
     }
 }
 
