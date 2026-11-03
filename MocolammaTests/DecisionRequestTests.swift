@@ -50,14 +50,34 @@ struct DecisionRequestTests {
             #expect(throws: (any Error).self) { try DecisionRequestBuilder.state(text: text, json: true) }
         }
     }
-    @Test func validatesConditionsAndLimits() throws {
+    @Test func validatesConditionsWithoutClientSizeLimit() throws {
         #expect(!DecisionCondition().isValid)
         #expect(!DecisionCondition(instructions: "Choose", options: ["same", "same"]).isValid)
         #expect(DecisionCondition(instructions: "Choose", options: ["a", "b", ""]).isValid)
         let q = DecisionCondition(instructions: "Rate", kind: .score, options: ["Low", "High"])
-        #expect(throws: DecisionError.self) {
-            try DecisionRequestBuilder.body(model: "d3:2b", state: .string(String(repeating: "a", count: 65_536)), images: [], conditions: [q], keepAlive: nil)
-        }
+        let data = try DecisionRequestBuilder.body(model: "sample-model", state: .string(String(repeating: "a", count: 65_536)), images: [], conditions: [q], keepAlive: nil)
+        #expect(data.count > 65_536)
+    }
+
+    @Test @MainActor func allowsMoreThan64ValidConditions() throws {
+        let conditions = (0..<65).map { DecisionCondition(instructions: "Condition \($0)", kind: .noul) }
+        let data = try DecisionRequestBuilder.body(model: "sample-model", state: .string("Sample input"), images: [], conditions: conditions, keepAlive: nil)
+        let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect((object["questions"] as? [String: Any])?.count == 65)
+        let session = DecisionSession()
+        session.input = "Sample input"
+        session.selectedModelID = "sample-model"
+        session.conditions = conditions
+        #expect(session.canEvaluate)
+    }
+
+    @Test func allowsImagePayloadOver32MiB() throws {
+        let image = String(repeating: "A", count: 32 * 1024 * 1024)
+        let q = DecisionCondition(instructions: "Inspect the image", kind: .noul)
+        let data = try DecisionRequestBuilder.body(model: "sample-model", state: .string("Sample input"), images: [image], conditions: [q], keepAlive: nil)
+        #expect(data.count > 32 * 1024 * 1024)
+        let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect((object["images"] as? [String])?.first == image)
     }
     @Test @MainActor func duplicateLabelsBlockRequestsAndEvaluation() throws {
         for kind in [DecisionCondition.Kind.choice, .score] {

@@ -21,7 +21,7 @@ struct DecisionClient {
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(http.statusCode) else {
             let error = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
-            throw DecisionError.server(http.statusCode, error?["error"] as? String ?? HTTPURLResponse.localizedString(forStatusCode: http.statusCode))
+            throw DecisionError.server(http.statusCode, error?["error"] as? String ?? "Server returned error \(http.statusCode)")
         }
         return (try JSONDecoder().decode(DecisionResponse.self, from: data), elapsed)
     }

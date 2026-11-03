@@ -105,7 +105,7 @@ final class DecisionSession {
 #endif
             } catch {
                 guard requestID == id, !Task.isCancelled else { return }
-                self.error = error.localizedDescription
+                self.error = "Decision API Error: \(error.localizedDescription)"
 #if DEBUG
                 print("Decision request failed: \(error.localizedDescription)")
 #endif

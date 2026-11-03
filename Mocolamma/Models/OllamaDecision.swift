@@ -156,7 +156,7 @@ enum DecisionRequestBuilder {
     }
 
     static func body(model: String, state: JSONValue, images: [String], conditions: [DecisionCondition], keepAlive: JSONValue?) throws -> Data {
-        guard !conditions.isEmpty, conditions.count <= 64, conditions.allSatisfy(\.isValid) else { throw DecisionError.invalidConditions }
+        guard !conditions.isEmpty, conditions.allSatisfy(\.isValid) else { throw DecisionError.invalidConditions }
         let encoder = JSONEncoder()
         func encode<T: Encodable>(_ value: T) throws -> String { String(decoding: try encoder.encode(value), as: UTF8.self) }
         // 質問と選択肢の入力順を保ち、同率時の優先順位が変わらないようにする。
@@ -173,17 +173,13 @@ enum DecisionRequestBuilder {
         }
         var fields = ["\"model\":\(try encode(model))", "\"state\":\(try encode(state))", "\"questions\":{\(questions.joined(separator: ","))}"]
         if let keepAlive { fields.append("\"keep_alive\":\(try encode(keepAlive))") }
-        let textBody = Data("{\(fields.joined(separator: ","))}".utf8)
-        guard textBody.count <= 65_536 else { throw DecisionError.textTooLarge }
         if !images.isEmpty { fields.append("\"images\":\(try encode(images))") }
-        let body = Data("{\(fields.joined(separator: ","))}".utf8)
-        guard body.count <= 32 * 1024 * 1024 else { throw DecisionError.requestTooLarge }
-        return body
+        return Data("{\(fields.joined(separator: ","))}".utf8)
     }
 }
 
 enum DecisionError: LocalizedError {
-    case invalidJSON, emptyState, invalidConditions, textTooLarge, requestTooLarge, unsupportedAttachments
+    case invalidJSON, emptyState, invalidConditions, unsupportedAttachments
     case server(Int, String)
     var errorDescription: String? {
         switch self {
@@ -191,9 +187,7 @@ enum DecisionError: LocalizedError {
         case .invalidJSON: String(localized: "Enter a valid JSON object or array.")
         case .emptyState: String(localized: "Enter content to evaluate.")
         case .invalidConditions: String(localized: "Enter each condition and at least two distinct options for choice or score questions.")
-        case .textTooLarge: String(localized: "Decision text and conditions must fit within 64 KiB.")
-        case .requestTooLarge: String(localized: "The decision request must fit within 32 MiB.")
-        case .server(let status, let message): String(localized: "Decision request failed (HTTP \(status)): \(message)")
+        case .server(_, let message): message
         }
     }
 }

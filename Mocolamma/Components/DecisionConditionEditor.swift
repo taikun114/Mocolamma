@@ -454,7 +454,6 @@ struct DecisionConditionsEditor: View {
             .padding(.vertical, 12)
 #endif
             .help("Add a decision condition")
-            .disabled(conditions.count >= 64)
         }
 #if os(macOS)
         .padding(.vertical, -10)
