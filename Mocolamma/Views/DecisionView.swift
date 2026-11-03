@@ -180,7 +180,7 @@ struct DecisionView: View {
         }
         .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
         .overlay(alignment: .bottom) {
-            if isEvaluateButtonPinned {
+            if showsEvaluateButtonOverlay {
                 GeometryReader { overlayGeometry in
                     let overlayFrame = overlayGeometry.frame(in: .global)
                     let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
@@ -198,9 +198,14 @@ struct DecisionView: View {
 #endif
                         .position(
                             x: targetFrame.isNull ? overlayGeometry.size.width / 2 : targetFrame.midX - overlayFrame.minX,
-                            y: overlayGeometry.size.height - evaluateButtonAreaHeight / 2 - bottomInset
+                            y: isEvaluateButtonPinned
+                                ? overlayGeometry.size.height - evaluateButtonAreaHeight / 2 - bottomInset
+                                : buttonFrame.midY - overlayFrame.minY
                         )
                 }
+#if os(iOS)
+                .clipped()
+#endif
                 .ignoresSafeArea(.container, edges: .horizontal)
             }
         }
@@ -215,12 +220,28 @@ struct DecisionView: View {
 #endif
     }
 
+    private var showsEvaluateButtonOverlay: Bool {
+#if os(iOS)
+        isEvaluateButtonPinned || buttonFrame.intersects(viewportFrame)
+#else
+        isEvaluateButtonPinned
+#endif
+    }
+
+    private var usesEvaluateButtonOverlay: Bool {
+#if os(iOS)
+        true
+#else
+        isEvaluateButtonPinned
+#endif
+    }
+
     private var inlineEvaluateButton: some View {
         evaluateButton
             .frame(height: evaluateButtonAreaHeight, alignment: .center)
-            .opacity(isEvaluateButtonPinned ? 0 : 1)
-            .allowsHitTesting(!isEvaluateButtonPinned)
-            .accessibilityHidden(isEvaluateButtonPinned)
+            .opacity(usesEvaluateButtonOverlay ? 0 : 1)
+            .allowsHitTesting(!usesEvaluateButtonOverlay)
+            .accessibilityHidden(usesEvaluateButtonOverlay)
             .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
                 buttonFrame = $0
             }
