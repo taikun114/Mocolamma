@@ -12,6 +12,10 @@ struct DecisionView: View {
     @State private var buttonFrame: CGRect = .null
     @State private var conditionRowFrame: CGRect = .null
     @State private var viewportFrame: CGRect = .zero
+#if os(iOS)
+    @State private var compactScrollOffset: CGFloat = 0
+    @State private var buttonContentFrame: CGRect?
+#endif
     @State private var isDecisionVisible = false
     @State private var showingResetConfirmation = false
     @State private var showingModeConfirmation = false
@@ -179,6 +183,11 @@ struct DecisionView: View {
 #endif
 #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        .onScrollGeometryChange(for: CGFloat.self) { geometry in
+            geometry.contentOffset.y
+        } action: { _, offset in
+            compactScrollOffset = offset
+        }
 #endif
         .onChange(of: session.resultRevision) { _, _ in
             withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
@@ -190,16 +199,26 @@ struct DecisionView: View {
                 let viewport = CGRect(origin: .zero, size: geometry.size)
                 let button = anchors["button"].map { geometry[$0] }
                 let conditions = anchors["conditions"].map { geometry[$0] }
-                let target = conditions ?? button
-                let pinned = button.map { $0.minY > viewport.height - evaluateButtonAreaHeight } ?? true
-                if pinned || button?.intersects(viewport) == true {
-                    evaluateButton
-                        .frame(width: target?.width ?? max(0, viewport.width - 32))
-                        .frame(height: evaluateButtonAreaHeight)
-                        .position(
-                            x: target?.midX ?? viewport.midX,
-                            y: pinned ? viewport.height - evaluateButtonAreaHeight / 2 : (button?.midY ?? viewport.midY)
-                        )
+                let trackedButton = buttonContentFrame?.offsetBy(dx: 0, dy: -compactScrollOffset)
+                let currentButton = button ?? trackedButton
+                let target = conditions ?? currentButton
+                let pinned = currentButton.map { $0.minY > viewport.height - evaluateButtonAreaHeight } ?? (compactScrollOffset <= 0)
+                Group {
+                    if pinned {
+                        evaluateButton
+                            .frame(width: target?.width ?? max(0, viewport.width - 32))
+                            .frame(height: evaluateButtonAreaHeight)
+                            .position(
+                                x: target?.midX ?? viewport.midX,
+                                y: viewport.height - evaluateButtonAreaHeight / 2
+                            )
+                    }
+                }
+                .onChange(of: button, initial: true) { _, frame in
+                    if let frame {
+                        // 行が画面外で破棄されてもスクロール量から位置を復元します。
+                        buttonContentFrame = frame.offsetBy(dx: 0, dy: compactScrollOffset)
+                    }
                 }
             }
             .clipped()
@@ -246,11 +265,7 @@ struct DecisionView: View {
     }
 
     private var usesEvaluateButtonOverlay: Bool {
-#if os(iOS)
-        true
-#else
         isEvaluateButtonPinned
-#endif
     }
 
     private var inlineEvaluateButton: some View {
@@ -268,7 +283,16 @@ struct DecisionView: View {
     }
 
     private var isEvaluateButtonPinned: Bool {
+#if os(iOS)
+        if let frame = buttonContentFrame {
+            return frame.minY - compactScrollOffset > viewportFrame.height - evaluateButtonAreaHeight
+        }
+        return buttonFrame.isNull
+            ? compactScrollOffset <= 0
+            : buttonFrame.minY - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
+#else
         buttonFrame.isNull || buttonFrame.minY - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
+#endif
     }
 
     @ToolbarContentBuilder
