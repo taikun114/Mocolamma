@@ -40,13 +40,13 @@ struct DecisionConditionEditor: View {
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) { condition.isExpanded.toggle() }
             } label: {
-                HStack {
+                HStack(alignment: .firstTextBaseline) {
                     Text("\(number).")
                     if condition.instructions.isEmpty {
                         Text("Decision Condition").foregroundStyle(.secondary)
                     } else { Text(condition.instructions).lineLimit(1) }
                     Spacer()
-                    Text(condition.kind.title).font(.caption).foregroundStyle(.secondary)
+                    Text(condition.kind.title).foregroundStyle(.secondary)
                     Image(systemName: condition.isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundStyle(.secondary)
                         .frame(width: disclosureWidth)
@@ -338,11 +338,12 @@ struct DecisionResultRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
+            HStack(alignment: .firstTextBaseline) {
                 Text("\(number). \(condition.instructions)")
                 Spacer()
-                Text(condition.kind.title).font(.caption).foregroundStyle(.secondary)
+                Text(condition.kind.title).foregroundStyle(.secondary)
             }
+            .padding(.bottom, 8)
             if let score = answer.score {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
@@ -353,7 +354,7 @@ struct DecisionResultRow: View {
                         Text("Most likely: \(condition.validOptions[winner])").font(.body)
                     }
                 }
-                .padding(.bottom, 4)
+                .padding(.bottom, 8)
             }
             VStack(spacing: resultOptionSpacing) {
                 ForEach(probabilities.indices, id: \.self) { index in

@@ -12,10 +12,6 @@ struct DecisionView: View {
     @State private var buttonFrame: CGRect = .null
     @State private var conditionRowFrame: CGRect = .null
     @State private var viewportFrame: CGRect = .zero
-#if os(iOS)
-    @State private var compactScrollOffset: CGFloat = 0
-    @State private var buttonContentFrame: CGRect?
-#endif
     @State private var isDecisionVisible = false
     @State private var showingResetConfirmation = false
     @State private var showingModeConfirmation = false
@@ -50,28 +46,25 @@ struct DecisionView: View {
             if isCompact || geometry.size.width < 760 {
                 compactContent
             } else {
+#if os(iOS)
+                iOSColumns
+#else
                 DecisionColumns {
                     Form { inputSection; conditionsSection }
                     .formStyle(.grouped)
 #if os(visionOS)
                     .environment(\.defaultMinListRowHeight, 0)
 #endif
-#if os(iOS)
-                    .contentMargins(.trailing, 16, for: .scrollContent)
-                    .scrollDismissesKeyboard(.interactively)
-#endif
                     .modifier(DecisionBottomBar { evaluateButton.padding() })
                 } results: {
                     ScrollViewReader { proxy in
                         Form { resultsSection }.formStyle(.grouped)
-#if os(iOS)
-                            .contentMargins(.leading, 16, for: .scrollContent)
-        #endif
                             .onChange(of: session.resultRevision) { _, _ in
                                 withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
                             }
                     }
                 }
+#endif
             }
         }
 #if os(visionOS)
@@ -83,6 +76,7 @@ struct DecisionView: View {
         ))
 #endif
 #if os(iOS)
+        .background(Color(uiColor: .systemGroupedBackground))
         .background {
             ExternalAttachmentDropBridge(context: attachmentDropContext, executor: executor,
                                          isEnabled: !session.isRunning && selectedModel != nil && (!session.isJSON || selectedModel?.supportsVision == true))
@@ -157,104 +151,145 @@ struct DecisionView: View {
         }
     }
 
-    private var compactContent: some View {
-        ScrollViewReader { proxy in
-        Form {
-            inputSection
-            conditionsSection
-#if os(macOS)
-            Section {} footer: {
-                inlineEvaluateButton
-                    .padding(.horizontal, -10)
-                    .padding(.bottom, -20)
-            }
+    @ViewBuilder private var compactContent: some View {
+#if os(iOS)
+        iOSCompactContent
 #else
-            Section {
-                inlineEvaluateButton
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
+        ScrollViewReader { proxy in
+            Form {
+                inputSection
+                conditionsSection
+#if os(macOS)
+                Section {} footer: {
+                    inlineEvaluateButton
+                        .padding(.horizontal, -10)
+                        .padding(.bottom, -20)
+                }
+#else
+                Section {
+                    inlineEvaluateButton
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+#endif
+                resultsSection
             }
-#endif
-            resultsSection
-        }
-        .formStyle(.grouped)
+            .formStyle(.grouped)
 #if os(visionOS)
-        .environment(\.defaultMinListRowHeight, 0)
+            .environment(\.defaultMinListRowHeight, 0)
 #endif
-#if os(iOS)
-        .scrollDismissesKeyboard(.interactively)
-        .onScrollGeometryChange(for: CGFloat.self) { geometry in
-            geometry.contentOffset.y
-        } action: { _, offset in
-            compactScrollOffset = offset
-        }
+            .onChange(of: session.resultRevision) { _, _ in
+                withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
+            }
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
+            .overlay(alignment: .bottom) {
+                if isEvaluateButtonPinned {
+                    GeometryReader { overlayGeometry in
+                        let overlayFrame = overlayGeometry.frame(in: .global)
+                        let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
+#if os(visionOS)
+                        let bottomInset = targetFrame.isNull ? 16 : max(0, targetFrame.minX - overlayFrame.minX)
+#else
+                        let bottomInset: CGFloat = 0
 #endif
-        .onChange(of: session.resultRevision) { _, _ in
-            withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
-        }
-        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
-#if os(iOS)
-        .overlayPreferenceValue(DecisionButtonAnchors.self) { anchors in
-            GeometryReader { geometry in
-                let viewport = CGRect(origin: .zero, size: geometry.size)
-                let button = anchors["button"].map { geometry[$0] }
-                let conditions = anchors["conditions"].map { geometry[$0] }
-                let trackedButton = buttonContentFrame?.offsetBy(dx: 0, dy: -compactScrollOffset)
-                let currentButton = button ?? trackedButton
-                let target = conditions ?? currentButton
-                let pinned = currentButton.map { $0.minY > viewport.height - evaluateButtonAreaHeight } ?? (compactScrollOffset <= 0)
-                Group {
-                    if pinned {
                         evaluateButton
-                            .frame(width: target?.width ?? max(0, viewport.width - 32))
-                            .frame(height: evaluateButtonAreaHeight)
+                            .frame(width: targetFrame.isNull ? max(0, overlayGeometry.size.width - 32) : targetFrame.width)
+#if os(visionOS)
+                            .frame(height: evaluateButtonAreaHeight, alignment: .bottom)
+#else
+                            .frame(height: evaluateButtonAreaHeight, alignment: .center)
+#endif
                             .position(
-                                x: target?.midX ?? viewport.midX,
-                                y: viewport.height - evaluateButtonAreaHeight / 2
+                                x: targetFrame.isNull ? overlayGeometry.size.width / 2 : targetFrame.midX - overlayFrame.minX,
+                                y: overlayGeometry.size.height - evaluateButtonAreaHeight / 2 - bottomInset
                             )
                     }
+                    .ignoresSafeArea(.container, edges: .horizontal)
                 }
-                .onChange(of: button, initial: true) { _, frame in
-                    if let frame {
-                        // 行が画面外で破棄されてもスクロール量から位置を復元します。
-                        buttonContentFrame = frame.offsetBy(dx: 0, dy: compactScrollOffset)
-                    }
-                }
-            }
-            .clipped()
-            .ignoresSafeArea(.container, edges: .horizontal)
-        }
-#else
-        .overlay(alignment: .bottom) {
-            if isEvaluateButtonPinned {
-                GeometryReader { overlayGeometry in
-                    let overlayFrame = overlayGeometry.frame(in: .global)
-                    let targetFrame = conditionRowFrame.isNull ? buttonFrame : conditionRowFrame
-#if os(visionOS)
-                    let bottomInset = targetFrame.isNull ? 16 : max(0, targetFrame.minX - overlayFrame.minX)
-#else
-                    let bottomInset: CGFloat = 0
-#endif
-                    evaluateButton
-                        .frame(width: targetFrame.isNull ? max(0, overlayGeometry.size.width - 32) : targetFrame.width)
-#if os(visionOS)
-                        .frame(height: evaluateButtonAreaHeight, alignment: .bottom)
-#else
-                        .frame(height: evaluateButtonAreaHeight, alignment: .center)
-#endif
-                        .position(
-                            x: targetFrame.isNull ? overlayGeometry.size.width / 2 : targetFrame.midX - overlayFrame.minX,
-                            y: isEvaluateButtonPinned
-                                ? overlayGeometry.size.height - evaluateButtonAreaHeight / 2 - bottomInset
-                                : buttonFrame.midY - overlayFrame.minY
-                        )
-                }
-                .ignoresSafeArea(.container, edges: .horizontal)
             }
         }
 #endif
+    }
+
+#if os(iOS)
+    private var iOSColumns: some View {
+        DecisionColumns {
+            ScrollView {
+                VStack(spacing: 32) {
+                    iOSInputSection
+                    iOSConditionsSection
+                }
+                .padding(20)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .modifier(DecisionBottomBar {
+                evaluateButton.padding(.horizontal, 20).padding(.vertical, 12)
+            })
+        } results: {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    iOSResultsSection.padding(20)
+                }
+                .onChange(of: session.resultRevision) { _, _ in
+                    withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
+                }
+            }
         }
     }
+
+    private var iOSCompactContent: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 32) {
+                    iOSInputSection
+                    iOSConditionsSection
+                    inlineEvaluateButton
+                    iOSResultsSection
+                }
+                .padding(20)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { viewportFrame = $0 }
+            .overlay(alignment: .bottom) {
+                if isEvaluateButtonPinned {
+                    evaluateButton
+                        .frame(height: evaluateButtonAreaHeight)
+                        .padding(.horizontal, 20)
+                }
+            }
+            .onChange(of: session.resultRevision) { _, _ in
+                withAnimation { proxy.scrollTo("decision-results", anchor: .top) }
+            }
+        }
+    }
+
+    private var iOSInputSection: some View {
+        DecisionGroupedSection(title: "Decision Content") {
+            inputRows.padding(DecisionGroupedMetrics.inputInsets)
+        }
+    }
+
+    private var iOSConditionsSection: some View {
+        @Bindable var session = session
+        return DecisionGroupedSection(title: "Decision Conditions") {
+            DecisionConditionsEditor(conditions: $session.conditions)
+                .padding(.horizontal, 16)
+                .disabled(session.isRunning)
+        }
+    }
+
+    private var iOSResultsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            DecisionGroupedSection(title: "Decision Results") {
+                resultsContent
+                    .padding(DecisionGroupedMetrics.resultInsets)
+            }
+            DecisionResultFooter(session: session, resultText: resultText, resultJSON: resultJSON, copy: copy)
+                .padding(.horizontal, DecisionGroupedMetrics.horizontalInset)
+        }
+        .id("decision-results")
+    }
+#endif
 
     private var evaluateButtonAreaHeight: CGFloat {
 #if os(macOS)
@@ -274,25 +309,13 @@ struct DecisionView: View {
             .opacity(usesEvaluateButtonOverlay ? 0 : 1)
             .allowsHitTesting(!usesEvaluateButtonOverlay)
             .accessibilityHidden(usesEvaluateButtonOverlay)
-#if os(iOS)
-            .anchorPreference(key: DecisionButtonAnchors.self, value: .bounds) { ["button": $0] }
-#endif
             .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
                 buttonFrame = $0
             }
     }
 
     private var isEvaluateButtonPinned: Bool {
-#if os(iOS)
-        if let frame = buttonContentFrame {
-            return frame.minY - compactScrollOffset > viewportFrame.height - evaluateButtonAreaHeight
-        }
-        return buttonFrame.isNull
-            ? compactScrollOffset <= 0
-            : buttonFrame.minY - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
-#else
         buttonFrame.isNull || buttonFrame.minY - viewportFrame.minY > viewportFrame.height - evaluateButtonAreaHeight
-#endif
     }
 
     @ToolbarContentBuilder
@@ -446,50 +469,58 @@ struct DecisionView: View {
     }
 
     private var inputSection: some View {
+        Section("Decision Content") { inputRows }
+    }
+
+    @ViewBuilder private var inputRows: some View {
         @Bindable var session = session
-        return Section("Decision Content") {
-            VStack(alignment: .leading, spacing: decisionAttachmentSpacing) {
-                VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: decisionAttachmentSpacing) {
+            VStack(alignment: .leading, spacing: 12) {
 #if os(macOS)
-                    AdaptiveSegmentedPickerRow(title: "Content to Evaluate") {
-                        inputModePicker
-                    }
-                    .padding(.top, 6)
-#else
+                AdaptiveSegmentedPickerRow(title: "Content to Evaluate") {
                     inputModePicker
-                    .pickerStyle(.menu)
+                }
+                .padding(.top, 6)
+#elseif os(iOS)
+                LabeledContent("Content to Evaluate") {
+                    inputModePicker
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                }
+#else
+                inputModePicker
+                .pickerStyle(.menu)
 #if os(visionOS)
-                    .padding(.bottom, 10)
+                .padding(.bottom, 10)
 #endif
 #endif
-                TextEditor(text: $session.input)
-                    .font(session.isJSON ? .system(.body, design: .monospaced) : .body)
-                    .scrollContentBackground(.hidden)
-                    .frame(height: 120)
-                    .padding(6)
-                    .modifier(DecisionInputStyle(isInvalid: session.isJSONInvalid))
-                    .accessibilityLabel("Content to Evaluate")
-                    .accessibilityIdentifier("decision_input")
-                if session.isJSONInvalid {
-                    Text("Enter a valid JSON object or array.").font(.caption).foregroundStyle(.red)
-                }
-                }
-#if !os(visionOS)
-                decisionAttachments
-#endif
+            TextEditor(text: $session.input)
+                .font(session.isJSON ? .system(.body, design: .monospaced) : .body)
+                .scrollContentBackground(.hidden)
+                .frame(height: 120)
+                .padding(6)
+                .modifier(DecisionInputStyle(isInvalid: session.isJSONInvalid))
+                .accessibilityLabel("Content to Evaluate")
+                .accessibilityIdentifier("decision_input")
+            if session.isJSONInvalid {
+                Text("Enter a valid JSON object or array.").font(.caption).foregroundStyle(.red)
             }
-            .disabled(session.isRunning)
-#if os(visionOS)
-            .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
-            .listRowSeparator(.hidden)
-#endif
-#if os(visionOS)
+            }
+#if !os(visionOS)
             decisionAttachments
-                .disabled(session.isRunning)
-                .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0))
-                .listRowSeparator(.hidden)
 #endif
         }
+        .disabled(session.isRunning)
+#if os(visionOS)
+        .listRowInsets(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
+        .listRowSeparator(.hidden)
+#endif
+#if os(visionOS)
+        decisionAttachments
+            .disabled(session.isRunning)
+            .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 0))
+            .listRowSeparator(.hidden)
+#endif
     }
 
     private var decisionAttachments: some View {
@@ -515,15 +546,6 @@ struct DecisionView: View {
         return Section("Decision Conditions") {
             DecisionConditionsEditor(conditions: $session.conditions)
                 .disabled(session.isRunning)
-#if os(iOS)
-                .listRowBackground(
-                    Color(uiColor: .secondarySystemGroupedBackground)
-                        .anchorPreference(key: DecisionButtonAnchors.self, value: .bounds) { ["conditions": $0] }
-                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: {
-                            conditionRowFrame = $0
-                        }
-                )
-#endif
         }
     }
 
@@ -583,33 +605,37 @@ struct DecisionView: View {
 
     private var resultsSection: some View {
         Section {
-            if session.isRunning {
-                ProgressView()
-                    .frame(maxWidth: .infinity, minHeight: 100)
-            } else if let result = session.result {
-                VStack(alignment: .leading, spacing: 16) {
-                    ForEach(Array(session.resultConditions.enumerated()), id: \.element.id) { index, condition in
-                        if let answer = result.answers[condition.id.uuidString] {
-                            DecisionResultRow(condition: condition, answer: answer, number: index + 1)
-                            if index < session.resultConditions.count - 1 { Divider() }
-                        }
-                    }
-                }
-                .id(session.resultRevision)
-#if os(iOS)
-                .listRowInsets(EdgeInsets(top: 16, leading: 20, bottom: 20, trailing: 20))
-#endif
-            } else {
-                Text("Decision results will appear here.")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 100)
-            }
+            resultsContent
         } header: {
             Text("Decision Results")
         } footer: {
             DecisionResultFooter(session: session, resultText: resultText, resultJSON: resultJSON, copy: copy)
         }
         .id("decision-results")
+    }
+
+    @ViewBuilder private var resultsContent: some View {
+        if session.isRunning {
+            ProgressView()
+                .frame(maxWidth: .infinity, minHeight: 100)
+        } else if let result = session.result {
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(Array(session.resultConditions.enumerated()), id: \.element.id) { index, condition in
+                    if let answer = result.answers[condition.id.uuidString] {
+                        DecisionResultRow(condition: condition, answer: answer, number: index + 1)
+                        if index < session.resultConditions.count - 1 { Divider() }
+                    }
+                }
+            }
+            .id(session.resultRevision)
+#if os(iOS)
+            .listRowInsets(EdgeInsets(top: 16, leading: 20, bottom: 20, trailing: 20))
+#endif
+        } else {
+            Text("Decision results will appear here.")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 100)
+        }
     }
 
     private var resultText: String {
@@ -625,14 +651,6 @@ struct DecisionView: View {
 #else
         UIPasteboard.general.string = text
 #endif
-    }
-}
-
-private struct DecisionButtonAnchors: PreferenceKey {
-    static var defaultValue: [String: Anchor<CGRect>] { [:] }
-
-    static func reduce(value: inout [String: Anchor<CGRect>], nextValue: () -> [String: Anchor<CGRect>]) {
-        value.merge(nextValue(), uniquingKeysWith: { _, next in next })
     }
 }
 
