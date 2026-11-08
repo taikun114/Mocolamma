@@ -2041,6 +2041,7 @@ struct SimpleTableCellStyle: StructuredText.TableCellStyle {
 // MARK: - Dedicated Style for Thinking Text
 
 struct MessageThinkingSectionView: View, Equatable {
+    @Environment(\.layoutDirection) private var layoutDirection
     let thinking: String
     let isStreaming: Bool
     let isThinkingCompleted: Bool
@@ -2068,10 +2069,10 @@ struct MessageThinkingSectionView: View, Equatable {
                     
                     Spacer()
                     
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "chevron.forward")
                         .font(.caption2)
                         .foregroundColor(.secondary)
-                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        .rotationEffect(.degrees(isExpanded ? (layoutDirection == .rightToLeft ? -90 : 90) : 0))
                 }
                 .contentShape(Rectangle())
             }

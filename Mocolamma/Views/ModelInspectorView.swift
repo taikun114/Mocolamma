@@ -7,6 +7,7 @@ import AppKit
 
 /// 選択されたOllamaモデルの詳細情報を表示するSwiftUIビューです。
 struct ModelInspectorView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     let model: OllamaModel
     let response: OllamaShowResponse?
     let isLoading: Bool
@@ -209,7 +210,7 @@ struct ModelInspectorView: View {
                                     NSCursor.closedHand.push()
                                     dragStartOffset = currentTagsOffset
                                 }
-                                let deltaX = value.translation.width
+                                let deltaX = value.translation.width * (layoutDirection == .rightToLeft ? -1 : 1)
                                 // スクロール位置を更新
                                 tagsScrollPos = ScrollPosition(point: CGPoint(x: dragStartOffset.x - deltaX, y: 0))
                             }

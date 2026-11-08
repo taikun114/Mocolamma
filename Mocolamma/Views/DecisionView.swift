@@ -570,7 +570,7 @@ struct DecisionView: View {
                 if session.isRunning { Image(systemName: "stop.fill") }
                 Text(session.isRunning ? "Cancel" : "Evaluate").fontWeight(.bold)
                 Spacer()
-                if !session.isRunning { Image(systemName: "arrow.right") }
+                if !session.isRunning { Image(systemName: "arrow.forward") }
             }
             .frame(maxWidth: .infinity)
         }

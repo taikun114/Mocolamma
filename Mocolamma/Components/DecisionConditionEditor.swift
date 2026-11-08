@@ -47,7 +47,7 @@ struct DecisionConditionEditor: View {
                     } else { Text(condition.instructions).lineLimit(1) }
                     Spacer()
                     Text(condition.kind.title).foregroundStyle(.secondary)
-                    Image(systemName: condition.isExpanded ? "chevron.down" : "chevron.right")
+                    Image(systemName: condition.isExpanded ? "chevron.down" : "chevron.forward")
                         .foregroundStyle(.secondary)
                         .frame(width: disclosureWidth)
                 }
@@ -348,8 +348,10 @@ struct DecisionResultRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(score, format: .number.precision(.fractionLength(2))).font(.largeTitle).bold()
-                        Text("/ \(DecisionResultFormatter.points(condition.validOptions.count - 1))").foregroundStyle(.secondary)
+                        Text(verbatim: "/").foregroundStyle(.secondary)
+                        Text(DecisionResultFormatter.points(condition.validOptions.count - 1)).foregroundStyle(.secondary)
                     }
+                    .environment(\.layoutDirection, .leftToRight)
                     if let winner = winningIndex {
                         Text("Most likely: \(condition.validOptions[winner])").font(.body)
                     }
