@@ -4,6 +4,21 @@ import Testing
 @testable import Mocolamma
 
 struct SpeechTests {
+    @Test func screenshotSpeechPromptsDescribeMocolammaInEachLanguage() {
+        #expect(ScreenshotConfiguration.speechModelName == "lfm3-audio:2b")
+        let english = ScreenshotConfiguration.speechPrompt(language: "en-US")
+        let japanese = ScreenshotConfiguration.speechPrompt(language: "ja-JP")
+        #expect(english.hasPrefix("Mocolamma is an application"))
+        #expect(english.contains("macOS, iOS, iPadOS, and visionOS"))
+        #expect(japanese.hasPrefix("Mocolammaは、Ollamaサーバーと接続して"))
+        #expect(japanese.contains("macOS、iOS、iPadOS、visionOS"))
+        for language in ["de-DE", "fr-FR", "zh-Hans", ""] {
+            #expect(ScreenshotConfiguration.speechPrompt(language: language) == english)
+        }
+        #expect(english.components(separatedBy: "\n\n").count == 2)
+        #expect(japanese.components(separatedBy: "\n\n").count == 2)
+    }
+
     @Test @MainActor func exportsBufferedAudioAsWAVWithOriginalSamplesAndReusesFile() async throws {
         let playback = SpeechPlayback()
         #expect(playback.audioExport == nil)

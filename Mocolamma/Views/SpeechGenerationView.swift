@@ -14,6 +14,7 @@ struct SpeechGenerationView: View {
     @State private var isNearBottom: Bool = true
     @State private var scrollToBottomTrigger: Int = 0
     @State private var scrollToMessageIDTrigger: UUID? = nil
+    @State private var isSpeechVisible = false
 
     @Binding var showingInspector: Bool
     var onToggleInspector: () -> Void
@@ -205,8 +206,16 @@ struct SpeechGenerationView: View {
         .navigationTitle("Speech Generation")
         .modifier(NavSubtitleIfAvailable(subtitle: subtitle))
         .toolbar { toolbarContent }
-        .onAppear { validateModel() }
-        .onChange(of: executor.models) { _, _ in validateModel() }
+        .onAppear {
+            isSpeechVisible = true
+            validateModel()
+            startScreenshotSpeechIfNeeded()
+        }
+        .onDisappear { isSpeechVisible = false }
+        .onChange(of: executor.models) { _, _ in
+            validateModel()
+            startScreenshotSpeechIfNeeded()
+        }
         .onChange(of: speech.selectedModelID) { _, _ in speech.resetVoices() }
         .task(id: ModelDetailRequest(context: executor.modelRequestContext, modelName: speech.selectedModelID ?? "", cacheRevision: executor.modelInfoCacheRevision)) {
             let context = executor.modelRequestContext
@@ -233,6 +242,16 @@ struct SpeechGenerationView: View {
             speech.selectedModelID = nil
             speech.resetVoices()
         }
+    }
+
+    private func startScreenshotSpeechIfNeeded() {
+        guard ScreenshotConfiguration.isEnabled, isSpeechVisible,
+              speech.messages.isEmpty, speech.input.isEmpty, !speech.isGenerating,
+              serverManager.selectedServer != nil,
+              let model = executor.models.first(where: { $0.name == ScreenshotConfiguration.speechModelName && $0.supportsSpeech }) else { return }
+        speech.selectedModelID = model.id
+        speech.input = ScreenshotConfiguration.speechPrompt
+        generateSpeech()
     }
 
     @ViewBuilder

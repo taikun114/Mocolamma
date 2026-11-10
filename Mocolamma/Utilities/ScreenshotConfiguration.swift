@@ -2,12 +2,33 @@ import Foundation
 
 enum ScreenshotConfiguration {
     static var chatPrompt: String {
-        Locale.preferredLanguages.first?.hasPrefix("en") == true
-            ? "Hello. Please tell me one thing you are good at."
-            : "こんにちは。あなたが得意なことを1つ教えてください。"
+        Locale.preferredLanguages.first?.hasPrefix("ja") == true
+            ? "こんにちは。あなたが得意なことを1つ教えてください。"
+            : "Hello. Please tell me one thing you are good at."
     }
 
     static let decisionModelName = "d3:4b"
+
+    static let speechModelName = "lfm3-audio:2b"
+
+    static var speechPrompt: String {
+        speechPrompt(language: Locale.preferredLanguages.first ?? "en")
+    }
+
+    static func speechPrompt(language: String) -> String {
+        if !language.hasPrefix("ja") {
+            return """
+            Mocolamma is an application that connects to Ollama servers, allowing you to manage models, chat, generate images, and more.
+
+            Mocolamma supports macOS, iOS, iPadOS, and visionOS, so you can use it on a wide range of devices. Even if your Mac with Ollama installed is in another room, you can conveniently control it remotely from your iPhone or another device at hand.
+            """
+        }
+        return """
+        Mocolammaは、Ollamaサーバーと接続してモデルを管理したり、チャットや画像生成などを行ったりすることができるアプリケーションです。
+
+        MocolammaはmacOS、iOS、iPadOS、visionOSに対応しており、幅広いデバイスでご利用いただけます。OllamaがインストールされたMacが別の部屋にあっても、手元のiPhoneなどからリモートで操作することができるため、非常に便利です。
+        """
+    }
 
     struct DecisionPreset {
         let input: String
@@ -15,11 +36,11 @@ enum ScreenshotConfiguration {
     }
 
     static var decisionPreset: DecisionPreset {
-        decisionPreset(language: Locale.preferredLanguages.first ?? "ja")
+        decisionPreset(language: Locale.preferredLanguages.first ?? "en")
     }
 
     static func decisionPreset(language: String) -> DecisionPreset {
-        if language.hasPrefix("en") {
+        if !language.hasPrefix("ja") {
             return DecisionPreset(
                 input: "The app suddenly crashes a few seconds after launch. Reinstalling it does not help, and it worked without any issues in the previous version. The app is currently completely unusable.",
                 conditions: [
