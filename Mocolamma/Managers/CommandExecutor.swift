@@ -2294,6 +2294,7 @@ struct OllamaShowResponse: Decodable {
     let details: OllamaModelDetails?
     let model_info: [String: JSONValue]?
     let capabilities: [String]?
+    var voices: [String]? = nil
 }
 
 extension OllamaShowResponse {

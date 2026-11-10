@@ -7,17 +7,19 @@ The order of listing is as follows (1.3.0 or later):
   - General
   - Server
   - Model
-  - Chat and Image Generation
+  - Chat / Image Generation / Speech Generation
   - Chat
   - Image Generation
+  - Speech Generation
   - Decision
 - Bug Fixes and Improvements
   - General
   - Server
   - Model
-  - Chat and Image Generation
+  - Chat / Image Generation / Speech Generation
   - Chat
   - Image Generation
+  - Speech Generation
   - Decision
 
 Each section lists items in the following order:
@@ -52,6 +54,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 #### General
 - **Support decision functionality**
   - You can now evaluate text and image content using models that support decision-making.
+- **Support speech generation**
+  - You can now generate speech from text using models that support speech generation.
 
 #### Model
 - **Support speech model tag**

@@ -195,3 +195,7 @@ extension OllamaModel {
 struct OllamaApiModelsResponse: Codable {
     let models: [OllamaModel]
 }
+
+extension OllamaModel {
+    var supportsSpeech: Bool { capabilities?.contains { $0.lowercased() == "speech" } == true }
+}

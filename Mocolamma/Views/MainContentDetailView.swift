@@ -55,6 +55,10 @@ struct MainContentDetailView: View {
                 NavigationStack {
                     DecisionView(showingInspector: $showingInspector, onToggleInspector: { showingInspector.toggle() })
                 }
+            } else if sidebarSelection == "speech_generation" {
+                NavigationStack {
+                    SpeechGenerationView(showingInspector: $showingInspector, onToggleInspector: { showingInspector.toggle() })
+                }
             } else if sidebarSelection == "image_generation" {
                 NavigationStack {
                     ImageGenerationView(

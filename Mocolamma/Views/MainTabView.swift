@@ -51,7 +51,7 @@ struct MainTabView: View {
 
     private var usesSelectedGenerationTab: Bool {
 #if os(iOS)
-        !isiOSAppOnVision && !usesCompactGeneration && tabBarPlacement == .topBar && ["chat", "decision", "image_generation"].contains(selection ?? "")
+        !isiOSAppOnVision && !usesCompactGeneration && tabBarPlacement == .topBar && ["chat", "decision", "image_generation", "speech_generation"].contains(selection ?? "")
 #else
         false
 #endif
@@ -131,6 +131,20 @@ struct MainTabView: View {
                                 Image(systemName: "photo").foregroundStyle(.blue)
                             }
                         }
+                        NavigationLink(value: "speech_generation") {
+                            Label {
+                                VStack(alignment: .leading) {
+                                    Text("Speech Generation")
+                                        .fontWeight(.bold)
+                                        .lineLimit(1)
+                                    Text("Read text aloud using speech generation models.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            } icon: {
+                                Image(systemName: ModelCapabilityTag("speech").iconName).foregroundStyle(.orange)
+                            }
+                        }
                     }
                     .navigationTitle("Generation")
                     .modifier(NavSubtitleIfAvailable(subtitle: serverManager.selectedServer.map { Text(verbatim: $0.name) } ?? Text("No Server Selected")))
@@ -139,6 +153,8 @@ struct MainTabView: View {
                             ChatView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
                         } else if destination == "decision" {
                             DecisionView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+                        } else if destination == "speech_generation" {
+                            SpeechGenerationView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
                         } else if destination == "image_generation" {
                             ImageGenerationView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
                         }
@@ -202,6 +218,20 @@ struct MainTabView: View {
 #endif
             .hidden((usesCompactGeneration || tabBarPlacement == .topBar) && selection != "image_generation")
             
+            Tab(usesSelectedGenerationTab && selection == "speech_generation" ? "Generation" : "Speech Generation", systemImage: usesSelectedGenerationTab && selection == "speech_generation" ? "sparkles" : ModelCapabilityTag("speech").iconName, value: "speech_generation") {
+                NavigationStack {
+                    SpeechGenerationView(showingInspector: $showingInspector, onToggleInspector: toggleInspector)
+#if os(iOS)
+                        .toolbar { generationBackButton }
+#endif
+                }
+                .background(TabBarPlacementObserver(placement: $tabBarPlacement, isActive: selection == "speech_generation"))
+            }
+#if os(iOS)
+            .tabPlacement(usesSelectedGenerationTab && selection == "speech_generation" ? .automatic : .sidebarOnly)
+#endif
+            .hidden((usesCompactGeneration || tabBarPlacement == .topBar) && selection != "speech_generation")
+
             Tab("Settings", systemImage: "gear", value: "settings") {
                 NavigationStack {
                     SettingsView()
@@ -210,7 +240,7 @@ struct MainTabView: View {
             }
         }
         .onChange(of: usesGenerationTab, initial: true) { _, grouped in
-            if grouped, usesCompactGeneration, let selection, ["chat", "decision", "image_generation"].contains(selection) {
+            if grouped, usesCompactGeneration, let selection, ["chat", "decision", "image_generation", "speech_generation"].contains(selection) {
                 withTransaction(Transaction(animation: nil)) {
                     generationPath = [selection]
                     self.selection = "generation"

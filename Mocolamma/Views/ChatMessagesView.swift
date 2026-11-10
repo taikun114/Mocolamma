@@ -36,6 +36,7 @@ struct ChatMessagesView: View {
     @Binding var scrollToBottomTrigger: Int
     @Binding var scrollToMessageIDTrigger: UUID?
     let isModelSelected: Bool
+    var allowsAttachments = true
     var bottomInset: CGFloat = 0
     let emptyStateTitle: LocalizedStringKey
     let emptyStateDescription: LocalizedStringKey
@@ -104,7 +105,7 @@ struct ChatMessagesView: View {
             .environment(selectionCoordinator)
             .modifier(TextSelectionCoordination())
         }
-        .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor))
+        .onDrop(of: AttachmentReorderDrag.externalContentTypes, delegate: AreaImageDropDelegate(items: .constant([]), isDraggingOver: .constant(false), executor: executor, isEnabled: allowsAttachments))
     }
 }
 

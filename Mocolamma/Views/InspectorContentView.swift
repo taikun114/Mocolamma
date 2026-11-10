@@ -262,6 +262,8 @@ struct InspectorContentView: View {
                     isTopKFocused = false
                 }
 #endif
+            } else if selection == "speech_generation" {
+                SpeechInspectorView()
             } else if selection == "image_generation" {
                 Form {
                     Section("Image Generation Settings") {

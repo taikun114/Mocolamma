@@ -22,6 +22,7 @@ struct ContentView: View {
     
     @Binding var showingInspector: Bool
     @Environment(ChatSettings.self) var chatSettings
+    @Environment(SpeechSession.self) private var speech
     
     // モデル追加シートの表示/非表示を制御します
     @Binding var showingAddModelsSheet: Bool
@@ -176,6 +177,9 @@ struct ContentView: View {
         }
         .onChange(of: modelSettings.modelListSortOrder) { _, _ in updateSortedModels() }
         .onChange(of: executor.isPulling) { _, newValue in isPulling = newValue }
+        .onChange(of: executor.modelRequestContext, initial: true) { _, context in
+            speech.changeServer(context)
+        }
         .onChange(of: executor.modelRequestContext) { _, _ in handleActiveServerChange() }
         .onReceive(appRefreshTrigger.publisher) {
             Task { await performRefreshForCurrentSelection() }
@@ -221,7 +225,7 @@ struct ContentView: View {
         serverManager.inspectorSelection = newSelection
         
         // 実行中モデルの更新（サーバー、モデル、チャット、画像生成タブ切り替え時に最新状態を確認）
-        if let sel = newSelection, ["server", "models", "generation", "chat", "decision", "image_generation"].contains(sel) && serverManager.selectedServer != nil {
+        if let sel = newSelection, ["server", "models", "generation", "chat", "decision", "image_generation", "speech_generation"].contains(sel) && serverManager.selectedServer != nil {
             Task {
                 _ = await executor.fetchRunningModels()
             }
@@ -355,7 +359,7 @@ struct ContentView: View {
                 }
             }
             
-        case "chat", "decision", "generation":
+        case "chat", "decision", "generation", "speech_generation":
             // 生成機能の画面でモデル一覧を再取得する
             Task {
                 executor.clearModelInfoCache()

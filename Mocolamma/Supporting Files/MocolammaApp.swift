@@ -30,6 +30,7 @@ struct MocolammaApp: App {
     @State private var serverManager = ServerManager()
     @State private var localNetworkChecker = LocalNetworkPermissionChecker()
     @State private var imageSettings = ImageGenerationSettings()
+    @State private var speechSession = SpeechSession()
     @State private var decisionSession = DecisionSession()
     @State private var chatSettings = ChatSettings() // ContentViewから昇格させて共有
     @State private var executor: CommandExecutor
@@ -52,7 +53,7 @@ struct MocolammaApp: App {
     // メニュー項目の有効/無効を判断する計算プロパティ
     private var isMenuActionDisabled: Bool {
         switch selection {
-        case "server", "models", "chat", "decision", "image_generation": // サーバー、モデル、チャット、画像生成のいずれかの画面が開いている場合は有効
+        case "server", "models", "chat", "decision", "image_generation", "speech_generation": // サーバー、モデル、チャット、画像生成のいずれかの画面が開いている場合は有効
             return false
         default: // "settings" または nil (初期状態など) の場合は無効
             return true
@@ -93,6 +94,7 @@ struct MocolammaApp: App {
             .environment(imageSettings)
             .environment(chatSettings)
             .environment(decisionSession)
+            .environment(speechSession)
             .environment(serverManager)
             .environment(executor)
             .onAppear {
@@ -131,6 +133,8 @@ struct MocolammaApp: App {
                     Label("Chat", systemImage: "message")
                         .tag("chat" as String?)
                         .keyboardShortcut("3", modifiers: .command)
+                    Label("Speech Generation", systemImage: ModelCapabilityTag("speech").iconName)
+                        .tag("speech_generation" as String?)
                     Label("Decision", systemImage: "list.bullet.circle")
                         .tag("decision" as String?)
                     Label("Image Generation", systemImage: "photo")

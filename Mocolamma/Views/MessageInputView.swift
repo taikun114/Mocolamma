@@ -14,6 +14,7 @@ struct MessageInputView: View {
     @Binding var showingInspector: Bool
     var attachmentOnly = false
     var imagesOnly = false
+    var allowsAttachments = true
     var placeholder: String = "Type your message..."
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
@@ -28,6 +29,7 @@ struct MessageInputView: View {
         selectedAttachments: Binding<[ChatInputAttachment]> = .constant([]),
         isStreaming: Binding<Bool>,
         showingInspector: Binding<Bool>,
+        allowsAttachments: Bool = true,
         placeholder: String = "Type your message...",
         selectedModel: OllamaModel?,
         sendMessage: @escaping () -> Void,
@@ -36,6 +38,7 @@ struct MessageInputView: View {
     ) {
         self.attachmentOnly = attachmentOnly
         self.imagesOnly = imagesOnly
+        self.allowsAttachments = allowsAttachments
         self._inputText = inputText
         self._selectedImages = selectedImages
         self._selectedAttachments = selectedAttachments
@@ -62,7 +65,7 @@ struct MessageInputView: View {
     
     /// 添付（ファイルまたは画像）が可能かどうかを判定します
     private var canAttach: Bool {
-        guard let model = selectedModel else { return false }
+        guard allowsAttachments, let model = selectedModel else { return false }
         return imagesOnly ? model.supportsVision : (attachmentOnly || model.supportsCompletion || model.supportsVision || model.supportsAudio)
     }
     
@@ -113,7 +116,7 @@ struct MessageInputView: View {
     }
 
     private var isAttachmentDropActive: Bool {
-        attachmentDropContext?.isExternalDragActive == true || executor.isDraggingFile
+        allowsAttachments && (attachmentDropContext?.isExternalDragActive == true || executor.isDraggingFile)
     }
 
     private var attachmentDropHint: some View {
@@ -203,64 +206,67 @@ struct MessageInputView: View {
                     )
                 } else {
                 HStack(alignment: .bottom) {
-                // プラスボタン (アクションシートを表示)
-                Button(action: {
-                    showingAttachSheet = true
-                }) {
+                if allowsAttachments {
+                    // プラスボタン (アクションシートを表示)
+                    Button(action: {
+                        showingAttachSheet = true
+                    }) {
 #if os(visionOS)
-                    Image(systemName: "plus")
-                        .font(.title2)
-                        .padding(8)
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .padding(8)
 #else
-                    ZStack {
+                        ZStack {
 #if !os(macOS)
-                        if #available(iOS 26, visionOS 26.0, *) {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .padding(8)
+                            if #available(iOS 26, visionOS 26.0, *) {
+                                Image(systemName: "plus")
+                                    .font(.title2)
+                                    .padding(8)
 #if !os(visionOS)
-                                .glassEffect(.regular.interactive())
+                                    .glassEffect(.regular.interactive())
 #endif
-                        } else {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .padding(8)
-                                .background(Circle().fill(.thinMaterial))
-                        }
+                            } else {
+                                Image(systemName: "plus")
+                                    .font(.title2)
+                                    .padding(8)
+                                    .background(Circle().fill(.thinMaterial))
+                            }
 #else
-                        if #available(macOS 26, *) {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .padding(7)
+                            if #available(macOS 26, *) {
+                                Image(systemName: "plus")
+                                    .font(.title2)
+                                    .padding(7)
 #if !os(visionOS)
-                                .glassEffect(.regular.interactive())
+                                    .glassEffect(.regular.interactive())
 #endif
-                        } else {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .padding(7)
-                                .background(Circle().fill(.thinMaterial))
+                            } else {
+                                Image(systemName: "plus")
+                                    .font(.title2)
+                                    .padding(7)
+                                    .background(Circle().fill(.thinMaterial))
+                            }
+#endif
                         }
+                        .contentShape(Rectangle())
 #endif
                     }
-                    .contentShape(Rectangle())
-#endif
-                }
 #if os(visionOS)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.circle)
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
 #else
-                .buttonStyle(.plain)
+                    .buttonStyle(.plain)
 #endif
-                .disabled(!canAttach)
-                .attachFileConfirmationDialog(
-                    isPresented: $showingAttachSheet,
-                    showingFilePicker: $showingFilePicker,
-                    showingPhotoPicker: $showingPhotoPicker,
-                    supportsCompletion: selectedModel?.supportsCompletion == true || selectedModel?.supportsAudio == true,
-                    supportsVision: selectedModel?.supportsVision == true
-                )
-                
+                    .disabled(!canAttach)
+                    .attachFileConfirmationDialog(
+                        isPresented: $showingAttachSheet,
+                        showingFilePicker: $showingFilePicker,
+                        showingPhotoPicker: $showingPhotoPicker,
+                        supportsCompletion: selectedModel?.supportsCompletion == true || selectedModel?.supportsAudio == true,
+                        supportsVision: selectedModel?.supportsVision == true
+                    )
+
+                }
+
                 ZStack(alignment: .leading) {
 #if !os(macOS)
                     if #available(iOS 26, visionOS 26.0, *) {
@@ -454,7 +460,7 @@ struct MessageInputView: View {
         .allowsHitTesting(selectedModel != nil)
         .background(Color.clear)
         .onChange(of: attachmentDropContext?.request?.id) { _, _ in
-            guard let request = attachmentDropContext?.request else { return }
+            guard allowsAttachments, let request = attachmentDropContext?.request else { return }
             attachmentDropContext?.request = nil
             if !request.urls.isEmpty { handleDroppedURLs(request.urls) }
             if !request.imageData.isEmpty { addImages(from: request.imageData) }

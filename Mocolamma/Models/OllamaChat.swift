@@ -400,6 +400,11 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var imageProgressCompleted: Int? // 現在のステップ数
     var imageProgressTotal: Int? // 合計ステップ数
     var isImageGeneration: Bool = false // 画像生成メッセージかどうか
+    var isSpeechGeneration = false
+    var speechPlayback: SpeechPlayback?
+    var speechVoice: String?
+    var speechModelName: String?
+    var latestSpeechRevision: ChatMessage?
     
     // 新しいプロパティ（やり直し履歴など）
     var revisions: [ChatMessage] = [] // やり直し履歴

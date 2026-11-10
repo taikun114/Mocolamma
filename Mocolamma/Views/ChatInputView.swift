@@ -6,6 +6,7 @@ struct ChatInputView: View {
     @Binding var selectedAttachments: [ChatInputAttachment]
     @Binding var isStreaming: Bool
     @Binding var showingInspector: Bool
+    var allowsAttachments = true
     var placeholder: String = "Type your message..."
     let selectedModel: OllamaModel?
     let sendMessage: () -> Void
@@ -17,6 +18,7 @@ struct ChatInputView: View {
         selectedAttachments: Binding<[ChatInputAttachment]> = .constant([]),
         isStreaming: Binding<Bool>,
         showingInspector: Binding<Bool>,
+        allowsAttachments: Bool = true,
         placeholder: String = "Type your message...",
         selectedModel: OllamaModel?,
         sendMessage: @escaping () -> Void,
@@ -27,6 +29,7 @@ struct ChatInputView: View {
         self._selectedAttachments = selectedAttachments
         self._isStreaming = isStreaming
         self._showingInspector = showingInspector
+        self.allowsAttachments = allowsAttachments
         self.placeholder = placeholder
         self.selectedModel = selectedModel
         self.sendMessage = sendMessage
@@ -40,6 +43,7 @@ struct ChatInputView: View {
             selectedAttachments: $selectedAttachments,
             isStreaming: $isStreaming,
             showingInspector: $showingInspector,
+            allowsAttachments: allowsAttachments,
             placeholder: placeholder,
             selectedModel: selectedModel,
             sendMessage: sendMessage,

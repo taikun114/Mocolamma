@@ -42,6 +42,8 @@ struct MessageView: View {
     @State private var isFileExporterPresented: Bool = false
     @State private var imageDocument: ImageDocument?
     @State private var isThinkingExpanded: Bool = false
+    @State private var audioCopyError: String?
+    @State private var isCopyingAudio = false
     
     private var isDownloadSuccessful: Bool {
         message.isDownloadSuccessful
@@ -64,11 +66,12 @@ struct MessageView: View {
     }
     
     private var canAttach: Bool {
-        isModelSelected && (supportsCompletion || supportsVision || supportsAudio)
+        !message.isSpeechGeneration && isModelSelected && (supportsCompletion || supportsVision || supportsAudio)
     }
     
     private var isDoneDisabled: Bool {
         guard isModelSelected && !isStreamingAny else { return true }
+        if message.isSpeechGeneration { return message.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
         return !ChatAttachmentSendPolicy.canSend(
             text: message.content, imageCount: editingImages.count, attachments: editingAttachments,
             supportsVision: supportsVision, supportsAudio: supportsAudio
@@ -98,7 +101,7 @@ struct MessageView: View {
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel(message.role == "user" ? "User message" : "Assistant message")
                 .accessibilityValue(message.content)
-                .padding(10)
+                .padding(message.isSpeechGeneration && message.role == "assistant" && message.speechPlayback?.hasAudio == true ? 0 : 10)
                 .background(
                     Group {
                         if message.role == "user" {
@@ -770,7 +773,7 @@ struct MessageView: View {
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .lineLimit(1)
-        } else if message.isImageGeneration {
+        } else if message.isImageGeneration || message.isSpeechGeneration {
             if let duration = message.totalDuration {
                 Text(formatDuration(nanoseconds: duration))
                     .font(.caption2)
@@ -784,6 +787,18 @@ struct MessageView: View {
                 .lineLimit(1)
             let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
             Text(String(format: "%.2f Tok/s", tokensPerSecond))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        if message.isSpeechGeneration, let modelName = message.speechModelName {
+            Text(verbatim: modelName)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        if message.isSpeechGeneration, let voice = message.speechVoice {
+            Text(verbatim: voice == "default" ? String(localized: "Default") : voice)
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .lineLimit(1)
@@ -817,6 +832,10 @@ struct MessageView: View {
     private var revisionNavigator: some View {
         HStack(alignment: .center, spacing: 4) {
             Button(action: {
+                if message.isSpeechGeneration {
+                    message.selectSpeechRevision(at: message.currentRevisionIndex - 1)
+                    return
+                }
                 message.currentRevisionIndex -= 1
                 let revision = message.revisions[message.currentRevisionIndex]
                 message.content = revision.content
@@ -860,6 +879,10 @@ struct MessageView: View {
             }
             
             Button(action: {
+                if message.isSpeechGeneration {
+                    message.selectSpeechRevision(at: message.currentRevisionIndex + 1)
+                    return
+                }
                 message.currentRevisionIndex += 1
                 if message.currentRevisionIndex < message.revisions.count {
                     let revision = message.revisions[message.currentRevisionIndex]
@@ -1074,7 +1097,9 @@ struct MessageView: View {
     @ViewBuilder
     private var copyButton: some View {
         Button(action: {
-            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+            if let audio = message.speechPlayback?.audioExport, message.isSpeechGeneration {
+                copyAudioToClipboard(audio)
+            } else if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
                 copyImageToClipboard(image: image)
             } else {
 #if os(macOS)
@@ -1118,12 +1143,23 @@ struct MessageView: View {
         .foregroundColor(.accentColor)
 #endif
         .help("Copy")
-        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
+        .disabled(isCopyingAudio || !hasTransferableContent)
+        .alert("Error Occurred", isPresented: Binding(get: { audioCopyError != nil }, set: { if !$0 { audioCopyError = nil } })) {
+            Button("OK") { audioCopyError = nil }
+        } message: {
+            Text(audioCopyError ?? "An unknown error occurred.")
+        }
     }
     
     private var shareButton: some View {
         Group {
-            if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
+            if let audio = message.speechPlayback?.audioExport, message.isSpeechGeneration {
+                ShareLink(item: audio, preview: SharePreview("Speech Generation")) {
+                    Image(systemName: "square.and.arrow.up")
+                        .contentShape(Rectangle())
+                        .padding(5)
+                }
+            } else if message.isImageGeneration, let base64String = message.generatedImage, let imageData = Data(base64Encoded: base64String), let image = PlatformImage(data: imageData) {
                 ShareLink(item: Image(platformImage: image), preview: SharePreview(message.content, image: Image(platformImage: image))) {
                     Image(systemName: "square.and.arrow.up")
                         .contentShape(Rectangle())
@@ -1159,7 +1195,34 @@ struct MessageView: View {
         .foregroundColor(.accentColor)
 #endif
         .help("Share")
-        .disabled(message.content.isEmpty && (message.thinking?.isEmpty ?? true) && (message.finalThinking?.isEmpty ?? true) && message.generatedImage == nil)
+        .disabled(!hasTransferableContent)
+    }
+
+    private var hasTransferableContent: Bool {
+        message.speechPlayback?.audioExport != nil || !message.content.isEmpty ||
+        !(message.thinking?.isEmpty ?? true) || !(message.finalThinking?.isEmpty ?? true) || message.generatedImage != nil
+    }
+
+    private func copyAudioToClipboard(_ audio: SpeechAudioExport) {
+        isCopyingAudio = true
+        Task { @MainActor in
+            defer { isCopyingAudio = false }
+            do {
+                let url = try await audio.fileURL()
+#if os(macOS)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                guard pasteboard.writeObjects([url as NSURL]) else { throw CocoaError(.fileWriteUnknown) }
+#else
+                guard let provider = NSItemProvider(contentsOf: url) else { throw CocoaError(.fileReadUnknown) }
+                UIPasteboard.general.setItemProviders([provider], localOnly: false, expirationDate: nil)
+#endif
+                showCopyFeedback()
+            } catch {
+                print("Speech audio copy failed: \(error.localizedDescription)")
+                audioCopyError = error.localizedDescription
+            }
+        }
     }
     
     private func showCopyFeedback() {
@@ -1501,6 +1564,18 @@ struct MessageView: View {
                         // 変換確定後にEnterが押されたら改行を挿入
                         message.content += "\n"
                     }
+                }
+            } else if message.isSpeechGeneration && message.role == "assistant" {
+                if let playback = message.speechPlayback, playback.hasAudio {
+                    SpeechPlayerView(playback: playback)
+                        .id(ObjectIdentifier(playback))
+                } else if message.isStreaming {
+                    ProgressView("Generating speech...")
+                        .padding()
+                }
+                if !message.content.isEmpty {
+                    streamingContentBody
+                        .padding(message.speechPlayback?.hasAudio == true ? 10 : 0)
                 }
             } else if message.isImageGeneration && message.role == "assistant" {
             VStack(alignment: .leading, spacing: 10) {

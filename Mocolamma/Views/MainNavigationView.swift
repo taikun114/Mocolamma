@@ -24,6 +24,7 @@ struct MainNavigationView: View {
                 Label("Chat", systemImage: "message").tag("chat")
                 Label("Decision", systemImage: ModelCapabilityTag("decision").iconName).tag("decision")
                 Label("Image Generation", systemImage: "photo").tag("image_generation")
+                Label("Speech Generation", systemImage: ModelCapabilityTag("speech").iconName).tag("speech_generation")
             }
             .navigationTitle("Menu")
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250) // サイドバーの幅を固定
