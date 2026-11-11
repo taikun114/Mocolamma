@@ -384,6 +384,8 @@ class ChatMessage: Identifiable, Codable, Equatable {
     var toolCalls: [ToolCall]?
     var toolName: String?
     var createdAt: String? // メッセージが作成された日時
+    var statistics = GenerationStatistics()
+    var finalStatistics: GenerationStatistics?
     var totalDuration: Int? // 応答生成にかかった合計時間 (ナノ秒)
     var evalCount: Int? // 応答内のトークン数
     var evalDuration: Int? // 応答生成にかかった時間 (ナノ秒)
@@ -908,6 +910,7 @@ struct ChatResponseChunk: Codable {
     let promptEvalDuration: Int?
     let evalCount: Int?
     let evalDuration: Int?
+    var promptEvalCachedCount: Int? = nil
     let doneReason: String?
     
     enum CodingKeys: String, CodingKey {
@@ -921,6 +924,7 @@ struct ChatResponseChunk: Codable {
         case promptEvalDuration = "prompt_eval_duration"
         case evalCount = "eval_count"
         case evalDuration = "eval_duration"
+        case promptEvalCachedCount = "prompt_eval_cached_count"
         case doneReason = "done_reason"
     }
 }

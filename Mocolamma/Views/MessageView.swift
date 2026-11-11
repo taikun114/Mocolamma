@@ -158,151 +158,36 @@ struct MessageView: View {
 #endif
             Group {
 #if os(visionOS)
-                HStack(alignment: .center, spacing: 8) {
+                HStack(alignment: .center, spacing: metadataActionsSpacing) {
                     if message.role == "user" { Spacer() }
-                    
-                    Text(dateString)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    
-                    if message.role == "assistant" { tokenAndSpeed }
-                    
-                    HStack(spacing: 6) {
-                        if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage {
-                            retryButton
-                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if (message.role == "assistant" || message.role == "user") {
-                            copyButton
-                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" {
-                            shareButton
-                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if message.role == "user" && isLastOwnUserMessage {
-                            if isEditing {
-                                cancelButton
-                                doneButton
-                            } else { editButton }
-                        }
-                    }
-                    
+                    metadataView
+                    HStack(spacing: 6) { actionButtons }
                     if message.role == "assistant" { Spacer() }
                 }
 #elseif os(iOS)
-                VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
+                VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: metadataActionsSpacing) {
                     HStack {
                         if message.role == "user" { Spacer() }
-                        ViewThatFits(in: .horizontal) {
-                            HStack(spacing: 6) {
-                                Text(dateString)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                if message.role == "assistant" {
-                                    tokenAndSpeed
-                                }
-                            }
-                            .lineLimit(1)
-                            .fixedSize(horizontal: true, vertical: false)
-                            
-                            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: 2) {
-                                Text(dateString)
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                if message.role == "assistant" {
-                                    tokenAndSpeed
-                                }
-                            }
-                            .lineLimit(1)
-                        }
+                        metadataView
                         if message.role == "assistant" { Spacer() }
                     }
                     HStack(spacing: 6) {
                         if message.role == "user" { Spacer() }
-                        if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty { revisionNavigator }
-                        if message.role == "assistant" && isLastAssistantMessage {
-                            retryButton
-                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if (message.role == "assistant" || message.role == "user") {
-                            copyButton
-                                .opacity(!message.isStreaming || message.isStopped ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if message.isImageGeneration && message.generatedImage != nil { downloadButton }
-                        if message.role == "assistant" {
-                            shareButton
-                                .opacity((!message.isStreaming || message.isStopped) && !isStreamingAny ? 1 : 0)
-                                .disabled(message.isStreaming && !message.isStopped)
-                        }
-                        if message.role == "user" && isLastOwnUserMessage {
-                            if isEditing {
-                                cancelButton
-                                doneButton
-                            } else { editButton }
-                        }
+                        actionButtons
                         if message.role == "assistant" { Spacer() }
                     }
                 }
 #else
-                HStack {
-                    if message.role == "user" {
-                        Spacer()
-                    }
-                    Text(dateString)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    
-                    if message.role == "assistant" {
-                        tokenAndSpeed
-                    }
-                    
-                    if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
-                        revisionNavigator
-                    }
-                    
-                    if message.role == "assistant" && isLastAssistantMessage && (!message.isStreaming || message.isStopped) {
-                        retryButton
-                    }
-                    
-                    if (message.role == "assistant" || message.role == "user") && (!message.isStreaming || message.isStopped) {
-                        copyButton
-                    }
-
-                    if message.isImageGeneration && message.generatedImage != nil {
-                        downloadButton
-                    }
-
-                    if message.role == "assistant" && (!message.isStreaming || message.isStopped) {
-                        shareButton
-                    }
-                    
-                    if message.role == "user" && isLastOwnUserMessage {
-                        if isEditing {
-                            cancelButton
-                            doneButton
-                        } else {
-                            editButton
-                        }
-                    }
-                    
-                    if message.role == "assistant" {
-                        Spacer()
-                    }
+                HStack(alignment: .center, spacing: metadataActionsSpacing) {
+                    if message.role == "user" { Spacer() }
+                    metadataView
+                    HStack(spacing: 8) { actionButtons }
+                    if message.role == "assistant" { Spacer() }
                 }
 #endif
             }
 #if os(macOS)
-            .opacity((isHovering && (!message.isStreaming || message.isStopped)) ? 1.0 : 0.0)
+            .opacity(isHovering ? 1.0 : 0.0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
 #else
             .opacity(1.0)
@@ -766,68 +651,53 @@ struct MessageView: View {
         }
     }
     
+    private var metadataActionsSpacing: CGFloat { 8 }
+
     @ViewBuilder
-    private var tokenAndSpeed: some View {
-        if message.isStopped {
-            Text("Stopped")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-        } else if message.isImageGeneration || message.isSpeechGeneration {
-            if let duration = message.totalDuration {
-                Text(formatDuration(nanoseconds: duration))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+    private var actionButtons: some View {
+        Group {
+            if message.role == "assistant" && isLastAssistantMessage && !message.revisions.isEmpty {
+                revisionNavigator
             }
-        } else if let evalCount = message.evalCount, let evalDuration = message.evalDuration, evalDuration > 0 {
-            Text("\(evalCount) Tokens")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            let tokensPerSecond = Double(evalCount) / (Double(evalDuration) / 1_000_000_000.0)
-            Text(String(format: "%.2f Tok/s", tokensPerSecond))
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
+            if message.role == "assistant" && isLastAssistantMessage {
+                retryButton
+                    .disabled(isStreamingAny)
+            }
+            if message.role == "assistant" || message.role == "user" {
+                copyButton
+            }
+            if message.role == "assistant" && message.isImageGeneration {
+                downloadButton
+                    .disabled(message.generatedImage == nil)
+            }
+            if message.role == "assistant" {
+                shareButton
+                    .disabled(isStreamingAny)
+            }
+            if message.role == "user" && isLastOwnUserMessage {
+                if isEditing {
+                    cancelButton
+                    doneButton
+                } else {
+                    editButton
+                }
+            }
         }
-        if message.isSpeechGeneration, let modelName = message.speechModelName {
-            Text(verbatim: modelName)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-        }
-        if message.isSpeechGeneration, let voice = message.speechVoice {
-            Text(verbatim: voice == "default" ? String(localized: "Default") : voice)
-                .font(.caption2)
-                .foregroundColor(.secondary)
+        .disabled(message.isStreaming && !message.isStopped)
+    }
+
+    @ViewBuilder
+    private var metadataView: some View {
+        if message.role == "assistant" {
+            GenerationMetadataView(metadata: .message(message), wrapsWhenNeeded: true)
+        } else {
+            Text(dateString)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
     }
-    
-    private func formatDuration(nanoseconds: Int) -> String {
-        let totalSeconds = Int(round(Double(nanoseconds) / 1_000_000_000.0))
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        
-        var parts: [String] = []
-        
-        if hours > 0 {
-            parts.append(String(format: NSLocalizedString("%dh", comment: "Duration hours (English)"), hours))
-        }
-        
-        if minutes > 0 || hours > 0 {
-            parts.append(String(format: NSLocalizedString("%dm", comment: "Duration minutes (English)"), minutes))
-        }
-        
-        parts.append(String(format: NSLocalizedString("%ds", comment: "Duration seconds (English)"), seconds))
-        
-        // 日本語環境の場合の特殊処理（もしxcstringsだけで解決できない場合のため）
-        // ただし、本来は xcstrings で "%dh" を "%d時間" に翻訳するのがベストプラクティスです。
-        return parts.joined(separator: " ")
-    }
-    
+
     @ViewBuilder
     private var revisionNavigator: some View {
         HStack(alignment: .center, spacing: 4) {
@@ -841,6 +711,7 @@ struct MessageView: View {
                 message.content = revision.content
                 message.thinking = revision.thinking
                 message.isThinkingCompleted = revision.isThinkingCompleted
+                message.statistics = revision.statistics
                 message.createdAt = revision.createdAt
                 message.totalDuration = revision.totalDuration
                 message.evalCount = revision.evalCount
@@ -889,6 +760,7 @@ struct MessageView: View {
                     message.content = revision.content
                     message.thinking = revision.thinking
                     message.isThinkingCompleted = revision.isThinkingCompleted
+                    message.statistics = revision.statistics
                     message.createdAt = revision.createdAt
                     message.totalDuration = revision.totalDuration
                     message.evalCount = revision.evalCount
@@ -899,6 +771,7 @@ struct MessageView: View {
                     message.content = message.latestContent ?? ""
                     message.thinking = message.finalThinking
                     message.isThinkingCompleted = message.finalIsThinkingCompleted
+                    message.statistics = message.finalStatistics ?? GenerationStatistics()
                     message.createdAt = message.finalCreatedAt
                     message.totalDuration = message.finalTotalDuration
                     message.evalCount = message.finalEvalCount
@@ -1124,10 +997,9 @@ struct MessageView: View {
                 showCopyFeedback()
             }
         }) {
-            Image(systemName: isCopied ? "checkmark" : SFSymbol.copy)
+            CopyFeedbackIcon(isCopied: isCopied)
                 .contentShape(Rectangle())
                 .padding(5)
-                .contentTransition(.symbolEffect(.replace))
         }
         .accessibilityLabel("Copy")
 #if !os(macOS)
@@ -2385,3 +2257,16 @@ struct ImageDocument: FileDocument {
 }
 
 
+
+#Preview("Message Actions") {
+    VStack(spacing: 24) {
+        ForEach([false, true], id: \.self) { isGenerating in
+            let message = ChatMessage(role: "assistant", content: "Example response", createdAt: "2026-11-11T01:00:00Z", isStreaming: isGenerating)
+            MessageView(message: message, isLastAssistantMessage: true, isLastOwnUserMessage: false,
+                        selectedModelName: "example:8b", onRetry: nil, onPreviewImage: nil,
+                        isStreamingAny: .constant(isGenerating), isModelSelected: true)
+        }
+    }
+    .padding()
+    .environment(ChatSettings())
+}

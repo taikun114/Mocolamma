@@ -661,7 +661,7 @@ private struct DecisionResultFooter: View {
     let copy: (String) -> Void
 
     var body: some View {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 16) {
                     ViewThatFits(in: .horizontal) {
                         HStack(spacing: 16) {
                             copyButtons
@@ -682,48 +682,28 @@ private struct DecisionResultFooter: View {
                     .buttonStyle(.borderless)
 #endif
                     .disabled(session.result == nil || session.isRunning)
-                    if let result = session.result {
-                        let lines = statisticsLines(for: result)
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(lines.indices, id: \.self) { index in
-                                Text(verbatim: lines[index])
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .contentShape(Rectangle())
-                        .contextMenu {
-                            Button("Copy", systemImage: SFSymbol.copy) {
-                                copy(lines.joined(separator: "\n"))
-                            }
-                        }
+                    if session.isRunning {
+                        GenerationMetadataView(metadata: .decisionProgress(startedAt: session.startedAt, modelName: session.requestedModelName))
+                    } else if let result = session.result {
+                        GenerationMetadataView(metadata: .decision(result, completedAt: session.completedAt, elapsed: session.elapsed))
                     }
             }
+            .padding(.top, 4)
             .textCase(nil)
 #if os(iOS)
             .padding(.bottom, 24)
 #endif
     }
-    private func statisticsLines(for result: DecisionResponse) -> [String] {
-        var lines = [
-            String(localized: "Model") + ": " + result.model,
-            String(localized: "Response time: \(session.elapsed * 1000, format: .number.precision(.fractionLength(2))) ms"),
-            String(localized: "Input tokens: \(result.usage.input_tokens)")
-        ]
-        if let cached = result.prompt_eval_cached_count {
-            lines.append(String(localized: "Cache hit: \(result.cacheHitRate ?? 0, format: .percent.precision(.fractionLength(2))) (\(cached) tokens)"))
-        }
-        return lines
-    }
-
     @ViewBuilder private var copyButtons: some View {
-        Button { copy(resultText) } label: {
-            Label("Copy Results", systemImage: SFSymbol.copy).fixedSize(horizontal: true, vertical: false)
+        CopyFeedbackButton(title: "Copy Results", systemImage: SFSymbol.copy) {
+            copy(resultText)
         }
+        .fixedSize(horizontal: true, vertical: false)
         .help("Copy Results")
-        Button { copy(resultJSON) } label: {
-            Label("Copy JSON", systemImage: "curlybraces").fixedSize(horizontal: true, vertical: false)
+        CopyFeedbackButton(title: "Copy JSON", systemImage: "curlybraces") {
+            copy(resultJSON)
         }
+        .fixedSize(horizontal: true, vertical: false)
         .help("Copy JSON")
     }
 

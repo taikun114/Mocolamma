@@ -8,6 +8,7 @@ extension ChatMessage {
         snapshot.speechPlayback = speechPlayback
         snapshot.speechVoice = speechVoice
         snapshot.speechModelName = speechModelName
+        snapshot.statistics = statistics
         snapshot.totalDuration = totalDuration
         snapshot.isStopped = isStopped
         return snapshot
@@ -37,6 +38,7 @@ extension ChatMessage {
         revision.speechPlayback?.seekFromControl(to: 0)
         content = revision.content
         createdAt = revision.createdAt
+        statistics = revision.statistics
         totalDuration = revision.totalDuration
         isStopped = revision.isStopped
         speechPlayback = revision.speechPlayback

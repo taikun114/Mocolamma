@@ -770,6 +770,7 @@ struct ChatView: View {
                 isStopped: executor.chatMessages[indexToRetry].finalIsStopped || executor.chatMessages[indexToRetry].isStopped,
                 isThinkingCompleted: executor.chatMessages[indexToRetry].finalIsThinkingCompleted || executor.chatMessages[indexToRetry].isThinkingCompleted
             )
+            archived.statistics = executor.chatMessages[indexToRetry].finalStatistics ?? executor.chatMessages[indexToRetry].statistics
             archived.revisions = executor.chatMessages[indexToRetry].revisions
             archived.currentRevisionIndex = executor.chatMessages[indexToRetry].currentRevisionIndex
             archived.originalContent = executor.chatMessages[indexToRetry].originalContent
@@ -792,6 +793,8 @@ struct ChatView: View {
             executor.chatMessages[indexToRetry].isStreaming = true
             executor.chatMessages[indexToRetry].isStopped = false
             executor.chatMessages[indexToRetry].isThinkingCompleted = false
+            executor.chatMessages[indexToRetry].statistics = GenerationStatistics()
+            executor.chatMessages[indexToRetry].finalStatistics = nil
             executor.chatMessages[indexToRetry].createdAt = MessageView.iso8601Formatter.string(from: Date())
             executor.chatMessages[indexToRetry].totalDuration = nil
             executor.chatMessages[indexToRetry].evalCount = nil
@@ -858,6 +861,10 @@ struct ChatView: View {
     /// ストリーミング応答を処理し、UIの更新負荷に応じて動的に頻度と排出量を調整
     @MainActor
     private func streamAssistantResponse(for messageId: UUID, with apiMessages: [ChatMessage], model: OllamaModel) async {
+        if let message = executor.chatMessages.first(where: { $0.id == messageId }) {
+            message.statistics = GenerationStatistics(modelName: model.name)
+            message.finalStatistics = nil
+        }
         var isFirstChunk = true
         var isInsideThinkingBlock = false
         
@@ -946,12 +953,15 @@ struct ChatView: View {
                 executor.chatMessages[index].finalizeStreaming(
                     content: buffer.rawContent,
                     thinking: buffer.rawThinking.isEmpty ? nil : buffer.rawThinking,
-                    totalDuration: chunk.totalDuration,
-                    evalCount: chunk.evalCount,
-                    evalDuration: chunk.evalDuration,
+                    totalDuration: chunk.totalDuration ?? executor.chatMessages[index].totalDuration,
+                    evalCount: chunk.evalCount ?? executor.chatMessages[index].evalCount,
+                    evalDuration: chunk.evalDuration ?? executor.chatMessages[index].evalDuration,
                     isThinkingCompleted: isThinkingCompleted
                 )
                 
+                executor.chatMessages[index].updateGenerationStatistics(from: chunk)
+                executor.chatMessages[index].statistics.completedAt = MessageView.parseDate(from: chunk.createdAt) ?? Date()
+                executor.chatMessages[index].finalStatistics = executor.chatMessages[index].statistics
                 executor.chatMessages[index].finalThinking = executor.chatMessages[index].thinking
                 executor.chatMessages[index].finalIsThinkingCompleted = executor.chatMessages[index].isThinkingCompleted
                 executor.chatMessages[index].finalCreatedAt = executor.chatMessages[index].createdAt
@@ -1008,6 +1018,8 @@ struct ChatView: View {
             ) {
                 guard let assistantMessageIndex = executor.chatMessages.firstIndex(where: { $0.id == messageId }) else { continue }
                 
+                executor.chatMessages[assistantMessageIndex].updateGenerationStatistics(from: chunk)
+
                 if let messageChunk = chunk.message {
                     // APIから返されたネイティブな思考テキストの処理
                     if let apiThinking = messageChunk.thinking, !apiThinking.isEmpty {
@@ -1555,11 +1567,14 @@ struct ImageGenerationView: View {
                 generatedImage: archiveImage,
                 isImageGeneration: true
             )
+            archived.statistics = executor.imageMessages[index].finalStatistics ?? executor.imageMessages[index].statistics
             executor.imageMessages[index].revisions.append(archived)
             // 参照位置は常に最新（末尾の次 = 現在バージョン）にする
             executor.imageMessages[index].currentRevisionIndex = executor.imageMessages[index].revisions.count
             
             // 再初期化
+            executor.imageMessages[index].statistics = GenerationStatistics()
+            executor.imageMessages[index].finalStatistics = nil
             executor.imageMessages[index].generatedImage = nil
             executor.imageMessages[index].latestGeneratedImage = nil
             executor.imageMessages[index].imageProgressCompleted = nil
@@ -1592,6 +1607,10 @@ struct ImageGenerationView: View {
     }
     
     private func runImageGeneration(for messageId: UUID, prompt: String, model: OllamaModel) async {
+        if let message = executor.imageMessages.first(where: { $0.id == messageId }) {
+            message.statistics = GenerationStatistics(modelName: model.name)
+            message.finalStatistics = nil
+        }
         do {
             for try await chunk in executor.generateImage(
                 model: model.name,
@@ -1613,6 +1632,11 @@ struct ImageGenerationView: View {
                 }
                 
                 await MainActor.run {
+                    let message = executor.imageMessages[index]
+                    if !chunk.model.isEmpty { message.statistics.modelName = chunk.model }
+                    if let value = chunk.loadDuration { message.statistics.loadDuration = value }
+                    if let value = chunk.totalDuration { message.totalDuration = value }
+
                     if let completed = chunk.completed {
                         executor.imageMessages[index].imageProgressCompleted = completed
                     }
@@ -1627,9 +1651,19 @@ struct ImageGenerationView: View {
                     }
                     
                     if chunk.done {
+                        let message = executor.imageMessages[index]
+                        message.statistics.completedAt = chunk.createdAt.flatMap { MessageView.parseDate(from: $0) } ?? Date()
+                        message.statistics.imageSteps = chunk.total ?? message.imageProgressTotal ?? chunk.completed
+                        if let encoded = message.generatedImage, let data = Data(base64Encoded: encoded),
+                           let source = CGImageSourceCreateWithData(data as CFData, nil),
+                           let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] {
+                            message.statistics.imageWidth = properties[kCGImagePropertyPixelWidth] as? Int
+                            message.statistics.imageHeight = properties[kCGImagePropertyPixelHeight] as? Int
+                        }
+                        message.finalStatistics = message.statistics
                         executor.imageMessages[index].isStreaming = false
-                        executor.imageMessages[index].totalDuration = chunk.totalDuration
-                        executor.imageMessages[index].finalTotalDuration = chunk.totalDuration
+                        executor.imageMessages[index].totalDuration = chunk.totalDuration ?? message.totalDuration
+                        executor.imageMessages[index].finalTotalDuration = message.totalDuration
                         executor.imageMessages[index].finalCreatedAt = executor.imageMessages[index].createdAt
                         executor.imageMessages[index].latestGeneratedImage = executor.imageMessages[index].generatedImage
                     }

@@ -56,6 +56,8 @@ In version 1.2.2 or earlier, it was listed as follows:
   - You can now evaluate text and image content using models that support decision-making.
 - **Support speech generation**
   - You can now generate speech from text using models that support speech generation.
+- **Add detailed statistics**
+  - You can now click or tap the area displaying the generation time, speed, and other metadata to view more detailed information. You can also copy individual items or all statistics.
 
 #### Model
 - **Support speech model tag**

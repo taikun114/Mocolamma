@@ -85,6 +85,7 @@ final class SpeechSession {
         message.isSpeechGeneration = true
         message.speechVoice = selectedVoice
         message.speechModelName = model.name
+        message.statistics = GenerationStatistics(modelName: model.name)
         message.revisions = revisions
         message.currentRevisionIndex = revisions.count
         let playback = SpeechPlayback()
@@ -109,6 +110,7 @@ final class SpeechSession {
                 guard requestID == id else { return }
                 try playback.finish()
                 let elapsed = start.duration(to: .now).components
+                message.statistics.completedAt = Date()
                 message.totalDuration = Int(elapsed.seconds) * 1_000_000_000 + Int(elapsed.attoseconds / 1_000_000_000)
 #if DEBUG
                 print("Speech generation completed: \(playback.duration ?? 0) seconds of audio")

@@ -15,6 +15,9 @@ final class DecisionSession {
     var resultRevision = UUID()
     var result: DecisionResponse?
     var resultConditions: [DecisionCondition] = []
+    var startedAt: Date?
+    var requestedModelName: String?
+    var completedAt: Date?
     var elapsed: TimeInterval = 0
     var isRunning = false
     var error: String?
@@ -52,6 +55,9 @@ final class DecisionSession {
         resultConditions = []
         error = nil
         elapsed = 0
+        completedAt = nil
+        startedAt = nil
+        requestedModelName = nil
     }
 
     func cancel() {
@@ -71,6 +77,8 @@ final class DecisionSession {
         let files = attachments
         let pictures = skipImages ? [] : images
         let keepAlive = keepAliveOption.apiValue(customValue: customKeepAliveValue, customUnit: customKeepAliveUnit)
+        startedAt = Date()
+        requestedModelName = model.name
         isRunning = true
         error = nil
         task = Task {
@@ -95,6 +103,7 @@ final class DecisionSession {
                 try Task.checkCancellation()
                 guard requestID == id else { return }
                 let response = measured.response
+                completedAt = Date()
                 result = response
                 resultConditions = snapshot
                 elapsed = measured.elapsed
