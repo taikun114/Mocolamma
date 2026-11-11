@@ -670,6 +670,9 @@ struct MessageView: View {
                 downloadButton
                     .disabled(message.generatedImage == nil)
             }
+            if message.role == "assistant" && message.isSpeechGeneration {
+                SpeechSaveButton(audio: message.speechPlayback?.audioExport)
+            }
             if message.role == "assistant" {
                 shareButton
                     .disabled(isStreamingAny)
