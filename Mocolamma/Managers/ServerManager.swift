@@ -64,6 +64,9 @@ class ServerManager {
     /// アプリケーションで利用可能なOllamaサーバーのリスト。
     var servers: [ServerInfo] {
         didSet {
+            for previousServer in oldValue where !servers.contains(where: { $0.id == previousServer.id && $0.host == previousServer.host }) {
+                connectionCheckIDs[previousServer.id] = nil
+            }
             let previousHost = oldValue.first { $0.id == selectedServerID }?.host
             if previousHost != selectedServer?.host { modelRequestRevision = UUID() }
             saveServers()
@@ -86,6 +89,7 @@ class ServerManager {
     
     /// 各サーバーの接続状態を詳細に保持する辞書
     var serverConnectionStatuses: [ServerInfo.ID: ServerConnectionStatus] = [:]
+    @ObservationIgnored private var connectionCheckIDs: [ServerInfo.ID: UUID] = [:]
     
     /// インスペクターの再描画を誘発するためのトークン
     var inspectorRefreshToken: UUID = UUID()
@@ -232,6 +236,58 @@ class ServerManager {
         serverConnectionStatuses[serverID] = status
     }
     
+    @MainActor
+    func checkConnection(for server: ServerInfo, showProgress: Bool = false, maxAttempts: Int = 1,
+                         check: @MainActor (String) async -> ServerConnectionStatus) async {
+        guard servers.contains(where: { $0.id == server.id && $0.host == server.host }), !Task.isCancelled else { return }
+        let request = UUID()
+        connectionCheckIDs[server.id] = request
+        defer {
+            if connectionCheckIDs[server.id] == request { connectionCheckIDs[server.id] = nil }
+        }
+        if showProgress || serverConnectionStatuses[server.id] == nil {
+            updateServerConnectionStatus(serverID: server.id, status: .checking)
+        }
+        let attempts = max(1, maxAttempts)
+        for attempt in 1...attempts {
+            guard !Task.isCancelled, connectionCheckIDs[server.id] == request,
+                  servers.contains(where: { $0.id == server.id && $0.host == server.host }) else { return }
+            let status = await check(server.host)
+            guard !Task.isCancelled, connectionCheckIDs[server.id] == request,
+                  servers.contains(where: { $0.id == server.id && $0.host == server.host }) else { return }
+            let shouldRetry: Bool
+            switch status {
+            case .connected, .errorWithMessage: shouldRetry = false
+            default: shouldRetry = attempt < attempts
+            }
+            if !shouldRetry {
+                updateServerConnectionStatus(serverID: server.id, status: status)
+                return
+            }
+            print("Connection check attempt \(attempt) of \(attempts) failed for \(server.host). Retrying in 0.5 seconds.")
+            do {
+                try await Task.sleep(for: .milliseconds(500))
+            } catch {
+                return
+            }
+        }
+    }
+
+    @MainActor
+    func pollConnection(for server: ServerInfo,
+                        check: @MainActor (String) async -> ServerConnectionStatus,
+                        sleep: @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) }) async {
+        while !Task.isCancelled, servers.contains(where: { $0.id == server.id && $0.host == server.host }) {
+            await checkConnection(for: server, check: check)
+            guard !Task.isCancelled, servers.contains(where: { $0.id == server.id && $0.host == server.host }) else { return }
+            do {
+                try await sleep(.seconds(5))
+            } catch {
+                return
+            }
+        }
+    }
+
     /// 現在のサーバーリストをUserDefaultsに保存します。
     private func saveServers() {
         if let encoded = try? JSONEncoder().encode(servers) {

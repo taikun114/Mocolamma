@@ -284,38 +284,18 @@ struct ContentView: View {
         
         switch currentSelection {
         case "server":
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            // サーバー接続状態を再チェック
-            for server in serverManager.servers {
-                serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
-                Task {
-                    let maxRetries = 3
-                    var finalStatus: ServerConnectionStatus?
-                    
-                    for attempt in 1...maxRetries {
-                        let status = await executor.checkAPIConnectivity(host: server.host)
-                        finalStatus = status
-                        
-                        // 接続成功、またはリトライ対象外のエラー（サーバーからのメッセージ付き応答など）ならループを抜ける
-                        if case .connected = status { break }
-                        if case .errorWithMessage = status { break }
-                        
-                        // リトライ対象のエラーの場合
-                        print("Attempt \(attempt) of \(maxRetries) failed for \(server.host). Status: \(status)")
-                        if attempt < maxRetries {
-                            print("Retrying in 0.5 seconds...")
-                            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒待機
-                        }
-                    }
-                    
-                    if let status = finalStatus {
-                        await MainActor.run {
-                            serverManager.updateServerConnectionStatus(serverID: server.id, status: status)
+            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
+            let servers = serverManager.servers
+            await withTaskGroup(of: Void.self) { group in
+                for server in servers {
+                    group.addTask { @MainActor in
+                        await serverManager.checkConnection(for: server, showProgress: true, maxAttempts: 3) { host in
+                            await executor.checkAPIConnectivity(host: host)
                         }
                     }
                 }
             }
-            
+
         case "models":
             // ダウンロード中はリフレッシュを実行しない
             guard !executor.isPulling else { return }

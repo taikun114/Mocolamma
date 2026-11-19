@@ -258,7 +258,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         
         // 接続確認専用セッション（30秒固定）
-        let checkConfig = URLSessionConfiguration.default
+        let checkConfig = (sessionConfiguration.copy() as? URLSessionConfiguration) ?? .default
         checkConfig.timeoutIntervalForRequest = 30.0
         checkConfig.timeoutIntervalForResource = 30.0
         connectionCheckSession = URLSession(configuration: checkConfig)
@@ -1195,7 +1195,7 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         
         let scheme = host.hasPrefix("https://") ? "https" : "http"
         let hostWithoutScheme = host.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "")
-        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/tags") else {
+        guard let url = URL(string: "\(scheme)://\(hostWithoutScheme)/api/version") else {
             print("Connection check error: Invalid URL for host \(host)")
             return .unknownHost
         }
@@ -2334,6 +2334,24 @@ struct OllamaRunningModel: Decodable {
     let name: String
     let expires_at: Date?
     let size_vram: Int64?
+    let size: Int64?
+    let runner: String?
+    let contextLength: Int?
+
+    var executionBackend: String? {
+        guard let runner = runner?.trimmingCharacters(in: .whitespacesAndNewlines), !runner.isEmpty else { return nil }
+        return runner
+    }
+
+    var processorDistribution: String? {
+        guard let size, size > 0, let size_vram, size_vram >= 0, size_vram <= size else { return nil }
+        let cpuPercent = Int((Double(size - size_vram) / Double(size) * 100).rounded())
+        let gpuPercent = 100 - cpuPercent
+        return [("CPU", cpuPercent), ("GPU", gpuPercent)]
+            .filter { $0.1 > 0 }
+            .map { "\($0.0) \($0.1)%" }
+            .joined(separator: " · ")
+    }
     
     var formattedVRAMSize: String? { // VRAMサイズをフォーマット
         guard let size = size_vram else { return nil }
@@ -2343,10 +2361,13 @@ struct OllamaRunningModel: Decodable {
     }
     
     // イニシャライザを追加
-    init(name: String, expires_at: Date?, size_vram: Int64?) {
+    init(name: String, expires_at: Date?, size_vram: Int64?, size: Int64? = nil, runner: String? = nil, contextLength: Int? = nil) {
         self.name = name
         self.expires_at = expires_at
         self.size_vram = size_vram
+        self.size = size
+        self.runner = runner
+        self.contextLength = contextLength
     }
     
     // ISO 8601日付文字列を処理するためのカスタムデコーディング
@@ -2354,6 +2375,9 @@ struct OllamaRunningModel: Decodable {
         case name
         case expires_at
         case size_vram
+        case size
+        case runner
+        case contextLength = "context_length"
     }
     
     init(from decoder: Decoder) throws {
@@ -2368,6 +2392,9 @@ struct OllamaRunningModel: Decodable {
             expires_at = nil
         }
         size_vram = try? container.decode(Int64.self, forKey: .size_vram)
+        size = try? container.decode(Int64.self, forKey: .size)
+        runner = try? container.decode(String.self, forKey: .runner)
+        contextLength = try? container.decode(Int.self, forKey: .contextLength)
     }
 }
 

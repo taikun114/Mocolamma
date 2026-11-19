@@ -9,9 +9,12 @@ private struct ModelAPIReply: Sendable {
 
 private actor ModelAPIScript {
     static let shared = ModelAPIScript()
+    private var requestedKeys: [String] = []
     private var heldKeys: Set<String> = []
     private var pending: [String: CheckedContinuation<ModelAPIReply, Error>] = [:]
     private var arrivals: [String: CheckedContinuation<Void, Never>] = [:]
+
+    func requestCount(_ key: String) -> Int { requestedKeys.filter { $0 == key }.count }
 
     func hold(_ key: String) { heldKeys.insert(key) }
     func waitForPending(_ key: String) async {
@@ -25,6 +28,7 @@ private actor ModelAPIScript {
     }
     func respond(_ request: URLRequest) async throws -> ModelAPIReply {
         let key = request.url!.host! + request.url!.path
+        requestedKeys.append(key)
         if heldKeys.remove(key) != nil {
             return try await withCheckedThrowingContinuation {
                 pending[key] = $0
@@ -37,7 +41,9 @@ private actor ModelAPIScript {
         let name = key.hasPrefix("alpha.invalid") ? "alpha-model" : "beta-model"
         let capability = key.hasPrefix("alpha.invalid") ? "completion" : "vision"
         let text: String
-        if key.hasSuffix("/api/tags") {
+        if key.hasSuffix("/api/version") {
+            text = #"{"version":"0.26.1"}"#
+        } else if key.hasSuffix("/api/tags") {
             text = "{\"models\":[{\"name\":\"\(name)\",\"model\":\"\(name)\",\"modified_at\":\"\",\"size\":1,\"digest\":\"test\"}]}"
         } else if key.hasSuffix("/api/show") {
             text = "{\"capabilities\":[\"\(capability)\"]}"
@@ -80,6 +86,21 @@ struct ModelRequestIsolationTests {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [ModelAPIProtocol.self]
         return (CommandExecutor(serverManager: manager, sessionConfiguration: config, monitorsDrag: false), manager, alpha, beta)
+    }
+
+    @Test func connectivityUsesVersionEndpointWithoutListingModels() async throws {
+        let (executor, _, alpha, _) = try makeExecutor()
+        let versionKey = "alpha.invalid/api/version"
+        let tagsKey = "alpha.invalid/api/tags"
+        let previousVersions = await ModelAPIScript.shared.requestCount(versionKey)
+        let previousTags = await ModelAPIScript.shared.requestCount(tagsKey)
+        let status = await executor.checkAPIConnectivity(host: alpha.host)
+        guard case .connected = status else {
+            Issue.record("Version endpoint did not confirm connectivity")
+            return
+        }
+        #expect(await ModelAPIScript.shared.requestCount(versionKey) == previousVersions + 1)
+        #expect(await ModelAPIScript.shared.requestCount(tagsKey) == previousTags)
     }
 
     @Test func lateDetailsCannotReplaceAnotherServersListOrCache() async throws {

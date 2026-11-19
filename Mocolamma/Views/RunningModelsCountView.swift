@@ -7,12 +7,14 @@ struct RunningModelsCountView: View {
     @State private var refreshID = UUID()
     @State private var runningModels: [OllamaRunningModel] = []
     @State private var isLoading: Bool = false
-    @State private var isExpanded: Bool = false
+    @State private var expandedModelNames: Set<String> = []
     
     // 追加のプロパティ
     var showList: Bool = true
     var showSummary: Bool = true
     var externalModels: [OllamaRunningModel]? = nil
+    var externalIsLoading = false
+    var refreshAction: (() async -> Void)? = nil
     
     private var currentModels: [OllamaRunningModel] {
         externalModels ?? runningModels
@@ -26,7 +28,7 @@ struct RunningModelsCountView: View {
     }()
     
     private var displayCountText: String {
-        if isLoading {
+        if isLoading || externalIsLoading {
             return "-"
         } else {
             if case .connected = connectionStatus {
@@ -55,29 +57,61 @@ struct RunningModelsCountView: View {
             if showList && currentModels.count > 0 {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(Array(currentModels.enumerated()), id: \.element.name) { index, model in
-                        HStack(alignment: .top) {
+                        DisclosureGroup(isExpanded: Binding(
+                            get: { expandedModelNames.contains(model.name) },
+                            set: { expanded in
+                                if expanded { expandedModelNames.insert(model.name) }
+                                else { expandedModelNames.remove(model.name) }
+                            }
+                        )) {
                             VStack(alignment: .leading) {
-                                Text(model.name)
-                                    .font(.subheadline)
-                                    .bold()
-                                    .foregroundColor(.primary)
-                                    .help(model.name)
-                                
+                                if let backend = model.executionBackend {
+                                    HStack(spacing: 4) {
+                                        Text("Execution Backend:")
+                                        Text(verbatim: backend)
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                }
+                                if let distribution = model.processorDistribution {
+                                    HStack(spacing: 4) {
+                                        Text("Allocation:")
+                                        Text(verbatim: distribution)
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                }
+
                                 if let formattedVRAMSize = model.formattedVRAMSize {
                                     Text("VRAM Size: \(formattedVRAMSize)")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
-                                
+
+                                if let contextLength = model.contextLength, contextLength > 0 {
+                                    HStack(spacing: 4) {
+                                        Text("Context Length:")
+                                        Text(contextLength, format: .number)
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                }
+
                                 if let expiresAt = model.expires_at {
                                     Text("Expires: \(expiresAt, formatter: Self.dateFormatter)")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
                             }
-                            
-                            Spacer()
-                            
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        } label: {
+                            Text(model.name)
+                                .font(.subheadline)
+                                .bold()
+                                .foregroundColor(.primary)
+                                .help(model.name)
+                        }
+                        .disclosureGroupStyle(RunningModelDisclosureStyle {
                             Button(action: {
                                 Task {
                                     await commandExecutor.unloadModel(modelName: model.name, host: host)
@@ -99,7 +133,7 @@ struct RunningModelsCountView: View {
                             .buttonStyle(.plain)
 #endif
                             .help("Unload this model from memory.")
-                        }
+                        })
                         .contentShape(Rectangle())
                         .contextMenu {
                             Button(action: {
@@ -128,6 +162,7 @@ struct RunningModelsCountView: View {
             }
         }
         .task(id: host) {
+            expandedModelNames = []
             if externalModels == nil {
                 await refresh()
             }
@@ -140,6 +175,10 @@ struct RunningModelsCountView: View {
     }
     
     private func refresh() async {
+        if let refreshAction {
+            await refreshAction()
+            return
+        }
         let id = UUID()
         refreshID = id
         await MainActor.run {
@@ -159,9 +198,52 @@ struct RunningModelsCountView: View {
     }
 }
 
+private struct RunningModelDisclosureStyle<Accessory: View>: DisclosureGroupStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ViewBuilder var accessory: () -> Accessory
+
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: configuration.isExpanded ? 4 : 0) {
+            HStack(alignment: .center) {
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                        configuration.isExpanded.toggle()
+                    }
+                } label: {
+                    HStack {
+                        configuration.label
+                        Image(systemName: "chevron.forward")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .rotationEffect(.degrees(configuration.isExpanded ? 90 : 0))
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityValue(configuration.isExpanded ? String(localized: "Expanded") : String(localized: "Collapsed"))
+                accessory()
+            }
+            VStack(alignment: .leading, spacing: 0) {
+                if configuration.isExpanded {
+                    configuration.content
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .clipped()
+        }
+    }
+}
+
 #Preview {
-    RunningModelsCountView(host: "localhost:11434", connectionStatus: .connected)
+    RunningModelsCountView(host: "preview.invalid", connectionStatus: .connected,
+                          externalModels: [
+                            .init(name: "example-mixed:8b", expires_at: nil, size_vram: 3_000_000_000, size: 4_000_000_000),
+                            .init(name: "example-gpu:8b", expires_at: nil, size_vram: 4_000_000_000, size: 4_000_000_000),
+                            .init(name: "example-cpu:8b", expires_at: nil, size_vram: 0, size: 4_000_000_000)
+                          ])
         .environment(CommandExecutor(serverManager: ServerManager()))
-        .frame(width: 200)
+        .frame(width: 280)
         .padding()
 }

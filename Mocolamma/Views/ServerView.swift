@@ -14,6 +14,7 @@ struct ServerView: View {
     @State private var showingDeleteConfirmationServer = false
     @State private var serverToDelete: ServerInfo?
     @State private var listSelection: ServerInfo.ID?
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     let onTogglePreview: () -> Void
@@ -212,12 +213,17 @@ struct ServerView: View {
                     selectedServerForInspector = serverManager.servers.first(where: { $0.id == activeID })
                 }
             }
-            
-            // サーバーが選択されており、かつ初期フェッチが未完了の場合のみ自動リフレッシュを実行
-            if serverManager.selectedServerID != nil && !executor.initialFetchCompleted && !executor.isRunning && !executor.isPulling {
-                try? await Task.sleep(nanoseconds: 500_000_000)
-                if !Task.isCancelled {
-                    appRefreshTrigger.send()
+        }
+        .task(id: connectionPollingContext) {
+            guard scenePhase == .active else { return }
+            let servers = serverManager.servers
+            await withTaskGroup(of: Void.self) { group in
+                for server in servers {
+                    group.addTask { @MainActor in
+                        await serverManager.pollConnection(for: server) { host in
+                            await executor.checkAPIConnectivity(host: host)
+                        }
+                    }
                 }
             }
         }
@@ -232,24 +238,20 @@ struct ServerView: View {
         }
     }
     
-    private func checkAllServerConnectivity() {
-        for server in serverManager.servers {
-            serverManager.updateServerConnectionStatus(serverID: server.id, status: .checking)
-            Task {
-                let connectionStatus = await executor.checkAPIConnectivity(host: server.host)
-                await MainActor.run {
-                    serverManager.updateServerConnectionStatus(serverID: server.id, status: connectionStatus)
-                }
-            }
-        }
+    private struct ConnectionPollingContext: Equatable {
+        let servers: [ServerInfo]
+        let isActive: Bool
     }
-    
+
+    private var connectionPollingContext: ConnectionPollingContext {
+        .init(servers: serverManager.servers, isActive: scenePhase == .active)
+    }
+
     private func handleServerListChange(oldServers: [ServerInfo], newServers: [ServerInfo]) {
         if let selectedID = serverManager.selectedServerID, !newServers.contains(where: { $0.id == selectedID }) {
             serverManager.selectedServerID = newServers.first?.id
         }
         listSelection = serverManager.selectedServerID
-        appRefreshTrigger.send()
     }
     
     private func handleListSelectionChange(oldID: ServerInfo.ID?, newID: ServerInfo.ID?) {

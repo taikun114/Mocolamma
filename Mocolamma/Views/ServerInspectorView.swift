@@ -5,10 +5,14 @@ import AppKit
 
 struct ServerInspectorView: View {
     @Environment(CommandExecutor.self) var commandExecutor
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     let server: ServerInfo
     let connectionStatus: ServerConnectionStatus? // チェック中にnilになる可能性あり
     @State private var ollamaVersion: String? // Ollamaバージョン用の新しい状態変数
+    @State private var versionHost: String?
+    @State private var modelsState = ServerInspectorModelsState()
+    @State private var versionRequestID = UUID()
     private let inspectorRefreshNotification = Notification.Name("InspectorRefreshRequested")
     
     private var indicatorSize: CGFloat {
@@ -182,7 +186,7 @@ struct ServerInspectorView: View {
                     VStack(alignment: .leading) {
                         Text("Ollama Version:")
                             .font(.subheadline)
-                        Text(ollamaVersion ?? "-")
+                        Text(displayedVersion)
                             .font(.title3)
                             .bold()
                             .foregroundColor(.primary)
@@ -190,70 +194,58 @@ struct ServerInspectorView: View {
                                 Button("Copy", systemImage: copyIconName) {
 #if os(macOS)
                                     NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(ollamaVersion ?? "-", forType: .string)
+                                    NSPasteboard.general.setString(displayedVersion, forType: .string)
 #else
-                                    UIPasteboard.general.string = ollamaVersion ?? "-"
+                                    UIPasteboard.general.string = displayedVersion
 #endif
                                 }
                             }
                     }
                     
-                    HStack(alignment: .center) {
-                        VStack(alignment: .leading) {
-                            Text("Running Models:")
-                                .font(.subheadline)
-                            RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showList: false)
-                                .environment(commandExecutor)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            NotificationCenter.default.post(name: Notification.Name("InspectorRefreshRequested"), object: nil)
-                        }) {
-#if os(visionOS)
-                            Label("Refresh", systemImage: "arrow.clockwise")
-                                .labelStyle(.iconOnly)
-                                .frame(width: 20, height: 20)
-#else
-                            Image(systemName: "arrow.clockwise")
-                                .foregroundStyle(Color.accentColor)
-                                .frame(width: 20, height: 20)
-#endif
-                        }
-                        .accessibilityLabel("Refresh")
-#if os(visionOS)
-                        .buttonStyle(.bordered)
-#else
-                        .buttonStyle(.plain)
-#endif
-                        .help("Refresh the list of running models.")
-                        .disabled(connectionStatus?.isConnected != true)
+                    VStack(alignment: .leading) {
+                        Text("Running Models:")
+                            .font(.subheadline)
+                        RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showList: false,
+                                               externalModels: displayedModels, externalIsLoading: modelsState.isLoading || modelsState.host != server.host,
+                                               refreshAction: refreshModels)
+                            .environment(commandExecutor)
                     }
-                    
-                    RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showSummary: false)
+
+                    RunningModelsCountView(host: server.host, connectionStatus: connectionStatus, showSummary: false,
+                                           externalModels: displayedModels, externalIsLoading: modelsState.isLoading || modelsState.host != server.host,
+                                           refreshAction: refreshModels)
                         .environment(commandExecutor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .task(id: server.host) {
-                    do {
-                        ollamaVersion = try await commandExecutor.fetchOllamaVersion(host: server.host)
-                    } catch {
-                        ollamaVersion = "-"
-                        print("Error fetching Ollama version: \(error)")
+                .task(id: refreshContext) {
+                    guard scenePhase == .active else {
+                        modelsState.stop()
+                        return
                     }
+                    await modelsState.poll(host: server.host) { host in
+                        await commandExecutor.fetchRunningModels(host: host)
+                    }
+                }
+                .task(id: refreshContext) {
+                    let request = UUID()
+                    versionRequestID = request
+                    guard scenePhase == .active else { return }
+                    ollamaVersion = nil
+                    versionHost = nil
+                    await refreshVersion(request: request)
                 }
                 .onReceive(NotificationCenter.default.publisher(for: inspectorRefreshNotification)) { _ in
-                    Task {
-                        do {
-                            ollamaVersion = try await commandExecutor.fetchOllamaVersion(host: server.host)
-                        } catch {
-                            ollamaVersion = "-"
-                            print("Error fetching Ollama version (refresh): \(error)")
-                        }
-                    }
+                    guard scenePhase == .active else { return }
+                    let request = UUID()
+                    versionRequestID = request
+                    Task { await refreshVersion(request: request) }
+                    Task { await refreshModels() }
                 }
-                
+                .onDisappear {
+                    modelsState.stop()
+                    versionRequestID = UUID()
+                }
+
                 Spacer()
             }
             .padding()
@@ -262,4 +254,44 @@ struct ServerInspectorView: View {
         .scrollClipDisabled()
 #endif
     }
+
+    private struct RefreshContext: Equatable {
+        let serverID: ServerInfo.ID
+        let host: String
+        let isActive: Bool
+    }
+
+    private var refreshContext: RefreshContext {
+        .init(serverID: server.id, host: server.host, isActive: scenePhase == .active)
+    }
+
+    private func refreshModels() async {
+        await modelsState.refresh(host: server.host) { host in
+            await commandExecutor.fetchRunningModels(host: host)
+        }
+    }
+
+    private var displayedVersion: String {
+        versionHost == server.host ? (ollamaVersion ?? "-") : "-"
+    }
+
+    private var displayedModels: [OllamaRunningModel] {
+        modelsState.host == server.host ? modelsState.models : []
+    }
+
+    private func refreshVersion(request: UUID) async {
+        guard !Task.isCancelled, versionRequestID == request else { return }
+        do {
+            let version = try await commandExecutor.fetchOllamaVersion(host: server.host)
+            guard !Task.isCancelled, versionRequestID == request else { return }
+            versionHost = server.host
+            ollamaVersion = version
+        } catch {
+            guard !Task.isCancelled, versionRequestID == request else { return }
+            versionHost = server.host
+            ollamaVersion = "-"
+            print("Error fetching Ollama version: \(error)")
+        }
+    }
+
 }

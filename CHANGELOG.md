@@ -75,6 +75,11 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve navigation to display a "Generation" tab in narrow layouts on iOS and iPadOS**
   - Generation features such as Chat and Image Generation are now grouped together in the "Generation" tab. As part of this change, the "Image" tab, renamed in version 1.4.1, has been restored to "Image Generation".
 
+#### Server
+- **Improve server status updates**
+- **Improve information displayed in the inspector**
+  - The inspector now displays each model's execution backend, CPU and GPU allocation percentages, and other details.
+
 #### Model
 - **Fix issue where inspector fields returning empty strings were not hidden**
 - **Fix issue where dragging model tags scrolled in the opposite direction on macOS when using RTL languages**
