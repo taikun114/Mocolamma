@@ -307,6 +307,9 @@ struct GenerationStatisticsPopover: View {
 #endif
         }
         .formStyle(.grouped)
+#if os(visionOS)
+        .visionOSVerticalSafeAreaInsets()
+#endif
     }
 
     private var copyStatisticsButton: some View {
@@ -319,8 +322,14 @@ struct GenerationStatisticsPopover: View {
         } label: {
             Label {
                 Text("Copy Statistics")
+#if os(visionOS)
+                    .foregroundStyle(Color.primary)
+#endif
             } icon: {
                 CopyFeedbackIcon(isCopied: isCopied)
+#if os(visionOS)
+                    .foregroundStyle(Color.primary)
+#endif
             }
         }
         .help("Copy statistics as text")

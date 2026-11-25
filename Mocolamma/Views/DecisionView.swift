@@ -692,6 +692,8 @@ private struct DecisionResultFooter: View {
             .textCase(nil)
 #if os(iOS)
             .padding(.bottom, 24)
+#elseif os(visionOS)
+            .padding(.bottom, 16)
 #endif
     }
     @ViewBuilder private var copyButtons: some View {

@@ -263,7 +263,11 @@ struct InspectorContentView: View {
                 }
 #endif
             } else if selection == "speech_generation" {
+#if os(visionOS)
+                SpeechInspectorView(controlSpacing: vStackSpacing)
+#else
                 SpeechInspectorView()
+#endif
             } else if selection == "image_generation" {
                 Form {
                     Section("Image Generation Settings") {
@@ -399,12 +403,7 @@ struct InspectorContentView: View {
             .help("Toggle Inspector")
         }
 #elseif os(visionOS)
-        .safeAreaInset(edge: .top) {
-            Color.clear.frame(height: 8)
-        }
-        .safeAreaInset(edge: .bottom) {
-            Color.clear.frame(height: 8)
-        }
+        .visionOSVerticalSafeAreaInsets()
 #endif
     }
     

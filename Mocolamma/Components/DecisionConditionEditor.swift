@@ -451,7 +451,11 @@ struct DecisionConditionsEditor: View {
                 }
             }
             .buttonStyle(.borderless)
+#if os(visionOS)
+            .foregroundStyle(Color.primary)
+#else
             .foregroundStyle(Color.accentColor)
+#endif
             .frame(maxWidth: .infinity)
 #if os(iOS)
             .padding(.vertical, 16)

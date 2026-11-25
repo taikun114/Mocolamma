@@ -191,7 +191,11 @@ struct MessageInputView: View {
                         showingAttachSheet = true
                     }
                     .buttonStyle(.borderless)
+#if os(visionOS)
+                    .foregroundStyle(Color.primary)
+#else
                     .foregroundStyle(Color.accentColor)
+#endif
 #if os(iOS)
                     .padding(.vertical, 4)
 #endif

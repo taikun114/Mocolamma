@@ -600,12 +600,7 @@ struct ModelInspectorView: View {
 #endif
         }
 #if os(visionOS)
-        .safeAreaInset(edge: .top) {
-            Color.clear.frame(height: 8)
-        }
-        .safeAreaInset(edge: .bottom) {
-            Color.clear.frame(height: 8)
-        }
+        .visionOSVerticalSafeAreaInsets()
         .animation(.easeInOut(duration: 0.3), value: isLoading)
 #endif
         .sheet(isPresented: $showingLicenseSheet) {

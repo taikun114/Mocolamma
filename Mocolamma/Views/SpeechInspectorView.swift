@@ -2,12 +2,13 @@ import SwiftUI
 
 struct SpeechInspectorView: View {
     @Environment(SpeechSession.self) private var speech
+    var controlSpacing: CGFloat = 8
 
     var body: some View {
         @Bindable var speech = speech
         Form {
             Section("Speech Generation Settings") {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: controlSpacing) {
                     Picker("Voice", selection: $speech.selectedVoice) {
                         Text("Default").tag("default")
                         ForEach(speech.voices.filter { $0 != "default" }, id: \.self) { voice in
