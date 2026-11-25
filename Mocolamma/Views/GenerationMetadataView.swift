@@ -87,6 +87,7 @@ struct GenerationMetadata {
                 .init(title: String(localized: "Model Load Time"), value: GenerationStatistics.formattedDuration(statistics.loadDuration)),
                 .init(title: String(localized: "Prefill Time"), value: GenerationStatistics.formattedDuration(statistics.promptEvalDuration)),
                 .init(title: String(localized: "Prefill Speed"), value: GenerationStatistics.formattedTokenSpeed(statistics.prefillTokensPerSecond)),
+                .init(title: String(localized: "Time to First Token (TTFT)"), value: GenerationStatistics.formattedDuration(seconds: statistics.timeToFirstTokenSeconds)),
                 .init(title: String(localized: "Output Token Generation Time"), value: GenerationStatistics.formattedDuration(message.evalDuration)),
                 .init(title: String(localized: "Output Speed"), value: speed),
                 .init(title: String(localized: "Total Processing Time"), value: duration)
@@ -402,7 +403,8 @@ struct GenerationStatisticsPopover: View {
 #Preview("Chat Statistics") {
     let message = ChatMessage(role: "assistant", content: "", totalDuration: 3_000_000_000, evalCount: 40, evalDuration: 2_000_000_000)
     message.statistics = GenerationStatistics(completedAt: Date(), modelName: "example-model:8b", loadDuration: 500_000_000,
-                                              promptEvalDuration: 500_000_000, promptEvalCount: 100, cachedTokenCount: 25)
+                                              promptEvalDuration: 500_000_000, promptEvalCount: 100, cachedTokenCount: 25,
+                                              timeToFirstTokenSeconds: 1.1)
     return GenerationStatisticsPopover(metadata: .message(message))
         .environment(\.locale, Locale(identifier: "ja"))
 }
@@ -410,7 +412,7 @@ struct GenerationStatisticsPopover: View {
 #Preview("Metadata Alignment") {
     VStack(alignment: .leading, spacing: 20) {
         HStack(alignment: .center, spacing: 8) {
-            GenerationMetadataView(metadata: .init(summaryItems: ["2026/11/10 23:00:00", "example:8b", "40 Tokens", "20.00 Tok/s"], sections: []))
+            GenerationMetadataView(metadata: .init(summaryItems: ["2026/11/10 23:00:00", "example:8b", "40 Tokens", "20.00 tok/s"], sections: []))
             Image(systemName: "arrow.clockwise").padding(5)
             Image(systemName: "doc.on.doc").padding(5)
             Image(systemName: "square.and.arrow.up").padding(5)
@@ -430,7 +432,7 @@ struct GenerationStatisticsPopover: View {
 
 #Preview("Compact Metadata") {
     VStack(alignment: .leading, spacing: 20) {
-        GenerationMetadataView(metadata: .init(summaryItems: ["2026/11/11 10:00:00", "example:8b", "40 Tokens", "20.00 Tok/s"], sections: []))
+        GenerationMetadataView(metadata: .init(summaryItems: ["2026/11/11 10:00:00", "example:8b", "40 Tokens", "20.00 tok/s"], sections: []))
         GenerationMetadataView(metadata: .init(summaryItems: ["2026/11/11 10:00:00", "example:8b"], sections: [], isGenerating: true))
     }
     .padding()

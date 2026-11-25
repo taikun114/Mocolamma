@@ -7,6 +7,7 @@ struct GenerationStatistics: Equatable {
     var promptEvalDuration: Int?
     var promptEvalCount: Int?
     var cachedTokenCount: Int?
+    var timeToFirstTokenSeconds: TimeInterval?
     var imageSteps: Int?
     var imageWidth: Int?
     var imageHeight: Int?
@@ -24,7 +25,7 @@ struct GenerationStatistics: Equatable {
 
     static func formattedTokenSpeed(_ speed: Double?) -> String {
         guard let speed, speed.isFinite, speed >= 0 else { return String(localized: "Unknown") }
-        return speed.formatted(.number.precision(.fractionLength(2))) + " Tok/s"
+        return speed.formatted(.number.precision(.fractionLength(2))) + " tok/s"
     }
 
     static func formattedDuration(_ nanoseconds: Int?) -> String {
@@ -58,6 +59,7 @@ extension ChatMessage {
         if let value = chunk.promptEvalDuration { statistics.promptEvalDuration = value }
         if let value = chunk.promptEvalCount { statistics.promptEvalCount = value }
         if let value = chunk.promptEvalCachedCount { statistics.cachedTokenCount = value }
+        if let value = chunk.timeToFirstTokenSeconds { statistics.timeToFirstTokenSeconds = value }
         if let value = chunk.totalDuration { totalDuration = value }
         if let value = chunk.evalCount { evalCount = value }
         if let value = chunk.evalDuration { evalDuration = value }

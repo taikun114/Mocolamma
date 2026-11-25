@@ -912,7 +912,15 @@ struct ChatResponseChunk: Codable {
     let evalDuration: Int?
     var promptEvalCachedCount: Int? = nil
     let doneReason: String?
-    
+
+    // クライアント側の実測値。APIのJSONには含めない。
+    var timeToFirstTokenSeconds: TimeInterval? = nil
+
+    var hasGeneratedTokens: Bool {
+        guard let message else { return false }
+        return !message.content.isEmpty || message.thinking?.isEmpty == false
+    }
+
     enum CodingKeys: String, CodingKey {
         case model
         case createdAt = "created_at"

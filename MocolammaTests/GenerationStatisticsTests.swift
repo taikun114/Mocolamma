@@ -78,22 +78,26 @@ struct GenerationStatisticsTests {
         message.totalDuration = 3_000_000_000
         message.statistics = GenerationStatistics(completedAt: Date(timeIntervalSince1970: 1), modelName: "original-model",
                                                   loadDuration: 500_000_000, promptEvalDuration: 500_000_000,
-                                                  promptEvalCount: 100, cachedTokenCount: 25)
+                                                  promptEvalCount: 100, cachedTokenCount: 25, timeToFirstTokenSeconds: 1.125)
         let metadata = GenerationMetadata.message(message)
-        #expect(metadata.sections.map { $0.rows.count } == [2, 6, 3])
+        #expect(metadata.sections.map { $0.rows.count } == [2, 7, 3])
         #expect(metadata.sections[0].rows[1].value == "original-model")
         #expect(metadata.sections[1].rows[2].title == String(localized: "Prefill Speed"))
         #expect(metadata.sections[1].rows[2].value == GenerationStatistics.formattedTokenSpeed(150))
-        #expect(metadata.sections[1].rows[4].title == String(localized: "Output Speed"))
-        #expect(metadata.sections[1].rows[4].value == GenerationStatistics.formattedTokenSpeed(20))
+        #expect(metadata.sections[1].rows[3].title == String(localized: "Time to First Token (TTFT)"))
+        #expect(metadata.sections[1].rows[3].value == GenerationStatistics.formattedDuration(seconds: 1.125))
+        #expect(metadata.sections[1].rows[4].title == String(localized: "Output Token Generation Time"))
+        #expect(metadata.sections[1].rows[5].title == String(localized: "Output Speed"))
+        #expect(metadata.sections[1].rows[5].value == GenerationStatistics.formattedTokenSpeed(20))
         #expect(metadata.copyText.contains(String(localized: "Prefill Speed") + ": " + GenerationStatistics.formattedTokenSpeed(150)))
         #expect(metadata.copyText.contains(String(localized: "Output Speed") + ": " + GenerationStatistics.formattedTokenSpeed(20)))
-        #expect(metadata.sections[1].rows[5].value == GenerationStatistics.formattedDuration(3_000_000_000))
+        #expect(metadata.copyText.contains(String(localized: "Time to First Token (TTFT)") + ": " + GenerationStatistics.formattedDuration(seconds: 1.125)))
+        #expect(metadata.sections[1].rows[6].value == GenerationStatistics.formattedDuration(3_000_000_000))
         #expect(metadata.sections[2].rows[0].value == String(localized: "\(100) Tokens"))
         #expect(metadata.sections[2].rows[1].value == String(localized: "\(40) Tokens"))
         #expect(metadata.sections[2].rows[2].value == GenerationStatistics.cacheHit(input: 100, cached: 25))
         #expect(metadata.copyText.contains("original-model"))
-        #expect(metadata.summary.contains(20.0.formatted(.number.precision(.fractionLength(2))) + " Tok/s"))
+        #expect(metadata.summary.contains(20.0.formatted(.number.precision(.fractionLength(2))) + " tok/s"))
         #expect(metadata.copyText.components(separatedBy: "\n\n").count == 3)
     }
 

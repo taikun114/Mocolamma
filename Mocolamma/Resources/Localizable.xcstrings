@@ -41658,6 +41658,82 @@
         }
       }
     },
+    "Time to First Token (TTFT)" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "زمن الوصول إلى أول رمز (TTFT)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit bis zum ersten Token (TTFT)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time to First Token (TTFT)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo hasta el primer token (TTFT)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps avant le premier token (TTFT)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初回トークン時間（TTFT）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 토큰까지 걸린 시간 (TTFT)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время до первого токена (TTFT)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Час до першого токена (TTFT)"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首個權杖的等待時間（TTFT）"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首个令牌等待时间（TTFT）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首個權杖的等待時間（TTFT）"
+          }
+        }
+      }
+    },
     "To allow local network access, go to Settings → Privacy & Security → Local Network, and toggle \"Mocolamma\" on." : {
       "comment" : "iOSとiPadOSでこのアプリ(Mocolamma)にローカルネットワーク許可を与えるための方法を紹介するテキスト。",
       "localizations" : {

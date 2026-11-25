@@ -90,7 +90,11 @@ class CommandExecutor: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     private var pendingPullCompleted: Int64 = 0 // 更新待機中の完了バイト数
     private var pendingPullProgress: Double = 0.0 // 更新待機中の進捗
     private let pullStatusUpdateInterval: TimeInterval = 0.033 // プルステータスの更新間隔（秒）: 約30fps
-    private var chatContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
+    private var chatContinuations: [URLSessionTask: (
+        continuation: AsyncThrowingStream<ChatResponseChunk, Error>.Continuation,
+        isStreaming: Bool,
+        firstTokenStartedAt: ContinuousClock.Instant?
+    )] = [:]
     private var chatLineBuffers: [URLSessionTask: String] = [:]
     private var imageContinuations: [URLSessionTask: (continuation: AsyncThrowingStream<ImageGenerationResponseChunk, Error>.Continuation, isStreaming: Bool)] = [:]
     
@@ -1683,10 +1687,10 @@ struct MarkdownTestView: View {
                 }
                 
                 let task = urlSession.dataTask(with: request)
-                self.chatContinuations[task] = (continuation: continuation, isStreaming: stream)
                 self.chatLineBuffers[task] = "" // このタスクのバッファを初期化
                 self.currentChatTask = task // 現在のチャットタスクを保持
-                
+
+                self.chatContinuations[task] = (continuation, stream, stream ? .now : nil)
                 task.resume()
             }
         }
@@ -1965,6 +1969,7 @@ struct MarkdownTestView: View {
     }
     
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        let receivedAt = ContinuousClock.now
         Task { @MainActor [weak self] in
             guard let self = self else { return }
             
@@ -2063,7 +2068,7 @@ struct MarkdownTestView: View {
                         }
                     }
                 }
-            } else if let (continuation, isStreaming) = self.chatContinuations[dataTask] {
+            } else if let (continuation, isStreaming, _) = self.chatContinuations[dataTask] {
                 if let httpResponse = dataTask.response as? HTTPURLResponse, httpResponse.statusCode != 200 {
                     // HTTPエラーがある場合はJSONデコードを試みるが、失敗してもエラーを投げて終了させる
                     if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -2102,7 +2107,12 @@ struct MarkdownTestView: View {
                         }
                         
                         do {
-                            let chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                            var chunk = try JSONDecoder().decode(ChatResponseChunk.self, from: jsonData)
+                            if let startedAt = self.chatContinuations[dataTask]?.firstTokenStartedAt, chunk.hasGeneratedTokens {
+                                let elapsed = startedAt.duration(to: receivedAt).components
+                                chunk.timeToFirstTokenSeconds = Double(elapsed.seconds) + Double(elapsed.attoseconds) / 1e18
+                                self.chatContinuations[dataTask]?.firstTokenStartedAt = nil
+                            }
                             continuation.yield(chunk)
                         } catch {
 #if DEBUG
@@ -2248,7 +2258,7 @@ struct MarkdownTestView: View {
                     await self.fetchOllamaModelsFromAPI()
                     self.isPulling = false
                 }
-            } else if let (continuation, _) = self.chatContinuations[task] {
+            } else if let continuation = self.chatContinuations[task]?.continuation {
                 // チャットタスクの完了を処理
                 if let error = error {
                     continuation.finish(throwing: error)

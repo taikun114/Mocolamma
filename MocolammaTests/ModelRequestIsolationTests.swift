@@ -47,6 +47,16 @@ private actor ModelAPIScript {
             text = "{\"models\":[{\"name\":\"\(name)\",\"model\":\"\(name)\",\"modified_at\":\"\",\"size\":1,\"digest\":\"test\"}]}"
         } else if key.hasSuffix("/api/show") {
             text = "{\"capabilities\":[\"\(capability)\"]}"
+        } else if key == "alpha.invalid/api/chat" {
+            text = """
+            {"model":"example","created_at":"","message":{"role":"assistant","content":""},"done":false}
+            {"model":"example","created_at":"","message":{"role":"assistant","content":"","thinking":"reasoning"},"done":false}
+            {"model":"example","created_at":"","message":{"role":"assistant","content":"answer"},"done":false}
+            {"model":"example","created_at":"","done":true}
+
+            """
+        } else if key == "beta.invalid/api/chat" {
+            text = #"{"model":"example","created_at":"","message":{"role":"assistant","content":"answer"},"done":true}"#
         } else {
             text = "{\"models\":[{\"name\":\"\(name)\"}]}"
         }
@@ -101,6 +111,35 @@ struct ModelRequestIsolationTests {
         }
         #expect(await ModelAPIScript.shared.requestCount(versionKey) == previousVersions + 1)
         #expect(await ModelAPIScript.shared.requestCount(tagsKey) == previousTags)
+    }
+
+    @Test(arguments: [true, false])
+    func chatMeasuresOnlyTheFirstGeneratedStreamingChunk(streaming: Bool) async throws {
+        let (executor, manager, alpha, beta) = try makeExecutor()
+        manager.selectedServerID = streaming ? alpha.id : beta.id
+        let assistant = ChatMessage(role: "assistant", content: "")
+        var timings: [TimeInterval?] = []
+        let chunks = executor.chat(
+            model: "example", messages: [ChatMessage(role: "user", content: "Hello")], stream: streaming,
+            useCustomChatSettings: false, isTemperatureEnabled: false, chatTemperature: 1,
+            isContextWindowEnabled: false, contextWindowValue: 4096, isSeedEnabled: false, seed: 0,
+            repeatLastN: nil, repeatPenalty: nil, numPredict: nil, topK: nil, topP: nil, minP: nil,
+            isSystemPromptEnabled: false, systemPrompt: "", thinkingOption: .defaultOption, tools: nil
+        )
+        for try await chunk in chunks {
+            timings.append(chunk.timeToFirstTokenSeconds)
+            assistant.updateGenerationStatistics(from: chunk)
+        }
+        if streaming {
+            try #require(timings.count == 4)
+            let firstToken = try #require(timings[1])
+            #expect(firstToken >= 0)
+            #expect([timings[0], timings[2], timings[3]].allSatisfy { $0 == nil })
+            #expect(assistant.statistics.timeToFirstTokenSeconds == firstToken)
+        } else {
+            #expect(timings == [nil])
+            #expect(assistant.statistics.timeToFirstTokenSeconds == nil)
+        }
     }
 
     @Test func lateDetailsCannotReplaceAnotherServersListOrCache() async throws {
