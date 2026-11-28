@@ -98,6 +98,7 @@ In version 1.2.2 or earlier, it was listed as follows:
   - This prevents accidental cancellation immediately after sending, such as when double-clicking or double-tapping the send button.
 - **Improve attachment display on macOS**
 - **Improve performance when attaching image files via drag and drop**
+- **Improve the appearance of message and prompt input fields**
 
 #### Chat
 - **Improve PDF file processing**

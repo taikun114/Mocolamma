@@ -7,6 +7,7 @@ struct MessageInputView: View {
     @Environment(CommandExecutor.self) var executor
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var isInputFocused: Bool
+    @State private var attachmentButtonDiameter: CGFloat?
     @Binding var inputText: String
     @Binding var selectedImages: [ChatInputImage]
     @Binding var selectedAttachments: [ChatInputAttachment]
@@ -15,6 +16,7 @@ struct MessageInputView: View {
     var attachmentOnly = false
     var imagesOnly = false
     var allowsAttachments = true
+    private let usesChatInputAppearance: Bool
     var placeholder: String = "Type your message..."
     var selectedModel: OllamaModel?
     var sendMessage: () -> Void
@@ -30,6 +32,7 @@ struct MessageInputView: View {
         isStreaming: Binding<Bool>,
         showingInspector: Binding<Bool>,
         allowsAttachments: Bool = true,
+        usesChatInputAppearance: Bool = false,
         placeholder: String = "Type your message...",
         selectedModel: OllamaModel?,
         sendMessage: @escaping () -> Void,
@@ -39,6 +42,7 @@ struct MessageInputView: View {
         self.attachmentOnly = attachmentOnly
         self.imagesOnly = imagesOnly
         self.allowsAttachments = allowsAttachments
+        self.usesChatInputAppearance = usesChatInputAppearance
         self._inputText = inputText
         self._selectedImages = selectedImages
         self._selectedAttachments = selectedAttachments
@@ -77,6 +81,17 @@ struct MessageInputView: View {
             text: inputText, imageCount: selectedImages.count, attachments: selectedAttachments,
             supportsVision: model.supportsVision, supportsAudio: model.supportsAudio
         )
+    }
+
+    private var inputShape: RoundedRectangle {
+        .rect(cornerRadius: usesChatInputAppearance ? (attachmentButtonDiameter ?? 32) / 2 : 24)
+    }
+
+    private var showsInputBorder: Bool {
+        if #available(macOS 26, iOS 26, visionOS 26, *), usesChatInputAppearance {
+            return false
+        }
+        return true
     }
     
     private var attachmentPreviewHorizontalPadding: CGFloat {
@@ -260,6 +275,13 @@ struct MessageInputView: View {
 #else
                     .buttonStyle(.plain)
 #endif
+                    .onGeometryChange(for: CGFloat.self) { geometry in
+                        min(geometry.size.width, geometry.size.height)
+                    } action: { diameter in
+                        if usesChatInputAppearance, diameter > 0 {
+                            attachmentButtonDiameter = diameter
+                        }
+                    }
                     .disabled(!canAttach)
                     .attachFileConfirmationDialog(
                         isPresented: $showingAttachSheet,
@@ -276,21 +298,21 @@ struct MessageInputView: View {
                     if #available(iOS 26, visionOS 26.0, *) {
                         Color.clear
 #if !os(visionOS)
-                            .glassEffect(in: .rect(cornerRadius: 24.0))
+                            .glassEffect(in: inputShape)
 #endif
                     } else {
                         VisualEffectView(material: .systemThinMaterial)
-                            .cornerRadius(24)
+                            .clipShape(inputShape)
                     }
 #else
                     if #available(macOS 26, *) {
                         Color.clear
 #if !os(visionOS)
-                            .glassEffect(in: .rect(cornerRadius: 24.0))
+                            .glassEffect(in: inputShape)
 #endif
                     } else {
                         VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                            .cornerRadius(24)
+                            .clipShape(inputShape)
                     }
 #endif
                     TextField(LocalizedStringKey(placeholder), text: $inputText, axis: .vertical)
@@ -307,6 +329,7 @@ struct MessageInputView: View {
                         .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
+                        .frame(minHeight: attachmentButtonDiameter)
                         .onSubmit { // macOSでの変換確定とEnterキー押下の処理を分離
 #if os(macOS)
                             if !isStreaming {
@@ -339,7 +362,7 @@ struct MessageInputView: View {
 #endif
                         }
                 }
-                .contentShape(.rect(cornerRadius: 24))
+                .contentShape(inputShape)
                 .onTapGesture {
                     if selectedModel != nil {
                         isInputFocused = true
@@ -347,13 +370,15 @@ struct MessageInputView: View {
                 }
 #if os(visionOS)
                 .hoverEffect()
-                .background(.regularMaterial, in: .rect(cornerRadius: 24))
+                .background(.regularMaterial, in: inputShape)
 #endif
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
+                .if(showsInputBorder) { input in
+                    input
+                        .clipShape(inputShape)
+                        .overlay {
+                            inputShape.stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        }
+                }
                 .fixedSize(horizontal: false, vertical: true)
                 
 #if !os(macOS)

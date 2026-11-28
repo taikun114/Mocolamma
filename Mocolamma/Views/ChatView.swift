@@ -105,6 +105,7 @@ struct ChatView: View {
             selectedAttachments: $executor.chatInputAttachments,
             isStreaming: $executor.isChatStreaming,
             showingInspector: $showingInspector,
+            usesChatInputAppearance: true,
             placeholder: "Type your message...",
             selectedModel: currentSelectedModel
         ) {
