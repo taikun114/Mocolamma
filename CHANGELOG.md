@@ -102,6 +102,7 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve the appearance of message and prompt input fields**
 
 #### Chat
+- **Fix issue where spacing below the thinking section could vary**
 - **Improve PDF file processing**
   - When sending PDF files to models that support image input, the corresponding image number is now included for each page. This helps models associate images with the correct PDF pages and distinguish them from separately attached images.
 

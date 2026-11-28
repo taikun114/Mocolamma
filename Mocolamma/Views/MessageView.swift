@@ -1516,7 +1516,7 @@ struct MessageView: View {
                 }
             }
         } else if !(message.thinking ?? "").isEmpty {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 8) {
                 MessageThinkingSectionView(
                     thinking: message.thinking ?? "",
                     isStreaming: message.isStreaming,
