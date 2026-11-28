@@ -322,8 +322,8 @@ struct MessageInputView: View {
                         .hoverEffectDisabled()
 #endif
                         .disabled(selectedModel == nil)
-                        .onChange(of: selectedModel) { _, model in
-                            if model != nil { isInputFocused = true }
+                        .onChange(of: selectedModel?.id) { _, modelID in
+                            if modelID != nil { isInputFocused = true }
                         }
                         .lineLimit(1...10)
                         .fixedSize(horizontal: false, vertical: true) // 高さをコンテンツに合わせる

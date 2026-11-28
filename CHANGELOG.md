@@ -93,7 +93,8 @@ In version 1.2.2 or earlier, it was listed as follows:
 - **Improve tag order**
   - Tags are now displayed in the order of main generation features → additional capabilities → supported inputs. In this version, the order is Text Generation, Image Generation, Speech Generation, Embedding, Decision, Thinking, Tool Calling, Image Input, and Audio Input.
 
-#### Chat and Image Generation
+#### Chat / Image Generation / Speech Generation
+- **Fix issue where the input field could regain focus without switching models**
 - **Improve the send button to remain disabled for 1 second after sending a message**
   - This prevents accidental cancellation immediately after sending, such as when double-clicking or double-tapping the send button.
 - **Improve attachment display on macOS**
