@@ -380,6 +380,7 @@ struct MessageInputView: View {
                         }
                 }
                 .fixedSize(horizontal: false, vertical: true)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.1), value: inputText)
                 
 #if !os(macOS)
                 if #available(iOS 26, visionOS 26.0, *) {
